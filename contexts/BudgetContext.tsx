@@ -1,65 +1,45 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { Budget } from '../types';
-import { MOCK_BUDGETS } from '../data/mockData';
+import {
+  useBudgetsQuery,
+  useCreateBudget,
+  useUpdateBudget,
+  useDeleteBudget,
+} from '../hooks/queries/useBudgets';
+import { BudgetRepository } from '../repositories';
+import { useDb } from '../providers/DatabaseProvider';
 
 interface BudgetContextType {
-  // 상태
   budgets: Budget[];
-
-  // Budget CRUD
   addBudget: (budget: Omit<Budget, 'id'>) => void;
   updateBudget: (budget: Budget) => void;
   deleteBudget: (budgetId: string) => void;
   deleteBudgetsByTripId: (tripId: string) => void;
-
-  // 헬퍼 함수
   getBudgetsByTripId: (tripId: string) => Budget[];
 }
 
-const BudgetContext = createContext<BudgetContextType | null>(null);
-
 export function BudgetProvider({ children }: { children: ReactNode }) {
-  const [budgets, setBudgets] = useState<Budget[]>(MOCK_BUDGETS);
+  return <>{children}</>;
+}
 
-  // Budget CRUD
-  const addBudget = (budget: Omit<Budget, 'id'>) => {
-    const newBudget = { ...budget, id: Date.now().toString() };
-    setBudgets([newBudget, ...budgets]);
-  };
+export function useBudgets(): BudgetContextType {
+  const db = useDb();
+  const { data: budgets = [] } = useBudgetsQuery();
+  const createBudget = useCreateBudget();
+  const updateBudgetMut = useUpdateBudget();
+  const deleteBudgetMut = useDeleteBudget();
 
-  const updateBudget = (budget: Budget) => {
-    setBudgets(budgets.map((b) => (b.id === budget.id ? budget : b)));
-  };
-
-  const deleteBudget = (budgetId: string) => {
-    setBudgets(budgets.filter((b) => b.id !== budgetId));
-  };
-
-  const deleteBudgetsByTripId = (tripId: string) => {
-    setBudgets(budgets.filter((b) => b.tripId !== tripId));
-  };
-
-  // 헬퍼 함수
-  const getBudgetsByTripId = (tripId: string) => budgets.filter((b) => b.tripId === tripId);
-
-  const value: BudgetContextType = {
+  return {
     budgets,
-    addBudget,
-    updateBudget,
-    deleteBudget,
-    deleteBudgetsByTripId,
-    getBudgetsByTripId,
+    addBudget: (budget) => createBudget.mutate(budget),
+    updateBudget: (budget) => updateBudgetMut.mutate(budget),
+    deleteBudget: (budgetId) => {
+      const budget = budgets.find((b) => b.id === budgetId);
+      if (budget) deleteBudgetMut.mutate({ id: budgetId, tripId: budget.tripId });
+    },
+    deleteBudgetsByTripId: (tripId) => {
+      new BudgetRepository(db).deleteByTripId(tripId);
+    },
+    getBudgetsByTripId: (tripId) => budgets.filter((b) => b.tripId === tripId),
   };
-
-  return <BudgetContext.Provider value={value}>{children}</BudgetContext.Provider>;
 }
-
-export function useBudgets() {
-  const context = useContext(BudgetContext);
-  if (!context) {
-    throw new Error('useBudgets must be used within a BudgetProvider');
-  }
-  return context;
-}
-
-export default BudgetContext;

@@ -7,8 +7,9 @@ import { useAuth } from '../contexts';
 // 원본 LoadingScreen.tsx 변환
 export default function LoadingScreen() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const [progress, setProgress] = useState(0);
+  const [animDone, setAnimDone] = useState(false);
 
   useEffect(() => {
     // 로딩 애니메이션 시뮬레이션
@@ -16,14 +17,7 @@ export default function LoadingScreen() {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          // 로딩 완료 후 로그인 또는 메인 화면으로 이동
-          setTimeout(() => {
-            if (isAuthenticated) {
-              router.replace('/(main)/trips');
-            } else {
-              router.replace('/(auth)/login');
-            }
-          }, 500);
+          setAnimDone(true);
           return 100;
         }
         return prev + 10;
@@ -31,7 +25,16 @@ export default function LoadingScreen() {
     }, 200);
 
     return () => clearInterval(interval);
-  }, [isAuthenticated, router]);
+  }, []);
+
+  // 애니메이션과 토큰 복원이 모두 완료된 후 라우팅
+  useEffect(() => {
+    if (!animDone || isLoading) return;
+    const timer = setTimeout(() => {
+      router.replace(isAuthenticated ? '/(main)/trips' : '/(auth)/login');
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [animDone, isLoading, isAuthenticated, router]);
 
   return (
     <YStack

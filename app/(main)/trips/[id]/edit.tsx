@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ScrollView, Alert, Pressable, Platform } from 'react-native';
-import { YStack, XStack, Text, Button, Input, Image } from 'tamagui';
-import { ArrowLeft, X, Image as ImageIcon } from '@tamagui/lucide-icons';
-import { useTrips } from '../../../../contexts';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { ArrowLeft, Image as ImageIcon, X } from '@tamagui/lucide-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Alert, Platform, Pressable, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Button, Image, Input, Text, XStack, YStack } from 'tamagui';
+import { useTrips } from '../../../../contexts';
 
 export default function EditTripScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -19,7 +19,7 @@ export default function EditTripScreen() {
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [coverImage, setCoverImage] = useState('');
+  const [imageUrl, setCoverImage] = useState('');
   const [countries, setCountries] = useState<string[]>([]);
   const [newCountry, setNewCountry] = useState('');
   const [status, setStatus] = useState<'ongoing' | 'completed'>('ongoing');
@@ -32,9 +32,8 @@ export default function EditTripScreen() {
       setTitle(trip.title);
       setStartDate(trip.startDate);
       setEndDate(trip.endDate);
-      setCoverImage(trip.coverImage);
+      setCoverImage(trip.imageUrl);
       setCountries(trip.countries);
-      setStatus(trip.status);
     }
   }, [trip]);
 
@@ -76,9 +75,8 @@ export default function EditTripScreen() {
       title: title.trim(),
       startDate,
       endDate,
-      coverImage: coverImage.trim() || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800',
-      countries,
-      status,
+      imageUrl: imageUrl.trim() || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800',
+      countries      
     });
 
     router.back();
@@ -346,12 +344,12 @@ export default function EditTripScreen() {
               borderColor="$border"
               borderRadius="$4"
               overflow="hidden"
-              minHeight={coverImage ? undefined : 192}
+              minHeight={imageUrl ? undefined : 192}
             >
-              {coverImage ? (
+              {imageUrl ? (
                 <YStack position="relative" aspectRatio={16 / 9}>
                   <Image
-                    source={{ uri: coverImage }}
+                    source={{ uri: imageUrl }}
                     width="100%"
                     height="100%"
                     resizeMode="cover"

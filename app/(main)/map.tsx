@@ -1,12 +1,12 @@
-import { useState, useMemo } from 'react';
+import { BookOpen, Calendar, MapPin, X } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
-import { ScrollView, Pressable, Modal } from 'react-native';
-import { YStack, XStack, Text, Button, Image } from 'tamagui';
-import { X, Calendar, MapPin, BookOpen } from '@tamagui/lucide-icons';
-import { useTrips } from '../../contexts/TripContext';
+import { useMemo, useState } from 'react';
+import { Modal, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Diary } from '../../types';
+import { Button, Image, Text, XStack, YStack } from 'tamagui';
 import { useDiaries } from '../../contexts';
+import { useTrips } from '../../contexts/TripContext';
+import { Diary } from '../../types';
 
 export default function MapViewScreen() {
   const router = useRouter();

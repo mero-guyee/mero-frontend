@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { Compass, Mail } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
-import { YStack, XStack, Text, Input, Button, Separator } from 'tamagui';
-import { Mail, Compass } from '@tamagui/lucide-icons';
+import { useState } from 'react';
+import { Alert } from 'react-native';
+import { Button, Input, Separator, Text, XStack, YStack } from 'tamagui';
+import { authApi } from '../../api';
 import { useAuth } from '../../contexts';
 
 // 원본 LoginScreen.tsx 변환
@@ -10,17 +12,26 @@ export default function LoginScreen() {
   const { setIsAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleEmailLogin = () => {
-    // Mock login - just proceed
-    setIsAuthenticated(true);
-    router.replace('/(main)/trips');
+  const handleEmailLogin = async () => {
+    setLoading(true);
+    try {
+      await authApi.login({ email, password });
+      setIsAuthenticated(true);
+      
+      Alert.alert('로그인 성공');
+      router.push('/(main)/map')
+    } catch (e: any) {
+      Alert.alert('로그인 실패', e?.message ?? '이메일 또는 비밀번호를 확인해주세요.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleAppleLogin = () => {
-    // Mock Apple login - just proceed
-    setIsAuthenticated(true);
-    router.replace('/(main)/trips');
+    // Apple 로그인 미구현
+    Alert.alert('알림', 'Apple 로그인은 준비 중입니다.');
   };
 
   const handleSignUpClick = () => {
@@ -138,9 +149,11 @@ export default function LoginScreen() {
             borderRadius="$4"
             pressStyle={{ backgroundColor: '$accentHover' }}
             onPress={handleEmailLogin}
+            disabled={loading}
+            opacity={loading ? 0.6 : 1}
           >
             <Text color="$foreground" fontWeight="600" fontSize={16}>
-              로그인
+              {loading ? '로그인 중...' : '로그인'}
             </Text>
           </Button>
 

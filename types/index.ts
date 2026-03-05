@@ -1,43 +1,61 @@
-// 원본 App.tsx에서 추출한 타입 정의
+// Local domain types (aligned with server API)
+
+export type FootprintLocation = {
+  placeName?: string;
+  country?: string;
+  city?: string;
+  latitude?: number;
+  longitude?: number;
+};
 
 export type Trip = {
   id: string;
+  serverId?: string;
   title: string;
-  coverImage: string;
+  imageUrl?: string;
   startDate: string;
   endDate: string;
   countries: string[];
-  status: "ongoing" | "completed";
 };
 
-export type Diary = {
+export type Footprint = {
   id: string;
+  serverId?: string;
   tripId: string;
   title: string;
-  date: string;
-  time: string;
-  location: string;
-  country: string;
   content: string;
-  photos: string[];
-  weather?: string;
-  temperature?: number;
-  tags?: string[];
+  date: string;
+  locations: FootprintLocation[];
+  photoUrls: string[];
+  weatherInfo?: string;
+};
+
+export type Memo = {
+  id: string;
+  serverId?: string;
+  tripId: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type Expense = {
   id: string;
+  serverId?: string;
   tripId: string;
-  diaryId?: string;
-  date: string;
-  category: string;
+  footprintId?: string;
+  categoryId: string;
   amount: number;
   currency: string;
-  memo: string;
+  description?: string;
+  date: string;
+  location?: string;
 };
 
-export type Category = {
+export type ExpenseCategory = {
   id: string;
+  serverId?: string;
   name: string;
   icon: string;
   color: string;
@@ -46,36 +64,28 @@ export type Category = {
 
 export type Budget = {
   id: string;
+  serverId?: string;
   tripId: string;
   currency: string;
   amount: number;
-};
-
-export type Note = {
-  id: string;
-  tripId: string;
-  title: string;
-  content: string;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
+  exchangeRate?: number;
 };
 
 export type Screen =
   | { type: "tripList" }
   | { type: "tripHome"; tripId: string }
   | { type: "tripForm"; tripId?: string }
-  | { type: "diaryList"; tripId?: string }
-  | { type: "diaryDetail"; diaryId: string }
-  | { type: "diaryForm"; diaryId?: string; tripId?: string }
+  | { type: "footprintList"; tripId?: string }
+  | { type: "footprintDetail"; footprintId: string }
+  | { type: "footprintForm"; footprintId?: string; tripId?: string }
   | {
       type: "expenseForm";
       tripId: string;
-      diaryId?: string;
+      footprintId?: string;
       date?: string;
       expenseId?: string;
     }
-  | { type: "noteForm"; tripId: string; noteId?: string }
+  | { type: "memoForm"; tripId: string; memoId?: string }
   | { type: "categoryManager" }
   | { type: "categoryForm"; categoryId?: string }
   | { type: "map" }

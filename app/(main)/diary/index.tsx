@@ -1,15 +1,15 @@
-import { useState, useMemo } from 'react';
+import { Plus, Search } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
-import { FlatList, Pressable, SectionList } from 'react-native';
-import { YStack, XStack, Text, Button, Input, Image } from 'tamagui';
-import { Search, Plus } from '@tamagui/lucide-icons';
-import { useTrips, useDiaries, useExpenses } from '../../../contexts';
+import { useMemo, useState } from 'react';
+import { Pressable, SectionList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Diary } from '../../../types';
+import { Button, Image, Input, Text, XStack, YStack } from 'tamagui';
+import { useDiaries, useExpenses, useTrips } from '../../../contexts';
+import { Memo } from '../../../types';
 
-interface DiarySection {
+interface MemoSection {
   title: string;
-  data: Diary[];
+  data: Memo[];
 }
 
 export default function DiaryListScreen() {
@@ -48,7 +48,7 @@ export default function DiaryListScreen() {
       }
       acc[monthKey].push(diary);
       return acc;
-    }, {} as Record<string, Diary[]>);
+    }, {} as Record<string, Memo[]>);
 
     return Object.entries(grouped).map(([title, data]) => ({
       title,
@@ -120,7 +120,7 @@ export default function DiaryListScreen() {
     );
   };
 
-  const renderSectionHeader = ({ section }: { section: DiarySection }) => (
+  const renderSectionHeader = ({ section }: { section: MemoSection }) => (
     <YStack
       backgroundColor="$card"
       paddingHorizontal="$5"

@@ -1,99 +1,68 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { Expense, Category } from '../types';
-import { MOCK_EXPENSES, MOCK_CATEGORIES } from '../data/mockData';
+import {
+  useExpensesQuery,
+  useCategoriesQuery,
+  useCreateExpense,
+  useUpdateExpense,
+  useDeleteExpense,
+  useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+} from '../hooks/queries/useExpenses';
+import { ExpenseRepository } from '../repositories';
+import { useDb } from '../providers/DatabaseProvider';
 
 interface ExpenseContextType {
-  // 상태
   expenses: Expense[];
   categories: Category[];
-
-  // Expense CRUD
   addExpense: (expense: Omit<Expense, 'id'>) => void;
   updateExpense: (expense: Expense) => void;
   deleteExpense: (expenseId: string) => void;
   deleteExpensesByDiaryId: (diaryId: string) => void;
   deleteExpensesByTripId: (tripId: string) => void;
-
-  // Category CRUD
   addCategory: (category: Omit<Category, 'id'>) => void;
   updateCategory: (category: Category) => void;
   deleteCategory: (categoryId: string) => void;
-
-  // 헬퍼 함수
   getExpensesByTripId: (tripId: string) => Expense[];
   getExpensesByDiaryId: (diaryId: string) => Expense[];
 }
 
-const ExpenseContext = createContext<ExpenseContextType | null>(null);
-
 export function ExpenseProvider({ children }: { children: ReactNode }) {
-  const [expenses, setExpenses] = useState<Expense[]>(MOCK_EXPENSES);
-  const [categories, setCategories] = useState<Category[]>(MOCK_CATEGORIES);
+  return <>{children}</>;
+}
 
-  // Expense CRUD
-  const addExpense = (expense: Omit<Expense, 'id'>) => {
-    const newExpense = { ...expense, id: Date.now().toString() };
-    setExpenses([newExpense, ...expenses]);
-  };
+export function useExpenses(): ExpenseContextType {
+  const db = useDb();
+  const { data: expenses = [] } = useExpensesQuery();
+  const { data: categories = [] } = useCategoriesQuery();
 
-  const updateExpense = (expense: Expense) => {
-    setExpenses(expenses.map((e) => (e.id === expense.id ? expense : e)));
-  };
+  const createExpense = useCreateExpense();
+  const updateExpenseMut = useUpdateExpense();
+  const deleteExpenseMut = useDeleteExpense();
+  const createCategory = useCreateCategory();
+  const updateCategoryMut = useUpdateCategory();
+  const deleteCategoryMut = useDeleteCategory();
 
-  const deleteExpense = (expenseId: string) => {
-    setExpenses(expenses.filter((e) => e.id !== expenseId));
-  };
-
-  const deleteExpensesByDiaryId = (diaryId: string) => {
-    setExpenses(expenses.filter((e) => e.diaryId !== diaryId));
-  };
-
-  const deleteExpensesByTripId = (tripId: string) => {
-    setExpenses(expenses.filter((e) => e.tripId !== tripId));
-  };
-
-  // Category CRUD
-  const addCategory = (category: Omit<Category, 'id'>) => {
-    const newCategory = { ...category, id: Date.now().toString() };
-    setCategories([newCategory, ...categories]);
-  };
-
-  const updateCategory = (category: Category) => {
-    setCategories(categories.map((c) => (c.id === category.id ? category : c)));
-  };
-
-  const deleteCategory = (categoryId: string) => {
-    setCategories(categories.filter((c) => c.id !== categoryId));
-  };
-
-  // 헬퍼 함수
-  const getExpensesByTripId = (tripId: string) => expenses.filter((e) => e.tripId === tripId);
-  const getExpensesByDiaryId = (diaryId: string) => expenses.filter((e) => e.diaryId === diaryId);
-
-  const value: ExpenseContextType = {
+  return {
     expenses,
     categories,
-    addExpense,
-    updateExpense,
-    deleteExpense,
-    deleteExpensesByDiaryId,
-    deleteExpensesByTripId,
-    addCategory,
-    updateCategory,
-    deleteCategory,
-    getExpensesByTripId,
-    getExpensesByDiaryId,
+    addExpense: (expense) => createExpense.mutate(expense),
+    updateExpense: (expense) => updateExpenseMut.mutate(expense),
+    deleteExpense: (expenseId) => {
+      const expense = expenses.find((e) => e.id === expenseId);
+      if (expense) deleteExpenseMut.mutate({ id: expenseId, tripId: expense.tripId });
+    },
+    deleteExpensesByDiaryId: (diaryId) => {
+      new ExpenseRepository(db).deleteByDiaryId(diaryId);
+    },
+    deleteExpensesByTripId: (tripId) => {
+      new ExpenseRepository(db).deleteByTripId(tripId);
+    },
+    addCategory: (category) => createCategory.mutate(category),
+    updateCategory: (category) => updateCategoryMut.mutate(category),
+    deleteCategory: (categoryId) => deleteCategoryMut.mutate(categoryId),
+    getExpensesByTripId: (tripId) => expenses.filter((e) => e.tripId === tripId),
+    getExpensesByDiaryId: (diaryId) => expenses.filter((e) => e.diaryId === diaryId),
   };
-
-  return <ExpenseContext.Provider value={value}>{children}</ExpenseContext.Provider>;
 }
-
-export function useExpenses() {
-  const context = useContext(ExpenseContext);
-  if (!context) {
-    throw new Error('useExpenses must be used within an ExpenseProvider');
-  }
-  return context;
-}
-
-export default ExpenseContext;

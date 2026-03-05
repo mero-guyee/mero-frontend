@@ -1,24 +1,24 @@
-import { useState } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ScrollView, Alert, Pressable } from 'react-native';
-import { YStack, XStack, Text, Button, Image } from 'tamagui';
 import {
   ArrowLeft,
-  MapPin,
-  Calendar,
-  FileText,
-  Pencil,
   BookOpen,
-  File,
+  Calendar,
   Download,
+  File,
+  FileText,
+  MapPin,
+  MoreVertical,
+  Pencil,
+  Trash2,
   Upload,
   X,
-  MoreVertical,
-  Trash2,
 } from '@tamagui/lucide-icons';
-import { useTrips, useDiaries, useExpenses } from '../../../../contexts';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as DocumentPicker from 'expo-document-picker';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Alert, Pressable, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Button, Image, Text, XStack, YStack } from 'tamagui';
+import { useDiaries, useExpenses, useTrips } from '../../../../contexts';
 
 type SubTab = 'notes' | 'files';
 
@@ -213,7 +213,7 @@ export default function TripHomeScreen() {
         {/* Cover Image */}
         <YStack height={192} position="relative" overflow="hidden">
           <Image
-            source={{ uri: trip.coverImage }}
+            source={{ uri: trip.imageUrl }}
             width="100%"
             height="100%"
             resizeMode="cover"

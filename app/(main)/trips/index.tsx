@@ -1,10 +1,10 @@
+import { Backpack, MapPin, Plus, Settings } from '@tamagui/lucide-icons';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Pressable } from 'react-native';
-import { useRouter } from 'expo-router';
-import { YStack, XStack, Text, Button, Image } from 'tamagui';
-import { Plus, MapPin, Settings, Backpack } from '@tamagui/lucide-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTrips, useDiaries, useExpenses } from '../../../contexts';
+import { Button, Image, Text, XStack, YStack } from 'tamagui';
+import { useDiaries, useExpenses, useTrips } from '../../../contexts';
 import { Trip } from '../../../types';
 
 // 원본 TripList.tsx 변환
@@ -19,7 +19,7 @@ export default function TripListScreen() {
   const [sort, setSort] = useState<'newest' | 'oldest'>('newest');
 
   const filteredTrips = trips
-    .filter((trip) => filter === 'all' || trip.status === filter)
+    .filter((trip) => filter === 'all')
     .sort((a, b) => {
       if (sort === 'newest') {
         return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
@@ -87,7 +87,7 @@ export default function TripListScreen() {
           {/* Cover Image */}
           <YStack height={180} overflow="hidden">
             <Image
-              source={{ uri: trip.coverImage }}
+              source={{ uri: trip.imageUrl }}
               width="100%"
               height="100%"
               resizeMode="cover"
@@ -110,7 +110,7 @@ export default function TripListScreen() {
               {trip.title}
             </Text>
 
-            {trip.status === 'ongoing' && (
+            {trip.startDate < trip.endDate && (
               <YStack backgroundColor="$muted" borderRadius="$4" padding="$3">
                 <XStack justifyContent="space-between" marginBottom="$2">
                   <Text color="$mutedForeground" fontSize={14}>
@@ -216,7 +216,7 @@ export default function TripListScreen() {
             </YStack>
             <YStack>
               <Text fontSize={18} fontWeight="600" color="$foreground">
-                현재씨의 기록
+                {}씨의 기록
               </Text>
               <Text fontSize={14} color="$mutedForeground">
                 세계는 넓고 갈 곳은 많습니다
