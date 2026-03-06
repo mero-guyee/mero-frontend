@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useDb } from '../../providers/DatabaseProvider';
-import { NoteRepository, TripRepository } from '../../repositories';
-import { Note, Trip } from '../../types';
+import { MemoRepository, TripRepository } from '../../repositories';
+import { Memo, Trip } from '../../types';
 
 export const tripKeys = {
   all: ['trips'] as const,
   detail: (id: string) => ['trips', id] as const,
-  notes: (tripId: string) => ['trips', tripId, 'notes'] as const,
+  memos: (tripId: string) => ['trips', tripId, 'memos'] as const,
 };
 
 export function useTripsQuery() {
@@ -26,20 +26,20 @@ export function useTripQuery(id: string) {
   });
 }
 
-export function useNotesQuery(tripId: string) {
+export function useMemosQuery(tripId: string) {
   const db = useDb();
   return useQuery({
-    queryKey: tripKeys.notes(tripId),
-    queryFn: () => new NoteRepository(db).getNotesByTripId(tripId),
+    queryKey: tripKeys.memos(tripId),
+    queryFn: () => new MemoRepository(db).getMemosByTripId(tripId),
     enabled: !!tripId,
   });
 }
 
-export function useAllNotesQuery() {
+export function useAllMemosQuery() {
   const db = useDb();
   return useQuery({
-    queryKey: ['notes', 'all'],
-    queryFn: () => new NoteRepository(db).getAllNotes(),
+    queryKey: ['memos', 'all'],
+    queryFn: () => new MemoRepository(db).getAllMemos(),
   });
 }
 
@@ -70,41 +70,41 @@ export function useDeleteTrip() {
   return useMutation({
     mutationFn: async (tripId: string) => {
       const repo = new TripRepository(db);
-      const noteRepo = new NoteRepository(db);
+      const memoRepo = new MemoRepository(db);
       await repo.deleteTrip(tripId);
-      await noteRepo.deleteByTripId(tripId);
+      await memoRepo.deleteByTripId(tripId);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: tripKeys.all }),
   });
 }
 
-export function useCreateNote() {
+export function useCreateMemo() {
   const db = useDb();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) =>
-      new NoteRepository(db).createNote(data),
-    onSuccess: (note) => qc.invalidateQueries({ queryKey: tripKeys.notes(note.tripId) }),
+    mutationFn: (data: Omit<Memo, 'id' | 'createdAt' | 'updatedAt'>) =>
+      new MemoRepository(db).createMemo(data),
+    onSuccess: (memo) => qc.invalidateQueries({ queryKey: tripKeys.memos(memo.tripId) }),
   });
 }
 
-export function useUpdateNote() {
+export function useUpdateMemo() {
   const db = useDb();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (note: Note) => new NoteRepository(db).updateNote(note),
-    onSuccess: (_, note) => qc.invalidateQueries({ queryKey: tripKeys.notes(note.tripId) }),
+    mutationFn: (memo: Memo) => new MemoRepository(db).updateMemo(memo),
+    onSuccess: (_, memo) => qc.invalidateQueries({ queryKey: tripKeys.memos(memo.tripId) }),
   });
 }
 
-export function useDeleteNote() {
+export function useDeleteMemo() {
   const db = useDb();
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, tripId }: { id: string; tripId: string }) => {
-      await new NoteRepository(db).deleteNote(id);
+      await new MemoRepository(db).deleteMemo(id);
       return tripId;
     },
-    onSuccess: (tripId) => qc.invalidateQueries({ queryKey: tripKeys.notes(tripId) }),
+    onSuccess: (tripId) => qc.invalidateQueries({ queryKey: tripKeys.memos(tripId) }),
   });
 }

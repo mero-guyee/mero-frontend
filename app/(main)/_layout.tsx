@@ -30,7 +30,7 @@ export default function MainLayout() {
         }}
       />
       <Tabs.Screen
-        name="diary"
+        name="footprint"
         options={{
           tabBarLabel: '일지',
           tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} />,

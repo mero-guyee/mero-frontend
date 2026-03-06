@@ -20,7 +20,7 @@ export interface LocationResponse {
 }
 
 export interface FootprintCreateRequest {
-  clientId: string; // local UUID (diaryId)
+  clientId: string; // local UUID (footprintId)
   title?: string;
   content?: string;
   date: string; // YYYY-MM-DD

@@ -19,7 +19,7 @@ export default function EditTripScreen() {
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [imageUrl, setCoverImage] = useState('');
+  const [imageUrl, setCoverImage] = useState<string|undefined>('');
   const [countries, setCountries] = useState<string[]>([]);
   const [newCountry, setNewCountry] = useState('');
   const [status, setStatus] = useState<'ongoing' | 'completed'>('ongoing');
@@ -75,7 +75,7 @@ export default function EditTripScreen() {
       title: title.trim(),
       startDate,
       endDate,
-      imageUrl: imageUrl.trim() || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800',
+      imageUrl: imageUrl?.trim() || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800',
       countries      
     });
 

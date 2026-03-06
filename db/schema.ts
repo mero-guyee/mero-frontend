@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 6;
 
 export const DROP_TABLES = `
   DROP TABLE IF EXISTS memos;
@@ -77,8 +77,11 @@ export const CREATE_TABLES = `
     tripId        TEXT NOT NULL,
     footprintId   TEXT,
     categoryId    TEXT NOT NULL,
+    categoryName  TEXT,
+    categoryIcon  TEXT,
+    categoryColor TEXT,
     amount        REAL NOT NULL,
-    currency      TEXT NOT NULL,
+    currency      TEXT NOT NULL DEFAULT 'KRW',
     description   TEXT,
     date          TEXT NOT NULL,
     location      TEXT,
@@ -105,10 +108,10 @@ export const CREATE_TABLES = `
     FOREIGN KEY (tripId) REFERENCES trips(id)
   );
 
-  CREATE INDEX IF NOT EXISTS idx_footprints_tripId  ON footprints(tripId);
-  CREATE INDEX IF NOT EXISTS idx_footprints_date    ON footprints(date);
-  CREATE INDEX IF NOT EXISTS idx_memos_tripId       ON memos(tripId);
-  CREATE INDEX IF NOT EXISTS idx_expenses_tripId    ON expenses(tripId);
+  CREATE INDEX IF NOT EXISTS idx_footprints_tripId    ON footprints(tripId);
+  CREATE INDEX IF NOT EXISTS idx_footprints_date      ON footprints(date);
+  CREATE INDEX IF NOT EXISTS idx_memos_tripId         ON memos(tripId);
+  CREATE INDEX IF NOT EXISTS idx_expenses_tripId      ON expenses(tripId);
   CREATE INDEX IF NOT EXISTS idx_expenses_footprintId ON expenses(footprintId);
-  CREATE INDEX IF NOT EXISTS idx_budgets_tripId     ON budgets(tripId);
+  CREATE INDEX IF NOT EXISTS idx_budgets_tripId       ON budgets(tripId);
 `;

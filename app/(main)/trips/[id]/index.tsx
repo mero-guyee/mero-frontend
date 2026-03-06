@@ -18,9 +18,9 @@ import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Image, Text, XStack, YStack } from 'tamagui';
-import { useDiaries, useExpenses, useTrips } from '../../../../contexts';
+import { useFootprints, useExpenses, useTrips } from '../../../../contexts';
 
-type SubTab = 'notes' | 'files';
+type SubTab = 'memos' | 'files';
 
 interface SelectedFile {
   name: string;
@@ -32,18 +32,18 @@ export default function TripHomeScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { getTripById, getNotesByTripId, deleteTrip, deleteNote } = useTrips();
-  const { getDiariesByTripId } = useDiaries();
+  const { getTripById, getMemosByTripId, deleteTrip, deleteMemo } = useTrips();
+  const { getFootprintsByTripId } = useFootprints();
   const { getExpensesByTripId } = useExpenses();
 
   const trip = getTripById(id || '');
-  const diaries = getDiariesByTripId(id || '');
+  const footprints = getFootprintsByTripId(id || '');
   const expenses = getExpensesByTripId(id || '');
-  const notes = getNotesByTripId(id || '');
+  const memos = getMemosByTripId(id || '');
 
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const [showMenu, setShowMenu] = useState(false);
-  const [subTab, setSubTab] = useState<SubTab>('notes');
+  const [subTab, setSubTab] = useState<SubTab>('memos');
 
   if (!trip) {
     return (
@@ -87,20 +87,20 @@ export default function TripHomeScreen() {
     });
   };
 
-  const handleEditNote = (noteId: string) => {
+  const handleEditNote = (memoId: string) => {
     router.push({
       pathname: '/trips/note-form',
-      params: { tripId: id, noteId },
+      params: { tripId: id, memoId },
     });
   };
 
-  const handleDeleteNote = (noteId: string) => {
+  const handleDeleteNote = (memoId: string) => {
     Alert.alert('메모 삭제', '이 메모를 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
       {
         text: '삭제',
         style: 'destructive',
-        onPress: () => deleteNote(noteId),
+        onPress: () => deleteMemo(memoId),
       },
     ]);
   };
@@ -257,12 +257,12 @@ export default function TripHomeScreen() {
               flex={1}
               height={40}
               borderRadius="$3"
-              backgroundColor={subTab === 'notes' ? '$accent' : 'transparent'}
-              pressStyle={{ backgroundColor: subTab === 'notes' ? '$accent' : '$muted' }}
-              onPress={() => setSubTab('notes')}
+              backgroundColor={subTab === 'memos' ? '$accent' : 'transparent'}
+              pressStyle={{ backgroundColor: subTab === 'memos' ? '$accent' : '$muted' }}
+              onPress={() => setSubTab('memos')}
             >
               <Text
-                color={subTab === 'notes' ? '$foreground' : '$mutedForeground'}
+                color={subTab === 'memos' ? '$foreground' : '$mutedForeground'}
                 fontSize={14}
                 fontWeight="500"
               >
@@ -290,12 +290,12 @@ export default function TripHomeScreen() {
 
         {/* Content Area */}
         <YStack padding="$5" paddingTop="$4">
-          {subTab === 'notes' ? (
+          {subTab === 'memos' ? (
             // Notes Section
             <YStack gap="$3">
               <XStack alignItems="center" justifyContent="space-between" marginBottom="$1">
                 <Text color="$foreground" fontSize={14}>
-                  {notes.length > 0 ? `총 ${notes.length}개의 메모` : '메모'}
+                  {memos.length > 0 ? `총 ${memos.length}개의 메모` : '메모'}
                 </Text>
                 <Pressable onPress={handleCreateNote}>
                   <Text color="$primary" fontSize={14}>
@@ -304,7 +304,7 @@ export default function TripHomeScreen() {
                 </Pressable>
               </XStack>
 
-              {notes.length === 0 ? (
+              {memos.length === 0 ? (
                 <YStack
                   backgroundColor="$card"
                   borderRadius="$6"
@@ -346,7 +346,7 @@ export default function TripHomeScreen() {
                 </YStack>
               ) : (
                 <YStack gap="$2">
-                  {notes.map((note) => (
+                  {memos.map((note) => (
                     <Pressable key={note.id} onPress={() => handleEditNote(note.id)}>
                       <YStack
                         backgroundColor="$card"
@@ -502,7 +502,7 @@ export default function TripHomeScreen() {
                   borderWidth={1}
                   borderColor="$border"
                 >
-                  {diaries.length === 0 ? (
+                  {footprints.length === 0 ? (
                     <Text textAlign="center" color="$mutedForeground" paddingVertical="$4">
                       아직 저장된 파일이 없습니다
                     </Text>

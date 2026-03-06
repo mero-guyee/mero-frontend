@@ -1,7 +1,7 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Expense, Category } from '../../types';
-import { ExpenseRepository, CategoryRepository } from '../../repositories';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useDb } from '../../providers/DatabaseProvider';
+import { ExpenseCategoryRepository, ExpenseRepository } from '../../repositories';
+import { Expense, ExpenseCategory } from '../../types';
 
 export const expenseKeys = {
   all: ['expenses'] as const,
@@ -30,7 +30,7 @@ export function useCategoriesQuery() {
   const db = useDb();
   return useQuery({
     queryKey: expenseKeys.categories,
-    queryFn: () => new CategoryRepository(db).getAllCategories(),
+    queryFn: () => new ExpenseCategoryRepository(db).getAllCategories(),
   });
 }
 
@@ -38,7 +38,7 @@ export function useCreateExpense() {
   const db = useDb();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: Omit<Expense, 'id'>) => new ExpenseRepository(db).createExpense(data),
+    mutationFn: (data: Omit<Expense, 'id' | 'createdAt'>) => new ExpenseRepository(db).createExpense(data),
     onSuccess: (expense) => {
       qc.invalidateQueries({ queryKey: expenseKeys.all });
       qc.invalidateQueries({ queryKey: expenseKeys.byTrip(expense.tripId) });
@@ -77,7 +77,8 @@ export function useCreateCategory() {
   const db = useDb();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: Omit<Category, 'id'>) => new CategoryRepository(db).createCategory(data),
+    mutationFn: (data: Omit<ExpenseCategory, 'id'>) =>
+      new ExpenseCategoryRepository(db).createCategory(data),
     onSuccess: () => qc.invalidateQueries({ queryKey: expenseKeys.categories }),
   });
 }
@@ -86,7 +87,8 @@ export function useUpdateCategory() {
   const db = useDb();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (category: Category) => new CategoryRepository(db).updateCategory(category),
+    mutationFn: (category: ExpenseCategory) =>
+      new ExpenseCategoryRepository(db).updateCategory(category),
     onSuccess: () => qc.invalidateQueries({ queryKey: expenseKeys.categories }),
   });
 }
@@ -95,7 +97,7 @@ export function useDeleteCategory() {
   const db = useDb();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => new CategoryRepository(db).deleteCategory(id),
+    mutationFn: (id: string) => new ExpenseCategoryRepository(db).deleteCategory(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: expenseKeys.categories }),
   });
 }

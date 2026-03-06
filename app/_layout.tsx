@@ -5,7 +5,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
   AuthProvider,
   TripProvider,
-  DiaryProvider,
+  FootprintProvider,
   ExpenseProvider,
   BudgetProvider,
 } from '../contexts';
@@ -30,7 +30,7 @@ function AppContent() {
     <SeedDatabase>
       <AuthProvider>
         <TripProvider>
-          <DiaryProvider>
+          <FootprintProvider>
             <ExpenseProvider>
               <BudgetProvider>
                 <StatusBar style="dark" />
@@ -43,7 +43,7 @@ function AppContent() {
                 </SafeAreaView>
               </BudgetProvider>
             </ExpenseProvider>
-          </DiaryProvider>
+          </FootprintProvider>
         </TripProvider>
       </AuthProvider>
     </SeedDatabase>

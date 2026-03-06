@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { FlatList, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Image, Text, XStack, YStack } from 'tamagui';
-import { useDiaries, useExpenses, useTrips } from '../../../contexts';
+import { useFootprints, useExpenses, useTrips } from '../../../contexts';
 import { Trip } from '../../../types';
 
 // 원본 TripList.tsx 변환
@@ -12,7 +12,7 @@ export default function TripListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { trips, setActiveTrip } = useTrips();
-  const { diaries } = useDiaries();
+  const { footprints } = useFootprints();
   const { expenses } = useExpenses();
 
   const [filter, setFilter] = useState<'all' | 'ongoing' | 'completed'>('all');
@@ -29,13 +29,13 @@ export default function TripListScreen() {
     });
 
   const getTripStats = (tripId: string) => {
-    const tripDiaries = diaries.filter((d) => d.tripId === tripId);
+    const tripDiaries = footprints.filter((f) => f.tripId === tripId);
     const tripExpenses = expenses.filter((e) => e.tripId === tripId);
     const totalAmount = tripExpenses.reduce((sum, e) => sum + e.amount, 0);
     const currency = tripExpenses[0]?.currency || 'USD';
 
     return {
-      diaryCount: tripDiaries.length,
+      footprintCount: tripDiaries.length,
       totalExpense: totalAmount,
       currency,
     };

@@ -1,43 +1,43 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Trip, Note } from '../types';
+import { Trip, Memo } from '../types';
 import {
   useTripsQuery,
-  useAllNotesQuery,
+  useAllMemosQuery,
   useCreateTrip,
   useUpdateTrip,
   useDeleteTrip,
-  useCreateNote,
-  useUpdateNote,
-  useDeleteNote,
+  useCreateMemo,
+  useUpdateMemo,
+  useDeleteMemo,
 } from '../hooks/queries/useTrips';
 
 interface TripContextType {
   trips: Trip[];
-  notes: Note[];
+  memos: Memo[];
   activeTrip: string | null;
-  currentTab: 'home' | 'diary' | 'map' | 'expense';
-  setCurrentTab: (tab: 'home' | 'diary' | 'map' | 'expense') => void;
+  currentTab: 'home' | 'footprint' | 'map' | 'expense';
+  setCurrentTab: (tab: 'home' | 'footprint' | 'map' | 'expense') => void;
   setActiveTrip: (tripId: string | null) => void;
   addTrip: (trip: Omit<Trip, 'id'>) => void;
   updateTrip: (trip: Trip) => void;
   deleteTrip: (tripId: string) => void;
-  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateNote: (note: Note) => void;
-  deleteNote: (noteId: string) => void;
+  addMemo: (memo: Omit<Memo, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  updateMemo: (memo: Memo) => void;
+  deleteMemo: (memoId: string) => void;
   getTripById: (tripId: string) => Trip | undefined;
-  getNotesByTripId: (tripId: string) => Note[];
+  getMemosByTripId: (tripId: string) => Memo[];
 }
 
 const TripUIContext = createContext<{
   activeTrip: string | null;
-  currentTab: 'home' | 'diary' | 'map' | 'expense';
+  currentTab: 'home' | 'footprint' | 'map' | 'expense';
   setActiveTrip: (id: string | null) => void;
-  setCurrentTab: (tab: 'home' | 'diary' | 'map' | 'expense') => void;
+  setCurrentTab: (tab: 'home' | 'footprint' | 'map' | 'expense') => void;
 } | null>(null);
 
 export function TripProvider({ children }: { children: ReactNode }) {
   const [activeTrip, setActiveTrip] = useState<string | null>(null);
-  const [currentTab, setCurrentTab] = useState<'home' | 'diary' | 'map' | 'expense'>('home');
+  const [currentTab, setCurrentTab] = useState<'home' | 'footprint' | 'map' | 'expense'>('home');
 
   return (
     <TripUIContext.Provider value={{ activeTrip, currentTab, setActiveTrip, setCurrentTab }}>
@@ -51,18 +51,18 @@ export function useTrips(): TripContextType {
   if (!ui) throw new Error('useTrips must be used within a TripProvider');
 
   const { data: trips = [] } = useTripsQuery();
-  const { data: notes = [] } = useAllNotesQuery();
+  const { data: memos = [] } = useAllMemosQuery();
 
   const createTrip = useCreateTrip();
   const updateTripMut = useUpdateTrip();
   const deleteTripMut = useDeleteTrip();
-  const createNote = useCreateNote();
-  const updateNoteMut = useUpdateNote();
-  const deleteNoteMut = useDeleteNote();
+  const createMemo = useCreateMemo();
+  const updateMemoMut = useUpdateMemo();
+  const deleteMemoMut = useDeleteMemo();
 
   return {
     trips,
-    notes,
+    memos,
     activeTrip: ui.activeTrip,
     currentTab: ui.currentTab,
     setCurrentTab: ui.setCurrentTab,
@@ -82,14 +82,14 @@ export function useTrips(): TripContextType {
         },
       });
     },
-    addNote: (note) => createNote.mutate(note),
-    updateNote: (note) => updateNoteMut.mutate(note),
-    deleteNote: (noteId) => {
-      const note = notes.find((n) => n.id === noteId);
-      if (note) deleteNoteMut.mutate({ id: noteId, tripId: note.tripId });
+    addMemo: (memo) => createMemo.mutate(memo),
+    updateMemo: (memo) => updateMemoMut.mutate(memo),
+    deleteMemo: (memoId) => {
+      const memo = memos.find((n) => n.id === memoId);
+      if (memo) deleteMemoMut.mutate({ id: memoId, tripId: memo.tripId });
     },
     getTripById: (tripId) => trips.find((t) => t.id === tripId),
-    getNotesByTripId: (tripId) => notes.filter((n) => n.tripId === tripId),
+    getMemosByTripId: (tripId) => memos.filter((n) => n.tripId === tripId),
   };
 }
 

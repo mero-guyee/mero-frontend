@@ -4,19 +4,19 @@ import { useMemo, useState } from 'react';
 import { Pressable, SectionList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Image, Input, Text, XStack, YStack } from 'tamagui';
-import { useDiaries, useExpenses, useTrips } from '../../../contexts';
-import { Memo } from '../../../types';
+import { useExpenses, useFootprints, useTrips } from '../../../contexts';
+import { Footprint } from '../../../types';
 
-interface MemoSection {
+interface FootprintSection {
   title: string;
-  data: Memo[];
+  data: Footprint[];
 }
 
-export default function DiaryListScreen() {
+export default function FootprintListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { trips, activeTrip } = useTrips();
-  const { diaries } = useDiaries();
+  const { footprints } = useFootprints();
   const { expenses } = useExpenses();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -24,57 +24,53 @@ export default function DiaryListScreen() {
 
   const activeTripData = activeTrip ? trips.find((t) => t.id === activeTrip) : null;
 
-  const filteredDiaries = useMemo(() => {
-    return diaries
-      .filter((d) => !activeTrip || d.tripId === activeTrip)
+  const filteredFootprints = useMemo(() => {
+    return footprints
+      .filter((f) => !activeTrip || f.tripId === activeTrip)
       .filter(
-        (d) =>
+        (f) =>
           searchQuery === '' ||
-          d.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          d.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          d.location.toLowerCase().includes(searchQuery.toLowerCase())
+          f.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          f.content.toLowerCase().includes(searchQuery.toLowerCase())
       )
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  }, [diaries, activeTrip, searchQuery]);
+  }, [footprints, activeTrip, searchQuery]);
 
-  const diariesByMonth = useMemo(() => {
-    const grouped = filteredDiaries.reduce((acc, diary) => {
-      const monthKey = new Date(diary.date).toLocaleDateString('ko-KR', {
+  const footprintsByMonth = useMemo(() => {
+    const grouped = filteredFootprints.reduce((acc, footprint) => {
+      const monthKey = new Date(footprint.date).toLocaleDateString('ko-KR', {
         year: 'numeric',
         month: 'long',
       });
       if (!acc[monthKey]) {
         acc[monthKey] = [];
       }
-      acc[monthKey].push(diary);
+      acc[monthKey].push(footprint);
       return acc;
-    }, {} as Record<string, Memo[]>);
+    }, {} as Record<string, Footprint[]>);
 
-    return Object.entries(grouped).map(([title, data]) => ({
-      title,
-      data,
-    }));
-  }, [filteredDiaries]);
+    return Object.entries(grouped).map(([title, data]) => ({ title, data }));
+  }, [filteredFootprints]);
 
-  const getDiaryExpense = (diaryId: string) => {
-    const diaryExpenses = expenses.filter((e) => e.diaryId === diaryId);
-    const total = diaryExpenses.reduce((sum, e) => sum + e.amount, 0);
-    const currency = diaryExpenses[0]?.currency || 'USD';
+  const getFootprintExpense = (footprintId: string) => {
+    const footprintExpenses = expenses.filter((e) => e.footprintId === footprintId);
+    const total = footprintExpenses.reduce((sum, e) => sum + e.amount, 0);
+    const currency = footprintExpenses[0]?.currency || 'USD';
     return { total, currency };
   };
 
-  const handleCreateDiary = () => {
-    router.push('/diary/new');
+  const handleCreateFootprint = () => {
+    router.push('/(main)/footprint/new');
   };
 
-  const handleSelectDiary = (diaryId: string) => {
-    router.push(`/diary/${diaryId}`);
+  const handleSelectFootprint = (footprintId: string) => {
+    router.push(`/(main)/footprint/${footprintId}` as any);
   };
 
-  const renderDiaryItem = ({ item: diary }: { item: Diary }) => {
-    const expense = getDiaryExpense(diary.id);
+  const renderFootprintItem = ({ item: footprint }: { item: Footprint }) => {
+    const firstLocation = footprint.locations[0];
     return (
-      <Pressable onPress={() => handleSelectDiary(diary.id)}>
+      <Pressable onPress={() => handleSelectFootprint(footprint.id)}>
         <XStack
           backgroundColor="$card"
           borderRadius="$6"
@@ -91,9 +87,9 @@ export default function DiaryListScreen() {
             elevation: 2,
           }}
         >
-          {diary.photos[0] && (
+          {footprint.photoUrls[0] && (
             <Image
-              source={{ uri: diary.photos[0] }}
+              source={{ uri: footprint.photoUrls[0] }}
               width={96}
               height={96}
               borderRadius="$4"
@@ -102,17 +98,17 @@ export default function DiaryListScreen() {
           )}
           <YStack flex={1}>
             <Text color="$mutedForeground" fontSize={14}>
-              {new Date(diary.date).toLocaleDateString('ko-KR', {
+              {new Date(footprint.date).toLocaleDateString('ko-KR', {
                 month: 'long',
                 day: 'numeric',
               })}{' '}
-              · {diary.location}
+              {firstLocation ? `· ${firstLocation.placeName || firstLocation.country || ''}` : ''}
             </Text>
             <Text color="$foreground" fontWeight="500" marginTop="$1" numberOfLines={1}>
-              {diary.title}
+              {footprint.title}
             </Text>
             <Text color="$mutedForeground" fontSize={14} marginTop="$1" numberOfLines={1}>
-              {diary.content}
+              {footprint.content}
             </Text>
           </YStack>
         </XStack>
@@ -120,7 +116,7 @@ export default function DiaryListScreen() {
     );
   };
 
-  const renderSectionHeader = ({ section }: { section: MemoSection }) => (
+  const renderSectionHeader = ({ section }: { section: FootprintSection }) => (
     <YStack
       backgroundColor="$card"
       paddingHorizontal="$5"
@@ -136,8 +132,8 @@ export default function DiaryListScreen() {
   const renderEmptyList = () => (
     <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical={80} paddingHorizontal="$4">
       <Text fontSize={48} marginBottom="$4">📔</Text>
-      <Text color="$foreground" marginBottom="$1">아직 일기가 없습니다</Text>
-      <Text color="$mutedForeground">새 일기를 작성해보세요</Text>
+      <Text color="$foreground" marginBottom="$1">아직 일지가 없습니다</Text>
+      <Text color="$mutedForeground">새 일지를 작성해보세요</Text>
     </YStack>
   );
 
@@ -179,7 +175,7 @@ export default function DiaryListScreen() {
               circular
               backgroundColor="$accent"
               pressStyle={{ backgroundColor: '$accentHover' }}
-              onPress={handleCreateDiary}
+              onPress={handleCreateFootprint}
             >
               <Plus size={20} color="$foreground" />
             </Button>
@@ -196,7 +192,7 @@ export default function DiaryListScreen() {
               borderRadius="$4"
               paddingHorizontal="$4"
               paddingVertical="$2"
-              placeholder="일기 검색..."
+              placeholder="일지 검색..."
               placeholderTextColor="$mutedForeground"
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -206,18 +202,18 @@ export default function DiaryListScreen() {
         )}
       </YStack>
 
-      {/* Diary List */}
+      {/* Footprint List */}
       <SectionList
-        sections={diariesByMonth}
+        sections={footprintsByMonth}
         keyExtractor={(item) => item.id}
-        renderItem={renderDiaryItem}
+        renderItem={renderFootprintItem}
         renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={renderEmptyList}
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingTop: 16,
           paddingBottom: 100,
-          flexGrow: filteredDiaries.length === 0 ? 1 : undefined,
+          flexGrow: filteredFootprints.length === 0 ? 1 : undefined,
         }}
         stickySectionHeadersEnabled={true}
       />

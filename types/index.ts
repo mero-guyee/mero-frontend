@@ -46,11 +46,15 @@ export type Expense = {
   tripId: string;
   footprintId?: string;
   categoryId: string;
+  categoryName?: string;
+  categoryIcon?: string;
+  categoryColor?: string;
   amount: number;
   currency: string;
   description?: string;
   date: string;
   location?: string;
+  createdAt: string;
 };
 
 export type ExpenseCategory = {

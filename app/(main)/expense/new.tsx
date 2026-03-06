@@ -1,39 +1,29 @@
-import { useState } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ScrollView, Alert, Pressable, Platform } from 'react-native';
-import { YStack, XStack, Text, Button, Input } from 'tamagui';
-import { ArrowLeft } from '@tamagui/lucide-icons';
-import { useTrips, useExpenses } from '../../../contexts';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { ArrowLeft } from '@tamagui/lucide-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useState } from 'react';
+import { Alert, Platform, Pressable, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Button, Input, Text, XStack, YStack } from 'tamagui';
+import { useExpenses, useTrips } from '../../../contexts';
 
-const CATEGORIES = [
-  { value: 'food', label: '식비', icon: '🍽️' },
-  { value: 'accommodation', label: '숙박', icon: '🏨' },
-  { value: 'transport', label: '교통', icon: '🚌' },
-  { value: 'activity', label: '관광', icon: '🎭' },
-  { value: 'shopping', label: '쇼핑', icon: '🛍️' },
-  { value: 'cafe', label: '카페', icon: '☕' },
-  { value: 'bar', label: '술집', icon: '🍺' },
-  { value: 'other', label: '기타', icon: '📦' },
-];
-
-const CURRENCIES = ['USD', 'EUR', 'JPY', 'KRW', 'GBP', 'CNY', 'THB', 'VND', 'PEN', 'BRL'];
+const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY', 'GBP', 'CNY', 'THB', 'VND', 'PEN', 'BRL'];
 
 export default function ExpenseFormScreen() {
-  const { tripId, diaryId } = useLocalSearchParams<{ tripId?: string; diaryId?: string }>();
+  const { tripId, footprintId } = useLocalSearchParams<{ tripId?: string; footprintId?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { activeTrip } = useTrips();
-  const { addExpense } = useExpenses();
+  const { categories, addExpense } = useExpenses();
 
   const effectiveTripId = tripId || activeTrip || '';
 
   const [amount, setAmount] = useState('');
-  const [currency, setCurrency] = useState('USD');
-  const [category, setCategory] = useState('food');
+  const [currency, setCurrency] = useState('KRW');
+  const [categoryId, setCategoryId] = useState(categories[0]?.id || '');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [memo, setMemo] = useState('');
+  const [description, setDescription] = useState('');
+  const [location, setLocation] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleSubmit = () => {
@@ -41,28 +31,34 @@ export default function ExpenseFormScreen() {
       Alert.alert('오류', '금액을 입력해주세요.');
       return;
     }
+    if (!categoryId) {
+      Alert.alert('오류', '카테고리를 선택해주세요.');
+      return;
+    }
+
+    const selectedCategory = categories.find((c) => c.id === categoryId);
 
     addExpense({
       tripId: effectiveTripId,
-      diaryId,
+      footprintId,
       date,
-      category,
+      categoryId,
+      categoryName: selectedCategory?.name,
+      categoryIcon: selectedCategory?.icon,
+      categoryColor: selectedCategory?.color,
       amount: parseFloat(amount),
       currency,
-      memo: memo.trim(),
+      description: description.trim() || undefined,
+      location: location.trim() || undefined,
     });
 
     router.back();
   };
 
-  const formatDate = (d: Date) => {
-    return d.toISOString().split('T')[0];
-  };
-
   const handleDateChange = (event: any, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
-      setDate(formatDate(selectedDate));
+      setDate(selectedDate.toISOString().split('T')[0]);
     }
   };
 
@@ -126,9 +122,9 @@ export default function ExpenseFormScreen() {
               <Text color="$foreground">{date}</Text>
             </XStack>
           </Pressable>
-          {diaryId && (
+          {footprintId && (
             <Text color="$mutedForeground" marginTop="$1" fontSize={14}>
-              일기 날짜로 자동 설정됨
+              발자국 날짜로 자동 설정됨
             </Text>
           )}
         </YStack>
@@ -155,7 +151,7 @@ export default function ExpenseFormScreen() {
               borderRadius="$4"
               paddingHorizontal="$4"
               paddingVertical="$3"
-              placeholder="0.00"
+              placeholder="0"
               placeholderTextColor="$mutedForeground"
               value={amount}
               onChangeText={setAmount}
@@ -163,7 +159,7 @@ export default function ExpenseFormScreen() {
               color="$foreground"
             />
           </YStack>
-          <YStack width={100}>
+          <YStack width={120}>
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               통화
             </Text>
@@ -202,10 +198,42 @@ export default function ExpenseFormScreen() {
           </YStack>
         </XStack>
 
-        {/* Memo */}
+        {/* Category */}
+        <YStack marginBottom="$6">
+          <Text color="$foreground" marginBottom="$3" fontWeight="500">
+            카테고리
+          </Text>
+          <XStack flexWrap="wrap" gap="$3">
+            {categories.map((cat) => (
+              <Pressable
+                key={cat.id}
+                onPress={() => setCategoryId(cat.id)}
+                style={{ width: '22%' }}
+              >
+                <YStack
+                  padding="$3"
+                  borderRadius="$4"
+                  borderWidth={2}
+                  borderColor={categoryId === cat.id ? '$primary' : '$border'}
+                  backgroundColor={categoryId === cat.id ? '$accent' : '$muted'}
+                  alignItems="center"
+                  gap="$1"
+                  opacity={categoryId === cat.id ? 0.8 : 1}
+                >
+                  <Text fontSize={20}>{cat.icon}</Text>
+                  <Text color="$foreground" fontSize={12} textAlign="center" numberOfLines={1}>
+                    {cat.name}
+                  </Text>
+                </YStack>
+              </Pressable>
+            ))}
+          </XStack>
+        </YStack>
+
+        {/* Description */}
         <YStack marginBottom="$6">
           <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            메모
+            설명
           </Text>
           <Input
             backgroundColor="$muted"
@@ -216,42 +244,30 @@ export default function ExpenseFormScreen() {
             paddingVertical="$3"
             placeholder="예: 점심 식사"
             placeholderTextColor="$mutedForeground"
-            value={memo}
-            onChangeText={setMemo}
+            value={description}
+            onChangeText={setDescription}
             color="$foreground"
           />
         </YStack>
 
-        {/* Category */}
+        {/* Location */}
         <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$3" fontWeight="500">
-            카테고리
+          <Text color="$foreground" marginBottom="$2" fontWeight="500">
+            장소
           </Text>
-          <XStack flexWrap="wrap" gap="$3">
-            {CATEGORIES.map((cat) => (
-              <Pressable
-                key={cat.value}
-                onPress={() => setCategory(cat.value)}
-                style={{ width: '22%' }}
-              >
-                <YStack
-                  padding="$3"
-                  borderRadius="$4"
-                  borderWidth={2}
-                  borderColor={category === cat.value ? '$primary' : '$border'}
-                  backgroundColor={category === cat.value ? '$accent' : '$muted'}
-                  alignItems="center"
-                  gap="$1"
-                  opacity={category === cat.value ? 0.4 : 1}
-                >
-                  <Text fontSize={24}>{cat.icon}</Text>
-                  <Text color="$foreground" fontSize={12}>
-                    {cat.label}
-                  </Text>
-                </YStack>
-              </Pressable>
-            ))}
-          </XStack>
+          <Input
+            backgroundColor="$muted"
+            borderWidth={2}
+            borderColor="$border"
+            borderRadius="$4"
+            paddingHorizontal="$4"
+            paddingVertical="$3"
+            placeholder="예: 마추픽추"
+            placeholderTextColor="$mutedForeground"
+            value={location}
+            onChangeText={setLocation}
+            color="$foreground"
+          />
         </YStack>
       </ScrollView>
     </YStack>

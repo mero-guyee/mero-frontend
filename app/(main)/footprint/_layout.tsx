@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-export default function DiaryLayout() {
+export default function FootprintLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />

@@ -1,18 +1,16 @@
-import { useState, useEffect } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ScrollView, Alert, Pressable, Modal, Platform } from 'react-native';
-import { YStack, XStack, Text, Button, Input, TextArea } from 'tamagui';
-import { ArrowLeft, X, Plus, MapPin, Navigation } from '@tamagui/lucide-icons';
-import { useTrips, useDiaries } from '../../../contexts';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ArrowLeft, MapPin, Plus, X } from '@tamagui/lucide-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Alert, Modal, Platform, Pressable, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Button, Input, Text, TextArea, XStack, YStack } from 'tamagui';
+import { useFootprints, useTrips } from '../../../contexts';
+import { FootprintLocation } from '../../../types';
 
-// Mock location data for autocomplete
 const MOCK_LOCATIONS = [
   '마추픽추, 페루',
-  '마추픽추 역사 보호구역',
   '쿠스코, 페루',
-  '쿠스코 역사 지구',
   '발파라이소, 칠레',
   '산티아고, 칠레',
   '우유니 소금사막, 볼리비아',
@@ -24,52 +22,36 @@ const MOCK_LOCATIONS = [
   '카르타헤나, 콜롬비아',
 ];
 
-export default function DiaryFormScreen() {
-  const { diaryId } = useLocalSearchParams<{ diaryId?: string }>();
+export default function FootprintFormScreen() {
+  const { footprintId } = useLocalSearchParams<{ footprintId?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { trips, activeTrip } = useTrips();
-  const { diaries, addDiary, updateDiary } = useDiaries();
+  const { footprints, addFootprint, updateFootprint } = useFootprints();
 
-  const existingDiary = diaryId ? diaries.find((d) => d.id === diaryId) : undefined;
+  const existingFootprint = footprintId ? footprints.find((f) => f.id === footprintId) : undefined;
 
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [time, setTime] = useState(new Date().toTimeString().slice(0, 5));
-  const [location, setLocation] = useState('');
-  const [country, setCountry] = useState('');
   const [content, setContent] = useState('');
   const [tripId, setTripId] = useState(activeTrip || trips[0]?.id || '');
-  const [weather, setWeather] = useState('');
-  const [temperature, setTemperature] = useState('');
-  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
-
-  // Location states
-  const [locations, setLocations] = useState<string[]>([]);
+  const [weatherInfo, setWeatherInfo] = useState('');
+  const [locations, setLocations] = useState<FootprintLocation[]>([]);
   const [showLocationModal, setShowLocationModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<string[]>([]);
-
-  // Date picker state
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
-    if (existingDiary) {
-      setTitle(existingDiary.title);
-      setDate(existingDiary.date);
-      setTime(existingDiary.time);
-      setLocation(existingDiary.location);
-      setCountry(existingDiary.country);
-      setContent(existingDiary.content);
-      setTripId(existingDiary.tripId);
-      setWeather(existingDiary.weather || '');
-      setTemperature(existingDiary.temperature?.toString() || '');
-      setPhotoUrls(existingDiary.photos);
-      if (existingDiary.location) {
-        setLocations([existingDiary.location]);
-      }
+    if (existingFootprint) {
+      setTitle(existingFootprint.title);
+      setDate(existingFootprint.date);
+      setContent(existingFootprint.content);
+      setTripId(existingFootprint.tripId);
+      setWeatherInfo(existingFootprint.weatherInfo || '');
+      setLocations(existingFootprint.locations);
     }
-  }, [existingDiary]);
+  }, [existingFootprint]);
 
   const handleSubmit = () => {
     if (!title.trim() || !tripId) {
@@ -77,27 +59,20 @@ export default function DiaryFormScreen() {
       return;
     }
 
-    const diaryData = {
+    const footprintData = {
       tripId,
       title: title.trim(),
       date,
-      time,
-      location: location.trim(),
-      country: country.trim(),
       content: content.trim(),
-      photos: photoUrls,
-      weather: weather.trim() || undefined,
-      temperature: temperature ? parseFloat(temperature) : undefined,
-      tags: [],
+      locations,
+      photoUrls: existingFootprint?.photoUrls ?? [],
+      weatherInfo: weatherInfo.trim() || undefined,
     };
 
-    if (existingDiary) {
-      updateDiary({
-        ...existingDiary,
-        ...diaryData,
-      });
+    if (existingFootprint) {
+      updateFootprint({ ...existingFootprint, ...footprintData });
     } else {
-      addDiary(diaryData);
+      addFootprint(footprintData);
     }
 
     router.back();
@@ -115,11 +90,15 @@ export default function DiaryFormScreen() {
     }
   };
 
-  const handleSelectLocation = (loc: string) => {
-    if (!locations.includes(loc)) {
-      const newLocations = [...locations, loc];
-      setLocations(newLocations);
-      setLocation(newLocations.join(', '));
+  const handleSelectLocation = (locString: string) => {
+    const parts = locString.split(', ');
+    const newLocation: FootprintLocation = {
+      placeName: parts[0],
+      country: parts[1],
+    };
+    const alreadyAdded = locations.some((l) => l.placeName === newLocation.placeName);
+    if (!alreadyAdded) {
+      setLocations([...locations, newLocation]);
     }
     setSearchQuery('');
     setSearchResults([]);
@@ -127,29 +106,13 @@ export default function DiaryFormScreen() {
   };
 
   const handleRemoveLocation = (index: number) => {
-    const newLocations = locations.filter((_, i) => i !== index);
-    setLocations(newLocations);
-    setLocation(newLocations.join(', '));
-  };
-
-  const handleUseCurrentLocation = () => {
-    const currentLoc = '현재 위치 (GPS)';
-    if (!locations.includes(currentLoc)) {
-      const newLocations = [...locations, currentLoc];
-      setLocations(newLocations);
-      setLocation(newLocations.join(', '));
-    }
-    setShowLocationModal(false);
-  };
-
-  const formatDate = (d: Date) => {
-    return d.toISOString().split('T')[0];
+    setLocations(locations.filter((_, i) => i !== index));
   };
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
-      setDate(formatDate(selectedDate));
+      setDate(selectedDate.toISOString().split('T')[0]);
     }
   };
 
@@ -177,7 +140,7 @@ export default function DiaryFormScreen() {
           <ArrowLeft size={20} color="$foreground" />
         </Button>
         <Text color="$foreground" fontSize={16} fontWeight="500">
-          {existingDiary ? '유랑 수정' : '새 유랑'}
+          {existingFootprint ? '유랑 수정' : '새 유랑'}
         </Text>
         <Button
           backgroundColor="$accent"
@@ -261,7 +224,7 @@ export default function DiaryFormScreen() {
                 >
                   <MapPin size={14} color="$foreground" />
                   <Text color="$foreground" fontSize={14}>
-                    {loc}
+                    {loc.placeName}{loc.country ? `, ${loc.country}` : ''}
                   </Text>
                   <Pressable onPress={() => handleRemoveLocation(index)}>
                     <X size={14} color="$foreground" />
@@ -288,6 +251,26 @@ export default function DiaryFormScreen() {
             placeholderTextColor="$mutedForeground"
             value={title}
             onChangeText={setTitle}
+            color="$foreground"
+          />
+        </YStack>
+
+        {/* Weather */}
+        <YStack marginBottom="$6">
+          <Text color="$foreground" marginBottom="$2" fontWeight="500">
+            🌤 날씨
+          </Text>
+          <Input
+            backgroundColor="$muted"
+            borderWidth={2}
+            borderColor="$border"
+            borderRadius="$4"
+            paddingHorizontal="$4"
+            paddingVertical="$3"
+            placeholder="예: 맑음 18°C"
+            placeholderTextColor="$mutedForeground"
+            value={weatherInfo}
+            onChangeText={setWeatherInfo}
             color="$foreground"
           />
         </YStack>
@@ -332,7 +315,6 @@ export default function DiaryFormScreen() {
             onPress={(e) => e.stopPropagation()}
           >
             <YStack backgroundColor="$card" borderRadius="$6" padding="$6">
-              {/* Modal Header */}
               <XStack alignItems="center" justifyContent="space-between" marginBottom="$5">
                 <Text color="$foreground" fontSize={18} fontWeight="600">
                   위치 추가
@@ -352,37 +334,6 @@ export default function DiaryFormScreen() {
                 </Button>
               </XStack>
 
-              {/* Current Location Button */}
-              <Pressable onPress={handleUseCurrentLocation}>
-                <XStack
-                  backgroundColor="$accent"
-                  borderRadius="$4"
-                  padding="$4"
-                  alignItems="center"
-                  gap="$3"
-                  marginBottom="$4"
-                  opacity={0.3}
-                >
-                  <YStack
-                    width={40}
-                    height={40}
-                    backgroundColor="$primary"
-                    borderRadius="$3"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <Navigation size={20} color="white" />
-                  </YStack>
-                  <YStack>
-                    <Text color="$foreground">현재 위치 사용</Text>
-                    <Text color="$mutedForeground" fontSize={12}>
-                      GPS로 현재 위치 가져오기
-                    </Text>
-                  </YStack>
-                </XStack>
-              </Pressable>
-
-              {/* Search Input */}
               <YStack marginBottom="$3">
                 <Text color="$foreground" fontSize={14} marginBottom="$2">
                   장소 검색
@@ -402,7 +353,6 @@ export default function DiaryFormScreen() {
                 />
               </YStack>
 
-              {/* Search Results */}
               <ScrollView style={{ maxHeight: 256 }}>
                 {searchQuery && searchResults.length === 0 && (
                   <Text textAlign="center" color="$mutedForeground" paddingVertical="$4" fontSize={14}>

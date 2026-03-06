@@ -1,15 +1,13 @@
-import { useState, useMemo } from 'react';
+import { Edit3, Plus, Trash2, X } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
-import { ScrollView, Pressable, Modal, Alert } from 'react-native';
-import { YStack, XStack, Text, Button, Input } from 'tamagui';
-import { Plus, Edit2, Trash2, X } from '@tamagui/lucide-icons';
-import { useTrips, useExpenses, useBudgets } from '../../../contexts';
+import { useMemo, useState } from 'react';
+import { Alert, Modal, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Button, Input, Text, XStack, YStack } from 'tamagui';
+import { useBudgets, useExpenses, useTrips } from '../../../contexts';
 import {
-  CATEGORY_LABELS,
-  CATEGORY_ICONS,
-  CURRENCY_SYMBOLS,
   CURRENCY_NAMES,
+  CURRENCY_SYMBOLS,
 } from '../../../data/mockData';
 import { Budget, Expense } from '../../../types';
 
@@ -23,7 +21,7 @@ export default function ExpenseViewScreen() {
   const [viewMode, setViewMode] = useState<'expenses' | 'budget'>('expenses');
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
-  const [budgetForm, setBudgetForm] = useState({ currency: 'USD', amount: '' });
+  const [budgetForm, setBudgetForm] = useState({ currency: 'KRW', amount: '' });
 
   const activeTripData = activeTrip ? trips.find((t) => t.id === activeTrip) : null;
   const filteredExpenses = expenses.filter((e) => !activeTrip || e.tripId === activeTrip);
@@ -64,7 +62,7 @@ export default function ExpenseViewScreen() {
       });
     } else {
       setEditingBudget(null);
-      setBudgetForm({ currency: 'USD', amount: '' });
+      setBudgetForm({ currency: 'KRW', amount: '' });
     }
     setShowBudgetModal(true);
   };
@@ -262,7 +260,7 @@ export default function ExpenseViewScreen() {
                               justifyContent="center"
                               borderRadius="$3"
                             >
-                              <Edit2 size={16} color="$mutedForeground" />
+                              <Edit3 size={16} color="$mutedForeground" />
                             </YStack>
                           </Pressable>
                           <Pressable onPress={() => handleDeleteBudget(budget.id)}>
@@ -382,7 +380,7 @@ export default function ExpenseViewScreen() {
                         </YStack>
                         <XStack alignItems="center" justifyContent="space-between">
                           <Text color="$mutedForeground">
-                            ${amount.toLocaleString()} / ${remaining.toLocaleString()}
+                            {getCurrencySymbol(currency)} {amount.toLocaleString()} / {getCurrencySymbol(currency)} {remaining.toLocaleString()}
                           </Text>
                         </XStack>
                       </YStack>
@@ -415,7 +413,7 @@ export default function ExpenseViewScreen() {
                 <YStack gap="$4">
                   {Object.entries(expensesByDate).map(([date, dayExpenses]) => {
                     const dayTotal = dayExpenses.reduce((sum, e) => sum + e.amount, 0);
-                    const mainCurrency = dayExpenses[0]?.currency || 'USD';
+                    const mainCurrency = dayExpenses[0]?.currency || 'KRW';
 
                     return (
                       <YStack key={date}>
@@ -451,11 +449,11 @@ export default function ExpenseViewScreen() {
                                   alignItems="center"
                                   justifyContent="center"
                                 >
-                                  <Text fontSize={18}>{CATEGORY_ICONS[expense.category] || '📦'}</Text>
+                                  <Text fontSize={18}>{expense.categoryIcon || '📦'}</Text>
                                 </YStack>
                                 <YStack>
-                                  <Text color="$foreground">{expense.memo}</Text>
-                                  <Text color="$mutedForeground">{CATEGORY_LABELS[expense.category]}</Text>
+                                  <Text color="$foreground">{expense.description}</Text>
+                                  <Text color="$mutedForeground">{expense.categoryName}</Text>
                                 </YStack>
                               </XStack>
                               <Text color="$foreground">

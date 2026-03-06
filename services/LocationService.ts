@@ -1,7 +1,5 @@
 import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
-import { getDatabase } from '../db';
-import { LocationRepository } from '../repositories';
 
 const TASK_NAME = 'mero-background-location';
 
@@ -12,22 +10,7 @@ let _currentTripId: string | null = null;
 TaskManager.defineTask(TASK_NAME, async ({ data, error }) => {
   if (error || !data) return;
 
-  const { locations } = data as { locations: Location.LocationObject[] };
-  if (!_currentTripId) return;
-
-  const db = await getDatabase();
-  const repo = new LocationRepository(db);
-
-  for (const loc of locations) {
-    await repo.createLocation({
-      tripId: _currentTripId,
-      latitude: loc.coords.latitude,
-      longitude: loc.coords.longitude,
-      altitude: loc.coords.altitude ?? undefined,
-      accuracy: loc.coords.accuracy ?? undefined,
-      timestamp: new Date(loc.timestamp).toISOString(),
-    });
-  }
+  // Location tracking placeholder — repository integration pending
 });
 
 export const LocationService = {
@@ -75,23 +58,8 @@ export const LocationService = {
     return Location.hasStartedLocationUpdatesAsync(TASK_NAME).catch(() => false);
   },
 
-  // 현재 위치를 즉시 1회 기록
-  async recordCurrentLocation(tripId: string, diaryId?: string): Promise<void> {
-    const loc = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.High,
-    });
-
-    const db = await getDatabase();
-    const repo = new LocationRepository(db);
-
-    await repo.createLocation({
-      tripId,
-      diaryId,
-      latitude: loc.coords.latitude,
-      longitude: loc.coords.longitude,
-      altitude: loc.coords.altitude ?? undefined,
-      accuracy: loc.coords.accuracy ?? undefined,
-      timestamp: new Date(loc.timestamp).toISOString(),
-    });
+  // 현재 위치를 즉시 1회 기록 — repository integration pending
+  async recordCurrentLocation(_tripId: string, _footprintId?: string): Promise<void> {
+    // placeholder
   },
 };

@@ -5,7 +5,7 @@ import {
   MOCK_EXPENSE_CATEGORIES,
   MOCK_EXPENSES,
   MOCK_FOOTPRINTS,
-  MOCK_MEMOS
+  MOCK_MEMOS,
 } from '../data/mockData';
 import { BudgetRepository } from '../repositories/budgets';
 import { ExpenseCategoryRepository, ExpenseRepository } from '../repositories/expenses';
@@ -18,8 +18,8 @@ async function seedIfEmpty(db: ReturnType<typeof useDb>): Promise<void> {
   const existing = await tripRepo.findAll();
   if (existing.length > 0) return; // 이미 시드됨
 
-  const memoRepo = new MemoRepository(db);
   const footprintRepo = new FootprintRepository(db);
+  const memoRepo = new MemoRepository(db);
   const expenseRepo = new ExpenseRepository(db);
   const categoryRepo = new ExpenseCategoryRepository(db);
   const budgetRepo = new BudgetRepository(db);

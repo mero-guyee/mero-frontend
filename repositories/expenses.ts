@@ -7,6 +7,9 @@ export interface ExpenseRow extends BaseEntity {
   tripId: string;
   footprintId?: string | null;
   categoryId: string;
+  categoryName?: string | null;
+  categoryIcon?: string | null;
+  categoryColor?: string | null;
   amount: number;
   currency: string;
   description?: string | null;
@@ -29,11 +32,15 @@ function rowToExpense(row: ExpenseRow): Expense {
     tripId: row.tripId,
     footprintId: row.footprintId ?? undefined,
     categoryId: row.categoryId,
+    categoryName: row.categoryName ?? undefined,
+    categoryIcon: row.categoryIcon ?? undefined,
+    categoryColor: row.categoryColor ?? undefined,
     amount: row.amount,
     currency: row.currency,
     description: row.description ?? undefined,
     date: row.date,
     location: row.location ?? undefined,
+    createdAt: row.createdAt,
   };
 }
 
@@ -78,11 +85,14 @@ export class ExpenseRepository extends BaseRepository<ExpenseRow> {
     return rows.map(rowToExpense);
   }
 
-  async createExpense(data: Omit<Expense, 'id' | 'serverId'>): Promise<Expense> {
+  async createExpense(data: Omit<Expense, 'id' | 'serverId' | 'createdAt'>): Promise<Expense> {
     const row = await this.create({
       ...data,
       serverId: null,
       footprintId: data.footprintId ?? null,
+      categoryName: data.categoryName ?? null,
+      categoryIcon: data.categoryIcon ?? null,
+      categoryColor: data.categoryColor ?? null,
       description: data.description ?? null,
       location: data.location ?? null,
     } as Omit<ExpenseRow, keyof BaseEntity>);
@@ -94,6 +104,9 @@ export class ExpenseRepository extends BaseRepository<ExpenseRow> {
       tripId: expense.tripId,
       footprintId: expense.footprintId ?? null,
       categoryId: expense.categoryId,
+      categoryName: expense.categoryName ?? null,
+      categoryIcon: expense.categoryIcon ?? null,
+      categoryColor: expense.categoryColor ?? null,
       amount: expense.amount,
       currency: expense.currency,
       description: expense.description ?? null,

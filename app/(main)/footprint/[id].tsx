@@ -1,31 +1,30 @@
-import { useState, useMemo } from 'react';
+import { ArrowLeft, Cloud, MapPin, MoreVertical } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ScrollView, Alert, Pressable, Modal } from 'react-native';
-import { YStack, XStack, Text, Button, Image } from 'tamagui';
-import { ArrowLeft, MoreVertical, MapPin, Cloud } from '@tamagui/lucide-icons';
-import { useTrips, useDiaries, useExpenses } from '../../../contexts';
+import { useMemo, useState } from 'react';
+import { Alert, Modal, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { CATEGORY_LABELS, CATEGORY_ICONS } from '../../../data/mockData';
+import { Button, Image, Text, XStack, YStack } from 'tamagui';
+import { useExpenses, useFootprints, useTrips } from '../../../contexts';
 
-export default function DiaryDetailScreen() {
+export default function FootprintDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { getTripById } = useTrips();
-  const { getDiaryById, deleteDiary } = useDiaries();
-  const { getExpensesByDiaryId, deleteExpense } = useExpenses();
+  const { getFootprintById, deleteFootprint } = useFootprints();
+  const { getExpensesByFootprintId, deleteExpense } = useExpenses();
 
-  const diary = getDiaryById(id || '');
-  const trip = diary ? getTripById(diary.tripId) : undefined;
-  const expenses = getExpensesByDiaryId(id || '');
+  const footprint = getFootprintById(id || '');
+  const trip = footprint ? getTripById(footprint.tripId) : undefined;
+  const expenses = getExpensesByFootprintId(id || '');
 
   const [showMenu, setShowMenu] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
-  if (!diary) {
+  if (!footprint) {
     return (
       <YStack flex={1} backgroundColor="$background" justifyContent="center" alignItems="center">
-        <Text color="$foreground">일기를 찾을 수 없습니다</Text>
+        <Text color="$foreground">일지를 찾을 수 없습니다</Text>
       </YStack>
     );
   }
@@ -33,59 +32,45 @@ export default function DiaryDetailScreen() {
   const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
   const currency = expenses[0]?.currency || 'USD';
 
-  // Split content into paragraphs and intersperse with photos
   const contentWithPhotos = useMemo(() => {
-    const paragraphs = diary.content.split('\n\n').filter((p) => p.trim());
-    const result: Array<{ type: 'text' | 'photo'; content: string; index?: number }> = [];
+    const paragraphs = footprint.content.split('\n\n').filter((p) => p.trim());
+    const result: Array<{ type: 'text' | 'photo'; content: string }> = [];
 
-    const photoInterval = Math.max(1, Math.floor(paragraphs.length / (diary.photos.length + 1)));
+    const photoInterval = Math.max(1, Math.floor(paragraphs.length / (footprint.photoUrls.length + 1)));
     let photoIndex = 0;
 
     paragraphs.forEach((paragraph, idx) => {
       result.push({ type: 'text', content: paragraph });
-
-      if (photoIndex < diary.photos.length && (idx + 1) % photoInterval === 0) {
-        result.push({
-          type: 'photo',
-          content: diary.photos[photoIndex],
-          index: photoIndex,
-        });
+      if (photoIndex < footprint.photoUrls.length && (idx + 1) % photoInterval === 0) {
+        result.push({ type: 'photo', content: footprint.photoUrls[photoIndex] });
         photoIndex++;
       }
     });
 
-    while (photoIndex < diary.photos.length) {
-      result.push({
-        type: 'photo',
-        content: diary.photos[photoIndex],
-        index: photoIndex,
-      });
+    while (photoIndex < footprint.photoUrls.length) {
+      result.push({ type: 'photo', content: footprint.photoUrls[photoIndex] });
       photoIndex++;
     }
 
     return result;
-  }, [diary]);
-
-  const handleBack = () => {
-    router.back();
-  };
+  }, [footprint]);
 
   const handleEdit = () => {
     setShowMenu(false);
     router.push({
-      pathname: '/diary/new',
-      params: { diaryId: diary.id },
-    });
+      pathname: '/(main)/footprint/new',
+      params: { footprintId: footprint.id },
+    } as any);
   };
 
   const handleDelete = () => {
-    Alert.alert('일기 삭제', '이 기록을 삭제하시겠습니까?', [
+    Alert.alert('일지 삭제', '이 기록을 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
       {
         text: '삭제',
         style: 'destructive',
         onPress: () => {
-          deleteDiary(diary.id);
+          deleteFootprint(footprint.id);
           router.back();
         },
       },
@@ -94,9 +79,9 @@ export default function DiaryDetailScreen() {
 
   const handleAddExpense = () => {
     router.push({
-      pathname: '/expense/new',
-      params: { diaryId: diary.id, tripId: diary.tripId },
-    });
+      pathname: '/(main)/expense/new',
+      params: { footprintId: footprint.id, tripId: footprint.tripId },
+    } as any);
   };
 
   const handleDeleteExpense = (expenseId: string) => {
@@ -108,10 +93,6 @@ export default function DiaryDetailScreen() {
         onPress: () => deleteExpense(expenseId),
       },
     ]);
-  };
-
-  const handlePosting = (platform: string) => {
-    Alert.alert('알림', `${platform} 포스팅 준비 중입니다!`);
   };
 
   return (
@@ -133,12 +114,12 @@ export default function DiaryDetailScreen() {
           circular
           backgroundColor="transparent"
           pressStyle={{ backgroundColor: '$accent' }}
-          onPress={handleBack}
+          onPress={() => router.back()}
         >
           <ArrowLeft size={20} color="$foreground" />
         </Button>
         <Text flex={1} textAlign="center" color="$foreground" fontSize={16} fontWeight="500">
-          {new Date(diary.date).toLocaleDateString('ko-KR', {
+          {new Date(footprint.date).toLocaleDateString('ko-KR', {
             month: 'long',
             day: 'numeric',
           })}
@@ -195,30 +176,27 @@ export default function DiaryDetailScreen() {
         {/* Title */}
         <YStack marginBottom="$6">
           <Text color="$foreground" fontSize={20} fontWeight="600" marginBottom="$2">
-            {diary.title}
+            {footprint.title}
           </Text>
           <YStack height={1} backgroundColor="$border" opacity={0.3} />
         </YStack>
 
         {/* Location & Weather */}
         <YStack gap="$2" marginBottom="$6">
-          <XStack alignItems="center" gap="$2">
-            <MapPin size={16} color="$foreground" />
-            <Text color="$foreground">
-              {diary.location}, {diary.country}
-            </Text>
-          </XStack>
-          {diary.weather && (
-            <XStack alignItems="center" gap="$2">
-              <Cloud size={16} color="$foreground" />
+          {footprint.locations.map((loc, i) => (
+            <XStack key={i} alignItems="center" gap="$2">
+              <MapPin size={16} color="$foreground" />
               <Text color="$foreground">
-                {diary.weather} {diary.temperature}°C
+                {[loc.placeName, loc.city, loc.country].filter(Boolean).join(', ')}
               </Text>
             </XStack>
+          ))}
+          {footprint.weatherInfo && (
+            <XStack alignItems="center" gap="$2">
+              <Cloud size={16} color="$foreground" />
+              <Text color="$foreground">{footprint.weatherInfo}</Text>
+            </XStack>
           )}
-          <XStack alignItems="center" gap="$2">
-            <Text color="$foreground">🕐 {diary.time}</Text>
-          </XStack>
         </YStack>
 
         <YStack height={1} backgroundColor="$border" opacity={0.3} marginBottom="$6" />
@@ -277,20 +255,14 @@ export default function DiaryDetailScreen() {
                   borderBottomColor="$border"
                 >
                   <XStack alignItems="flex-start" justifyContent="space-between" marginBottom="$1">
-                    <XStack alignItems="center" gap="$2">
-                      <Text>{CATEGORY_ICONS[expense.category] || '📦'}</Text>
-                      <Text color="$foreground">{CATEGORY_LABELS[expense.category] || '기타'}</Text>
-                    </XStack>
+                    <Text color="$foreground">{expense.description || '지출'}</Text>
                     <Pressable onPress={() => handleDeleteExpense(expense.id)}>
                       <Text color="$destructive" fontSize={14}>
                         삭제
                       </Text>
                     </Pressable>
                   </XStack>
-                  <Text color="$mutedForeground" marginLeft={28}>
-                    {expense.memo}
-                  </Text>
-                  <Text color="$foreground" marginLeft={28}>
+                  <Text color="$foreground">
                     {expense.currency} {expense.amount.toLocaleString()}
                   </Text>
                 </YStack>
@@ -331,61 +303,6 @@ export default function DiaryDetailScreen() {
             </Text>
           </Button>
         </YStack>
-
-        <YStack height={1} backgroundColor="$border" opacity={0.3} marginBottom="$6" />
-
-        {/* Social Posting */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" fontSize={16} fontWeight="600" marginBottom="$3">
-            📝 포스팅하기
-          </Text>
-          <XStack alignItems="center" justifyContent="center" gap="$3">
-            <Pressable onPress={() => handlePosting('네이버 블로그')}>
-              <YStack
-                width={40}
-                height={40}
-                borderRadius={20}
-                backgroundColor="#03C75A"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Text color="white" fontWeight="700" fontSize={16}>
-                  N
-                </Text>
-              </YStack>
-            </Pressable>
-            <Pressable onPress={() => handlePosting('인스타그램')}>
-              <YStack
-                width={40}
-                height={40}
-                borderRadius={20}
-                alignItems="center"
-                justifyContent="center"
-                style={{
-                  backgroundColor: '#E1306C',
-                }}
-              >
-                <Text color="white" fontWeight="700" fontSize={14}>
-                  IG
-                </Text>
-              </YStack>
-            </Pressable>
-            <Pressable onPress={() => handlePosting('티스토리')}>
-              <YStack
-                width={40}
-                height={40}
-                borderRadius={20}
-                backgroundColor="#FF5544"
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Text color="white" fontWeight="700" fontSize={16}>
-                  T
-                </Text>
-              </YStack>
-            </Pressable>
-          </XStack>
-        </YStack>
       </ScrollView>
 
       {/* Photo Modal */}
@@ -409,7 +326,6 @@ export default function DiaryDetailScreen() {
         </Pressable>
       </Modal>
 
-      {/* Close menu overlay */}
       {showMenu && (
         <Pressable
           style={{
