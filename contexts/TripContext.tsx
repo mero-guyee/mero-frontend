@@ -1,15 +1,15 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Trip, Memo } from '../types';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 import {
-  useTripsQuery,
   useAllMemosQuery,
-  useCreateTrip,
-  useUpdateTrip,
-  useDeleteTrip,
   useCreateMemo,
-  useUpdateMemo,
+  useCreateTrip,
   useDeleteMemo,
+  useDeleteTrip,
+  useTripsQuery,
+  useUpdateMemo,
+  useUpdateTrip,
 } from '../hooks/queries/useTrips';
+import { Memo, Trip } from '../types';
 
 interface TripContextType {
   trips: Trip[];

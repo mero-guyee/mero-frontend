@@ -21,20 +21,13 @@ export default function FootprintDetailScreen() {
   const [showMenu, setShowMenu] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
-  if (!footprint) {
-    return (
-      <YStack flex={1} backgroundColor="$background" justifyContent="center" alignItems="center">
-        <Text color="$foreground">일지를 찾을 수 없습니다</Text>
-      </YStack>
-    );
-  }
-
   const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const currency = expenses[0]?.currency || 'USD';
+  const currency = expenses[0]?.currency || 'KRW';
 
   const contentWithPhotos = useMemo(() => {
+    if (!footprint) return [];
     const paragraphs = footprint.content.split('\n\n').filter((p) => p.trim());
-    const result: Array<{ type: 'text' | 'photo'; content: string }> = [];
+    const result: { type: 'text' | 'photo'; content: string }[] = [];
 
     const photoInterval = Math.max(1, Math.floor(paragraphs.length / (footprint.photoUrls.length + 1)));
     let photoIndex = 0;
@@ -55,12 +48,20 @@ export default function FootprintDetailScreen() {
     return result;
   }, [footprint]);
 
+  if (!footprint) {
+    return (
+      <YStack flex={1} backgroundColor="$background" justifyContent="center" alignItems="center">
+        <Text color="$foreground">일지를 찾을 수 없습니다</Text>
+      </YStack>
+    );
+  }
+
   const handleEdit = () => {
     setShowMenu(false);
     router.push({
       pathname: '/(main)/footprint/new',
       params: { footprintId: footprint.id },
-    } as any);
+    } );
   };
 
   const handleDelete = () => {
@@ -81,7 +82,7 @@ export default function FootprintDetailScreen() {
     router.push({
       pathname: '/(main)/expense/new',
       params: { footprintId: footprint.id, tripId: footprint.tripId },
-    } as any);
+    });
   };
 
   const handleDeleteExpense = (expenseId: string) => {

@@ -1,49 +1,43 @@
-import { useState, useEffect } from 'react';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ScrollView } from 'react-native';
-import { YStack, XStack, Text, Button, Input, TextArea } from 'tamagui';
 import { ArrowLeft } from '@tamagui/lucide-icons';
-import { useTrips } from '../../../contexts';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Button, Input, Text, TextArea, XStack, YStack } from 'tamagui';
+import { useTrips } from '../../../contexts';
 
-export default function NoteFormScreen() {
-  const { tripId, noteId } = useLocalSearchParams<{ tripId: string; noteId?: string }>();
+export default function MemoFormScreen() {
+  const { tripId, memoId } = useLocalSearchParams<{ tripId: string; memoId?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { notes, addNote, updateNote } = useTrips();
+  const { memos, addMemo, updateMemo } = useTrips();
 
-  const existingNote = noteId ? notes.find((n) => n.id === noteId) : undefined;
+  const existingMemo = memoId ? memos.find((n) => n.id === memoId) : undefined;
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
 
   useEffect(() => {
-    if (existingNote) {
-      setTitle(existingNote.title);
-      setContent(existingNote.content);
+    if (existingMemo) {
+      setTitle(existingMemo.title);
+      setContent(existingMemo.content);
     }
-  }, [existingNote]);
+  }, [existingMemo]);
 
   const handleSubmit = () => {
     if (!title.trim()) return;
 
-    const now = new Date().toISOString().split('T')[0];
-
-    if (existingNote) {
-      updateNote({
-        ...existingNote,
+    if (existingMemo) {
+      updateMemo({
+        ...existingMemo,
         title: title.trim(),
         content,
-        updatedAt: now,
       });
     } else {
-      addNote({
+      addMemo({
         tripId: tripId || '',
         title: title.trim(),
         content,
-        tags: [],
-        createdAt: now,
-        updatedAt: now,
       });
     }
 
@@ -74,7 +68,7 @@ export default function NoteFormScreen() {
           <ArrowLeft size={20} color="$foreground" />
         </Button>
         <Text color="$foreground" fontSize={16} fontWeight="500">
-          {existingNote ? '노트 수정' : '새 노트'}
+          {existingMemo ? '메모 수정' : '새 메모'}
         </Text>
         <Button
           backgroundColor="$accent"
@@ -105,7 +99,7 @@ export default function NoteFormScreen() {
             borderRadius="$4"
             paddingHorizontal="$4"
             paddingVertical="$3"
-            placeholder="노트 제목을 입력하세요"
+            placeholder="메모 제목을 입력하세요"
             placeholderTextColor="$mutedForeground"
             value={title}
             onChangeText={setTitle}

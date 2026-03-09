@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { YStack, Text, Spinner } from 'tamagui';
-import { Image } from 'expo-image';
+import { useEffect, useState } from 'react';
+import { Text, YStack } from 'tamagui';
 import { useAuth } from '../contexts';
 
 // 원본 LoadingScreen.tsx 변환

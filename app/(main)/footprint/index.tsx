@@ -64,7 +64,7 @@ export default function FootprintListScreen() {
   };
 
   const handleSelectFootprint = (footprintId: string) => {
-    router.push(`/(main)/footprint/${footprintId}` as any);
+    router.push(`/(main)/footprint/${footprintId}`);
   };
 
   const renderFootprintItem = ({ item: footprint }: { item: Footprint }) => {

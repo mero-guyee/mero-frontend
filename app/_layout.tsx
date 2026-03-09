@@ -1,18 +1,18 @@
-import { Stack } from 'expo-router';
 import { TamaguiProvider } from '@tamagui/core';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
   AuthProvider,
-  TripProvider,
-  FootprintProvider,
-  ExpenseProvider,
   BudgetProvider,
+  ExpenseProvider,
+  FootprintProvider,
+  TripProvider,
 } from '../contexts';
 import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
 import { QueryProvider } from '../providers/QueryProvider';
 import { SeedDatabase } from '../providers/SeedDatabase';
-import { View, ActivityIndicator } from 'react-native';
 import config from '../tamagui.config';
 
 function AppContent() {

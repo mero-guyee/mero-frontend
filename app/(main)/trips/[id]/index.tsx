@@ -18,7 +18,7 @@ import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Image, Text, XStack, YStack } from 'tamagui';
-import { useFootprints, useExpenses, useTrips } from '../../../../contexts';
+import { useExpenses, useFootprints, useTrips } from '../../../../contexts';
 
 type SubTab = 'memos' | 'files';
 
@@ -80,21 +80,21 @@ export default function TripHomeScreen() {
     );
   };
 
-  const handleCreateNote = () => {
+  const handleCreateMemo = () => {
     router.push({
-      pathname: '/trips/note-form',
+      pathname: '/trips/memo-form',
       params: { tripId: id },
-    });
+    } as any);
   };
 
-  const handleEditNote = (memoId: string) => {
+  const handleEditMemo = (memoId: string) => {
     router.push({
-      pathname: '/trips/note-form',
+      pathname: '/trips/memo-form',
       params: { tripId: id, memoId },
-    });
+    } as any);
   };
 
-  const handleDeleteNote = (memoId: string) => {
+  const handleDeleteMemo = (memoId: string) => {
     Alert.alert('메모 삭제', '이 메모를 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
       {
@@ -297,7 +297,7 @@ export default function TripHomeScreen() {
                 <Text color="$foreground" fontSize={14}>
                   {memos.length > 0 ? `총 ${memos.length}개의 메모` : '메모'}
                 </Text>
-                <Pressable onPress={handleCreateNote}>
+                <Pressable onPress={handleCreateMemo}>
                   <Text color="$primary" fontSize={14}>
                     + 새 메모
                   </Text>
@@ -334,7 +334,7 @@ export default function TripHomeScreen() {
                     borderRadius="$4"
                     paddingHorizontal="$6"
                     paddingVertical="$3"
-                    onPress={handleCreateNote}
+                    onPress={handleCreateMemo}
                   >
                     <XStack alignItems="center" gap="$2">
                       <Pencil size={16} color="$foreground" />
@@ -347,7 +347,7 @@ export default function TripHomeScreen() {
               ) : (
                 <YStack gap="$2">
                   {memos.map((note) => (
-                    <Pressable key={note.id} onPress={() => handleEditNote(note.id)}>
+                    <Pressable key={note.id} onPress={() => handleEditMemo(note.id)}>
                       <YStack
                         backgroundColor="$card"
                         borderRadius="$6"
@@ -362,7 +362,7 @@ export default function TripHomeScreen() {
                           <Pressable
                             onPress={(e) => {
                               e.stopPropagation();
-                              handleDeleteNote(note.id);
+                              handleDeleteMemo(note.id);
                             }}
                             style={{ padding: 8, marginRight: -8, marginTop: -8 }}
                           >

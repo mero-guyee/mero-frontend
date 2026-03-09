@@ -1,5 +1,5 @@
+import { Backpack, BookOpen, Map, Settings, Wallet } from '@tamagui/lucide-icons';
 import { Tabs } from 'expo-router';
-import { Backpack, BookOpen, Map, Wallet, Settings } from '@tamagui/lucide-icons';
 
 export default function MainLayout() {
   return (

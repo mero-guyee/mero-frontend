@@ -6,7 +6,7 @@ export default function TripsLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="new" />
       <Stack.Screen name="[id]" />
-      <Stack.Screen name="note-form" />
+      <Stack.Screen name="memo-form" />
     </Stack>
   );
 }

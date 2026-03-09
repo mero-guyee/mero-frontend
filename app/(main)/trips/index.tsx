@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { FlatList, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Image, Text, XStack, YStack } from 'tamagui';
-import { useFootprints, useExpenses, useTrips } from '../../../contexts';
+import { useExpenses, useFootprints, useTrips } from '../../../contexts';
 import { Trip } from '../../../types';
 
 // 원본 TripList.tsx 변환

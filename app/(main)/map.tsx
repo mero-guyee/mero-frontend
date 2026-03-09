@@ -67,7 +67,7 @@ export default function MapViewScreen() {
 
   const handleViewFootprint = (footprintId: string) => {
     setShowTimelineModal(false);
-    router.push(`/(main)/footprint/${footprintId}` as any);
+    router.push(`/(main)/footprint/${footprintId}`);
   };
 
   return (
