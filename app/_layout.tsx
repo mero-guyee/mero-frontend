@@ -53,7 +53,7 @@ function AppContent() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <TamaguiProvider config={config}>
+      <TamaguiProvider config={config} defaultTheme="light">
         <DatabaseProvider>
           <QueryProvider>
             <AppContent />
