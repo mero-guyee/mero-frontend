@@ -129,23 +129,21 @@ export default function NewTripScreen() {
       </XStack>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
-        {/* Title */}
-        <YStack marginBottom="$6">
+        <YStack marginBottom="$6" >
           <Text color="$foreground" marginBottom="$2" fontWeight="500">
             모험의 이름
           </Text>
           <Input
-            backgroundColor="$muted"
+            height={48}
+            backgroundColor="transparent"
             borderWidth={2}
             borderColor="$border"
             borderRadius="$4"
             paddingHorizontal="$4"
-            paddingVertical="$3"
             placeholder="예: 2026 남미 여행"
             placeholderTextColor="$mutedForeground"
             value={title}
             onChangeText={setTitle}
-            color="$foreground"
           />
         </YStack>
 

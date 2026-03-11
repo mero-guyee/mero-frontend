@@ -1,5 +1,5 @@
-import { createTamagui, createTokens, createFont } from '@tamagui/core'
 import { createAnimations } from '@tamagui/animations-react-native'
+import { createFont, createTamagui, createTokens } from '@tamagui/core'
 
 // 기본 폰트 설정
 const bodyFont = createFont({
@@ -210,6 +210,8 @@ export const config = createTamagui({
       destructiveForeground: tokens.color.destructiveForeground,
       ring: tokens.color.ring,
       inputBackground: tokens.color.inputBackground,
+      foreground: tokens.color.foreground,
+      
       // 차트 색상
       chart1: tokens.color.chart1,
       chart2: tokens.color.chart2,
