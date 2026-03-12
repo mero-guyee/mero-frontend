@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Input, Text, XStack, YStack } from 'tamagui';
+import { Button, Text, XStack, YStack } from 'tamagui';
+import { CircularButton, FilledButton, Input } from '../../../components/ui';
 import { useBudgets, useExpenses, useTrips } from '../../../contexts';
 import {
   CURRENCY_NAMES,
@@ -203,16 +204,15 @@ export default function ExpenseViewScreen() {
                 <Text color="$mutedForeground" marginBottom="$6" textAlign="center">
                   화폐별로 예산을 설정하고 지출을 관리해보세요
                 </Text>
-                <Button
+                <FilledButton
                   backgroundColor="$primary"
                   pressStyle={{ opacity: 0.8 }}
-                  borderRadius="$3"
                   paddingHorizontal="$5"
                   paddingVertical="$3"
                   onPress={() => handleOpenBudgetModal()}
                 >
                   <Text color="white" fontWeight="500">첫 예산 추가하기</Text>
-                </Button>
+                </FilledButton>
               </YStack>
             ) : (
               <YStack gap="$3">
@@ -515,15 +515,9 @@ export default function ExpenseViewScreen() {
                 <Text color="$foreground" fontSize={18} fontWeight="600">
                   {editingBudget ? '예산 수정' : '예산 추가'}
                 </Text>
-                <Button
-                  size="$3"
-                  circular
-                  backgroundColor="transparent"
-                  pressStyle={{ backgroundColor: '$accent' }}
-                  onPress={handleCloseBudgetModal}
-                >
+                <CircularButton size="$3" onPress={handleCloseBudgetModal}>
                   <X size={20} color="$mutedForeground" />
-                </Button>
+                </CircularButton>
               </XStack>
 
               <YStack gap="$4">
@@ -575,26 +569,17 @@ export default function ExpenseViewScreen() {
               </YStack>
 
               <XStack gap="$3" marginTop="$6">
-                <Button
+                <FilledButton
                   flex={1}
                   backgroundColor="$muted"
                   pressStyle={{ backgroundColor: '$secondary' }}
-                  borderRadius="$4"
-                  height={48}
                   onPress={handleCloseBudgetModal}
                 >
                   <Text color="$foreground">취소</Text>
-                </Button>
-                <Button
-                  flex={1}
-                  backgroundColor="$accent"
-                  pressStyle={{ backgroundColor: '$accentHover' }}
-                  borderRadius="$4"
-                  height={48}
-                  onPress={handleSaveBudget}
-                >
+                </FilledButton>
+                <FilledButton flex={1} onPress={handleSaveBudget}>
                   <Text color="$foreground">{editingBudget ? '수정' : '추가'}</Text>
-                </Button>
+                </FilledButton>
               </XStack>
             </YStack>
           </Pressable>

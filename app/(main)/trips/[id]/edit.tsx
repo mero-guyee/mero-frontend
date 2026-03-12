@@ -5,7 +5,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Image, Input, Text, XStack, YStack } from 'tamagui';
+import { Image, Text, XStack, YStack } from 'tamagui';
+import { CircularButton, FilledButton, Input } from '../../../../components/ui';
 import { useTrips } from '../../../../contexts';
 
 export default function EditTripScreen() {
@@ -125,34 +126,20 @@ export default function EditTripScreen() {
         borderBottomColor="$primary"
         style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
       >
-        <Button
-          size="$4"
-          circular
-          backgroundColor="transparent"
-          pressStyle={{ backgroundColor: '$accent' }}
-          onPress={() => router.back()}
-        >
+        <CircularButton onPress={() => router.back()}>
           <ArrowLeft size={20} color="$foreground" />
-        </Button>
+        </CircularButton>
         <Text color="$foreground" fontSize={16} fontWeight="500">
           모험 수정
         </Text>
-        <Button
-          backgroundColor="$accent"
-          pressStyle={{ backgroundColor: '$accentHover' }}
-          borderRadius="$4"
-          paddingHorizontal="$4"
-          paddingVertical="$2"
-          onPress={handleSubmit}
-        >
+        <FilledButton paddingHorizontal="$4" paddingVertical="$2" onPress={handleSubmit}>
           <Text color="$foreground" fontWeight="500">
             저장
           </Text>
-        </Button>
+        </FilledButton>
       </XStack>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
-        {/* Title */}
         <YStack marginBottom="$6">
           <Text color="$foreground" marginBottom="$2" fontWeight="500">
             모험의 이름
@@ -276,18 +263,11 @@ export default function EditTripScreen() {
               color="$foreground"
               onSubmitEditing={handleAddCountry}
             />
-            <Button
-              backgroundColor="$accent"
-              pressStyle={{ backgroundColor: '$accentHover' }}
-              borderRadius="$4"
-              paddingHorizontal="$4"
-              paddingVertical="$3"
-              onPress={handleAddCountry}
-            >
+            <FilledButton paddingHorizontal="$4" paddingVertical="$3" onPress={handleAddCountry}>
               <Text color="$foreground" fontWeight="500">
                 추가
               </Text>
-            </Button>
+            </FilledButton>
           </XStack>
         </YStack>
 

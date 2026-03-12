@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Image, Text, XStack, YStack } from 'tamagui';
+import { Image, Text, XStack, YStack } from 'tamagui';
+import { CircularButton, FilledButton } from '../../../components/ui';
 import { useExpenses, useFootprints, useTrips } from '../../../contexts';
 import { Trip } from '../../../types';
 
@@ -172,18 +173,16 @@ export default function TripListScreen() {
       <Text color="$mutedForeground" textAlign="center" marginBottom="$6">
         새로운 모험의 기록을 남겨보세요
       </Text>
-      <Button
-        height={48}
+      <FilledButton
         paddingHorizontal="$6"
         backgroundColor="$primary"
-        borderRadius="$6"
         pressStyle={{ backgroundColor: '$primaryHover' }}
         onPress={handleCreateTrip}
       >
         <Text color="white" fontWeight="600">
           여정 만들기
         </Text>
-      </Button>
+      </FilledButton>
     </YStack>
   );
 
@@ -224,24 +223,12 @@ export default function TripListScreen() {
             </YStack>
           </XStack>
           <XStack gap="$2">
-            <Button
-              size="$4"
-              backgroundColor="transparent"
-              borderRadius="$4"
-              pressStyle={{ backgroundColor: '$muted' }}
-              onPress={handleSettings}
-            >
+            <CircularButton pressStyle={{ backgroundColor: '$muted' }} onPress={handleSettings}>
               <Settings size={20} color="$foreground" />
-            </Button>
-            <Button
-              size="$4"
-              backgroundColor="$accent"
-              borderRadius="$4"
-              pressStyle={{ backgroundColor: '$accentHover' }}
-              onPress={handleCreateTrip}
-            >
+            </CircularButton>
+            <CircularButton backgroundColor="$accent" pressStyle={{ backgroundColor: '$accentHover' }} onPress={handleCreateTrip}>
               <Plus size={20} color="$foreground" />
-            </Button>
+            </CircularButton>
           </XStack>
         </XStack>
 

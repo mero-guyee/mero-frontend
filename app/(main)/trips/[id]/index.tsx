@@ -18,6 +18,7 @@ import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Image, Text, XStack, YStack } from 'tamagui';
+import { CircularButton, FilledButton } from '../../../../components/ui';
 import { useExpenses, useFootprints, useTrips } from '../../../../contexts';
 
 type SubTab = 'memos' | 'files';
@@ -154,28 +155,16 @@ export default function TripHomeScreen() {
         borderBottomColor="$primary"
         style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
       >
-        <Button
-          size="$4"
-          circular
-          backgroundColor="transparent"
-          pressStyle={{ backgroundColor: '$accent' }}
-          onPress={handleBack}
-        >
+        <CircularButton onPress={handleBack}>
           <ArrowLeft size={20} color="$foreground" />
-        </Button>
+        </CircularButton>
         <Text flex={1} textAlign="center" color="$foreground" fontSize={16} fontWeight="500">
           {trip.title}
         </Text>
         <YStack position="relative">
-          <Button
-            size="$4"
-            circular
-            backgroundColor="transparent"
-            pressStyle={{ backgroundColor: '$accent' }}
-            onPress={() => setShowMenu(!showMenu)}
-          >
+          <CircularButton onPress={() => setShowMenu(!showMenu)}>
             <MoreVertical size={20} color="$foreground" />
-          </Button>
+          </CircularButton>
           {showMenu && (
             <YStack
               position="absolute"
@@ -328,10 +317,7 @@ export default function TripHomeScreen() {
                   <Text color="$mutedForeground" fontSize={14} marginBottom="$3">
                     자유롭게 메모하세요
                   </Text>
-                  <Button
-                    backgroundColor="$accent"
-                    pressStyle={{ backgroundColor: '$accentHover' }}
-                    borderRadius="$4"
+                  <FilledButton
                     paddingHorizontal="$6"
                     paddingVertical="$3"
                     onPress={handleCreateMemo}
@@ -342,7 +328,7 @@ export default function TripHomeScreen() {
                         첫 노트 작성하기
                       </Text>
                     </XStack>
-                  </Button>
+                  </FilledButton>
                 </YStack>
               ) : (
                 <YStack gap="$2">
@@ -474,17 +460,11 @@ export default function TripHomeScreen() {
                       </XStack>
                     ))}
 
-                    <Button
-                      marginTop="$3"
-                      backgroundColor="$accent"
-                      pressStyle={{ backgroundColor: '$accentHover' }}
-                      borderRadius="$4"
-                      height={48}
-                    >
+                    <FilledButton marginTop="$3">
                       <Text color="$foreground" fontWeight="500">
                         업로드
                       </Text>
-                    </Button>
+                    </FilledButton>
                   </YStack>
                 )}
               </YStack>

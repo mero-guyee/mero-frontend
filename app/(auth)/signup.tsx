@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Input, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
+import { CircularButton, FilledButton, Input } from '../../components/ui';
 import { authApi, Currency, Timezone } from '../../api';
 import { useAuth } from '../../contexts';
 
@@ -76,9 +77,7 @@ export default function SignUpScreen() {
         <YStack width="100%" maxWidth={400} alignSelf="center">
           {/* Header */}
           <XStack alignItems="center" marginBottom="$6" marginTop="$4">
-            <Button
-              size="$4"
-              circular
+            <CircularButton
               backgroundColor="$card"
               pressStyle={{ backgroundColor: '$muted' }}
               onPress={handleBackToLogin}
@@ -91,7 +90,7 @@ export default function SignUpScreen() {
               }}
             >
               <ArrowLeft size={20} color="$foreground" />
-            </Button>
+            </CircularButton>
             <Text marginLeft="$4" fontSize={20} fontWeight="600" color="$foreground">
               회원가입
             </Text>
@@ -269,11 +268,7 @@ export default function SignUpScreen() {
             </YStack>
 
             {/* Submit button */}
-            <Button
-              height={48}
-              backgroundColor="$accent"
-              borderRadius="$4"
-              pressStyle={{ backgroundColor: '$accentHover' }}
+            <FilledButton
               onPress={handleSubmit}
               disabled={loading}
               opacity={loading ? 0.6 : 1}
@@ -281,7 +276,7 @@ export default function SignUpScreen() {
               <Text color="$foreground" fontWeight="600" fontSize={16}>
                 {loading ? '가입 중...' : '가입하기'}
               </Text>
-            </Button>
+            </FilledButton>
           </YStack>
 
           {/* Terms */}

@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, SectionList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Image, Input, Text, XStack, YStack } from 'tamagui';
+import { Image, Text, XStack, YStack } from 'tamagui';
+import { CircularButton, Input } from '../../../components/ui';
 import { useExpenses, useFootprints, useTrips } from '../../../contexts';
 import { Footprint } from '../../../types';
 
@@ -161,24 +162,16 @@ export default function FootprintListScreen() {
             )}
           </YStack>
           <XStack alignItems="center" gap="$2">
-            <Button
-              size="$4"
-              circular
-              backgroundColor="transparent"
-              pressStyle={{ backgroundColor: '$accent' }}
-              onPress={() => setShowSearch(!showSearch)}
-            >
+            <CircularButton onPress={() => setShowSearch(!showSearch)}>
               <Search size={20} color="$foreground" />
-            </Button>
-            <Button
-              size="$4"
-              circular
+            </CircularButton>
+            <CircularButton
               backgroundColor="$accent"
               pressStyle={{ backgroundColor: '$accentHover' }}
               onPress={handleCreateFootprint}
             >
               <Plus size={20} color="$foreground" />
-            </Button>
+            </CircularButton>
           </XStack>
         </XStack>
 

@@ -3,7 +3,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Image, Text, XStack, YStack } from 'tamagui';
+import { Image, Text, XStack, YStack } from 'tamagui';
+import { CircularButton, FilledButton } from '../../../components/ui';
 import { useExpenses, useFootprints, useTrips } from '../../../contexts';
 
 export default function FootprintDetailScreen() {
@@ -110,15 +111,9 @@ export default function FootprintDetailScreen() {
         borderBottomColor="$primary"
         style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
       >
-        <Button
-          size="$4"
-          circular
-          backgroundColor="transparent"
-          pressStyle={{ backgroundColor: '$accent' }}
-          onPress={() => router.back()}
-        >
+        <CircularButton onPress={() => router.back()}>
           <ArrowLeft size={20} color="$foreground" />
-        </Button>
+        </CircularButton>
         <Text flex={1} textAlign="center" color="$foreground" fontSize={16} fontWeight="500">
           {new Date(footprint.date).toLocaleDateString('ko-KR', {
             month: 'long',
@@ -126,15 +121,9 @@ export default function FootprintDetailScreen() {
           })}
         </Text>
         <YStack position="relative">
-          <Button
-            size="$4"
-            circular
-            backgroundColor="transparent"
-            pressStyle={{ backgroundColor: '$accent' }}
-            onPress={() => setShowMenu(!showMenu)}
-          >
+          <CircularButton onPress={() => setShowMenu(!showMenu)}>
             <MoreVertical size={20} color="$foreground" />
-          </Button>
+          </CircularButton>
           {showMenu && (
             <YStack
               position="absolute"
@@ -291,18 +280,11 @@ export default function FootprintDetailScreen() {
               <Text color="$mutedForeground">지출 기록이 없습니다</Text>
             </YStack>
           )}
-          <Button
-            marginTop="$3"
-            backgroundColor="$accent"
-            pressStyle={{ backgroundColor: '$accentHover' }}
-            borderRadius="$4"
-            height={48}
-            onPress={handleAddExpense}
-          >
+          <FilledButton marginTop="$3" onPress={handleAddExpense}>
             <Text color="$foreground" fontWeight="500">
               + 지출 남기기
             </Text>
-          </Button>
+          </FilledButton>
         </YStack>
       </ScrollView>
 

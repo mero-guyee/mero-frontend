@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { ScrollView, Pressable, Alert } from 'react-native';
-import { YStack, XStack, Text, Button } from 'tamagui';
+import { YStack, XStack, Text } from 'tamagui';
+import { CircularButton, FilledButton } from '../../../components/ui';
 import { ArrowLeft, Plus, Edit3, Trash2, GripVertical } from '@tamagui/lucide-icons';
 import { useExpenses } from '../../../contexts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -52,33 +53,20 @@ export default function CategoryManagerScreen() {
         style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
       >
         <XStack paddingHorizontal="$4" paddingVertical="$3" alignItems="center" justifyContent="space-between">
-          <Button
-            size="$4"
-            circular
-            backgroundColor="transparent"
-            pressStyle={{ backgroundColor: '$accent' }}
-            onPress={() => router.back()}
-          >
+          <CircularButton onPress={() => router.back()}>
             <ArrowLeft size={20} color="$foreground" />
-          </Button>
+          </CircularButton>
           <Text color="$foreground" fontSize={16} fontWeight="500">
             카테고리 관리
           </Text>
-          <Button
-            size="$4"
-            circular
-            backgroundColor="transparent"
-            pressStyle={{ backgroundColor: '$accent' }}
-            onPress={handleAddCategory}
-          >
+          <CircularButton onPress={handleAddCategory}>
             <Plus size={20} color="$foreground" />
-          </Button>
+          </CircularButton>
         </XStack>
         <XStack paddingHorizontal="$4" paddingBottom="$3">
-          <Button
+          <FilledButton
             backgroundColor={isEditing ? '$primary' : '$muted'}
             pressStyle={{ opacity: 0.8 }}
-            borderRadius="$4"
             paddingHorizontal="$4"
             paddingVertical="$2"
             onPress={() => setIsEditing(!isEditing)}
@@ -86,7 +74,7 @@ export default function CategoryManagerScreen() {
             <Text color={isEditing ? 'white' : '$foreground'}>
               {isEditing ? '완료' : '편집'}
             </Text>
-          </Button>
+          </FilledButton>
         </XStack>
       </YStack>
 

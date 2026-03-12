@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { ScrollView, Pressable, Alert } from 'react-native';
-import { YStack, XStack, Text, Button } from 'tamagui';
+import { YStack, XStack, Text } from 'tamagui';
+import { FilledButton } from '../../../components/ui';
 import { User, Globe, Bell, Lock, HelpCircle, Tag, ChevronRight } from '@tamagui/lucide-icons';
 import { useAuth } from '../../../contexts';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -162,18 +163,16 @@ export default function SettingsScreen() {
         </YStack>
 
         {/* Logout Button */}
-        <Button
+        <FilledButton
           backgroundColor="$destructive"
           pressStyle={{ opacity: 0.8 }}
-          borderRadius="$4"
-          height={48}
           marginTop="$4"
           onPress={handleLogout}
         >
           <Text color="white" fontWeight="500">
             로그아웃
           </Text>
-        </Button>
+        </FilledButton>
 
         {/* Version */}
         <Text textAlign="center" color="$mutedForeground" marginTop="$6">

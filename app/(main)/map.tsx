@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Image, Text, XStack, YStack } from 'tamagui';
+import { Image, Text, XStack, YStack } from 'tamagui';
+import { CircularButton } from '../../components/ui';
 import { useFootprints } from '../../contexts';
 import { useTrips } from '../../contexts/TripContext';
 import { Footprint } from '../../types';
@@ -203,15 +204,9 @@ export default function MapViewScreen() {
                     {timelineMemos.length}개의 기록
                   </Text>
                 </YStack>
-                <Button
-                  size="$3"
-                  circular
-                  backgroundColor="transparent"
-                  pressStyle={{ backgroundColor: '$accent' }}
-                  onPress={() => setShowTimelineModal(false)}
-                >
+                <CircularButton size="$3" onPress={() => setShowTimelineModal(false)}>
                   <X size={20} color="$foreground" />
-                </Button>
+                </CircularButton>
               </XStack>
 
               {/* Timeline Content */}

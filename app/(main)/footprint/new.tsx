@@ -1,10 +1,11 @@
-import { ArrowLeft, MapPin, Plus, X } from '@tamagui/lucide-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { ArrowLeft, MapPin, Plus, X } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Modal, Platform, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Input, Text, TextArea, XStack, YStack } from 'tamagui';
+import { Text, TextArea, XStack, YStack } from 'tamagui';
+import { CircularButton, FilledButton, Input } from '../../../components/ui';
 import { useFootprints, useTrips } from '../../../contexts';
 import { FootprintLocation } from '../../../types';
 
@@ -130,30 +131,17 @@ export default function FootprintFormScreen() {
         borderBottomColor="$primary"
         style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
       >
-        <Button
-          size="$4"
-          circular
-          backgroundColor="transparent"
-          pressStyle={{ backgroundColor: '$accent' }}
-          onPress={() => router.back()}
-        >
+        <CircularButton onPress={() => router.back()}>
           <ArrowLeft size={20} color="$foreground" />
-        </Button>
+        </CircularButton>
         <Text color="$foreground" fontSize={16} fontWeight="500">
           {existingFootprint ? '유랑 수정' : '새 유랑'}
         </Text>
-        <Button
-          backgroundColor="$accent"
-          pressStyle={{ backgroundColor: '$accentHover' }}
-          borderRadius="$4"
-          paddingHorizontal="$4"
-          paddingVertical="$2"
-          onPress={handleSubmit}
-        >
+        <FilledButton paddingHorizontal="$4" paddingVertical="$2" onPress={handleSubmit}>
           <Text color="$foreground" fontWeight="500">
             저장
           </Text>
-        </Button>
+        </FilledButton>
       </XStack>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
@@ -193,10 +181,8 @@ export default function FootprintFormScreen() {
             <Text color="$foreground" fontWeight="500">
               📍 머문 곳
             </Text>
-            <Button
+            <FilledButton
               size="$3"
-              backgroundColor="$accent"
-              pressStyle={{ backgroundColor: '$accentHover' }}
               borderRadius="$3"
               onPress={() => setShowLocationModal(true)}
             >
@@ -206,7 +192,7 @@ export default function FootprintFormScreen() {
                   위치 추가
                 </Text>
               </XStack>
-            </Button>
+            </FilledButton>
           </XStack>
 
           {locations.length > 0 && (
@@ -319,11 +305,8 @@ export default function FootprintFormScreen() {
                 <Text color="$foreground" fontSize={18} fontWeight="600">
                   위치 추가
                 </Text>
-                <Button
+                <CircularButton
                   size="$3"
-                  circular
-                  backgroundColor="transparent"
-                  pressStyle={{ backgroundColor: '$accent' }}
                   onPress={() => {
                     setShowLocationModal(false);
                     setSearchQuery('');
@@ -331,7 +314,7 @@ export default function FootprintFormScreen() {
                   }}
                 >
                   <X size={20} color="$foreground" />
-                </Button>
+                </CircularButton>
               </XStack>
 
               <YStack marginBottom="$3">

@@ -2,7 +2,8 @@ import { Compass, Mail } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert } from 'react-native';
-import { Button, Input, Separator, Text, XStack, YStack } from 'tamagui';
+import { Separator, Text, XStack, YStack } from 'tamagui';
+import { FilledButton, Input } from '../../components/ui';
 import { authApi } from '../../api';
 import { useAuth } from '../../contexts';
 
@@ -143,11 +144,7 @@ export default function LoginScreen() {
           </YStack>
 
           {/* Login Button */}
-          <Button
-            height={48}
-            backgroundColor="$accent"
-            borderRadius="$4"
-            pressStyle={{ backgroundColor: '$accentHover' }}
+          <FilledButton
             onPress={handleEmailLogin}
             disabled={loading}
             opacity={loading ? 0.6 : 1}
@@ -155,7 +152,7 @@ export default function LoginScreen() {
             <Text color="$foreground" fontWeight="600" fontSize={16}>
               {loading ? '로그인 중...' : '로그인'}
             </Text>
-          </Button>
+          </FilledButton>
 
           {/* Divider */}
           <XStack alignItems="center" marginVertical="$6">
@@ -167,11 +164,7 @@ export default function LoginScreen() {
           </XStack>
 
           {/* Apple Login */}
-          <Button
-            height={48}
-            backgroundColor="$accent"
-            borderRadius="$4"
-            pressStyle={{ backgroundColor: '$accentHover' }}
+          <FilledButton
             onPress={handleAppleLogin}
           >
             <XStack alignItems="center" gap="$2">
@@ -180,7 +173,7 @@ export default function LoginScreen() {
                 Apple로 로그인
               </Text>
             </XStack>
-          </Button>
+          </FilledButton>
         </YStack>
 
         {/* Sign up link */}

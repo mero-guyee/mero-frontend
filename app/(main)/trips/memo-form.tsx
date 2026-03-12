@@ -3,7 +3,8 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Input, Text, TextArea, XStack, YStack } from 'tamagui';
+import { Text, TextArea, XStack, YStack } from 'tamagui';
+import { CircularButton, FilledButton, Input } from '../../../components/ui';
 import { useTrips } from '../../../contexts';
 
 export default function MemoFormScreen() {
@@ -58,22 +59,13 @@ export default function MemoFormScreen() {
         borderBottomColor="$primary"
         style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
       >
-        <Button
-          size="$4"
-          circular
-          backgroundColor="transparent"
-          pressStyle={{ backgroundColor: '$accent' }}
-          onPress={() => router.back()}
-        >
+        <CircularButton onPress={() => router.back()}>
           <ArrowLeft size={20} color="$foreground" />
-        </Button>
+        </CircularButton>
         <Text color="$foreground" fontSize={16} fontWeight="500">
           {existingMemo ? '메모 수정' : '새 메모'}
         </Text>
-        <Button
-          backgroundColor="$accent"
-          pressStyle={{ backgroundColor: '$accentHover' }}
-          borderRadius="$4"
+        <FilledButton
           paddingHorizontal="$4"
           paddingVertical="$2"
           onPress={handleSubmit}
@@ -83,7 +75,7 @@ export default function MemoFormScreen() {
           <Text color="$foreground" fontWeight="500">
             저장
           </Text>
-        </Button>
+        </FilledButton>
       </XStack>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
