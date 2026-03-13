@@ -1,4 +1,6 @@
 import * as SQLite from 'expo-sqlite';
+import type { MemoResponse } from '../api/memos';
+import type { TripResponse } from '../api/trips';
 import { Memo, Trip } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
@@ -84,6 +86,26 @@ export class TripRepository extends BaseRepository<TripRow> {
   async deleteTrip(id: string): Promise<void> {
     await this.delete(id);
   }
+
+  async upsertFromServer(serverTrip: TripResponse): Promise<void> {
+    if (!serverTrip.clientId) return;
+    const existing = await this.findById(serverTrip.clientId);
+    if (existing) {
+      if (existing.syncStatus === 'pending') return;
+      await this.db.runAsync(
+        `UPDATE trips SET serverId=?, title=?, startDate=?, endDate=?, countries=?, imageUrl=?, syncStatus='synced' WHERE id=?`,
+        [String(serverTrip.id), serverTrip.title, serverTrip.startDate, serverTrip.endDate,
+          JSON.stringify(serverTrip.countries), serverTrip.imageUrl ?? '', serverTrip.clientId]
+      );
+    } else {
+      await this.db.runAsync(
+        `INSERT OR IGNORE INTO trips (id, serverId, title, imageUrl, startDate, endDate, countries, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,?,?,'synced',NULL)`,
+        [serverTrip.clientId, String(serverTrip.id), serverTrip.title, serverTrip.imageUrl ?? '',
+          serverTrip.startDate, serverTrip.endDate, JSON.stringify(serverTrip.countries),
+          serverTrip.createdAt, serverTrip.createdAt]
+      );
+    }
+  }
 }
 
 export class MemoRepository extends BaseRepository<MemoRow> {
@@ -133,5 +155,23 @@ export class MemoRepository extends BaseRepository<MemoRow> {
       `UPDATE memos SET deletedAt = datetime('now'), updatedAt = datetime('now'), syncStatus = 'pending' WHERE tripId = ?`,
       [tripId]
     );
+  }
+
+  async upsertFromServer(serverMemo: MemoResponse, localTripId: string): Promise<void> {
+    if (!serverMemo.clientId) return;
+    const existing = await this.findById(serverMemo.clientId);
+    if (existing) {
+      if (existing.syncStatus === 'pending') return;
+      await this.db.runAsync(
+        `UPDATE memos SET serverId=?, title=?, content=?, syncStatus='synced', updatedAt=? WHERE id=?`,
+        [String(serverMemo.id), serverMemo.title, serverMemo.content, serverMemo.updatedAt, serverMemo.clientId]
+      );
+    } else {
+      await this.db.runAsync(
+        `INSERT OR IGNORE INTO memos (id, serverId, tripId, title, content, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,'synced',NULL)`,
+        [serverMemo.clientId, String(serverMemo.id), localTripId, serverMemo.title, serverMemo.content,
+          serverMemo.createdAt, serverMemo.updatedAt]
+      );
+    }
   }
 }

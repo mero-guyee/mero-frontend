@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import type { ExpenseResponse } from '../api/expenses';
 import { Expense, ExpenseCategory } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
@@ -132,6 +133,30 @@ export class ExpenseRepository extends BaseRepository<ExpenseRow> {
       `UPDATE expenses SET deletedAt = datetime('now'), updatedAt = datetime('now'), syncStatus = 'pending' WHERE footprintId = ?`,
       [footprintId]
     );
+  }
+
+  async upsertFromServer(serverExpense: ExpenseResponse, localTripId: string): Promise<void> {
+    if (!serverExpense.clientId) return;
+    const existing = await this.findById(serverExpense.clientId);
+    if (existing) {
+      if (existing.syncStatus === 'pending') return;
+      await this.db.runAsync(
+        `UPDATE expenses SET serverId=?, amount=?, currency=?, categoryId=?, categoryName=?, categoryIcon=?, categoryColor=?, description=?, date=?, syncStatus='synced' WHERE id=?`,
+        [String(serverExpense.id), serverExpense.amount, serverExpense.currency,
+          String(serverExpense.categoryId), serverExpense.categoryName, serverExpense.categoryIcon,
+          serverExpense.categoryColor, serverExpense.description ?? null, serverExpense.date,
+          serverExpense.clientId]
+      );
+    } else {
+      await this.db.runAsync(
+        `INSERT OR IGNORE INTO expenses (id, serverId, tripId, footprintId, categoryId, categoryName, categoryIcon, categoryColor, amount, currency, description, date, location, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,NULL,?,?,?,?,?,?,?,?,NULL,?,?,'synced',NULL)`,
+        [serverExpense.clientId, String(serverExpense.id), localTripId,
+          String(serverExpense.categoryId), serverExpense.categoryName, serverExpense.categoryIcon,
+          serverExpense.categoryColor, serverExpense.amount, serverExpense.currency,
+          serverExpense.description ?? null, serverExpense.date,
+          serverExpense.createdAt, serverExpense.createdAt]
+      );
+    }
   }
 }
 

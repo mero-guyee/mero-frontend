@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import type { BudgetResponse } from '../api/budgets';
 import { Budget } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
@@ -71,5 +72,25 @@ export class BudgetRepository extends BaseRepository<BudgetRow> {
       `UPDATE budgets SET deletedAt = datetime('now'), updatedAt = datetime('now'), syncStatus = 'pending' WHERE tripId = ?`,
       [tripId]
     );
+  }
+
+  async upsertFromServer(serverBudget: BudgetResponse, localTripId: string): Promise<void> {
+    if (!serverBudget.clientId) return;
+    const existing = await this.findById(serverBudget.clientId);
+    if (existing) {
+      if (existing.syncStatus === 'pending') return;
+      await this.db.runAsync(
+        `UPDATE budgets SET serverId=?, amount=?, currency=?, exchangeRate=?, syncStatus='synced', updatedAt=? WHERE id=?`,
+        [String(serverBudget.id), serverBudget.amount, serverBudget.currency,
+          serverBudget.exchangeRate ?? null, serverBudget.updatedAt, serverBudget.clientId]
+      );
+    } else {
+      await this.db.runAsync(
+        `INSERT OR IGNORE INTO budgets (id, serverId, tripId, currency, amount, exchangeRate, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,?,'synced',NULL)`,
+        [serverBudget.clientId, String(serverBudget.id), localTripId,
+          serverBudget.currency, serverBudget.amount, serverBudget.exchangeRate ?? null,
+          serverBudget.createdAt, serverBudget.updatedAt]
+      );
+    }
   }
 }

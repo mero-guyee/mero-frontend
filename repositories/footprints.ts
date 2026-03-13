@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import type { FootprintResponse } from '../api/footprints';
 import { Footprint } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
@@ -86,5 +87,26 @@ export class FootprintRepository extends BaseRepository<FootprintRow> {
       `UPDATE footprints SET deletedAt = datetime('now'), updatedAt = datetime('now'), syncStatus = 'pending' WHERE tripId = ?`,
       [tripId]
     );
+  }
+
+  async upsertFromServer(serverFootprint: FootprintResponse, localTripId: string): Promise<void> {
+    if (!serverFootprint.clientId) return;
+    const existing = await this.findById(serverFootprint.clientId);
+    if (existing) {
+      if (existing.syncStatus === 'pending') return;
+      await this.db.runAsync(
+        `UPDATE footprints SET serverId=?, content=?, date=?, locations=?, syncStatus='synced' WHERE id=?`,
+        [String(serverFootprint.id), serverFootprint.content ?? '', serverFootprint.date,
+          JSON.stringify(serverFootprint.locations ?? []), serverFootprint.clientId]
+      );
+    } else {
+      await this.db.runAsync(
+        `INSERT OR IGNORE INTO footprints (id, serverId, tripId, title, content, date, locations, photoUrls, weatherInfo, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,?,NULL,?,?,'synced',NULL)`,
+        [serverFootprint.clientId, String(serverFootprint.id), localTripId,
+          serverFootprint.content ?? '', serverFootprint.content ?? '', serverFootprint.date,
+          JSON.stringify(serverFootprint.locations ?? []), JSON.stringify([]),
+          new Date().toISOString(), new Date().toISOString()]
+      );
+    }
   }
 }

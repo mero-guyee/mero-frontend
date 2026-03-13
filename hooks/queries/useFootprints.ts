@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { footprintsApi } from '../../api/footprints';
 import { Footprint } from '../../types';
 import { FootprintRepository } from '../../repositories';
+import { TripRepository } from '../../repositories';
 import { useDb } from '../../providers/DatabaseProvider';
 
 export const footprintKeys = {
@@ -21,7 +23,20 @@ export function useFootprintsByTripQuery(tripId: string) {
   const db = useDb();
   return useQuery({
     queryKey: footprintKeys.byTrip(tripId),
-    queryFn: () => new FootprintRepository(db).getFootprintsByTripId(tripId),
+    queryFn: async () => {
+      const tripRepo = new TripRepository(db);
+      const repo = new FootprintRepository(db);
+      try {
+        const trip = await tripRepo.getTripById(tripId);
+        if (trip?.serverId) {
+          const serverFootprints = await footprintsApi.getAll(parseInt(trip.serverId));
+          await Promise.all(serverFootprints.map((f) => repo.upsertFromServer(f, tripId)));
+        }
+      } catch {
+        // offline — use local cache
+      }
+      return repo.getFootprintsByTripId(tripId);
+    },
     enabled: !!tripId,
   });
 }
@@ -39,7 +54,28 @@ export function useCreateFootprint() {
   const db = useDb();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: Omit<Footprint, 'id' | 'serverId'>) => new FootprintRepository(db).createFootprint(data),
+    mutationFn: async (data: Omit<Footprint, 'id' | 'serverId'>) => {
+      const tripRepo = new TripRepository(db);
+      const repo = new FootprintRepository(db);
+      const localFootprint = await repo.createFootprint(data);
+      try {
+        const trip = await tripRepo.getTripById(data.tripId);
+        if (trip?.serverId) {
+          const serverFootprint = await footprintsApi.create(parseInt(trip.serverId), {
+            clientId: localFootprint.id,
+            title: data.title,
+            content: data.content,
+            date: data.date,
+            locations: data.locations,
+            photoUrls: data.photoUrls,
+          });
+          await repo.setServerId(localFootprint.id, String(serverFootprint.id));
+        }
+      } catch {
+        // stays pending
+      }
+      return localFootprint;
+    },
     onSuccess: (footprint) => {
       qc.invalidateQueries({ queryKey: footprintKeys.all });
       qc.invalidateQueries({ queryKey: footprintKeys.byTrip(footprint.tripId) });
@@ -51,7 +87,29 @@ export function useUpdateFootprint() {
   const db = useDb();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (footprint: Footprint) => new FootprintRepository(db).updateFootprint(footprint),
+    mutationFn: async (footprint: Footprint) => {
+      const tripRepo = new TripRepository(db);
+      const repo = new FootprintRepository(db);
+      const updated = await repo.updateFootprint(footprint);
+      try {
+        if (footprint.serverId) {
+          const trip = await tripRepo.getTripById(footprint.tripId);
+          if (trip?.serverId) {
+            await footprintsApi.update(parseInt(trip.serverId), parseInt(footprint.serverId), {
+              title: footprint.title,
+              content: footprint.content,
+              date: footprint.date,
+              locations: footprint.locations,
+              photoUrls: footprint.photoUrls,
+            });
+            await repo.markSynced(footprint.id);
+          }
+        }
+      } catch {
+        // stays pending
+      }
+      return updated;
+    },
     onSuccess: (_, footprint) => {
       qc.invalidateQueries({ queryKey: footprintKeys.all });
       qc.invalidateQueries({ queryKey: footprintKeys.byTrip(footprint.tripId) });
@@ -65,7 +123,20 @@ export function useDeleteFootprint() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, tripId }: { id: string; tripId: string }) => {
-      await new FootprintRepository(db).deleteFootprint(id);
+      const tripRepo = new TripRepository(db);
+      const repo = new FootprintRepository(db);
+      const footprintRow = await repo.findById(id);
+      await repo.deleteFootprint(id);
+      try {
+        if (footprintRow?.serverId) {
+          const trip = await tripRepo.getTripById(tripId);
+          if (trip?.serverId) {
+            await footprintsApi.delete(parseInt(trip.serverId), parseInt(footprintRow.serverId));
+          }
+        }
+      } catch {
+        // stays soft-deleted with pending status
+      }
       return tripId;
     },
     onSuccess: (tripId) => {
