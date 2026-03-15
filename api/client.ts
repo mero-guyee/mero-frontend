@@ -2,7 +2,7 @@ import { tokenStorage } from './tokenStorage';
 
 export { tokenStorage } from './tokenStorage';
 
-export const BASE_URL = 'https://mero-dev-development.up.railway.app';
+export const BASE_URL = __DEV__ ? 'http://10.0.2.2:8080' : 'https://mero-dev-development.up.railway.app';
 
 export class ApiError extends Error {
   constructor(
@@ -79,7 +79,7 @@ export async function apiRequest<T>(
 
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
 
-  if (res.status === 401) {
+  if (res.status === 401 || res.status === 403) {
     if (isRefreshing) {
       return new Promise<T>((resolve, reject) => {
         registerRefreshSubscriberAction((token) => {
@@ -99,8 +99,10 @@ export async function apiRequest<T>(
   }
 
   if (!res.ok) {
-    const body = await res.text();
-    throw new ApiError(res.status, body);
+    const text = await res.text();
+    let message = text;
+    try { message = JSON.parse(text).message ?? text; } catch {}
+    throw new ApiError(res.status, message);
   }
 
   return res.status === 204 ? (undefined as T) : await res.json();
@@ -117,6 +119,40 @@ export async function apiFormRequest<T>(path: string, body: FormData): Promise<T
     body,
   });
 
-  if (!res.ok) throw new ApiError(res.status, await res.text());
+  console.log("this is headers", headers)
+
+  if (res.status === 401 || res.status === 403) {
+    if (isRefreshing) {
+      return new Promise<T>((resolve, reject) => {
+        registerRefreshSubscriberAction((token) => {
+          const retryHeaders = { ...headers, Authorization: `Bearer ${token}` };
+          fetch(`${BASE_URL}${path}`, { method: 'POST', headers: retryHeaders, body })
+            .then((r) => r.status === 204 ? (undefined as T) : r.json())
+            .then(resolve)
+            .catch(reject);
+        });
+      });
+    }
+
+    isRefreshing = true;
+    const newToken = await refreshAccessToken();
+    isRefreshing = false;
+
+    if (!newToken) throw new ApiError(401, 'Unauthorized');
+
+    onRefreshed(newToken);
+    const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` };
+    const retryRes = await fetch(`${BASE_URL}${path}`, { method: 'POST', headers: retryHeaders, body });
+    if (!retryRes.ok) throw new ApiError(retryRes.status, await retryRes.text());
+    return retryRes.status === 204 ? (undefined as T) : await retryRes.json();
+  }
+
+  if (!res.ok) {
+    const text = await res.text();
+    
+    let message = text;
+    try { message = JSON.parse(text).message ?? text; } catch {}
+    throw new ApiError(res.status, message);
+  }
   return res.status === 204 ? (undefined as T) : await res.json();
 }
