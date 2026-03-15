@@ -1,11 +1,12 @@
 import { apiFormRequest, apiRequest } from './client';
 
 export interface TripCreateRequest {
-  clientId: string; // local UUID
+  clientId: string;
   title: string;
-  startDate: string; // YYYY-MM-DD
-  endDate: string;   // YYYY-MM-DD
-  countries?: string[];
+  startDate: string;
+  endDate: string;  
+  countries: string[];
+  imageUrl?: string;
 }
 
 export interface TripUpdateRequest {
@@ -44,11 +45,21 @@ export const tripsApi = {
   getById: (tripId: number): Promise<TripDetailResponse> =>
     apiRequest(`/api/trips/${tripId}`),
 
-  create: (data: TripCreateRequest): Promise<TripResponse> =>
-    apiRequest('/api/trips', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    }),
+  create: (data: TripCreateRequest): Promise<TripResponse> => {
+    const form = new FormData();
+    form.append('data', JSON.stringify({
+      clientId: data.clientId,
+      title: data.title,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      countries: data.countries,
+    }));
+    if (data.imageUrl) {
+      form.append('image', { uri: data.imageUrl, name: 'cover.jpg', type: 'image/jpeg' } as any);
+    }
+    
+    return apiFormRequest('/api/trips', form);
+  },
 
   update: (tripId: number, data: TripUpdateRequest): Promise<TripResponse> =>
     apiRequest(`/api/trips/${tripId}`, {
