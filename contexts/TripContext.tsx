@@ -2,11 +2,13 @@ import React, { createContext, ReactNode, useContext, useState } from 'react';
 import {
   useAllMemosQuery,
   useCreateMemo,
-  useCreateTrip,
   useDeleteMemo,
+  useUpdateMemo,
+} from '../hooks/queries/useMemos';
+import {
+  useCreateTrip,
   useDeleteTrip,
   useTripsQuery,
-  useUpdateMemo,
   useUpdateTrip,
 } from '../hooks/queries/useTrips';
 import { Memo, Trip } from '../types';
