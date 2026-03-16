@@ -72,11 +72,10 @@ export default function EditTripScreen() {
     }
 
     updateTrip({
-      id: trip.id,
+      ...trip,
       title: title.trim(),
       startDate,
       endDate,
-      imageUrl: imageUrl?.trim() || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800',
       countries      
     });
 
