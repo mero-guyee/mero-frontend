@@ -119,8 +119,6 @@ export async function apiFormRequest<T>(path: string, body: FormData): Promise<T
     body,
   });
 
-  console.log("this is headers", headers)
-
   if (res.status === 401 || res.status === 403) {
     if (isRefreshing) {
       return new Promise<T>((resolve, reject) => {

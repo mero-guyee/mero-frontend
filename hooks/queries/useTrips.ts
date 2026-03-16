@@ -75,7 +75,6 @@ export function useCreateTrip() {
     mutationFn: async (data: Omit<Trip, 'id'>) => {
       const repo = new TripRepository(db);
       const localTrip = await repo.createTrip(data);
-      console.log("this is local trip", localTrip)
       try {
         const serverTrip = await tripsApi.create({
           clientId: localTrip.id,
@@ -87,7 +86,6 @@ export function useCreateTrip() {
         });
         
         await repo.setServerId(localTrip.id, String(serverTrip.id));
-        console.log('Trip created on server with ID:', serverTrip.id);
       } catch (e){
         if(e instanceof ApiError) {
           console.error('Failed to create trip on server:', e.status, e.message); 
