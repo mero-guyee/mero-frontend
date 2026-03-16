@@ -20,7 +20,7 @@ export default function EditTripScreen() {
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [imageUrl, setCoverImage] = useState<string|undefined>('');
+  const [imageUrl, setCoverImage] = useState<string | undefined>('');
   const [countries, setCountries] = useState<string[]>([]);
   const [newCountry, setNewCountry] = useState('');
   const [status, setStatus] = useState<'ongoing' | 'completed'>('ongoing');
@@ -76,7 +76,7 @@ export default function EditTripScreen() {
       title: title.trim(),
       startDate,
       endDate,
-      countries      
+      countries,
     });
 
     router.back();
@@ -327,12 +327,7 @@ export default function EditTripScreen() {
             >
               {imageUrl ? (
                 <YStack position="relative" aspectRatio={16 / 9}>
-                  <Image
-                    source={{ uri: imageUrl }}
-                    width="100%"
-                    height="100%"
-                    resizeMode="cover"
-                  />
+                  <Image source={{ uri: imageUrl }} width="100%" height="100%" resizeMode="cover" />
                   <Pressable
                     onPress={(e) => {
                       e.stopPropagation();
@@ -351,7 +346,13 @@ export default function EditTripScreen() {
                   </Pressable>
                 </YStack>
               ) : (
-                <YStack flex={1} alignItems="center" justifyContent="center" padding="$6" minHeight={192}>
+                <YStack
+                  flex={1}
+                  alignItems="center"
+                  justifyContent="center"
+                  padding="$6"
+                  minHeight={192}
+                >
                   <YStack
                     width={64}
                     height={64}

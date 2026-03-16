@@ -52,7 +52,12 @@ export default function CategoryManagerScreen() {
         borderBottomColor="$primary"
         style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
       >
-        <XStack paddingHorizontal="$4" paddingVertical="$3" alignItems="center" justifyContent="space-between">
+        <XStack
+          paddingHorizontal="$4"
+          paddingVertical="$3"
+          alignItems="center"
+          justifyContent="space-between"
+        >
           <CircularButton onPress={() => router.back()}>
             <ArrowLeft size={20} color="$foreground" />
           </CircularButton>
@@ -71,9 +76,7 @@ export default function CategoryManagerScreen() {
             paddingVertical="$2"
             onPress={() => setIsEditing(!isEditing)}
           >
-            <Text color={isEditing ? 'white' : '$foreground'}>
-              {isEditing ? '완료' : '편집'}
-            </Text>
+            <Text color={isEditing ? 'white' : '$foreground'}>{isEditing ? '완료' : '편집'}</Text>
           </FilledButton>
         </XStack>
       </YStack>
@@ -94,9 +97,7 @@ export default function CategoryManagerScreen() {
                 borderWidth={1}
                 borderColor="$border"
               >
-                {isEditing && (
-                  <GripVertical size={20} color="$mutedForeground" />
-                )}
+                {isEditing && <GripVertical size={20} color="$mutedForeground" />}
                 <YStack
                   width={40}
                   height={40}

@@ -38,17 +38,20 @@ export default function FootprintListScreen() {
   }, [footprints, activeTrip, searchQuery]);
 
   const footprintsByMonth = useMemo(() => {
-    const grouped = filteredFootprints.reduce((acc, footprint) => {
-      const monthKey = new Date(footprint.date).toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-      });
-      if (!acc[monthKey]) {
-        acc[monthKey] = [];
-      }
-      acc[monthKey].push(footprint);
-      return acc;
-    }, {} as Record<string, Footprint[]>);
+    const grouped = filteredFootprints.reduce(
+      (acc, footprint) => {
+        const monthKey = new Date(footprint.date).toLocaleDateString('ko-KR', {
+          year: 'numeric',
+          month: 'long',
+        });
+        if (!acc[monthKey]) {
+          acc[monthKey] = [];
+        }
+        acc[monthKey].push(footprint);
+        return acc;
+      },
+      {} as Record<string, Footprint[]>
+    );
 
     return Object.entries(grouped).map(([title, data]) => ({ title, data }));
   }, [filteredFootprints]);
@@ -131,9 +134,19 @@ export default function FootprintListScreen() {
   );
 
   const renderEmptyList = () => (
-    <YStack flex={1} alignItems="center" justifyContent="center" paddingVertical={80} paddingHorizontal="$4">
-      <Text fontSize={48} marginBottom="$4">📔</Text>
-      <Text color="$foreground" marginBottom="$1">아직 일지가 없습니다</Text>
+    <YStack
+      flex={1}
+      alignItems="center"
+      justifyContent="center"
+      paddingVertical={80}
+      paddingHorizontal="$4"
+    >
+      <Text fontSize={48} marginBottom="$4">
+        📔
+      </Text>
+      <Text color="$foreground" marginBottom="$1">
+        아직 일지가 없습니다
+      </Text>
       <Text color="$mutedForeground">새 일지를 작성해보세요</Text>
     </YStack>
   );

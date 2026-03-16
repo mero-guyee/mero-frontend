@@ -30,7 +30,10 @@ export default function FootprintDetailScreen() {
     const paragraphs = footprint.content.split('\n\n').filter((p) => p.trim());
     const result: { type: 'text' | 'photo'; content: string }[] = [];
 
-    const photoInterval = Math.max(1, Math.floor(paragraphs.length / (footprint.photoUrls.length + 1)));
+    const photoInterval = Math.max(
+      1,
+      Math.floor(paragraphs.length / (footprint.photoUrls.length + 1))
+    );
     let photoIndex = 0;
 
     paragraphs.forEach((paragraph, idx) => {
@@ -62,7 +65,7 @@ export default function FootprintDetailScreen() {
     router.push({
       pathname: '/(main)/footprint/new',
       params: { footprintId: footprint.id },
-    } );
+    });
   };
 
   const handleDelete = () => {

@@ -81,15 +81,28 @@ export class BudgetRepository extends BaseRepository<BudgetRow> {
       if (existing.syncStatus === 'pending') return;
       await this.db.runAsync(
         `UPDATE budgets SET serverId=?, amount=?, currency=?, exchangeRate=?, syncStatus='synced', updatedAt=? WHERE id=?`,
-        [String(serverBudget.id), serverBudget.amount, serverBudget.currency,
-          serverBudget.exchangeRate ?? null, serverBudget.updatedAt, serverBudget.clientId]
+        [
+          String(serverBudget.id),
+          serverBudget.amount,
+          serverBudget.currency,
+          serverBudget.exchangeRate ?? null,
+          serverBudget.updatedAt,
+          serverBudget.clientId,
+        ]
       );
     } else {
       await this.db.runAsync(
         `INSERT OR IGNORE INTO budgets (id, serverId, tripId, currency, amount, exchangeRate, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,?,'synced',NULL)`,
-        [serverBudget.clientId, String(serverBudget.id), localTripId,
-          serverBudget.currency, serverBudget.amount, serverBudget.exchangeRate ?? null,
-          serverBudget.createdAt, serverBudget.updatedAt]
+        [
+          serverBudget.clientId,
+          String(serverBudget.id),
+          localTripId,
+          serverBudget.currency,
+          serverBudget.amount,
+          serverBudget.exchangeRate ?? null,
+          serverBudget.createdAt,
+          serverBudget.updatedAt,
+        ]
       );
     }
   }

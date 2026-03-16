@@ -85,7 +85,13 @@ export default function SettingsScreen() {
           <Text color="$mutedForeground" marginBottom="$3">
             계정
           </Text>
-          <YStack backgroundColor="$card" borderRadius="$4" overflow="hidden" borderWidth={1} borderColor="$border">
+          <YStack
+            backgroundColor="$card"
+            borderRadius="$4"
+            overflow="hidden"
+            borderWidth={1}
+            borderColor="$border"
+          >
             <SettingItem
               icon={<User size={20} color="$foreground" />}
               label="프로필 설정"
@@ -99,7 +105,13 @@ export default function SettingsScreen() {
           <Text color="$mutedForeground" marginBottom="$3">
             경비
           </Text>
-          <YStack backgroundColor="$card" borderRadius="$4" overflow="hidden" borderWidth={1} borderColor="$border">
+          <YStack
+            backgroundColor="$card"
+            borderRadius="$4"
+            overflow="hidden"
+            borderWidth={1}
+            borderColor="$border"
+          >
             <SettingItem
               icon={<Tag size={20} color="$foreground" />}
               label="카테고리 관리"
@@ -113,7 +125,13 @@ export default function SettingsScreen() {
           <Text color="$mutedForeground" marginBottom="$3">
             일반
           </Text>
-          <YStack backgroundColor="$card" borderRadius="$4" overflow="hidden" borderWidth={1} borderColor="$border">
+          <YStack
+            backgroundColor="$card"
+            borderRadius="$4"
+            overflow="hidden"
+            borderWidth={1}
+            borderColor="$border"
+          >
             <SettingItem
               icon={<Globe size={20} color="$foreground" />}
               label="언어 설정"
@@ -133,7 +151,13 @@ export default function SettingsScreen() {
           <Text color="$mutedForeground" marginBottom="$3">
             보안
           </Text>
-          <YStack backgroundColor="$card" borderRadius="$4" overflow="hidden" borderWidth={1} borderColor="$border">
+          <YStack
+            backgroundColor="$card"
+            borderRadius="$4"
+            overflow="hidden"
+            borderWidth={1}
+            borderColor="$border"
+          >
             <SettingItem
               icon={<Lock size={20} color="$foreground" />}
               label="개인정보 보호"
@@ -147,7 +171,13 @@ export default function SettingsScreen() {
           <Text color="$mutedForeground" marginBottom="$3">
             지원
           </Text>
-          <YStack backgroundColor="$card" borderRadius="$4" overflow="hidden" borderWidth={1} borderColor="$border">
+          <YStack
+            backgroundColor="$card"
+            borderRadius="$4"
+            overflow="hidden"
+            borderWidth={1}
+            borderColor="$border"
+          >
             <SettingItem
               icon={<HelpCircle size={20} color="$foreground" />}
               label="도움말"

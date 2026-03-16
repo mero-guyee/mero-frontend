@@ -1,5 +1,12 @@
 export { authApi } from './auth';
-export type { Currency, LoginRequest, LoginResponse, SignUpRequest, Timezone, UserResponse } from './auth';
+export type {
+  Currency,
+  LoginRequest,
+  LoginResponse,
+  SignUpRequest,
+  Timezone,
+  UserResponse,
+} from './auth';
 
 export { budgetsApi } from './budgets';
 export type { BudgetCreateRequest, BudgetResponse, BudgetUpdateRequest } from './budgets';

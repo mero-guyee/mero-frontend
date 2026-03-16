@@ -20,11 +20,7 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  return (
-    <DatabaseContext.Provider value={{ db, isReady }}>
-      {children}
-    </DatabaseContext.Provider>
-  );
+  return <DatabaseContext.Provider value={{ db, isReady }}>{children}</DatabaseContext.Provider>;
 }
 
 export function useDb(): SQLite.SQLiteDatabase {

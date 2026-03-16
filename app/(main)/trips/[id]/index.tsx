@@ -133,9 +133,7 @@ export default function TripHomeScreen() {
   const getTimeText = (dateString: string) => {
     const createdDate = new Date(dateString);
     const now = new Date();
-    const daysDiff = Math.floor(
-      (now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const daysDiff = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
     if (daysDiff === 0) return '오늘';
     if (daysDiff === 1) return '어제';
     return `${daysDiff}일 전`;
@@ -188,7 +186,12 @@ export default function TripHomeScreen() {
                   <Text color="$foreground">수정</Text>
                 </XStack>
               </Pressable>
-              <Pressable onPress={() => { setShowMenu(false); handleDelete(); }}>
+              <Pressable
+                onPress={() => {
+                  setShowMenu(false);
+                  handleDelete();
+                }}
+              >
                 <XStack padding="$3" hoverStyle={{ backgroundColor: '$destructive' }}>
                   <Text color="$destructive">삭제</Text>
                 </XStack>
@@ -201,12 +204,7 @@ export default function TripHomeScreen() {
       <ScrollView style={{ flex: 1 }}>
         {/* Cover Image */}
         <YStack height={192} position="relative" overflow="hidden">
-          <Image
-            source={{ uri: trip.imageUrl }}
-            width="100%"
-            height="100%"
-            resizeMode="cover"
-          />
+          <Image source={{ uri: trip.imageUrl }} width="100%" height="100%" resizeMode="cover" />
           <YStack
             position="absolute"
             bottom={0}
@@ -341,7 +339,11 @@ export default function TripHomeScreen() {
                         borderWidth={1}
                         borderColor="$border"
                       >
-                        <XStack alignItems="flex-start" justifyContent="space-between" marginBottom="$2">
+                        <XStack
+                          alignItems="flex-start"
+                          justifyContent="space-between"
+                          marginBottom="$2"
+                        >
                           <Text color="$foreground" fontWeight="500" flex={1} paddingRight="$2">
                             {note.title}
                           </Text>

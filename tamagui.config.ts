@@ -1,5 +1,5 @@
-import { createAnimations } from '@tamagui/animations-react-native'
-import { createFont, createTamagui, createTokens } from '@tamagui/core'
+import { createAnimations } from '@tamagui/animations-react-native';
+import { createFont, createTamagui, createTokens } from '@tamagui/core';
 
 // 기본 폰트 설정
 const bodyFont = createFont({
@@ -42,7 +42,7 @@ const bodyFont = createFont({
     6: -0.5,
     7: -1,
   },
-})
+});
 
 // 원본 CSS 변수를 Tamagui 토큰으로 변환
 const tokens = createTokens({
@@ -152,7 +152,7 @@ const tokens = createTokens({
     4: 400,
     5: 500,
   },
-})
+});
 
 const animations = createAnimations({
   fast: {
@@ -172,7 +172,7 @@ const animations = createAnimations({
     damping: 20,
     stiffness: 60,
   },
-})
+});
 
 export const config = createTamagui({
   tokens,
@@ -211,7 +211,7 @@ export const config = createTamagui({
       ring: tokens.color.ring,
       inputBackground: tokens.color.inputBackground,
       foreground: tokens.color.foreground,
-      
+
       // 차트 색상
       chart1: tokens.color.chart1,
       chart2: tokens.color.chart2,
@@ -255,12 +255,12 @@ export const config = createTamagui({
     fs: 'flexShrink',
     fb: 'flexBasis',
   } as const,
-})
+});
 
-export type AppConfig = typeof config
+export type AppConfig = typeof config;
 
 declare module '@tamagui/core' {
   interface TamaguiCustomConfig extends AppConfig {}
 }
 
-export default config
+export default config;

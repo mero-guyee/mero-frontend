@@ -62,7 +62,11 @@ export const expensesApi = {
       body: JSON.stringify(data),
     }),
 
-  update: (tripId: number, expenseId: number, data: ExpenseUpdateRequest): Promise<ExpenseResponse> =>
+  update: (
+    tripId: number,
+    expenseId: number,
+    data: ExpenseUpdateRequest
+  ): Promise<ExpenseResponse> =>
     apiRequest(`/api/trips/${tripId}/expenses/${expenseId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -88,9 +92,12 @@ export interface ExpenseCategoryResponse {
 
 export const expenseCategoriesApi = {
   create: (data: ExpenseCategoryCreateRequest): Promise<ExpenseCategoryResponse> =>
-    apiRequest(`/api/expense-categories?name=${encodeURIComponent(data.name)}&icon=${encodeURIComponent(data.icon)}&color=${encodeURIComponent(data.color)}`, {
-      method: 'POST',
-    }),
+    apiRequest(
+      `/api/expense-categories?name=${encodeURIComponent(data.name)}&icon=${encodeURIComponent(data.icon)}&color=${encodeURIComponent(data.color)}`,
+      {
+        method: 'POST',
+      }
+    ),
 
   delete: (categoryId: number): Promise<void> =>
     apiRequest(`/api/expense-categories/${categoryId}`, { method: 'DELETE' }),

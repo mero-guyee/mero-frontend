@@ -20,9 +20,9 @@ export default function LoginScreen() {
     try {
       await authApi.login({ email, password });
       setIsAuthenticated(true);
-      
+
       Alert.alert('로그인 성공');
-      router.push('/(main)/map')
+      router.push('/(main)/map');
     } catch (e: any) {
       Alert.alert('로그인 실패', e?.message ?? '이메일 또는 비밀번호를 확인해주세요.');
     } finally {
@@ -68,12 +68,7 @@ export default function LoginScreen() {
           >
             <Compass size={32} color="white" />
           </YStack>
-          <Text
-            fontSize={40}
-            fontWeight="700"
-            color="$foreground"
-            marginBottom="$1"
-          >
+          <Text fontSize={40} fontWeight="700" color="$foreground" marginBottom="$1">
             유랑자의 기록
           </Text>
           <Text fontSize={18} color="$mutedForeground">
@@ -144,11 +139,7 @@ export default function LoginScreen() {
           </YStack>
 
           {/* Login Button */}
-          <FilledButton
-            onPress={handleEmailLogin}
-            disabled={loading}
-            opacity={loading ? 0.6 : 1}
-          >
+          <FilledButton onPress={handleEmailLogin} disabled={loading} opacity={loading ? 0.6 : 1}>
             <Text color="$foreground" fontWeight="600" fontSize={16}>
               {loading ? '로그인 중...' : '로그인'}
             </Text>
@@ -164,9 +155,7 @@ export default function LoginScreen() {
           </XStack>
 
           {/* Apple Login */}
-          <FilledButton
-            onPress={handleAppleLogin}
-          >
+          <FilledButton onPress={handleAppleLogin}>
             <XStack alignItems="center" gap="$2">
               <Text fontSize={20}></Text>
               <Text color="$foreground" fontWeight="600" fontSize={16}>
@@ -181,12 +170,7 @@ export default function LoginScreen() {
           <Text fontSize={14} color="$mutedForeground">
             계정이 없으신가요?
           </Text>
-          <Text
-            fontSize={14}
-            color="$primary"
-            fontWeight="600"
-            onPress={handleSignUpClick}
-          >
+          <Text fontSize={14} color="$primary" fontWeight="600" onPress={handleSignUpClick}>
             회원가입
           </Text>
         </XStack>

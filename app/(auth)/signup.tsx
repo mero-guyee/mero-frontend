@@ -58,7 +58,7 @@ export default function SignUpScreen() {
     try {
       await authApi.signup({ email, password, nickname, defaultCurrency, timezone });
       setIsAuthenticated(true);
-      Alert.alert('회원가입 성공')
+      Alert.alert('회원가입 성공');
       router.replace('/(main)/trips');
     } catch (e: any) {
       Alert.alert('회원가입 실패', e?.message ?? '다시 시도해주세요.');
@@ -238,7 +238,7 @@ export default function SignUpScreen() {
               >
                 <DollarSign size={20} color="$mutedForeground" />
                 <Text flex={1} marginLeft="$3" color="$foreground">
-                  {CURRENCIES.find(c => c.value === defaultCurrency)?.label || defaultCurrency}
+                  {CURRENCIES.find((c) => c.value === defaultCurrency)?.label || defaultCurrency}
                 </Text>
                 <ChevronDown size={20} color="$mutedForeground" />
               </XStack>
@@ -261,18 +261,14 @@ export default function SignUpScreen() {
               >
                 <Globe size={20} color="$mutedForeground" />
                 <Text flex={1} marginLeft="$3" color="$foreground" numberOfLines={1}>
-                  {TIMEZONES.find(t => t.value === timezone)?.label || timezone}
+                  {TIMEZONES.find((t) => t.value === timezone)?.label || timezone}
                 </Text>
                 <ChevronDown size={20} color="$mutedForeground" />
               </XStack>
             </YStack>
 
             {/* Submit button */}
-            <FilledButton
-              onPress={handleSubmit}
-              disabled={loading}
-              opacity={loading ? 0.6 : 1}
-            >
+            <FilledButton onPress={handleSubmit} disabled={loading} opacity={loading ? 0.6 : 1}>
               <Text color="$foreground" fontWeight="600" fontSize={16}>
                 {loading ? '가입 중...' : '가입하기'}
               </Text>

@@ -6,10 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Button, Text, XStack, YStack } from 'tamagui';
 import { CircularButton, FilledButton, Input } from '../../../components/ui';
 import { useBudgets, useExpenses, useTrips } from '../../../contexts';
-import {
-  CURRENCY_NAMES,
-  CURRENCY_SYMBOLS,
-} from '../../../data/mockData';
+import { CURRENCY_NAMES, CURRENCY_SYMBOLS } from '../../../data/mockData';
 import { Budget, Expense } from '../../../types';
 
 export default function ExpenseViewScreen() {
@@ -29,25 +26,31 @@ export default function ExpenseViewScreen() {
   const filteredBudgets = budgets.filter((b) => !activeTrip || b.tripId === activeTrip);
 
   const expensesByCurrency = useMemo(() => {
-    return filteredExpenses.reduce((acc, expense) => {
-      if (!acc[expense.currency]) {
-        acc[expense.currency] = 0;
-      }
-      acc[expense.currency] += expense.amount;
-      return acc;
-    }, {} as Record<string, number>);
+    return filteredExpenses.reduce(
+      (acc, expense) => {
+        if (!acc[expense.currency]) {
+          acc[expense.currency] = 0;
+        }
+        acc[expense.currency] += expense.amount;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }, [filteredExpenses]);
 
   const expensesByDate = useMemo(() => {
     return filteredExpenses
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .reduce((acc, expense) => {
-        if (!acc[expense.date]) {
-          acc[expense.date] = [];
-        }
-        acc[expense.date].push(expense);
-        return acc;
-      }, {} as Record<string, Expense[]>);
+      .reduce(
+        (acc, expense) => {
+          if (!acc[expense.date]) {
+            acc[expense.date] = [];
+          }
+          acc[expense.date].push(expense);
+          return acc;
+        },
+        {} as Record<string, Expense[]>
+      );
   }, [filteredExpenses]);
 
   const getCurrencySymbol = (currency: string) => {
@@ -137,7 +140,13 @@ export default function ExpenseViewScreen() {
         )}
 
         {/* View Mode Tabs */}
-        <XStack marginTop="$3" backgroundColor="$accent" borderRadius="$4" padding="$1" opacity={0.3}>
+        <XStack
+          marginTop="$3"
+          backgroundColor="$accent"
+          borderRadius="$4"
+          padding="$1"
+          opacity={0.3}
+        >
           <Button
             flex={1}
             height={40}
@@ -187,7 +196,9 @@ export default function ExpenseViewScreen() {
                 borderWidth={1}
                 borderColor="$border"
               >
-                <Text fontSize={48} marginBottom="$3">🎒</Text>
+                <Text fontSize={48} marginBottom="$3">
+                  🎒
+                </Text>
                 <Text color="$mutedForeground">여행을 선택해주세요</Text>
               </YStack>
             ) : filteredBudgets.length === 0 ? (
@@ -199,8 +210,12 @@ export default function ExpenseViewScreen() {
                 borderWidth={1}
                 borderColor="$border"
               >
-                <Text fontSize={48} marginBottom="$3">💰</Text>
-                <Text color="$foreground" marginBottom="$1">아직 예산이 없습니다</Text>
+                <Text fontSize={48} marginBottom="$3">
+                  💰
+                </Text>
+                <Text color="$foreground" marginBottom="$1">
+                  아직 예산이 없습니다
+                </Text>
                 <Text color="$mutedForeground" marginBottom="$6" textAlign="center">
                   화폐별로 예산을 설정하고 지출을 관리해보세요
                 </Text>
@@ -211,7 +226,9 @@ export default function ExpenseViewScreen() {
                   paddingVertical="$3"
                   onPress={() => handleOpenBudgetModal()}
                 >
-                  <Text color="white" fontWeight="500">첫 예산 추가하기</Text>
+                  <Text color="white" fontWeight="500">
+                    첫 예산 추가하기
+                  </Text>
                 </FilledButton>
               </YStack>
             ) : (
@@ -230,7 +247,11 @@ export default function ExpenseViewScreen() {
                       borderWidth={1}
                       borderColor="$border"
                     >
-                      <XStack alignItems="flex-start" justifyContent="space-between" marginBottom="$4">
+                      <XStack
+                        alignItems="flex-start"
+                        justifyContent="space-between"
+                        marginBottom="$4"
+                      >
                         <XStack alignItems="center" gap="$3" flex={1}>
                           <YStack
                             width={48}
@@ -247,7 +268,8 @@ export default function ExpenseViewScreen() {
                               {CURRENCY_NAMES[budget.currency] || budget.currency}
                             </Text>
                             <Text color="$mutedForeground">
-                              예산 {getCurrencySymbol(budget.currency)} {budget.amount.toLocaleString()}
+                              예산 {getCurrencySymbol(budget.currency)}{' '}
+                              {budget.amount.toLocaleString()}
                             </Text>
                           </YStack>
                         </XStack>
@@ -353,12 +375,22 @@ export default function ExpenseViewScreen() {
                 <YStack gap="$3">
                   {Object.entries(expensesByCurrency).map(([currency, amount]) => {
                     const budget = budgets.find((b) => b.currency === currency);
-                    const percentage = budget && budget.amount > 0 ? Math.round((amount / budget.amount) * 100) : 0;
+                    const percentage =
+                      budget && budget.amount > 0 ? Math.round((amount / budget.amount) * 100) : 0;
                     const remaining = budget ? budget.amount - amount : 0;
 
                     return (
-                      <YStack key={currency} backgroundColor="$muted" borderRadius="$4" padding="$4">
-                        <XStack alignItems="center" justifyContent="space-between" marginBottom="$1">
+                      <YStack
+                        key={currency}
+                        backgroundColor="$muted"
+                        borderRadius="$4"
+                        padding="$4"
+                      >
+                        <XStack
+                          alignItems="center"
+                          justifyContent="space-between"
+                          marginBottom="$1"
+                        >
                           <YStack
                             paddingHorizontal="$2"
                             paddingVertical="$1"
@@ -366,11 +398,21 @@ export default function ExpenseViewScreen() {
                             borderRadius="$2"
                             opacity={0.4}
                           >
-                            <Text color="$foreground" fontSize={12}>{currency}</Text>
+                            <Text color="$foreground" fontSize={12}>
+                              {currency}
+                            </Text>
                           </YStack>
-                          <Text color="$mutedForeground" fontSize={14}>{percentage}%</Text>
+                          <Text color="$mutedForeground" fontSize={14}>
+                            {percentage}%
+                          </Text>
                         </XStack>
-                        <YStack height={8} backgroundColor="$secondary" borderRadius={4} overflow="hidden" marginBottom="$2">
+                        <YStack
+                          height={8}
+                          backgroundColor="$secondary"
+                          borderRadius={4}
+                          overflow="hidden"
+                          marginBottom="$2"
+                        >
                           <YStack
                             height="100%"
                             borderRadius={4}
@@ -380,7 +422,8 @@ export default function ExpenseViewScreen() {
                         </YStack>
                         <XStack alignItems="center" justifyContent="space-between">
                           <Text color="$mutedForeground">
-                            {getCurrencySymbol(currency)} {amount.toLocaleString()} / {getCurrencySymbol(currency)} {remaining.toLocaleString()}
+                            {getCurrencySymbol(currency)} {amount.toLocaleString()} /{' '}
+                            {getCurrencySymbol(currency)} {remaining.toLocaleString()}
                           </Text>
                         </XStack>
                       </YStack>
@@ -406,7 +449,9 @@ export default function ExpenseViewScreen() {
               </Text>
               {filteredExpenses.length === 0 ? (
                 <YStack alignItems="center" paddingVertical={32}>
-                  <Text fontSize={48} marginBottom="$3">🛍️</Text>
+                  <Text fontSize={48} marginBottom="$3">
+                    🛍️
+                  </Text>
                   <Text color="$mutedForeground">아직 지출 내역이 없습니다</Text>
                 </YStack>
               ) : (
@@ -417,9 +462,15 @@ export default function ExpenseViewScreen() {
 
                     return (
                       <YStack key={date}>
-                        <XStack alignItems="center" justifyContent="space-between" marginBottom="$2" paddingHorizontal="$1">
+                        <XStack
+                          alignItems="center"
+                          justifyContent="space-between"
+                          marginBottom="$2"
+                          paddingHorizontal="$1"
+                        >
                           <Text color="$foreground">
-                            📅 {new Date(date).toLocaleDateString('ko-KR', {
+                            📅{' '}
+                            {new Date(date).toLocaleDateString('ko-KR', {
                               year: 'numeric',
                               month: 'long',
                               day: 'numeric',
@@ -457,7 +508,8 @@ export default function ExpenseViewScreen() {
                                 </YStack>
                               </XStack>
                               <Text color="$foreground">
-                                {getCurrencySymbol(expense.currency)} {expense.amount.toLocaleString()}
+                                {getCurrencySymbol(expense.currency)}{' '}
+                                {expense.amount.toLocaleString()}
                               </Text>
                             </XStack>
                           ))}
@@ -522,11 +574,16 @@ export default function ExpenseViewScreen() {
 
               <YStack gap="$4">
                 <YStack>
-                  <Text color="$mutedForeground" marginBottom="$2">화폐</Text>
+                  <Text color="$mutedForeground" marginBottom="$2">
+                    화폐
+                  </Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <XStack gap="$2">
                       {Object.entries(CURRENCY_NAMES).map(([code, name]) => (
-                        <Pressable key={code} onPress={() => setBudgetForm({ ...budgetForm, currency: code })}>
+                        <Pressable
+                          key={code}
+                          onPress={() => setBudgetForm({ ...budgetForm, currency: code })}
+                        >
                           <YStack
                             paddingHorizontal="$3"
                             paddingVertical="$2"
@@ -544,7 +601,9 @@ export default function ExpenseViewScreen() {
                 </YStack>
 
                 <YStack>
-                  <Text color="$mutedForeground" marginBottom="$2">예산 금액</Text>
+                  <Text color="$mutedForeground" marginBottom="$2">
+                    예산 금액
+                  </Text>
                   <XStack alignItems="center">
                     <Text color="$mutedForeground" marginRight="$2">
                       {getCurrencySymbol(budgetForm.currency)}

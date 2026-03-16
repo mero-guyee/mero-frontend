@@ -76,25 +76,25 @@ export type Budget = {
 };
 
 export type Screen =
-  | { type: "tripList" }
-  | { type: "tripHome"; tripId: string }
-  | { type: "tripForm"; tripId?: string }
-  | { type: "footprintList"; tripId?: string }
-  | { type: "footprintDetail"; footprintId: string }
-  | { type: "footprintForm"; footprintId?: string; tripId?: string }
+  | { type: 'tripList' }
+  | { type: 'tripHome'; tripId: string }
+  | { type: 'tripForm'; tripId?: string }
+  | { type: 'footprintList'; tripId?: string }
+  | { type: 'footprintDetail'; footprintId: string }
+  | { type: 'footprintForm'; footprintId?: string; tripId?: string }
   | {
-      type: "expenseForm";
+      type: 'expenseForm';
       tripId: string;
       footprintId?: string;
       date?: string;
       expenseId?: string;
     }
-  | { type: "memoForm"; tripId: string; memoId?: string }
-  | { type: "categoryManager" }
-  | { type: "categoryForm"; categoryId?: string }
-  | { type: "map" }
-  | { type: "expense" }
-  | { type: "settings" }
-  | { type: "loading" }
-  | { type: "login" }
-  | { type: "signup" };
+  | { type: 'memoForm'; tripId: string; memoId?: string }
+  | { type: 'categoryManager' }
+  | { type: 'categoryForm'; categoryId?: string }
+  | { type: 'map' }
+  | { type: 'expense' }
+  | { type: 'settings' }
+  | { type: 'loading' }
+  | { type: 'login' }
+  | { type: 'signup' };

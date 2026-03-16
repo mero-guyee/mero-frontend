@@ -87,12 +87,7 @@ export default function TripListScreen() {
         >
           {/* Cover Image */}
           <YStack height={180} overflow="hidden">
-            <Image
-              source={{ uri: trip.imageUrl }}
-              width="100%"
-              height="100%"
-              resizeMode="cover"
-            />
+            <Image source={{ uri: trip.imageUrl }} width="100%" height="100%" resizeMode="cover" />
             <YStack
               position="absolute"
               bottom={0}
@@ -121,12 +116,7 @@ export default function TripListScreen() {
                     D+{daysPassed} / {totalDays}일
                   </Text>
                 </XStack>
-                <YStack
-                  height={10}
-                  backgroundColor="$secondary"
-                  borderRadius={5}
-                  overflow="hidden"
-                >
+                <YStack height={10} backgroundColor="$secondary" borderRadius={5} overflow="hidden">
                   <YStack
                     height={10}
                     backgroundColor="$primary"
@@ -154,7 +144,12 @@ export default function TripListScreen() {
   };
 
   const renderEmptyState = () => (
-    <YStack alignItems="center" justifyContent="center" paddingVertical="$10" paddingHorizontal="$4">
+    <YStack
+      alignItems="center"
+      justifyContent="center"
+      paddingVertical="$10"
+      paddingHorizontal="$4"
+    >
       <YStack
         width={200}
         height={200}
@@ -226,7 +221,11 @@ export default function TripListScreen() {
             <CircularButton pressStyle={{ backgroundColor: '$muted' }} onPress={handleSettings}>
               <Settings size={20} color="$foreground" />
             </CircularButton>
-            <CircularButton backgroundColor="$accent" pressStyle={{ backgroundColor: '$accentHover' }} onPress={handleCreateTrip}>
+            <CircularButton
+              backgroundColor="$accent"
+              pressStyle={{ backgroundColor: '$accentHover' }}
+              onPress={handleCreateTrip}
+            >
               <Plus size={20} color="$foreground" />
             </CircularButton>
           </XStack>
@@ -243,7 +242,11 @@ export default function TripListScreen() {
             paddingHorizontal="$4"
             paddingVertical="$2.5"
           >
-            <Pressable onPress={() => setFilter(filter === 'all' ? 'ongoing' : filter === 'ongoing' ? 'completed' : 'all')}>
+            <Pressable
+              onPress={() =>
+                setFilter(filter === 'all' ? 'ongoing' : filter === 'ongoing' ? 'completed' : 'all')
+              }
+            >
               <Text color="$foreground" fontSize={14}>
                 {filter === 'all' ? '전체' : filter === 'ongoing' ? '진행 중' : '완료됨'}
               </Text>

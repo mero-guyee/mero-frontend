@@ -70,7 +70,11 @@ export const footprintsApi = {
       body: JSON.stringify(data),
     }),
 
-  update: (tripId: number, footprintId: number, data: FootprintUpdateRequest): Promise<FootprintResponse> =>
+  update: (
+    tripId: number,
+    footprintId: number,
+    data: FootprintUpdateRequest
+  ): Promise<FootprintResponse> =>
     apiRequest(`/api/trips/${tripId}/footprints/${footprintId}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -79,7 +83,11 @@ export const footprintsApi = {
   delete: (tripId: number, footprintId: number): Promise<void> =>
     apiRequest(`/api/trips/${tripId}/footprints/${footprintId}`, { method: 'DELETE' }),
 
-  uploadPhotos: (tripId: number, footprintId: number, imageUris: string[]): Promise<FootprintDetailResponse> => {
+  uploadPhotos: (
+    tripId: number,
+    footprintId: number,
+    imageUris: string[]
+  ): Promise<FootprintDetailResponse> => {
     const form = new FormData();
     imageUris.forEach((uri, i) => {
       form.append('photos', { uri, name: `photo_${i}.jpg`, type: 'image/jpeg' } as any);

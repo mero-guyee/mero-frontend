@@ -13,7 +13,7 @@ import {
 import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
 import { QueryProvider } from '../providers/QueryProvider';
 import { SeedDatabase } from '../providers/SeedDatabase';
-import "../reactotron-config";
+import '../reactotron-config';
 import config from '../tamagui.config';
 
 function AppContent() {

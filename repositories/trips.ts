@@ -94,15 +94,30 @@ export class TripRepository extends BaseRepository<TripRow> {
       if (existing.syncStatus === 'pending') return;
       await this.db.runAsync(
         `UPDATE trips SET serverId=?, title=?, startDate=?, endDate=?, countries=?, imageUrl=?, syncStatus='synced' WHERE id=?`,
-        [String(serverTrip.id), serverTrip.title, serverTrip.startDate, serverTrip.endDate,
-          JSON.stringify(serverTrip.countries), serverTrip.imageUrl ?? '', serverTrip.clientId]
+        [
+          String(serverTrip.id),
+          serverTrip.title,
+          serverTrip.startDate,
+          serverTrip.endDate,
+          JSON.stringify(serverTrip.countries),
+          serverTrip.imageUrl ?? '',
+          serverTrip.clientId,
+        ]
       );
     } else {
       await this.db.runAsync(
         `INSERT OR IGNORE INTO trips (id, serverId, title, imageUrl, startDate, endDate, countries, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,?,?,'synced',NULL)`,
-        [serverTrip.clientId, String(serverTrip.id), serverTrip.title, serverTrip.imageUrl ?? '',
-          serverTrip.startDate, serverTrip.endDate, JSON.stringify(serverTrip.countries),
-          serverTrip.createdAt, serverTrip.createdAt]
+        [
+          serverTrip.clientId,
+          String(serverTrip.id),
+          serverTrip.title,
+          serverTrip.imageUrl ?? '',
+          serverTrip.startDate,
+          serverTrip.endDate,
+          JSON.stringify(serverTrip.countries),
+          serverTrip.createdAt,
+          serverTrip.createdAt,
+        ]
       );
     }
   }
@@ -164,13 +179,26 @@ export class MemoRepository extends BaseRepository<MemoRow> {
       if (existing.syncStatus === 'pending') return;
       await this.db.runAsync(
         `UPDATE memos SET serverId=?, title=?, content=?, syncStatus='synced', updatedAt=? WHERE id=?`,
-        [String(serverMemo.id), serverMemo.title, serverMemo.content, serverMemo.updatedAt, serverMemo.clientId]
+        [
+          String(serverMemo.id),
+          serverMemo.title,
+          serverMemo.content,
+          serverMemo.updatedAt,
+          serverMemo.clientId,
+        ]
       );
     } else {
       await this.db.runAsync(
         `INSERT OR IGNORE INTO memos (id, serverId, tripId, title, content, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,'synced',NULL)`,
-        [serverMemo.clientId, String(serverMemo.id), localTripId, serverMemo.title, serverMemo.content,
-          serverMemo.createdAt, serverMemo.updatedAt]
+        [
+          serverMemo.clientId,
+          String(serverMemo.id),
+          localTripId,
+          serverMemo.title,
+          serverMemo.content,
+          serverMemo.createdAt,
+          serverMemo.updatedAt,
+        ]
       );
     }
   }

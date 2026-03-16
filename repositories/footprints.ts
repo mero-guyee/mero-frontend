@@ -9,8 +9,8 @@ export interface FootprintRow extends BaseEntity {
   title: string;
   content: string;
   date: string;
-  locations: string;  // JSON string
-  photoUrls: string;  // JSON string
+  locations: string; // JSON string
+  photoUrls: string; // JSON string
   weatherInfo?: string | null;
 }
 
@@ -96,16 +96,29 @@ export class FootprintRepository extends BaseRepository<FootprintRow> {
       if (existing.syncStatus === 'pending') return;
       await this.db.runAsync(
         `UPDATE footprints SET serverId=?, content=?, date=?, locations=?, syncStatus='synced' WHERE id=?`,
-        [String(serverFootprint.id), serverFootprint.content ?? '', serverFootprint.date,
-          JSON.stringify(serverFootprint.locations ?? []), serverFootprint.clientId]
+        [
+          String(serverFootprint.id),
+          serverFootprint.content ?? '',
+          serverFootprint.date,
+          JSON.stringify(serverFootprint.locations ?? []),
+          serverFootprint.clientId,
+        ]
       );
     } else {
       await this.db.runAsync(
         `INSERT OR IGNORE INTO footprints (id, serverId, tripId, title, content, date, locations, photoUrls, weatherInfo, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,?,NULL,?,?,'synced',NULL)`,
-        [serverFootprint.clientId, String(serverFootprint.id), localTripId,
-          serverFootprint.content ?? '', serverFootprint.content ?? '', serverFootprint.date,
-          JSON.stringify(serverFootprint.locations ?? []), JSON.stringify([]),
-          new Date().toISOString(), new Date().toISOString()]
+        [
+          serverFootprint.clientId,
+          String(serverFootprint.id),
+          localTripId,
+          serverFootprint.content ?? '',
+          serverFootprint.content ?? '',
+          serverFootprint.date,
+          JSON.stringify(serverFootprint.locations ?? []),
+          JSON.stringify([]),
+          new Date().toISOString(),
+          new Date().toISOString(),
+        ]
       );
     }
   }

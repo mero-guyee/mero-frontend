@@ -63,6 +63,7 @@ export function useExpenses(): ExpenseContextType {
     updateCategory: (category) => updateCategoryMut.mutate(category),
     deleteCategory: (categoryId) => deleteCategoryMut.mutate(categoryId),
     getExpensesByTripId: (tripId) => expenses.filter((e) => e.tripId === tripId),
-    getExpensesByFootprintId: (footprintId) => expenses.filter((e) => e.footprintId === footprintId),
+    getExpensesByFootprintId: (footprintId) =>
+      expenses.filter((e) => e.footprintId === footprintId),
   };
 }

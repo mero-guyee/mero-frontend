@@ -33,8 +33,8 @@ export const LocationService = {
 
     await Location.startLocationUpdatesAsync(TASK_NAME, {
       accuracy: Location.Accuracy.High,
-      timeInterval: 60_000,       // 1분마다
-      distanceInterval: 50,        // 또는 50m 이동 시
+      timeInterval: 60_000, // 1분마다
+      distanceInterval: 50, // 또는 50m 이동 시
       showsBackgroundLocationIndicator: true,
       foregroundService: {
         notificationTitle: 'Mero',

@@ -23,8 +23,7 @@ export interface MemoResponse {
 }
 
 export const memosApi = {
-  getAll: (tripId: number): Promise<MemoResponse[]> =>
-    apiRequest(`/api/trips/${tripId}/memos`),
+  getAll: (tripId: number): Promise<MemoResponse[]> => apiRequest(`/api/trips/${tripId}/memos`),
 
   getById: (tripId: number, memoId: number): Promise<MemoResponse> =>
     apiRequest(`/api/trips/${tripId}/memos/${memoId}`),

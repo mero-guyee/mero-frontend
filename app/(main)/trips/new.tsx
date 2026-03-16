@@ -53,7 +53,8 @@ export default function NewTripScreen() {
       title: title.trim(),
       startDate,
       endDate,
-      imageUrl: imageUrl.trim() || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800',
+      imageUrl:
+        imageUrl.trim() || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800',
       countries,
     });
 
@@ -117,7 +118,7 @@ export default function NewTripScreen() {
       </XStack>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
-        <YStack marginBottom="$6" >
+        <YStack marginBottom="$6">
           <Text color="$foreground" marginBottom="$2" fontWeight="500">
             모험의 이름
           </Text>
@@ -189,7 +190,6 @@ export default function NewTripScreen() {
             mode="date"
             display="default"
             onChange={handleStartDateChange}
-            
           />
         )}
         {showEndPicker && (
@@ -266,12 +266,7 @@ export default function NewTripScreen() {
             >
               {imageUrl ? (
                 <YStack position="relative" aspectRatio={16 / 9}>
-                  <Image
-                    source={{ uri: imageUrl }}
-                    width="100%"
-                    height="100%"
-                    resizeMode="cover"
-                  />
+                  <Image source={{ uri: imageUrl }} width="100%" height="100%" resizeMode="cover" />
                   <Pressable
                     onPress={(e) => {
                       e.stopPropagation();
@@ -290,7 +285,13 @@ export default function NewTripScreen() {
                   </Pressable>
                 </YStack>
               ) : (
-                <YStack flex={1} alignItems="center" justifyContent="center" padding="$6" minHeight={192}>
+                <YStack
+                  flex={1}
+                  alignItems="center"
+                  justifyContent="center"
+                  padding="$6"
+                  minHeight={192}
+                >
                   <YStack
                     width={64}
                     height={64}

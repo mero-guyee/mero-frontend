@@ -16,8 +16,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // 앱 시작 시 SecureStore에서 토큰을 읽어 로그인 상태 복원
   useEffect(() => {
-    tokenStorage.getAccessToken()
-      .then((token) => { if (token) setIsAuthenticated(true); })
+    tokenStorage
+      .getAccessToken()
+      .then((token) => {
+        if (token) setIsAuthenticated(true);
+      })
       .finally(() => setIsLoading(false));
   }, []);
 

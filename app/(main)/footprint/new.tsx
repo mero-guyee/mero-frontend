@@ -181,11 +181,7 @@ export default function FootprintFormScreen() {
             <Text color="$foreground" fontWeight="500">
               📍 머문 곳
             </Text>
-            <FilledButton
-              size="$3"
-              borderRadius="$3"
-              onPress={() => setShowLocationModal(true)}
-            >
+            <FilledButton size="$3" borderRadius="$3" onPress={() => setShowLocationModal(true)}>
               <XStack alignItems="center" gap="$1.5">
                 <Plus size={16} color="$foreground" />
                 <Text color="$foreground" fontSize={14}>
@@ -210,7 +206,8 @@ export default function FootprintFormScreen() {
                 >
                   <MapPin size={14} color="$foreground" />
                   <Text color="$foreground" fontSize={14}>
-                    {loc.placeName}{loc.country ? `, ${loc.country}` : ''}
+                    {loc.placeName}
+                    {loc.country ? `, ${loc.country}` : ''}
                   </Text>
                   <Pressable onPress={() => handleRemoveLocation(index)}>
                     <X size={14} color="$foreground" />
@@ -296,10 +293,7 @@ export default function FootprintFormScreen() {
           }}
           onPress={() => setShowLocationModal(false)}
         >
-          <Pressable
-            style={{ width: '100%', maxWidth: 400 }}
-            onPress={(e) => e.stopPropagation()}
-          >
+          <Pressable style={{ width: '100%', maxWidth: 400 }} onPress={(e) => e.stopPropagation()}>
             <YStack backgroundColor="$card" borderRadius="$6" padding="$6">
               <XStack alignItems="center" justifyContent="space-between" marginBottom="$5">
                 <Text color="$foreground" fontSize={18} fontWeight="600">
@@ -338,7 +332,12 @@ export default function FootprintFormScreen() {
 
               <ScrollView style={{ maxHeight: 256 }}>
                 {searchQuery && searchResults.length === 0 && (
-                  <Text textAlign="center" color="$mutedForeground" paddingVertical="$4" fontSize={14}>
+                  <Text
+                    textAlign="center"
+                    color="$mutedForeground"
+                    paddingVertical="$4"
+                    fontSize={14}
+                  >
                     검색 결과가 없습니다
                   </Text>
                 )}
@@ -362,7 +361,12 @@ export default function FootprintFormScreen() {
                   </Pressable>
                 ))}
                 {!searchQuery && (
-                  <Text textAlign="center" color="$mutedForeground" paddingVertical="$4" fontSize={14}>
+                  <Text
+                    textAlign="center"
+                    color="$mutedForeground"
+                    paddingVertical="$4"
+                    fontSize={14}
+                  >
                     장소를 검색해보세요
                   </Text>
                 )}

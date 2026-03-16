@@ -84,11 +84,11 @@ export function useCreateTrip() {
           countries: data.countries,
           imageUrl: data.imageUrl,
         });
-        
+
         await repo.setServerId(localTrip.id, String(serverTrip.id));
-      } catch (e){
-        if(e instanceof ApiError) {
-          console.error('Failed to create trip on server:', e.status, e.message); 
+      } catch (e) {
+        if (e instanceof ApiError) {
+          console.error('Failed to create trip on server:', e.status, e.message);
         }
       }
       return localTrip;

@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { expenseCategoriesApi, expensesApi } from '../../api/expenses';
 import { useDb } from '../../providers/DatabaseProvider';
-import { ExpenseCategoryRepository, ExpenseRepository } from '../../repositories';
-import { TripRepository } from '../../repositories';
+import { ExpenseCategoryRepository, ExpenseRepository, TripRepository } from '../../repositories';
 import { Expense, ExpenseCategory } from '../../types';
 
 export const expenseKeys = {
@@ -59,7 +58,8 @@ export function useCreateExpense() {
       const localExpense = await repo.createExpense(data);
       try {
         const trip = await tripRepo.getTripById(data.tripId);
-        const categoryServerId = (await new ExpenseCategoryRepository(db).findById(data.categoryId))?.serverId;
+        const categoryServerId = (await new ExpenseCategoryRepository(db).findById(data.categoryId))
+          ?.serverId;
         if (trip?.serverId && categoryServerId) {
           const serverExpense = await expensesApi.create(parseInt(trip.serverId), {
             clientId: localExpense.id,
@@ -96,7 +96,9 @@ export function useUpdateExpense() {
       try {
         if (expense.serverId) {
           const trip = await tripRepo.getTripById(expense.tripId);
-          const categoryServerId = (await new ExpenseCategoryRepository(db).findById(expense.categoryId))?.serverId;
+          const categoryServerId = (
+            await new ExpenseCategoryRepository(db).findById(expense.categoryId)
+          )?.serverId;
           if (trip?.serverId && categoryServerId) {
             await expensesApi.update(parseInt(trip.serverId), parseInt(expense.serverId), {
               amount: expense.amount,

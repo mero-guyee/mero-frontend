@@ -23,20 +23,23 @@ export default function MapViewScreen() {
   const filteredFootprints = footprints.filter((f) => !activeTrip || f.tripId === activeTrip);
 
   const footprintsByCountry = useMemo(() => {
-    return filteredFootprints.reduce((acc, footprint) => {
-      for (const loc of footprint.locations) {
-        const country = loc.country;
-        if (country) {
-          if (!acc[country]) {
-            acc[country] = [];
-          }
-          if (!acc[country].find((f) => f.id === footprint.id)) {
-            acc[country].push(footprint);
+    return filteredFootprints.reduce(
+      (acc, footprint) => {
+        for (const loc of footprint.locations) {
+          const country = loc.country;
+          if (country) {
+            if (!acc[country]) {
+              acc[country] = [];
+            }
+            if (!acc[country].find((f) => f.id === footprint.id)) {
+              acc[country].push(footprint);
+            }
           }
         }
-      }
-      return acc;
-    }, {} as Record<string, Footprint[]>);
+        return acc;
+      },
+      {} as Record<string, Footprint[]>
+    );
   }, [filteredFootprints]);
 
   const handleCountryClick = (country: string) => {
@@ -105,7 +108,9 @@ export default function MapViewScreen() {
           borderColor="$border"
           marginBottom="$4"
         >
-          <Text fontSize={48} marginBottom="$2">🗺️</Text>
+          <Text fontSize={48} marginBottom="$2">
+            🗺️
+          </Text>
           <Text color="$mutedForeground">지도 뷰</Text>
           <Text color="$mutedForeground" fontSize={14} marginTop="$1">
             (지도 라이브러리 연동 필요)
@@ -162,8 +167,12 @@ export default function MapViewScreen() {
 
         {filteredFootprints.length === 0 && (
           <YStack alignItems="center" justifyContent="center" paddingVertical={80}>
-            <Text fontSize={48} marginBottom="$4">🌍</Text>
-            <Text color="$foreground" marginBottom="$1">아직 여행 기록이 없습니다</Text>
+            <Text fontSize={48} marginBottom="$4">
+              🌍
+            </Text>
+            <Text color="$foreground" marginBottom="$1">
+              아직 여행 기록이 없습니다
+            </Text>
             <Text color="$mutedForeground">새로운 여행을 떠나보세요</Text>
           </YStack>
         )}
@@ -179,11 +188,13 @@ export default function MapViewScreen() {
           }}
           onPress={() => setShowTimelineModal(false)}
         >
-          <Pressable
-            style={{ maxHeight: '85%' }}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <YStack backgroundColor="$card" borderTopLeftRadius="$6" borderTopRightRadius="$6" flex={1}>
+          <Pressable style={{ maxHeight: '85%' }} onPress={(e) => e.stopPropagation()}>
+            <YStack
+              backgroundColor="$card"
+              borderTopLeftRadius="$6"
+              borderTopRightRadius="$6"
+              flex={1}
+            >
               {/* Modal Header */}
               <XStack
                 alignItems="center"
@@ -263,7 +274,11 @@ export default function MapViewScreen() {
                               borderWidth={2}
                               borderColor="$border"
                             >
-                              <XStack alignItems="flex-start" justifyContent="space-between" marginBottom="$2">
+                              <XStack
+                                alignItems="flex-start"
+                                justifyContent="space-between"
+                                marginBottom="$2"
+                              >
                                 <Text color="$foreground" fontWeight="500" flex={1}>
                                   {memo.title}
                                 </Text>

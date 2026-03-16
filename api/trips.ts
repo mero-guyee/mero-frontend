@@ -4,7 +4,7 @@ export interface TripCreateRequest {
   clientId: string;
   title: string;
   startDate: string;
-  endDate: string;  
+  endDate: string;
   countries: string[];
   imageUrl?: string;
 }
@@ -39,25 +39,26 @@ export interface TripDetailResponse extends TripResponse {
 }
 
 export const tripsApi = {
-  getAll: (): Promise<TripResponse[]> =>
-    apiRequest('/api/trips'),
+  getAll: (): Promise<TripResponse[]> => apiRequest('/api/trips'),
 
-  getById: (tripId: number): Promise<TripDetailResponse> =>
-    apiRequest(`/api/trips/${tripId}`),
+  getById: (tripId: number): Promise<TripDetailResponse> => apiRequest(`/api/trips/${tripId}`),
 
   create: (data: TripCreateRequest): Promise<TripResponse> => {
     const form = new FormData();
-    form.append('data', JSON.stringify({
-      clientId: data.clientId,
-      title: data.title,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      countries: data.countries,
-    }));
+    form.append(
+      'data',
+      JSON.stringify({
+        clientId: data.clientId,
+        title: data.title,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        countries: data.countries,
+      })
+    );
     if (data.imageUrl) {
       form.append('image', { uri: data.imageUrl, name: 'cover.jpg', type: 'image/jpeg' } as any);
     }
-    
+
     return apiFormRequest('/api/trips', form);
   },
 
@@ -79,7 +80,11 @@ export const tripsApi = {
   deleteImage: (tripId: number): Promise<void> =>
     apiRequest(`/api/trips/${tripId}/image`, { method: 'DELETE' }),
 
-  uploadDocument: (tripId: number, fileUri: string, fileName: string): Promise<TripDocumentResponse> => {
+  uploadDocument: (
+    tripId: number,
+    fileUri: string,
+    fileName: string
+  ): Promise<TripDocumentResponse> => {
     const form = new FormData();
     form.append('file', { uri: fileUri, name: fileName, type: 'application/octet-stream' } as any);
     return apiFormRequest(`/api/trips/${tripId}/documents`, form);

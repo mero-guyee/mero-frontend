@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { footprintsApi } from '../../api/footprints';
 import { Footprint } from '../../types';
-import { FootprintRepository } from '../../repositories';
-import { TripRepository } from '../../repositories';
+import { FootprintRepository, TripRepository } from '../../repositories';
 import { useDb } from '../../providers/DatabaseProvider';
 
 export const footprintKeys = {

@@ -8,8 +8,8 @@ export interface MemoRow extends BaseEntity {
   title: string;
   content: string;
   date: string;
-  locations: string;  // JSON string
-  photoUrls: string;  // JSON string
+  locations: string; // JSON string
+  photoUrls: string; // JSON string
   weatherInfo?: string | null;
 }
 

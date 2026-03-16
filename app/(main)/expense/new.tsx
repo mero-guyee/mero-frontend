@@ -172,10 +172,7 @@ export default function ExpenseFormScreen() {
                       borderRadius="$2"
                       backgroundColor={currency === curr ? '$primary' : 'transparent'}
                     >
-                      <Text
-                        color={currency === curr ? 'white' : '$foreground'}
-                        fontSize={12}
-                      >
+                      <Text color={currency === curr ? 'white' : '$foreground'} fontSize={12}>
                         {curr}
                       </Text>
                     </YStack>

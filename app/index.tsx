@@ -73,36 +73,16 @@ export default function LoadingScreen() {
       >
         유랑
       </Text>
-      <Text
-        fontSize={16}
-        color="$mutedForeground"
-        marginBottom="$8"
-        textAlign="center"
-      >
+      <Text fontSize={16} color="$mutedForeground" marginBottom="$8" textAlign="center">
         여행의 모든 순간을 기록하세요
       </Text>
 
       {/* 로딩 인디케이터 */}
       <YStack width="60%" marginTop="$4">
-        <YStack
-          height={6}
-          backgroundColor="$muted"
-          borderRadius={3}
-          overflow="hidden"
-        >
-          <YStack
-            height={6}
-            backgroundColor="$primary"
-            borderRadius={3}
-            width={`${progress}%`}
-          />
+        <YStack height={6} backgroundColor="$muted" borderRadius={3} overflow="hidden">
+          <YStack height={6} backgroundColor="$primary" borderRadius={3} width={`${progress}%`} />
         </YStack>
-        <Text
-          fontSize={12}
-          color="$mutedForeground"
-          textAlign="center"
-          marginTop="$2"
-        >
+        <Text fontSize={12} color="$mutedForeground" textAlign="center" marginTop="$2">
           로딩 중...
         </Text>
       </YStack>
