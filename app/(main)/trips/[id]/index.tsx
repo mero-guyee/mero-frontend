@@ -1,14 +1,14 @@
+import MemoCard from '@/components/memos/MemoCard';
+import { MemoEmptyState } from '@/components/memos/MemoEmptyState';
+import NewMemoButton from '@/components/memos/NewMemoButton';
 import {
   ArrowLeft,
-  BookOpen,
   Calendar,
   Download,
   File,
   FileText,
   MapPin,
   MoreVertical,
-  Pencil,
-  Trash2,
   Upload,
   X,
 } from '@tamagui/lucide-icons';
@@ -17,11 +17,10 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Image, Text, XStack, YStack } from 'tamagui';
+import { Image, Text, XStack, YStack } from 'tamagui';
+import { SubTab, TripSubTabs } from '../../../../components/trips/TripSubTabs';
 import { CircularButton, FilledButton } from '../../../../components/ui';
 import { useExpenses, useFootprints, useTrips } from '../../../../contexts';
-
-type SubTab = 'memos' | 'files';
 
 interface SelectedFile {
   name: string;
@@ -231,142 +230,25 @@ export default function TripHomeScreen() {
           </YStack>
         </YStack>
 
-        {/* Sub Tab Navigation */}
-        <YStack paddingTop="$4" paddingHorizontal="$5">
-          <XStack
-            backgroundColor="$card"
-            padding="$1"
-            borderRadius="$4"
-            borderWidth={1}
-            borderColor="$border"
-          >
-            <Button
-              flex={1}
-              height={40}
-              borderRadius="$3"
-              backgroundColor={subTab === 'memos' ? '$accent' : 'transparent'}
-              pressStyle={{ backgroundColor: subTab === 'memos' ? '$accent' : '$muted' }}
-              onPress={() => setSubTab('memos')}
-            >
-              <Text
-                color={subTab === 'memos' ? '$foreground' : '$mutedForeground'}
-                fontSize={14}
-                fontWeight="500"
-              >
-                📝 메모
-              </Text>
-            </Button>
-            <Button
-              flex={1}
-              height={40}
-              borderRadius="$3"
-              backgroundColor={subTab === 'files' ? '$accent' : 'transparent'}
-              pressStyle={{ backgroundColor: subTab === 'files' ? '$accent' : '$muted' }}
-              onPress={() => setSubTab('files')}
-            >
-              <Text
-                color={subTab === 'files' ? '$foreground' : '$mutedForeground'}
-                fontSize={14}
-                fontWeight="500"
-              >
-                📂 서류
-              </Text>
-            </Button>
-          </XStack>
-        </YStack>
+        <TripSubTabs activeTab={subTab} onTabChange={setSubTab} />
 
         {/* Content Area */}
         <YStack padding="$5" paddingTop="$4">
           {subTab === 'memos' ? (
             // Notes Section
             <YStack gap="$3">
-              <XStack alignItems="center" justifyContent="space-between" marginBottom="$1">
-                <Text color="$foreground" fontSize={14}>
-                  {memos.length > 0 ? `총 ${memos.length}개의 메모` : '메모'}
-                </Text>
-                <Pressable onPress={handleCreateMemo}>
-                  <Text color="$primary" fontSize={14}>
-                    + 새 메모
-                  </Text>
-                </Pressable>
-              </XStack>
-
+              <NewMemoButton memosLength={memos.length} onPress={handleCreateMemo} />
               {memos.length === 0 ? (
-                <YStack
-                  backgroundColor="$card"
-                  borderRadius="$6"
-                  padding="$8"
-                  alignItems="center"
-                  borderWidth={1}
-                  borderColor="$border"
-                >
-                  <YStack
-                    width={64}
-                    height={64}
-                    backgroundColor="$accent"
-                    borderRadius="$4"
-                    alignItems="center"
-                    justifyContent="center"
-                    marginBottom="$3"
-                    opacity={0.3}
-                  >
-                    <BookOpen size={32} color="$primary" />
-                  </YStack>
-                  <Text color="$mutedForeground" fontSize={14} marginBottom="$3">
-                    자유롭게 메모하세요
-                  </Text>
-                  <FilledButton
-                    paddingHorizontal="$6"
-                    paddingVertical="$3"
-                    onPress={handleCreateMemo}
-                  >
-                    <XStack alignItems="center" gap="$2">
-                      <Pencil size={16} color="$foreground" />
-                      <Text color="$foreground" fontWeight="500">
-                        첫 노트 작성하기
-                      </Text>
-                    </XStack>
-                  </FilledButton>
-                </YStack>
+                <MemoEmptyState onPress={handleCreateMemo} />
               ) : (
                 <YStack gap="$2">
                   {memos.map((note) => (
-                    <Pressable key={note.id} onPress={() => handleEditMemo(note.id)}>
-                      <YStack
-                        backgroundColor="$card"
-                        borderRadius="$6"
-                        padding="$4"
-                        borderWidth={1}
-                        borderColor="$border"
-                      >
-                        <XStack
-                          alignItems="flex-start"
-                          justifyContent="space-between"
-                          marginBottom="$2"
-                        >
-                          <Text color="$foreground" fontWeight="500" flex={1} paddingRight="$2">
-                            {note.title}
-                          </Text>
-                          <Pressable
-                            onPress={(e) => {
-                              e.stopPropagation();
-                              handleDeleteMemo(note.id);
-                            }}
-                            style={{ padding: 8, marginRight: -8, marginTop: -8 }}
-                          >
-                            <Trash2 size={16} color="$destructive" />
-                          </Pressable>
-                        </XStack>
-                        <Text
-                          color="$mutedForeground"
-                          fontSize={14}
-                          numberOfLines={2}
-                          marginBottom="$2"
-                        >
-                          {note.content}
-                        </Text>
-                      </YStack>
-                    </Pressable>
+                    <MemoCard
+                      key={note.id}
+                      memo={note}
+                      onPress={handleEditMemo}
+                      onDelete={handleDeleteMemo}
+                    />
                   ))}
                 </YStack>
               )}
