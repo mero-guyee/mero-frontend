@@ -81,10 +81,10 @@ export class BaseRepository<T extends BaseEntity> {
     const setClause = keys.map((k) => `${k} = ?`).join(', ');
     const values = keys.map((k) => this.toRow(updates[k as keyof typeof updates]));
 
-    await this.db.runAsync(
-      `UPDATE ${this.table} SET ${setClause} WHERE id = ?`,
-      [...(values as SQLite.SQLiteBindValue[]), id]
-    );
+    await this.db.runAsync(`UPDATE ${this.table} SET ${setClause} WHERE id = ?`, [
+      ...(values as SQLite.SQLiteBindValue[]),
+      id,
+    ]);
 
     return { ...existing, ...updates };
   }
@@ -96,6 +96,12 @@ export class BaseRepository<T extends BaseEntity> {
     );
   }
 
+  // for test. do not use in production.
+
+  async deleteAll(): Promise<void> {
+    await this.db.runAsync(`DELETE FROM ${this.table}`);
+  }
+
   async getPending(): Promise<T[]> {
     const rows = await this.db.getAllAsync<Record<string, any>>(
       `SELECT * FROM ${this.table} WHERE syncStatus = 'pending'`
@@ -104,10 +110,7 @@ export class BaseRepository<T extends BaseEntity> {
   }
 
   async markSynced(id: string): Promise<void> {
-    await this.db.runAsync(
-      `UPDATE ${this.table} SET syncStatus = 'synced' WHERE id = ?`,
-      [id]
-    );
+    await this.db.runAsync(`UPDATE ${this.table} SET syncStatus = 'synced' WHERE id = ?`, [id]);
   }
 
   async setServerId(id: string, serverId: string): Promise<void> {
