@@ -58,7 +58,7 @@ export function useCreateMemo() {
       }
       return localMemo;
     },
-    onSuccess: (memo) => qc.invalidateQueries({ queryKey: memoKeys.byTrip(memo.tripId) }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: memoKeys.all }),
   });
 }
 
@@ -86,7 +86,7 @@ export function useUpdateMemo() {
       }
       return updated;
     },
-    onSuccess: (_, memo) => qc.invalidateQueries({ queryKey: memoKeys.byTrip(memo.tripId) }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: memoKeys.all }),
   });
 }
 
@@ -111,6 +111,6 @@ export function useDeleteMemo() {
       }
       return tripId;
     },
-    onSuccess: (tripId) => qc.invalidateQueries({ queryKey: memoKeys.byTrip(tripId) }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: memoKeys.all }),
   });
 }
