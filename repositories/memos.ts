@@ -3,14 +3,13 @@ import { Memo } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
 export interface MemoRow extends BaseEntity {
+  id: string;
   serverId?: string | null;
   tripId: string;
   title: string;
   content: string;
-  date: string;
-  locations: string; // JSON string
-  photoUrls: string; // JSON string
-  weatherInfo?: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 function rowToMemo(row: MemoRow): Memo {
@@ -20,10 +19,8 @@ function rowToMemo(row: MemoRow): Memo {
     tripId: row.tripId,
     title: row.title,
     content: row.content,
-    date: row.date,
-    locations: typeof row.locations === 'string' ? JSON.parse(row.locations) : row.locations,
-    photoUrls: typeof row.photoUrls === 'string' ? JSON.parse(row.photoUrls) : row.photoUrls,
-    weatherInfo: row.weatherInfo ?? undefined,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
   };
 }
 
@@ -58,9 +55,6 @@ export class MemoRepository extends BaseRepository<MemoRow> {
     const row = await this.create({
       ...data,
       serverId: null,
-      locations: JSON.stringify(data.locations ?? []),
-      photoUrls: JSON.stringify(data.photoUrls ?? []),
-      weatherInfo: data.weatherInfo ?? null,
     } as Omit<MemoRow, keyof BaseEntity>);
     return rowToMemo(row);
   }
@@ -69,10 +63,6 @@ export class MemoRepository extends BaseRepository<MemoRow> {
     const row = await this.update(memo.id, {
       title: memo.title,
       content: memo.content,
-      date: memo.date,
-      locations: JSON.stringify(memo.locations),
-      photoUrls: JSON.stringify(memo.photoUrls),
-      weatherInfo: memo.weatherInfo ?? null,
     });
     return row ? rowToMemo(row) : null;
   }
