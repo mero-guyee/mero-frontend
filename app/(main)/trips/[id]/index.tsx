@@ -11,10 +11,9 @@ import { useTrips } from '../../../../contexts';
 
 export default function TripHomeScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { getTripById, getMemosByTripId } = useTrips();
+  const { getTripById, memos } = useTrips();
 
   const trip = getTripById(id || '');
-  const memos = getMemosByTripId(id || '');
 
   const [showMenu, setShowMenu] = useState(false);
   const [subTab, setSubTab] = useState<SubTab>('memos');

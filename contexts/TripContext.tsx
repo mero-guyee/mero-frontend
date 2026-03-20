@@ -1,8 +1,8 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 import {
-  useAllMemosQuery,
   useCreateMemo,
   useDeleteMemo,
+  useMemosQuery,
   useUpdateMemo,
 } from '../hooks/queries/useMemos';
 import {
@@ -27,7 +27,6 @@ interface TripContextType {
   updateMemo: (memo: Memo) => void;
   deleteMemo: (memoId: string) => void;
   getTripById: (tripId: string) => Trip | undefined;
-  getMemosByTripId: (tripId: string) => Memo[];
 }
 
 const TripUIContext = createContext<{
@@ -53,7 +52,7 @@ export function useTrips(): TripContextType {
   if (!ui) throw new Error('useTrips must be used within a TripProvider');
 
   const { data: trips = [] } = useTripsQuery();
-  const { data: memos = [] } = useAllMemosQuery();
+  const { data: memos = [] } = useMemosQuery(ui.activeTrip ?? '');
 
   const createTrip = useCreateTrip();
   const updateTripMut = useUpdateTrip();
@@ -91,7 +90,6 @@ export function useTrips(): TripContextType {
       if (memo) deleteMemoMut.mutate({ id: memoId, tripId: memo.tripId });
     },
     getTripById: (tripId) => trips.find((t) => t.id === tripId),
-    getMemosByTripId: (tripId) => memos.filter((n) => n.tripId === tripId),
   };
 }
 

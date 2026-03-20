@@ -27,14 +27,6 @@ export function useMemosQuery(tripId: string) {
   });
 }
 
-export function useAllMemosQuery() {
-  const db = useDb();
-  return useQuery({
-    queryKey: memoKeys.all,
-    queryFn: () => new MemoRepository(db).getAllMemos(),
-  });
-}
-
 export function useCreateMemo() {
   const db = useDb();
   const qc = useQueryClient();
