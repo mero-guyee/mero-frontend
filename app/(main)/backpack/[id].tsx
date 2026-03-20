@@ -5,9 +5,9 @@ import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView } from 'react-native';
 import { Text, YStack } from 'tamagui';
-import { TripDocumentsTab } from '../../../../components/trips/documents/TripDocumentsTab';
-import { SubTab, TripSubTabs } from '../../../../components/trips/TripSubTabs';
-import { useTrips } from '../../../../contexts';
+import { TripDocumentsTab } from '../../../components/trips/documents/TripDocumentsTab';
+import { SubTab, TripSubTabs } from '../../../components/trips/TripSubTabs';
+import { useTrips } from '../../../contexts';
 
 export default function TripHomeScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -28,29 +28,19 @@ export default function TripHomeScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      {/* App Bar */}
       <BackpackHeader trip={trip} />
       <ScrollView style={{ flex: 1 }}>
-        {/* Cover Image */}
         <TripDetailCoverImage trip={trip} />
 
         <TripSubTabs activeTab={subTab} onTabChange={setSubTab} />
 
-        {/* Content Area */}
         <YStack padding="$5" paddingTop="$4">
-          {subTab === 'memos' ? (
-            // Memos Section
-            <MemoTab memos={memos} tripId={id} />
-          ) : (
-            <TripDocumentsTab />
-          )}
+          {subTab === 'memos' ? <MemoTab memos={memos} tripId={id} /> : <TripDocumentsTab />}
         </YStack>
 
-        {/* Bottom padding for tab bar */}
         <YStack height={100} />
       </ScrollView>
 
-      {/* Close menu when clicking outside */}
       {showMenu && (
         <Pressable
           style={{

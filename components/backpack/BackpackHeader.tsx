@@ -8,14 +8,14 @@ import { Alert, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
 
-export default function TripDetailHeader({ trip }: { trip: Trip }) {
+export default function BackpackHeader({ trip }: { trip: Trip }) {
   const [showMenu, setShowMenu] = useState(false);
   const { deleteTrip } = useTrips();
 
   const insets = useSafeAreaInsets();
 
   const handleBack = () => {
-    router.back();
+    router.navigate('/(main)/trips');
   };
 
   const handleEdit = () => {

@@ -23,7 +23,7 @@ export default function MainLayout() {
       }}
     >
       <Tabs.Screen
-        name="trips"
+        name="backpack"
         options={{
           tabBarLabel: '배낭',
           tabBarIcon: ({ color, size }) => <Backpack size={size} color={color} />,
@@ -55,6 +55,13 @@ export default function MainLayout() {
         options={{
           tabBarLabel: '설정',
           tabBarIcon: ({ color, size }) => <Settings size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="trips"
+        options={{
+          href: null,
+          tabBarStyle: { display: 'none' },
         }}
       />
     </Tabs>

@@ -10,14 +10,14 @@ export default function MemoTab({ memos, tripId }: { memos: Memo[]; tripId: stri
   const { deleteMemo } = useTrips();
   const handleCreateMemo = () => {
     router.push({
-      pathname: '/trips/memo-form',
+      pathname: '/backpack/memo-form',
       params: { tripId },
     } as any);
   };
 
   const handleEditMemo = (memoId: string) => {
     router.push({
-      pathname: '/trips/memo-form',
+      pathname: '/backpack/memo-form',
       params: { tripId, memoId },
     } as any);
   };
