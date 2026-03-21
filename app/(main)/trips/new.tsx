@@ -1,5 +1,6 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ArrowLeft, Image as ImageIcon, X } from '@tamagui/lucide-icons';
+import { Asset } from 'expo-asset';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -43,18 +44,24 @@ export default function NewTripScreen() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim() || !startDate || !endDate) {
       Alert.alert('오류', '제목, 시작일, 종료일을 입력해주세요.');
       return;
+    }
+
+    let finalImageUrl = imageUrl.trim();
+    if (!finalImageUrl) {
+      const asset = Asset.fromModule(require('../../../assets/images/mountain.jpg'));
+      await asset.downloadAsync();
+      finalImageUrl = asset.localUri ?? '';
     }
 
     addTrip({
       title: title.trim(),
       startDate,
       endDate,
-      imageUrl:
-        imageUrl.trim() || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800',
+      imageUrl: finalImageUrl,
       countries,
     });
 

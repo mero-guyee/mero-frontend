@@ -39,7 +39,7 @@ export function TripCard({ trip, onPress }: TripCardProps) {
       >
         {/* Cover Image */}
         <YStack height={180} overflow="hidden">
-          <Image source={{ uri: trip.imageUrl }} width="100%" height="100%" resizeMode="cover" />
+          <Image source={{ uri: trip.imageUrl }} width="100%" height="100%" objectFit="cover" />
           <YStack
             position="absolute"
             bottom={0}
