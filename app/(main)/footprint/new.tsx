@@ -1,10 +1,11 @@
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { ArrowLeft, MapPin, Plus, X } from '@tamagui/lucide-icons';
+import { ArrowLeft, Camera, MapPin, Plus, X } from '@tamagui/lucide-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Modal, Platform, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Text, TextArea, XStack, YStack } from 'tamagui';
+import { Image, Text, TextArea, XStack, YStack } from 'tamagui';
 import { CircularButton, FilledButton, Input } from '../../../components/ui';
 import { useFootprints, useTrips } from '../../../contexts';
 import { FootprintLocation } from '../../../types';
@@ -42,6 +43,7 @@ export default function FootprintFormScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<string[]>([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
 
   useEffect(() => {
     if (existingFootprint) {
@@ -51,8 +53,29 @@ export default function FootprintFormScreen() {
       setTripId(existingFootprint.tripId);
       setWeatherInfo(existingFootprint.weatherInfo || '');
       setLocations(existingFootprint.locations);
+      setPhotoUrls(existingFootprint.photoUrls ?? []);
     }
   }, [existingFootprint]);
+
+  const handleAddPhoto = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('권한 필요', '사진을 선택하려면 갤러리 접근 권한이 필요합니다.');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      quality: 0.8,
+    });
+    if (!result.canceled) {
+      setPhotoUrls((prev) => [...prev, ...result.assets.map((a) => a.uri)]);
+    }
+  };
+
+  const handleRemovePhoto = (index: number) => {
+    setPhotoUrls((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = () => {
     if (!title.trim() || !tripId) {
@@ -66,7 +89,7 @@ export default function FootprintFormScreen() {
       date,
       content: content.trim(),
       locations,
-      photoUrls: existingFootprint?.photoUrls ?? [],
+      photoUrls,
       weatherInfo: weatherInfo.trim() || undefined,
     };
 
@@ -278,6 +301,54 @@ export default function FootprintFormScreen() {
             minHeight={200}
             textAlignVertical="top"
           />
+        </YStack>
+
+        {/* Photos */}
+        <YStack marginBottom="$6">
+          <XStack alignItems="center" justifyContent="space-between" marginBottom="$2">
+            <Text color="$foreground" fontWeight="500">
+              📸 사진
+            </Text>
+            <Pressable onPress={handleAddPhoto}>
+              <XStack alignItems="center" gap="$1">
+                <Camera size={16} color="$primary" />
+                <Text color="$primary" fontSize={14}>
+                  사진 추가
+                </Text>
+              </XStack>
+            </Pressable>
+          </XStack>
+
+          {photoUrls.length > 0 && (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <XStack gap="$2">
+                {photoUrls.map((uri, index) => (
+                  <YStack key={index} position="relative">
+                    <Image
+                      source={{ uri }}
+                      width={100}
+                      height={100}
+                      borderRadius={8}
+                      objectFit="cover"
+                    />
+                    <Pressable
+                      onPress={() => handleRemovePhoto(index)}
+                      style={{
+                        position: 'absolute',
+                        top: 4,
+                        right: 4,
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        borderRadius: 10,
+                        padding: 3,
+                      }}
+                    >
+                      <X size={12} color="white" />
+                    </Pressable>
+                  </YStack>
+                ))}
+              </XStack>
+            </ScrollView>
+          )}
         </YStack>
       </ScrollView>
 
