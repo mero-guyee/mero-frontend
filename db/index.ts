@@ -1,5 +1,5 @@
 import * as SQLite from 'expo-sqlite';
-import { CREATE_TABLES, DROP_TABLES, SCHEMA_VERSION } from './schema';
+import { CREATE_TABLES, DROP_TABLES, SCHEMA_VERSION, SEED_CATEGORIES } from './schema';
 
 let db: SQLite.SQLiteDatabase | null = null;
 
@@ -34,6 +34,7 @@ async function runMigrations(database: SQLite.SQLiteDatabase): Promise<void> {
       await database.execAsync(DROP_TABLES);
     }
     await database.execAsync(CREATE_TABLES);
+    await database.execAsync(SEED_CATEGORIES);
     await database.runAsync(
       `INSERT OR REPLACE INTO _meta (key, value) VALUES ('schema_version', ?)`,
       [String(SCHEMA_VERSION)]

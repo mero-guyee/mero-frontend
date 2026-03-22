@@ -26,6 +26,7 @@ export default function ExpenseFormScreen() {
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
+  console.log(categories.length);
 
   const handleSubmit = () => {
     if (!amount || parseFloat(amount) <= 0) {
@@ -37,16 +38,11 @@ export default function ExpenseFormScreen() {
       return;
     }
 
-    const selectedCategory = categories.find((c) => c.id === categoryId);
-
     addExpense({
       tripId: effectiveTripId,
       footprintId,
       date,
       categoryId,
-      categoryName: selectedCategory?.name,
-      categoryIcon: selectedCategory?.icon,
-      categoryColor: selectedCategory?.color,
       amount: parseFloat(amount),
       currency,
       description: description.trim() || undefined,

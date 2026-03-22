@@ -6,7 +6,6 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { AuthProvider, BudgetProvider, ExpenseProvider, TripProvider } from '../contexts';
 import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
 import { QueryProvider } from '../providers/QueryProvider';
-import { SeedDatabase } from '../providers/SeedDatabase';
 import '../reactotron-config';
 import config from '../tamagui.config';
 
@@ -22,24 +21,22 @@ function AppContent() {
   }
 
   return (
-    <SeedDatabase>
-      <AuthProvider>
-        <TripProvider>
-          <ExpenseProvider>
-            <BudgetProvider>
-              <StatusBar style="dark" />
-              <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="index" />
-                  <Stack.Screen name="(auth)" />
-                  <Stack.Screen name="(main)" />
-                </Stack>
-              </SafeAreaView>
-            </BudgetProvider>
-          </ExpenseProvider>
-        </TripProvider>
-      </AuthProvider>
-    </SeedDatabase>
+    <AuthProvider>
+      <TripProvider>
+        <ExpenseProvider>
+          <BudgetProvider>
+            <StatusBar style="dark" />
+            <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="(main)" />
+              </Stack>
+            </SafeAreaView>
+          </BudgetProvider>
+        </ExpenseProvider>
+      </TripProvider>
+    </AuthProvider>
   );
 }
 

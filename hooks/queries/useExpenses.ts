@@ -44,7 +44,16 @@ export function useCategoriesQuery() {
   const db = useDb();
   return useQuery({
     queryKey: expenseKeys.categories,
-    queryFn: () => new ExpenseCategoryRepository(db).getAllCategories(),
+    queryFn: async () => {
+      const repo = new ExpenseCategoryRepository(db);
+      try {
+        const serverCategories = await expenseCategoriesApi.getAll();
+        await Promise.all(serverCategories.map((c) => repo.upsertFromServer(c)));
+      } catch {
+        // offline — use local cache
+      }
+      return repo.getAllCategories();
+    },
   });
 }
 

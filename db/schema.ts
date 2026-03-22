@@ -115,3 +115,14 @@ export const CREATE_TABLES = `
   CREATE INDEX IF NOT EXISTS idx_expenses_footprintId ON expenses(footprintId);
   CREATE INDEX IF NOT EXISTS idx_budgets_tripId       ON budgets(tripId);
 `;
+
+export const SEED_CATEGORIES = `
+  INSERT OR REPLACE INTO expense_categories (id, name, icon, color, isDefault, createdAt, updatedAt, syncStatus)
+  VALUES
+    ('1', '교통',     '🚕', '#4CAF50', 1, datetime('now'), datetime('now'), 'synced'),
+    ('2', '식비',     '🍽️',  '#FF9800', 1, datetime('now'), datetime('now'), 'synced'),
+    ('3', '숙박',     '🏨',  '#2196F3', 1, datetime('now'), datetime('now'), 'synced'),
+    ('4', '액티비티', '🎭',  '#9C27B0', 1, datetime('now'), datetime('now'), 'synced'),
+    ('5', '쇼핑',     '🛍️',  '#E91E63', 1, datetime('now'), datetime('now'), 'synced'),
+    ('6', '기타',     '💰',  '#607D8B', 1, datetime('now'), datetime('now'), 'synced');
+`;

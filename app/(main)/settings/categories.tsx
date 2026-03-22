@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { ArrowLeft, Edit3, GripVertical, Plus, Trash2 } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
-import { ScrollView, Pressable, Alert } from 'react-native';
-import { YStack, XStack, Text } from 'tamagui';
-import { CircularButton, FilledButton } from '../../../components/ui';
-import { ArrowLeft, Plus, Edit3, Trash2, GripVertical } from '@tamagui/lucide-icons';
-import { useExpenses } from '../../../contexts';
+import { useState } from 'react';
+import { Alert, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Text, XStack, YStack } from 'tamagui';
+import { CircularButton, FilledButton } from '../../../components/ui';
+import { useExpenses } from '../../../contexts';
 
 const CATEGORY_ICONS: Record<string, string> = {
   restaurant: '🍽️',

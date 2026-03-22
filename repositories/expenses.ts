@@ -1,5 +1,5 @@
 import * as SQLite from 'expo-sqlite';
-import type { ExpenseResponse } from '../api/expenses';
+import type { ExpenseCategoryResponse, ExpenseResponse } from '../api/expenses';
 import { Expense, ExpenseCategory } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
@@ -209,6 +209,25 @@ export class ExpenseCategoryRepository extends BaseRepository<ExpenseCategoryRow
       isDefault: category.isDefault ? 1 : 0,
     });
     return row ? rowToExpenseCategory(row) : null;
+  }
+
+  async upsertFromServer(serverCategory: ExpenseCategoryResponse): Promise<void> {
+    const serverId = String(serverCategory.id);
+    const existing = await this.db.getFirstAsync<ExpenseCategoryRow>(
+      `SELECT * FROM expense_categories WHERE serverId = ? AND deletedAt IS NULL`,
+      [serverId]
+    );
+    if (existing) {
+      await this.db.runAsync(
+        `UPDATE expense_categories SET name=?, icon=?, color=?, isDefault=?, syncStatus='synced', updatedAt=datetime('now') WHERE id=?`,
+        [serverCategory.name, serverCategory.icon, serverCategory.color, serverCategory.isDefault ? 1 : 0, existing.id]
+      );
+    } else {
+      await this.db.runAsync(
+        `INSERT OR IGNORE INTO expense_categories (id, serverId, name, icon, color, isDefault, createdAt, updatedAt, syncStatus) VALUES (?,?,?,?,?,?,datetime('now'),datetime('now'),'synced')`,
+        [serverId, serverId, serverCategory.name, serverCategory.icon, serverCategory.color, serverCategory.isDefault ? 1 : 0]
+      );
+    }
   }
 
   async deleteCategory(id: string): Promise<void> {
