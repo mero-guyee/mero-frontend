@@ -3,13 +3,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import {
-  AuthProvider,
-  BudgetProvider,
-  ExpenseProvider,
-  FootprintProvider,
-  TripProvider,
-} from '../contexts';
+import { AuthProvider, BudgetProvider, ExpenseProvider, TripProvider } from '../contexts';
 import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
 import { QueryProvider } from '../providers/QueryProvider';
 import { SeedDatabase } from '../providers/SeedDatabase';
@@ -31,20 +25,18 @@ function AppContent() {
     <SeedDatabase>
       <AuthProvider>
         <TripProvider>
-          <FootprintProvider>
-            <ExpenseProvider>
-              <BudgetProvider>
-                <StatusBar style="dark" />
-                <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="index" />
-                    <Stack.Screen name="(auth)" />
-                    <Stack.Screen name="(main)" />
-                  </Stack>
-                </SafeAreaView>
-              </BudgetProvider>
-            </ExpenseProvider>
-          </FootprintProvider>
+          <ExpenseProvider>
+            <BudgetProvider>
+              <StatusBar style="dark" />
+              <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="(auth)" />
+                  <Stack.Screen name="(main)" />
+                </Stack>
+              </SafeAreaView>
+            </BudgetProvider>
+          </ExpenseProvider>
         </TripProvider>
       </AuthProvider>
     </SeedDatabase>

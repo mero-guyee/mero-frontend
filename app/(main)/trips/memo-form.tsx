@@ -5,13 +5,13 @@ import { ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, TextArea, XStack, YStack } from 'tamagui';
 import { CircularButton, FilledButton, Input } from '../../../components/ui';
-import { useTrips } from '../../../contexts';
+import { useMemos } from '../../../contexts';
 
 export default function MemoFormScreen() {
   const { tripId, memoId } = useLocalSearchParams<{ tripId: string; memoId?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { memos, addMemo, updateMemo } = useTrips();
+  const { memos, addMemo, updateMemo } = useMemos();
 
   const existingMemo = memoId ? memos.find((n) => n.id === memoId) : undefined;
 

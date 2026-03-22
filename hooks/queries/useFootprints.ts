@@ -1,8 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { footprintsApi } from '../../api/footprints';
-import { Footprint } from '../../types';
-import { FootprintRepository, TripRepository } from '../../repositories';
 import { useDb } from '../../providers/DatabaseProvider';
+import { FootprintRepository, TripRepository } from '../../repositories';
+import { Footprint } from '../../types';
 
 export const footprintKeys = {
   all: ['footprints'] as const,
@@ -10,13 +10,6 @@ export const footprintKeys = {
   detail: (id: string) => ['footprints', id] as const,
 };
 
-export function useFootprintsQuery() {
-  const db = useDb();
-  return useQuery({
-    queryKey: footprintKeys.all,
-    queryFn: () => new FootprintRepository(db).getAllFootprints(),
-  });
-}
 
 export function useFootprintsByTripQuery(tripId: string) {
   const db = useDb();

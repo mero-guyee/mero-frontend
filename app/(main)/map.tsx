@@ -5,8 +5,7 @@ import { Modal, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { CircularButton } from '../../components/ui';
-import { useFootprints } from '../../contexts';
-import { useTrips } from '../../contexts/TripContext';
+import { useFootprints, useTrips } from '../../contexts';
 import { Footprint } from '../../types';
 
 export default function MapViewScreen() {

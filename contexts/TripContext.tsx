@@ -1,21 +1,14 @@
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 import {
-  useCreateMemo,
-  useDeleteMemo,
-  useMemosQuery,
-  useUpdateMemo,
-} from '../hooks/queries/useMemos';
-import {
   useCreateTrip,
   useDeleteTrip,
   useTripsQuery,
   useUpdateTrip,
 } from '../hooks/queries/useTrips';
-import { Memo, Trip } from '../types';
+import { Trip } from '../types';
 
 interface TripContextType {
   trips: Trip[];
-  memos: Memo[];
   activeTrip: string | null;
   currentTab: 'home' | 'footprint' | 'map' | 'expense';
   setCurrentTab: (tab: 'home' | 'footprint' | 'map' | 'expense') => void;
@@ -23,9 +16,6 @@ interface TripContextType {
   addTrip: (trip: Omit<Trip, 'id'>) => void;
   updateTrip: (trip: Trip) => void;
   deleteTrip: (tripId: string) => void;
-  addMemo: (memo: Omit<Memo, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateMemo: (memo: Memo) => void;
-  deleteMemo: (memoId: string) => void;
   getTripById: (tripId: string) => Trip | undefined;
 }
 
@@ -52,18 +42,13 @@ export function useTrips(): TripContextType {
   if (!ui) throw new Error('useTrips must be used within a TripProvider');
 
   const { data: trips = [] } = useTripsQuery();
-  const { data: memos = [] } = useMemosQuery(ui.activeTrip ?? '');
 
   const createTrip = useCreateTrip();
   const updateTripMut = useUpdateTrip();
   const deleteTripMut = useDeleteTrip();
-  const createMemo = useCreateMemo();
-  const updateMemoMut = useUpdateMemo();
-  const deleteMemoMut = useDeleteMemo();
 
   return {
     trips,
-    memos,
     activeTrip: ui.activeTrip,
     currentTab: ui.currentTab,
     setCurrentTab: ui.setCurrentTab,
@@ -82,12 +67,6 @@ export function useTrips(): TripContextType {
           }
         },
       });
-    },
-    addMemo: (memo) => createMemo.mutate(memo),
-    updateMemo: (memo) => updateMemoMut.mutate(memo),
-    deleteMemo: (memoId) => {
-      const memo = memos.find((n) => n.id === memoId);
-      if (memo) deleteMemoMut.mutate({ id: memoId, tripId: memo.tripId });
     },
     getTripById: (tripId) => trips.find((t) => t.id === tripId),
   };

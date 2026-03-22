@@ -1,4 +1,4 @@
-import { useTrips } from '@/contexts';
+import { useMemos } from '@/contexts';
 import { Memo } from '@/types';
 import { router } from 'expo-router';
 import { Alert, Pressable } from 'react-native';
@@ -7,7 +7,7 @@ import MemoCard from './MemoCard';
 import { MemoEmptyState } from './MemoEmptyState';
 
 export default function MemoTab({ memos, tripId }: { memos: Memo[]; tripId: string }) {
-  const { deleteMemo } = useTrips();
+  const { deleteMemo } = useMemos();
   const handleCreateMemo = () => {
     router.push({
       pathname: '/backpack/memo-form',

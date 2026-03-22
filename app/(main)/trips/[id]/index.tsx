@@ -7,11 +7,12 @@ import { Pressable, ScrollView } from 'react-native';
 import { Text, YStack } from 'tamagui';
 import { TripDocumentsTab } from '../../../../components/trips/documents/TripDocumentsTab';
 import { SubTab, TripSubTabs } from '../../../../components/trips/TripSubTabs';
-import { useTrips } from '../../../../contexts';
+import { useMemos, useTrips } from '../../../../contexts';
 
 export default function TripHomeScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { getTripById, memos } = useTrips();
+  const { getTripById } = useTrips();
+  const { memos } = useMemos();
 
   const trip = getTripById(id || '');
 

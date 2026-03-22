@@ -12,10 +12,10 @@ export default function FootprintDetailScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { getTripById } = useTrips();
-  const { getFootprintById, deleteFootprint } = useFootprints();
+  const { footprints, deleteFootprint } = useFootprints();
   const { getExpensesByFootprintId, deleteExpense } = useExpenses();
 
-  const footprint = getFootprintById(id || '');
+  const footprint = footprints.find((f) => f.id === (id || ''));
   const trip = footprint ? getTripById(footprint.tripId) : undefined;
   const expenses = getExpensesByFootprintId(id || '');
 
