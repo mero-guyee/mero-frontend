@@ -1,7 +1,10 @@
 import { Backpack, BookOpen, Map, Settings, Wallet } from '@tamagui/lucide-icons';
 import { Tabs } from 'expo-router';
+import { useActiveTripGuard } from '../../hooks/useActiveTripGuard';
 
 export default function MainLayout() {
+  useActiveTripGuard();
+
   return (
     <Tabs
       screenOptions={{
