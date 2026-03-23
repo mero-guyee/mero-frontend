@@ -14,7 +14,7 @@ export function ExpenseCard({ expense }: ExpenseCardProps) {
 
   return (
     <Pressable
-      onPress={() => router.push({ pathname: '/expense/edit', params: { expenseId: expense.id } })}
+      onPress={() => router.push({ pathname: '/expense/detail', params: { expenseId: expense.id } })}
     >
       <XStack
         backgroundColor="$muted"
