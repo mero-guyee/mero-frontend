@@ -5,13 +5,14 @@ import {
   useCreateExpense,
   useDeleteCategory,
   useDeleteExpense,
-  useExpensesQuery,
+  useExpensesByTripQuery,
   useUpdateCategory,
   useUpdateExpense,
 } from '../hooks/queries/useExpenses';
 import { useDb } from '../providers/DatabaseProvider';
 import { ExpenseRepository } from '../repositories';
 import { Expense, ExpenseCategory } from '../types';
+import { useTrips } from './TripContext';
 
 interface ExpenseContextType {
   expenses: Expense[];
@@ -34,7 +35,8 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
 
 export function useExpenses(): ExpenseContextType {
   const db = useDb();
-  const { data: expenses = [] } = useExpensesQuery();
+  const { activeTrip } = useTrips();
+  const { data: expenses = [] } = useExpensesByTripQuery(activeTrip ?? '');
   const { data: categories = [] } = useCategoriesQuery();
 
   const createExpense = useCreateExpense();

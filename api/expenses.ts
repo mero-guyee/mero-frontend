@@ -91,17 +91,7 @@ export interface ExpenseCategoryResponse {
 }
 
 export const expenseCategoriesApi = {
-  getAll: (): Promise<ExpenseCategoryResponse[]> =>
-    // For test.
-    Promise.resolve([
-      { id: 1, name: '교통', icon: '🚕', color: '#4CAF50', isDefault: true },
-      { id: 2, name: '식비', icon: '🍽️', color: '#FF9800', isDefault: true },
-      { id: 3, name: '숙박', icon: '🏨', color: '#2196F3', isDefault: true },
-      { id: 4, name: '액티비티', icon: '🎭', color: '#9C27B0', isDefault: true },
-      { id: 5, name: '쇼핑', icon: '🛍️', color: '#E91E63', isDefault: true },
-      { id: 6, name: '기타', icon: '💰', color: '#607D8B', isDefault: true },
-    ]),
-
+  getAll: (): Promise<ExpenseCategoryResponse[]> => apiRequest('/api/expense-categories'),
   create: (data: ExpenseCategoryCreateRequest): Promise<ExpenseCategoryResponse> =>
     apiRequest(
       `/api/expense-categories?name=${encodeURIComponent(data.name)}&icon=${encodeURIComponent(data.icon)}&color=${encodeURIComponent(data.color)}`,

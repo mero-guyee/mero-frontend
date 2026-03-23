@@ -26,7 +26,6 @@ export default function ExpenseFormScreen() {
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
-  console.log(categories.length);
 
   const handleSubmit = () => {
     if (!amount || parseFloat(amount) <= 0) {
