@@ -4,6 +4,8 @@ import { useDb } from '../../providers/DatabaseProvider';
 import { BudgetRepository, TripRepository } from '../../repositories';
 import { Budget } from '../../types';
 
+const DEFAULT_EXCHANGE_RATE = 1;
+
 export const budgetKeys = {
   all: ['budgets'] as const,
   byTrip: (tripId: string) => ['budgets', 'trip', tripId] as const,
@@ -54,7 +56,7 @@ export function useCreateBudget() {
             clientId: localBudget.id,
             amount: data.amount,
             currency: data.currency as any,
-            exchangeRate: data.exchangeRate,
+            exchangeRate: data.exchangeRate || DEFAULT_EXCHANGE_RATE,
           });
           await repo.setServerId(localBudget.id, String(serverBudget.id));
         }
