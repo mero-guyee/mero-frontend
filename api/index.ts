@@ -11,7 +11,7 @@ export type {
 export { budgetsApi } from './budgets';
 export type { BudgetCreateRequest, BudgetResponse, BudgetUpdateRequest } from './budgets';
 
-export { ApiError, BASE_URL, apiRequest } from './client';
+export { ApiError, apiRequest, BASE_URL } from './client';
 export { tokenStorage } from './tokenStorage';
 
 export { expenseCategoriesApi, expensesApi } from './expenses';
@@ -46,3 +46,6 @@ export type {
   TripResponse,
   TripUpdateRequest,
 } from './trips';
+
+export { naverApi } from './naver';
+export type { NaverConnectRequest, NaverConnectResponse, NaverStatusResponse } from './naver';
