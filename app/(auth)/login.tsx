@@ -1,13 +1,15 @@
 import { Compass, Mail } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Alert } from 'react-native';
 import { Separator, Text, XStack, YStack } from 'tamagui';
+import { authApi, naverApi } from '../../api';
 import { FilledButton, Input } from '../../components/ui';
-import { authApi } from '../../api';
 import { useAuth } from '../../contexts';
 
-// 원본 LoginScreen.tsx 변환
+const DEEP_LINK = 'mero://auth/naver/callback';
+
 export default function LoginScreen() {
   const router = useRouter();
   const { setIsAuthenticated } = useAuth();
@@ -27,6 +29,29 @@ export default function LoginScreen() {
       Alert.alert('로그인 실패', e?.message ?? '이메일 또는 비밀번호를 확인해주세요.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleNaverLogin = async () => {
+    const { authUrl } = await naverApi.getAuthUrl();
+
+    const result = await WebBrowser.openAuthSessionAsync(authUrl, DEEP_LINK);
+
+    if (result.type === 'success') {
+      const url = new URL(result.url);
+      const code = url.searchParams.get('code');
+      const returnedState = url.searchParams.get('state');
+      if (code && returnedState) {
+        try {
+          const { naverNickname } = await naverApi.connect({ code, state: returnedState });
+          Alert.alert(`환영합니다, ${naverNickname}님. 새로운 모험을 시작해보시죠.`);
+        } catch (e) {
+          Alert.alert('네이버 로그인 실패', '네이버 로그인 과정에서 오류가 발생했습니다.');
+          return;
+        }
+      }
+    } else if (result.type === 'cancel') {
+      Alert.alert('취소', '네이버 로그인이 취소되었습니다.');
     }
   };
 
@@ -154,15 +179,27 @@ export default function LoginScreen() {
             <Separator flex={1} />
           </XStack>
 
-          {/* Apple Login */}
-          <FilledButton onPress={handleAppleLogin}>
-            <XStack alignItems="center" gap="$2">
-              <Text fontSize={20}></Text>
-              <Text color="$foreground" fontWeight="600" fontSize={16}>
-                Apple로 로그인
-              </Text>
-            </XStack>
-          </FilledButton>
+          <YStack gap={14}>
+            {/* Naver Login */}
+            <FilledButton onPress={handleNaverLogin} bg="#03C75A">
+              <XStack alignItems="center" gap="$2">
+                <Text fontSize={20}></Text>
+                <Text color="$foreground" fontWeight="600" fontSize={16}>
+                  Naver로 로그인
+                </Text>
+              </XStack>
+            </FilledButton>
+
+            {/* Apple Login */}
+            <FilledButton onPress={handleAppleLogin}>
+              <XStack alignItems="center" gap="$2">
+                <Text fontSize={20}></Text>
+                <Text color="$foreground" fontWeight="600" fontSize={16}>
+                  Apple로 로그인
+                </Text>
+              </XStack>
+            </FilledButton>
+          </YStack>
         </YStack>
 
         {/* Sign up link */}

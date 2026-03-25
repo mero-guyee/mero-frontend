@@ -17,7 +17,14 @@ export interface NaverStatusResponse {
   naverNickname: string;
 }
 
+export interface NaverAuthUrlResponse {
+  authUrl: string;
+  state: string;
+}
+
 export const naverApi = {
+  getAuthUrl: (): Promise<NaverAuthUrlResponse> => apiRequest('/api/social/naver/auth-url'),
+
   connect: (data: NaverConnectRequest): Promise<NaverConnectResponse> =>
     apiRequest('/api/social/naver/connect', {
       method: 'POST',
