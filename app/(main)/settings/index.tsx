@@ -1,15 +1,15 @@
+import { Bell, ChevronRight, Globe, HelpCircle, Lock, Tag, User } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
-import { ScrollView, Pressable, Alert } from 'react-native';
-import { YStack, XStack, Text } from 'tamagui';
-import { FilledButton } from '../../../components/ui';
-import { User, Globe, Bell, Lock, HelpCircle, Tag, ChevronRight } from '@tamagui/lucide-icons';
-import { useAuth } from '../../../contexts';
+import { Alert, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Text, XStack, YStack } from 'tamagui';
+import { FilledButton } from '../../../components/ui';
+import { useAuth } from '../../../contexts';
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { logout } = useAuth();
   const insets = useSafeAreaInsets();
-  const { setIsAuthenticated } = useAuth();
 
   const handleManageCategories = () => {
     router.push('/settings/categories');
@@ -19,14 +19,14 @@ export default function SettingsScreen() {
     Alert.alert('알림', `${feature} 기능은 준비 중입니다.`);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     Alert.alert('로그아웃', '정말 로그아웃하시겠습니까?', [
       { text: '취소', style: 'cancel' },
       {
         text: '로그아웃',
         style: 'destructive',
-        onPress: () => {
-          setIsAuthenticated(false);
+        onPress: async () => {
+          logout();
           router.replace('/');
         },
       },
