@@ -4,7 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Alert } from 'react-native';
 import { Separator, Text, XStack, YStack } from 'tamagui';
-import { authApi, naverApi } from '../../api';
+import { naverApi } from '../../api';
 import { FilledButton, Input } from '../../components/ui';
 import { useAuth } from '../../contexts';
 
@@ -12,7 +12,7 @@ const DEEP_LINK = 'mero://auth/naver/callback';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { setIsAuthenticated } = useAuth();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,11 +20,7 @@ export default function LoginScreen() {
   const handleEmailLogin = async () => {
     setLoading(true);
     try {
-      await authApi.login({ email, password });
-      setIsAuthenticated(true);
-
-      Alert.alert('로그인 성공');
-      router.push('/(main)/map');
+      await login({ email, password });
     } catch (e: any) {
       Alert.alert('로그인 실패', e?.message ?? '이메일 또는 비밀번호를 확인해주세요.');
     } finally {

@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { authApi, tokenStorage } from '../api';
 
@@ -5,6 +6,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean; // 앱 시작 시 토큰 복원 중 여부
   setIsAuthenticated: (value: boolean) => void;
+  login: ({ email, password }: { email: string; password: string }) => Promise<void>;
   logout: () => void;
 }
 
@@ -13,6 +15,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   // 앱 시작 시 SecureStore에서 토큰을 읽어 로그인 상태 복원
   useEffect(() => {
@@ -24,6 +27,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setIsLoading(false));
   }, []);
 
+  const login = async ({ email, password }: { email: string; password: string }) => {
+    await authApi.login({ email, password });
+    setIsAuthenticated(true);
+
+    router.push('/(main)/trips');
+  };
+
   const logout = async () => {
     await authApi.logout();
     setIsAuthenticated(false);
@@ -33,6 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated,
     isLoading,
     setIsAuthenticated,
+    login,
     logout,
   };
 
