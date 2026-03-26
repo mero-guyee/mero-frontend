@@ -178,28 +178,15 @@ export default function LoginScreen() {
             </Text>
             <Separator flex={1} />
           </XStack>
-
-          <YStack gap={14}>
-            {/* Naver Login */}
-            <FilledButton onPress={handleNaverLogin} bg="#03C75A">
-              <XStack alignItems="center" gap="$2">
-                <Text fontSize={20}></Text>
-                <Text color="$foreground" fontWeight="600" fontSize={16}>
-                  Naver로 로그인
-                </Text>
-              </XStack>
-            </FilledButton>
-
-            {/* Apple Login */}
-            <FilledButton onPress={handleAppleLogin}>
-              <XStack alignItems="center" gap="$2">
-                <Text fontSize={20}></Text>
-                <Text color="$foreground" fontWeight="600" fontSize={16}>
-                  Apple로 로그인
-                </Text>
-              </XStack>
-            </FilledButton>
-          </YStack>
+          {/* Apple Login */}
+          <FilledButton onPress={handleAppleLogin}>
+            <XStack alignItems="center" gap="$2">
+              <Text fontSize={20}></Text>
+              <Text color="$foreground" fontWeight="600" fontSize={16}>
+                Apple로 로그인
+              </Text>
+            </XStack>
+          </FilledButton>
         </YStack>
 
         {/* Sign up link */}
