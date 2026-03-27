@@ -32,6 +32,7 @@ export interface TripResponse {
   countries: string[];
   imageUrl?: string;
   createdAt: string;
+  documents: TripDocumentResponse[];
 }
 
 export interface TripDetailResponse extends TripResponse {
@@ -85,8 +86,13 @@ export const tripsApi = {
     fileUri: string,
     fileName: string
   ): Promise<TripDocumentResponse> => {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    let mimeType = 'application/octet-stream'; // 기본
+    if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
+    else if (extension === 'png') mimeType = 'image/png';
+    else if (extension === 'pdf') mimeType = 'application/pdf';
     const form = new FormData();
-    form.append('file', { uri: fileUri, name: fileName, type: 'application/octet-stream' } as any);
+    form.append('file', { uri: fileUri, name: fileName, type: mimeType } as any);
     return apiFormRequest(`/api/trips/${tripId}/documents`, form);
   },
 
