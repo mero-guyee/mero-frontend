@@ -1,3 +1,4 @@
+import { tripsApi } from '@/api';
 import { File, Upload, X } from '@tamagui/lucide-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import { useState } from 'react';
@@ -11,32 +12,25 @@ interface SelectedDocument {
   uri: string;
 }
 
-export function TripDocumentsTab() {
-  const [selectedDocuments, setSelectedDocuments] = useState<SelectedDocument[]>([]);
+export function TripDocumentsTab({ tripId }: { tripId: string }) {
+  const [selectedDocument, setSelectedDocument] = useState<SelectedDocument>();
 
   const handleFileSelect = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
         type: ['application/pdf', 'image/jpeg', 'image/png'],
-        multiple: true,
       });
 
       if (!result.canceled && result.assets) {
-        const newDocuments: SelectedDocument[] = result.assets.map((asset) => ({
-          name: asset.name,
-          size: asset.size || 0,
-          uri: asset.uri,
-        }));
-        setSelectedDocuments([...selectedDocuments, ...newDocuments]);
+        const { name, size, uri } = result.assets[0];
+        setSelectedDocument({ name, size: size!, uri });
       }
     } catch (error) {
       console.error('File selection error:', error);
     }
   };
 
-  const removeFile = (index: number) => {
-    setSelectedDocuments(selectedDocuments.filter((_, i) => i !== index));
-  };
+  const removeFile = (index: number) => {};
 
   return (
     <YStack gap="$6">
@@ -85,50 +79,53 @@ export function TripDocumentsTab() {
           </YStack>
         </Pressable>
 
-        {selectedDocuments.length > 0 && (
+        {selectedDocument && (
           <YStack marginTop="$4" gap="$2">
-            <Text color="$foreground" fontSize={14} marginBottom="$2">
-              선택된 파일 ({selectedDocuments.length})
-            </Text>
-            {selectedDocuments.map((doucment, index) => (
-              <XStack
-                key={index}
-                backgroundColor="$card"
-                borderRadius="$4"
-                padding="$3"
-                alignItems="center"
-                justifyContent="space-between"
-                borderWidth={1}
-                borderColor="$border"
-              >
-                <XStack alignItems="center" gap="$3" flex={1}>
-                  <YStack
-                    width={40}
-                    height={40}
-                    backgroundColor="$accent"
-                    borderRadius="$3"
-                    alignItems="center"
-                    justifyContent="center"
-                    opacity={0.4}
-                  >
-                    <File size={20} color="$foreground" />
-                  </YStack>
-                  <YStack flex={1}>
-                    <Text color="$foreground" fontSize={14} numberOfLines={1}>
-                      {doucment.name}
-                    </Text>
-                    <Text color="$mutedForeground" fontSize={12}>
-                      {(doucment.size / 1024).toFixed(1)} KB
-                    </Text>
-                  </YStack>
-                </XStack>
-                <Pressable onPress={() => removeFile(index)} style={{ padding: 8 }}>
-                  <X size={16} color="$destructive" />
-                </Pressable>
+            <XStack
+              backgroundColor="$card"
+              borderRadius="$4"
+              padding="$3"
+              alignItems="center"
+              justifyContent="space-between"
+              borderWidth={1}
+              borderColor="$border"
+            >
+              <XStack alignItems="center" gap="$3" flex={1}>
+                <YStack
+                  width={40}
+                  height={40}
+                  backgroundColor="$accent"
+                  borderRadius="$3"
+                  alignItems="center"
+                  justifyContent="center"
+                  opacity={0.4}
+                >
+                  <File size={20} color="$foreground" />
+                </YStack>
+                <YStack flex={1}>
+                  <Text color="$foreground" fontSize={14} numberOfLines={1}>
+                    {selectedDocument.name}
+                  </Text>
+                  <Text color="$mutedForeground" fontSize={12}>
+                    {(selectedDocument.size / 1024).toFixed(1)} KB
+                  </Text>
+                </YStack>
               </XStack>
-            ))}
+              <Pressable onPress={() => removeFile(1)} style={{ padding: 8 }}>
+                <X size={16} color="$destructive" />
+              </Pressable>
+            </XStack>
 
-            <FilledButton marginTop="$3">
+            <FilledButton
+              marginTop="$3"
+              onPress={() =>
+                tripsApi.uploadDocument(
+                  parseInt(tripId),
+                  selectedDocument.uri,
+                  selectedDocument.name
+                )
+              }
+            >
               <Text color="$foreground" fontWeight="500">
                 업로드
               </Text>
