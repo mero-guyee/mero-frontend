@@ -16,6 +16,7 @@ export type Trip = {
   startDate: string;
   endDate: string;
   countries: string[];
+  documents?: string[];
 };
 
 export type Footprint = {

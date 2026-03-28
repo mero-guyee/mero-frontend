@@ -1,6 +1,5 @@
 import * as SQLite from 'expo-sqlite';
-import type { MemoResponse } from '../api/memos';
-import type { TripResponse } from '../api/trips';
+import type { TripDetailResponse, TripResponse } from '../api/trips';
 import { Memo, Trip } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
@@ -10,7 +9,8 @@ export interface TripRow extends BaseEntity {
   imageUrl: string;
   startDate: string;
   endDate: string;
-  countries: string; // JSON string in DB
+  countries: string;
+  documents?: string;
 }
 
 export interface MemoRow extends BaseEntity {
@@ -29,6 +29,7 @@ function rowToTrip(row: TripRow): Trip {
     startDate: row.startDate,
     endDate: row.endDate,
     countries: typeof row.countries === 'string' ? JSON.parse(row.countries) : row.countries,
+    documents: typeof row.documents === 'string' ? JSON.parse(row.documents) : row.documents,
   };
 }
 
@@ -121,83 +122,39 @@ export class TripRepository extends BaseRepository<TripRow> {
       );
     }
   }
-}
 
-export class MemoRepository extends BaseRepository<MemoRow> {
-  constructor(db: SQLite.SQLiteDatabase) {
-    super(db, 'memos');
-  }
-
-  protected fromRow(row: Record<string, any>): MemoRow {
-    return row as MemoRow;
-  }
-
-  async getAllMemos(): Promise<Memo[]> {
-    const rows = await this.findAll();
-    return rows.map(rowToMemo);
-  }
-
-  async getMemosByTripId(tripId: string): Promise<Memo[]> {
-    const rows = await this.db.getAllAsync<MemoRow>(
-      `SELECT * FROM memos WHERE tripId = ? AND deletedAt IS NULL ORDER BY createdAt DESC`,
-      [tripId]
-    );
-    return rows.map(rowToMemo);
-  }
-
-  async createMemo(data: Omit<Memo, 'id' | 'serverId' | 'createdAt' | 'updatedAt'>): Promise<Memo> {
-    const row = await this.create({
-      ...data,
-      serverId: null,
-    } as Omit<MemoRow, keyof BaseEntity>);
-    return rowToMemo(row);
-  }
-
-  async updateMemo(memo: Memo): Promise<Memo | null> {
-    const row = await this.update(memo.id, {
-      title: memo.title,
-      content: memo.content,
-    });
-    return row ? rowToMemo(row) : null;
-  }
-
-  async deleteMemo(id: string): Promise<void> {
-    await this.delete(id);
-  }
-
-  async deleteByTripId(tripId: string): Promise<void> {
-    await this.db.runAsync(
-      `UPDATE memos SET deletedAt = datetime('now'), updatedAt = datetime('now'), syncStatus = 'pending' WHERE tripId = ?`,
-      [tripId]
-    );
-  }
-
-  async upsertFromServer(serverMemo: MemoResponse, localTripId: string): Promise<void> {
-    if (!serverMemo.clientId) return;
-    const existing = await this.findById(serverMemo.clientId);
+  async upsertDetailFromServer(serverTrip: TripDetailResponse): Promise<void> {
+    if (!serverTrip.clientId) return;
+    const existing = await this.findById(serverTrip.clientId);
     if (existing) {
       if (existing.syncStatus === 'pending') return;
       await this.db.runAsync(
-        `UPDATE memos SET serverId=?, title=?, content=?, syncStatus='synced', updatedAt=? WHERE id=?`,
+        `UPDATE trips SET serverId=?, title=?, startDate=?, endDate=?, countries=?, imageUrl=?, syncStatus='synced', documents=? WHERE id=?`,
         [
-          String(serverMemo.id),
-          serverMemo.title,
-          serverMemo.content,
-          serverMemo.updatedAt,
-          serverMemo.clientId,
+          String(serverTrip.id),
+          serverTrip.title,
+          serverTrip.startDate,
+          serverTrip.endDate,
+          JSON.stringify(serverTrip.countries),
+          serverTrip.imageUrl ?? '',
+          JSON.stringify(serverTrip.documents),
+          serverTrip.clientId,
         ]
       );
     } else {
       await this.db.runAsync(
-        `INSERT OR IGNORE INTO memos (id, serverId, tripId, title, content, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,'synced',NULL)`,
+        `INSERT OR IGNORE INTO trips (id, serverId, title, imageUrl, startDate, endDate, countries, createdAt, updatedAt, syncStatus, deletedAt, documents) VALUES (?,?,?,?,?,?,?,?,?,'synced',NULL,?)`,
         [
-          serverMemo.clientId,
-          String(serverMemo.id),
-          localTripId,
-          serverMemo.title,
-          serverMemo.content,
-          serverMemo.createdAt,
-          serverMemo.updatedAt,
+          serverTrip.clientId,
+          String(serverTrip.id),
+          serverTrip.title,
+          serverTrip.imageUrl ?? '',
+          serverTrip.startDate,
+          serverTrip.endDate,
+          JSON.stringify(serverTrip.countries),
+          serverTrip.createdAt,
+          serverTrip.createdAt,
+          JSON.stringify(serverTrip.documents),
         ]
       );
     }

@@ -29,7 +29,18 @@ export function useTripQuery(id: string) {
   const db = useDb();
   return useQuery({
     queryKey: tripKeys.detail(id),
-    queryFn: () => new TripRepository(db).getTripById(id),
+    queryFn: async () => {
+      const repo = new TripRepository(db);
+      const tripRow = await repo.getTripById(id);
+      try {
+        if (tripRow?.serverId) {
+          const serverTrip = await tripsApi.getById(parseInt(tripRow.serverId));
+          await repo.upsertFromServer(serverTrip);
+        }
+      } catch {}
+
+      return repo.getTripById(id);
+    },
     enabled: !!id,
   });
 }

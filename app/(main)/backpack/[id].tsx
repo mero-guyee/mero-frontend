@@ -1,20 +1,19 @@
 import BackpackHeader from '@/components/backpack/BackpackHeader';
 import TripDetailCoverImage from '@/components/trips/detail/TripDetailCoverImage';
+import { TripDocumentsTab } from '@/components/trips/documents/TripDocumentsTab';
 import MemoTab from '@/components/trips/memos/MemoTab';
+import { useTripQuery } from '@/hooks/queries/useTrips';
 import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView } from 'react-native';
 import { Text, YStack } from 'tamagui';
-import { TripDocumentsTab } from '../../../components/trips/documents/TripDocumentsTab';
 import { SubTab, TripSubTabs } from '../../../components/trips/TripSubTabs';
-import { useMemos, useTrips } from '../../../contexts';
+import { useMemos } from '../../../contexts';
 
 export default function TripHomeScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { getTripById } = useTrips();
+  const { id } = useLocalSearchParams<{ id: string; serverId?: string }>();
+  const { data: trip } = useTripQuery(id || '');
   const { memos } = useMemos();
-
-  const trip = getTripById(id || '');
 
   const [showMenu, setShowMenu] = useState(false);
   const [subTab, setSubTab] = useState<SubTab>('memos');
@@ -36,7 +35,11 @@ export default function TripHomeScreen() {
         <TripSubTabs activeTab={subTab} onTabChange={setSubTab} />
 
         <YStack padding="$5" paddingTop="$4">
-          {subTab === 'memos' ? <MemoTab memos={memos} tripId={id} /> : <TripDocumentsTab />}
+          {subTab === 'memos' ? (
+            <MemoTab memos={memos} tripId={id} />
+          ) : (
+            <TripDocumentsTab tripId={trip.serverId!} />
+          )}
         </YStack>
 
         <YStack height={100} />

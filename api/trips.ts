@@ -32,7 +32,6 @@ export interface TripResponse {
   countries: string[];
   imageUrl?: string;
   createdAt: string;
-  documents: TripDocumentResponse[];
 }
 
 export interface TripDetailResponse extends TripResponse {

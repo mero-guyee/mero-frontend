@@ -22,6 +22,7 @@ export const CREATE_TABLES = `
     startDate   TEXT NOT NULL,
     endDate     TEXT NOT NULL,
     countries   TEXT NOT NULL DEFAULT '[]',
+    documents   TEXT NOT NULL DEFAULT '[]',
     createdAt   TEXT NOT NULL,
     updatedAt   TEXT NOT NULL,
     syncStatus  TEXT NOT NULL DEFAULT 'pending',
