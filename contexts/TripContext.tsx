@@ -1,11 +1,14 @@
+import { QueryClient } from '@tanstack/react-query';
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 import {
+  tripKeys,
+  useCreateDocument,
   useCreateTrip,
   useDeleteTrip,
   useTripsQuery,
   useUpdateTrip,
 } from '../hooks/queries/useTrips';
-import { Trip } from '../types';
+import { Trip, TripDocumentFile } from '../types';
 
 interface TripContextType {
   trips: Trip[];
@@ -17,6 +20,7 @@ interface TripContextType {
   updateTrip: (trip: Trip) => void;
   deleteTrip: (tripId: string) => void;
   getTripById: (tripId: string) => Trip | undefined;
+  createDocument: (tripId: string, document: TripDocumentFile) => void;
 }
 
 const TripUIContext = createContext<{
@@ -46,6 +50,7 @@ export function useTrips(): TripContextType {
   const createTrip = useCreateTrip();
   const updateTripMut = useUpdateTrip();
   const deleteTripMut = useDeleteTrip();
+  const createDocumentMut = useCreateDocument();
 
   return {
     trips,
@@ -69,6 +74,17 @@ export function useTrips(): TripContextType {
       });
     },
     getTripById: (tripId) => trips.find((t) => t.id === tripId),
+    createDocument: async (tripId: string, document: TripDocumentFile) => {
+      createDocumentMut.mutate(
+        { tripId, data: document },
+        {
+          onSuccess: () => {
+            const qc = new QueryClient();
+            qc.invalidateQueries({ queryKey: tripKeys.detail(tripId) });
+          },
+        }
+      );
+    },
   };
 }
 

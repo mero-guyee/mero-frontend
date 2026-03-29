@@ -1,3 +1,4 @@
+import { TripDocument } from '@/types';
 import { apiFormRequest, apiRequest } from './client';
 
 export interface TripCreateRequest {
@@ -16,13 +17,6 @@ export interface TripUpdateRequest {
   countries?: string[];
 }
 
-export interface TripDocumentResponse {
-  id: number;
-  fileName: string;
-  fileUrl: string;
-  createdAt: string;
-}
-
 export interface TripResponse {
   id: number;
   clientId: string;
@@ -35,7 +29,12 @@ export interface TripResponse {
 }
 
 export interface TripDetailResponse extends TripResponse {
-  documents: TripDocumentResponse[];
+  documents: TripDocument[];
+}
+
+export interface TripDocumentCreateRequest {
+  tripId: number;
+  file: Omit<TripDocument, 'id' | 'fileSize'>;
 }
 
 export const tripsApi = {
@@ -80,12 +79,10 @@ export const tripsApi = {
   deleteImage: (tripId: number): Promise<void> =>
     apiRequest(`/api/trips/${tripId}/image`, { method: 'DELETE' }),
 
-  uploadDocument: (
-    tripId: number,
-    fileUri: string,
-    fileName: string
-  ): Promise<TripDocumentResponse> => {
-    const extension = fileName.split('.').pop()?.toLowerCase();
+  uploadDocument: (params: TripDocumentCreateRequest): Promise<TripDocument> => {
+    const { tripId, file } = params;
+    const { fileName, fileUri } = file;
+    const extension = file.fileName.split('.').pop()?.toLowerCase();
     let mimeType = 'application/octet-stream'; // 기본
     if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
     else if (extension === 'png') mimeType = 'image/png';

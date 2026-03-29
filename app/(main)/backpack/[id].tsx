@@ -38,7 +38,7 @@ export default function TripHomeScreen() {
           {subTab === 'memos' ? (
             <MemoTab memos={memos} tripId={id} />
           ) : (
-            <TripDocumentsTab tripId={trip.serverId!} />
+            <TripDocumentsTab tripId={trip.id} />
           )}
         </YStack>
 

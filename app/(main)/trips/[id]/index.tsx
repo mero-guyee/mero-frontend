@@ -10,7 +10,7 @@ import { TripDocumentsTab } from '../../../../components/trips/documents/TripDoc
 import { SubTab, TripSubTabs } from '../../../../components/trips/TripSubTabs';
 import { useMemos } from '../../../../contexts';
 
-export default function TripHomeScreen() {
+export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: trip } = useTripQuery(id || '');
   const { memos } = useMemos();

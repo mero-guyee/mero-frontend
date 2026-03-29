@@ -1,6 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 import type { TripDetailResponse, TripResponse } from '../api/trips';
-import { Memo, Trip } from '../types';
+import { Memo, Trip, TripDocumentFile } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
 export interface TripRow extends BaseEntity {
@@ -86,6 +86,14 @@ export class TripRepository extends BaseRepository<TripRow> {
 
   async deleteTrip(id: string): Promise<void> {
     await this.delete(id);
+  }
+
+  async createDocument(tripId: string, document: TripDocumentFile): Promise<Trip | null> {
+    const row = await this.update(tripId, {
+      documents: JSON.stringify(document),
+    });
+
+    return row ? rowToTrip(row) : null;
   }
 
   async upsertFromServer(serverTrip: TripResponse): Promise<void> {

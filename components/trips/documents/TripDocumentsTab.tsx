@@ -1,4 +1,4 @@
-import { tripsApi } from '@/api';
+import { useTrips } from '@/contexts';
 import { File, Upload, X } from '@tamagui/lucide-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import { useState } from 'react';
@@ -13,6 +13,7 @@ interface SelectedDocument {
 }
 
 export function TripDocumentsTab({ tripId }: { tripId: string }) {
+  const { createDocument } = useTrips();
   const [selectedDocument, setSelectedDocument] = useState<SelectedDocument>();
 
   const handleFileSelect = async () => {
@@ -119,11 +120,10 @@ export function TripDocumentsTab({ tripId }: { tripId: string }) {
             <FilledButton
               marginTop="$3"
               onPress={() =>
-                tripsApi.uploadDocument(
-                  parseInt(tripId),
-                  selectedDocument.uri,
-                  selectedDocument.name
-                )
+                createDocument(tripId, {
+                  fileName: selectedDocument.name,
+                  fileUri: selectedDocument.uri,
+                })
               }
             >
               <Text color="$foreground" fontWeight="500">
