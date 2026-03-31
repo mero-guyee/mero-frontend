@@ -1,15 +1,14 @@
 import { CircularButton } from '@/components/ui';
 import { useTrips } from '@/contexts';
 import { Trip } from '@/types';
-import { ArrowLeft, MoreVertical } from '@tamagui/lucide-icons';
+import { ArrowLeft } from '@tamagui/lucide-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { Alert, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Text, XStack, YStack } from 'tamagui';
+import { Text, XStack } from 'tamagui';
+import More from '../ui/More';
 
 export default function BackpackHeader({ trip }: { trip: Trip }) {
-  const [showMenu, setShowMenu] = useState(false);
   const { deleteTrip } = useTrips();
 
   const insets = useSafeAreaInsets();
@@ -19,7 +18,6 @@ export default function BackpackHeader({ trip }: { trip: Trip }) {
   };
 
   const handleEdit = () => {
-    setShowMenu(false);
     router.push(`/trips/${trip.id}/edit`);
   };
 
@@ -58,46 +56,22 @@ export default function BackpackHeader({ trip }: { trip: Trip }) {
       <Text flex={1} textAlign="center" color="$foreground" fontSize={16} fontWeight="500">
         {trip.title}
       </Text>
-      <YStack position="relative">
-        <CircularButton onPress={() => setShowMenu(!showMenu)}>
-          <MoreVertical size={20} color="$foreground" />
-        </CircularButton>
-        {showMenu && (
-          <YStack
-            position="absolute"
-            top={44}
-            right={0}
-            width={180}
-            backgroundColor="$card"
-            borderRadius="$4"
-            overflow="hidden"
-            zIndex={100}
-            style={{
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.15,
-              shadowRadius: 8,
-              elevation: 8,
-            }}
-          >
-            <Pressable onPress={handleEdit}>
-              <XStack padding="$3" hoverStyle={{ backgroundColor: '$accent' }}>
-                <Text color="$foreground">수정</Text>
-              </XStack>
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                setShowMenu(false);
-                handleDelete();
-              }}
-            >
-              <XStack padding="$3" hoverStyle={{ backgroundColor: '$destructive' }}>
-                <Text color="$destructive">삭제</Text>
-              </XStack>
-            </Pressable>
-          </YStack>
-        )}
-      </YStack>
+      <More>
+        <Pressable onPress={handleEdit}>
+          <XStack padding="$3" hoverStyle={{ backgroundColor: '$accent' }}>
+            <Text color="$foreground">수정</Text>
+          </XStack>
+        </Pressable>
+        <Pressable
+          onPress={() => {
+            handleDelete();
+          }}
+        >
+          <XStack padding="$3" hoverStyle={{ backgroundColor: '$destructive' }}>
+            <Text color="$destructive">삭제</Text>
+          </XStack>
+        </Pressable>
+      </More>
     </XStack>
   );
 }

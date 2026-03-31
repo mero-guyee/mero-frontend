@@ -1,4 +1,5 @@
-import { ArrowLeft, Cloud, MapPin, MoreVertical } from '@tamagui/lucide-icons';
+import More from '@/components/ui/More';
+import { ArrowLeft, Cloud, MapPin } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView } from 'react-native';
@@ -19,7 +20,6 @@ export default function FootprintDetailScreen() {
   const trip = footprint ? getTripById(footprint.tripId) : undefined;
   const expenses = getExpensesByFootprintId(id || '');
 
-  const [showMenu, setShowMenu] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
@@ -61,7 +61,6 @@ export default function FootprintDetailScreen() {
   }
 
   const handleEdit = () => {
-    setShowMenu(false);
     router.push({
       pathname: '/(main)/footprint/new',
       params: { footprintId: footprint.id },
@@ -123,46 +122,22 @@ export default function FootprintDetailScreen() {
             day: 'numeric',
           })}
         </Text>
-        <YStack position="relative">
-          <CircularButton onPress={() => setShowMenu(!showMenu)}>
-            <MoreVertical size={20} color="$foreground" />
-          </CircularButton>
-          {showMenu && (
-            <YStack
-              position="absolute"
-              top={44}
-              right={0}
-              width={180}
-              backgroundColor="$card"
-              borderRadius="$4"
-              overflow="hidden"
-              zIndex={100}
-              style={{
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.15,
-                shadowRadius: 8,
-                elevation: 8,
-              }}
-            >
-              <Pressable onPress={handleEdit}>
-                <XStack padding="$3">
-                  <Text color="$foreground">수정</Text>
-                </XStack>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  setShowMenu(false);
-                  handleDelete();
-                }}
-              >
-                <XStack padding="$3">
-                  <Text color="$destructive">삭제</Text>
-                </XStack>
-              </Pressable>
-            </YStack>
-          )}
-        </YStack>
+        <More>
+          <Pressable onPress={handleEdit}>
+            <XStack padding="$3">
+              <Text color="$foreground">수정</Text>
+            </XStack>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              handleDelete();
+            }}
+          >
+            <XStack padding="$3">
+              <Text color="$destructive">삭제</Text>
+            </XStack>
+          </Pressable>
+        </More>
       </XStack>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
@@ -311,20 +286,6 @@ export default function FootprintDetailScreen() {
           )}
         </Pressable>
       </Modal>
-
-      {showMenu && (
-        <Pressable
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 50,
-          }}
-          onPress={() => setShowMenu(false)}
-        />
-      )}
     </YStack>
   );
 }
