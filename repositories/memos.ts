@@ -1,3 +1,4 @@
+import { MemoResponse } from '@/api';
 import * as SQLite from 'expo-sqlite';
 import { Memo } from '../types';
 import { BaseEntity, BaseRepository } from './base';
@@ -45,13 +46,13 @@ export class MemoRepository extends BaseRepository<MemoRow> {
 
   async getMemosByTripId(tripId: string): Promise<Memo[]> {
     const rows = await this.db.getAllAsync<MemoRow>(
-      `SELECT * FROM memos WHERE tripId = ? AND deletedAt IS NULL ORDER BY date DESC`,
+      `SELECT * FROM memos WHERE tripId = ? AND deletedAt IS NULL ORDER BY createdAt DESC`,
       [tripId]
     );
     return rows.map(rowToMemo);
   }
 
-  async createMemo(data: Omit<Memo, 'id' | 'serverId'>): Promise<Memo> {
+  async createMemo(data: Omit<Memo, 'id' | 'createdAt' | 'updatedAt'>): Promise<Memo> {
     const row = await this.create({
       ...data,
       serverId: null,
@@ -76,5 +77,36 @@ export class MemoRepository extends BaseRepository<MemoRow> {
       `UPDATE memos SET deletedAt = datetime('now'), updatedAt = datetime('now'), syncStatus = 'pending' WHERE tripId = ?`,
       [tripId]
     );
+  }
+
+  async upsertFromServer(serverMemo: MemoResponse, localTripId: string): Promise<void> {
+    if (!serverMemo.clientId) return;
+    const existing = await this.findById(serverMemo.clientId);
+    if (existing) {
+      if (existing.syncStatus === 'pending') return;
+      await this.db.runAsync(
+        `UPDATE memos SET serverId=?, title=?, content=?, syncStatus='synced', updatedAt=? WHERE id=?`,
+        [
+          String(serverMemo.id),
+          serverMemo.title,
+          serverMemo.content,
+          serverMemo.updatedAt,
+          serverMemo.clientId,
+        ]
+      );
+    } else {
+      await this.db.runAsync(
+        `INSERT OR IGNORE INTO memos (id, serverId, tripId, title, content, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,'synced',NULL)`,
+        [
+          serverMemo.clientId,
+          String(serverMemo.id),
+          localTripId,
+          serverMemo.title,
+          serverMemo.content,
+          serverMemo.createdAt,
+          serverMemo.updatedAt,
+        ]
+      );
+    }
   }
 }
