@@ -13,7 +13,7 @@ interface SelectedDocument {
 }
 
 export function TripDocumentsTab({ tripId }: { tripId: string }) {
-  const { createDocument } = useTrips();
+  const { createDocument, documents } = useTrips();
   const [selectedDocument, setSelectedDocument] = useState<SelectedDocument>();
 
   const handleFileSelect = async () => {
@@ -139,18 +139,57 @@ export function TripDocumentsTab({ tripId }: { tripId: string }) {
         <Text color="$foreground" fontSize={14} marginBottom="$3">
           저장된 파일
         </Text>
-        <YStack
-          backgroundColor="$card"
-          borderRadius="$6"
-          padding="$4"
-          gap="$2"
-          borderWidth={1}
-          borderColor="$border"
-        >
-          <Text textAlign="center" color="$mutedForeground" paddingVertical="$4">
-            아직 저장된 파일이 없습니다
-          </Text>
-        </YStack>
+        {documents.length > 0 ? (
+          <YStack gap="$2">
+            {documents.map((doc, index) => (
+              <XStack
+                key={index}
+                backgroundColor="$card"
+                borderRadius="$4"
+                padding="$3"
+                alignItems="center"
+                justifyContent="space-between"
+                borderWidth={1}
+                borderColor="$border"
+              >
+                <XStack alignItems="center" gap="$3" flex={1}>
+                  <YStack
+                    width={40}
+                    height={40}
+                    backgroundColor="$accent"
+                    borderRadius="$3"
+                    alignItems="center"
+                    justifyContent="center"
+                    opacity={0.4}
+                  >
+                    <File size={20} color="$foreground" />
+                  </YStack>
+                  <YStack flex={1}>
+                    <Text color="$foreground" fontSize={14} numberOfLines={1}>
+                      {doc.fileName}
+                    </Text>
+                  </YStack>
+                </XStack>
+                <Pressable onPress={() => removeFile(index)} style={{ padding: 8 }}>
+                  <X size={16} color="$destructive" />
+                </Pressable>
+              </XStack>
+            ))}
+          </YStack>
+        ) : (
+          <YStack
+            backgroundColor="$card"
+            borderRadius="$6"
+            padding="$4"
+            gap="$2"
+            borderWidth={1}
+            borderColor="$border"
+          >
+            <Text textAlign="center" color="$mutedForeground" paddingVertical="$4">
+              아직 저장된 파일이 없습니다
+            </Text>
+          </YStack>
+        )}
       </YStack>
     </YStack>
   );

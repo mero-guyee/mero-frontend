@@ -1,6 +1,6 @@
 import * as SQLite from 'expo-sqlite';
 import type { TripDetailResponse, TripResponse } from '../api/trips';
-import { Memo, Trip, TripDocumentFile } from '../types';
+import { Trip, TripDocument, TripDocumentFile } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
 export interface TripRow extends BaseEntity {
@@ -33,18 +33,6 @@ function rowToTrip(row: TripRow): Trip {
   };
 }
 
-function rowToMemo(row: MemoRow): Memo {
-  return {
-    id: row.id,
-    serverId: row.serverId ?? undefined,
-    tripId: row.tripId,
-    title: row.title,
-    content: row.content,
-    createdAt: row.createdAt,
-    updatedAt: row.updatedAt,
-  };
-}
-
 export class TripRepository extends BaseRepository<TripRow> {
   constructor(db: SQLite.SQLiteDatabase) {
     super(db, 'trips');
@@ -69,6 +57,7 @@ export class TripRepository extends BaseRepository<TripRow> {
       ...data,
       serverId: null,
       countries: JSON.stringify(data.countries),
+      documents: JSON.stringify([]),
     } as Omit<TripRow, keyof BaseEntity>);
     return rowToTrip(row);
   }
@@ -88,9 +77,16 @@ export class TripRepository extends BaseRepository<TripRow> {
     await this.delete(id);
   }
 
+  async getDocumentsByTripId(tripId: string): Promise<TripDocument[]> {
+    const trip = await this.getTripById(tripId);
+    return trip?.documents ?? [];
+  }
+
   async createDocument(tripId: string, document: TripDocumentFile): Promise<Trip | null> {
+    const existing = await this.getTripById(tripId);
+    const docs = existing?.documents ?? [];
     const row = await this.update(tripId, {
-      documents: JSON.stringify(document),
+      documents: JSON.stringify([...docs, { ...document }]),
     });
 
     return row ? rowToTrip(row) : null;

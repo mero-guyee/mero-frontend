@@ -5,10 +5,11 @@ import {
   useCreateDocument,
   useCreateTrip,
   useDeleteTrip,
+  useDocumentsQuery,
   useTripsQuery,
   useUpdateTrip,
 } from '../hooks/queries/useTrips';
-import { Trip, TripDocumentFile } from '../types';
+import { Trip, TripDocument, TripDocumentFile } from '../types';
 
 interface TripContextType {
   trips: Trip[];
@@ -20,6 +21,7 @@ interface TripContextType {
   updateTrip: (trip: Trip) => void;
   deleteTrip: (tripId: string) => void;
   getTripById: (tripId: string) => Trip | undefined;
+  documents: TripDocument[];
   createDocument: (tripId: string, document: TripDocumentFile) => void;
 }
 
@@ -46,6 +48,7 @@ export function useTrips(): TripContextType {
   if (!ui) throw new Error('useTrips must be used within a TripProvider');
 
   const { data: trips = [] } = useTripsQuery();
+  const { data: documents = [] } = useDocumentsQuery(ui.activeTrip ?? '');
 
   const createTrip = useCreateTrip();
   const updateTripMut = useUpdateTrip();
@@ -74,6 +77,7 @@ export function useTrips(): TripContextType {
       });
     },
     getTripById: (tripId) => trips.find((t) => t.id === tripId),
+    documents,
     createDocument: async (tripId: string, document: TripDocumentFile) => {
       createDocumentMut.mutate(
         { tripId, data: document },

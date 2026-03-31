@@ -1,6 +1,7 @@
 export const tripKeys = {
   all: ['trips'] as const,
   detail: (id: string) => ['trips', id] as const,
+  documents: (tripId: string) => ['trips', tripId, 'documents'] as const,
 };
 
 export const memoKeys = {

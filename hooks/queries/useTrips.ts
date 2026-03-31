@@ -104,6 +104,25 @@ export function useUpdateTrip() {
   });
 }
 
+export function useDocumentsQuery(tripId: string) {
+  const db = useDb();
+  return useQuery({
+    queryKey: tripKeys.documents(tripId),
+    queryFn: async () => {
+      const repo = new TripRepository(db);
+      const trip = await repo.getTripById(tripId);
+      try {
+        if (trip?.serverId) {
+          const serverTrip = await tripsApi.getById(parseInt(trip!.serverId!));
+          await repo.upsertFromServer(serverTrip);
+        }
+      } catch {}
+
+      return repo.getDocumentsByTripId(tripId);
+    },
+  });
+}
+
 export function useDeleteTrip() {
   const db = useDb();
   const qc = useQueryClient();
@@ -140,6 +159,7 @@ export function useCreateDocument() {
     }): Promise<Trip | null> => {
       const repo = new TripRepository(db);
       const updated = await repo.createDocument(tripId, data);
+
       const localTrip = await repo.getTripById(tripId);
       try {
         if (localTrip?.serverId) {
