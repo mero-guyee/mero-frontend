@@ -163,7 +163,13 @@ export default function FootprintFormScreen() {
         </FilledButton>
       </XStack>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
+      {/* 성능 문제시 리팩토링 필요 */}
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        nestedScrollEnabled={true}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ padding: 24 }}
+      >
         {/* Date */}
         <YStack marginBottom="$6">
           <Text color="$foreground" marginBottom="$2" fontWeight="500">

@@ -1,6 +1,7 @@
 import * as Location from 'expo-location';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import MapView, { MapPressEvent, Marker } from 'react-native-maps';
 
 type Coordinate = {
@@ -21,7 +22,7 @@ export default function LocationPicker({ onConfirm }: Props) {
   }>(null);
   const [selected, setSelected] = useState<Coordinate | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const mapRef = useRef<MapView>(null);
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -62,10 +63,45 @@ export default function LocationPicker({ onConfirm }: Props) {
 
   return (
     <View style={styles.container}>
-      <MapView style={styles.map} initialRegion={initialRegion!} onPress={handleMapPress}>
+      <MapView
+        ref={mapRef}
+        style={styles.map}
+        initialRegion={initialRegion!}
+        onPress={handleMapPress}
+      >
         {selected && <Marker coordinate={selected} />}
       </MapView>
+      <GooglePlacesAutocomplete
+        listViewDisplayed="auto"
+        styles={{
+          container: {
+            position: 'absolute',
+            top: 16,
+            width: '90%',
+            alignSelf: 'center',
+            zIndex: 1,
+          },
+          textInput: { backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12 },
+        }}
+        placeholder="장소 검색"
+        query={{
+          key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY!,
+          language: ['ko', 'en'],
+        }}
+        onPress={(data, details = null) => {
+          const lat = details?.geometry?.location.lat;
+          const lng = details?.geometry?.location.lng;
 
+          console.log(lat, lng);
+          mapRef.current?.animateToRegion({
+            latitude: lat!,
+            longitude: lng!,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+        }}
+        fetchDetails={true} // 좌표 받으려면 필수
+      />
       {!selected && (
         <View style={styles.hint}>
           <Text style={styles.hintText}>지도를 탭해서 위치를 선택하세요</Text>
@@ -82,7 +118,7 @@ export default function LocationPicker({ onConfirm }: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, position: 'relative' },
   map: { flex: 1, aspectRatio: 1 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   hint: {
