@@ -2,33 +2,32 @@ import { Plus } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { Pressable, ScrollView } from 'react-native';
-import { Text, XStack, YStack } from 'tamagui';
-import { useBudgets, useExpenses, useTrips } from '../../contexts';
-import { CURRENCY_SYMBOLS } from '../../data/constants';
+import { Text, YStack } from 'tamagui';
+import { useExpenses, useTrips } from '../../contexts';
 import { Expense } from '../../types';
 import { ExpenseCard } from './ExpenseCard';
+import ExpenseDayTotal from './ExpenseDayTotal';
+import ExpenseTotalByCurrency from './ExpenseTotalByCurrency';
 
 export function ExpensesView() {
   const router = useRouter();
   const { activeTrip } = useTrips();
   const { expenses } = useExpenses();
-  const { budgets } = useBudgets();
-
-  const filteredExpenses = expenses.filter((e) => !activeTrip || e.tripId === activeTrip);
 
   const expensesByCurrency = useMemo(() => {
-    return filteredExpenses.reduce(
-      (acc, expense) => {
-        if (!acc[expense.currency]) acc[expense.currency] = 0;
-        acc[expense.currency] += expense.amount;
-        return acc;
-      },
-      {} as Record<string, number>
-    );
-  }, [filteredExpenses]);
+    const initalValue = {} as Record<string, number>;
+    return expenses.reduce((acc, currentExpense) => {
+      const { currency, amount } = currentExpense;
+      if (!acc[currency]) {
+        acc[currency] = 0;
+      }
+      acc[currency] += amount;
+      return acc;
+    }, initalValue);
+  }, [expenses]);
 
   const expensesByDate = useMemo(() => {
-    return filteredExpenses
+    return expenses
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
       .reduce(
         (acc, expense) => {
@@ -38,9 +37,7 @@ export function ExpensesView() {
         },
         {} as Record<string, Expense[]>
       );
-  }, [filteredExpenses]);
-
-  const getCurrencySymbol = (currency: string) => CURRENCY_SYMBOLS[currency] || currency;
+  }, [expenses]);
 
   const handleAddExpense = () => {
     router.push({ pathname: '/expense/new', params: { tripId: activeTrip } });
@@ -65,53 +62,9 @@ export function ExpensesView() {
                 사용한 화폐별 총 지출
               </Text>
               <YStack gap="$3">
-                {Object.entries(expensesByCurrency).map(([currency, amount]) => {
-                  const budget = budgets.find((b) => b.currency === currency);
-                  const percentage =
-                    budget && budget.amount > 0 ? Math.round((amount / budget.amount) * 100) : 0;
-                  const remaining = budget ? budget.amount - amount : 0;
-
-                  return (
-                    <YStack key={currency} backgroundColor="$muted" borderRadius="$4" padding="$4">
-                      <XStack alignItems="center" justifyContent="space-between" marginBottom="$1">
-                        <YStack
-                          paddingHorizontal="$2"
-                          paddingVertical="$1"
-                          backgroundColor="$accent"
-                          borderRadius="$2"
-                          opacity={0.4}
-                        >
-                          <Text color="$foreground" fontSize={12}>
-                            {currency}
-                          </Text>
-                        </YStack>
-                        <Text color="$mutedForeground" fontSize={14}>
-                          {percentage}%
-                        </Text>
-                      </XStack>
-                      <YStack
-                        height={8}
-                        backgroundColor="$secondary"
-                        borderRadius={4}
-                        overflow="hidden"
-                        marginBottom="$2"
-                      >
-                        <YStack
-                          height="100%"
-                          borderRadius={4}
-                          backgroundColor={percentage >= 100 ? '$destructive' : '$primary'}
-                          width={`${Math.min(percentage, 100)}%`}
-                        />
-                      </YStack>
-                      <XStack alignItems="center" justifyContent="space-between">
-                        <Text color="$mutedForeground">
-                          {getCurrencySymbol(currency)} {amount.toLocaleString()} /{' '}
-                          {getCurrencySymbol(currency)} {remaining.toLocaleString()}
-                        </Text>
-                      </XStack>
-                    </YStack>
-                  );
-                })}
+                {Object.entries(expensesByCurrency).map(([currency, amount]) => (
+                  <ExpenseTotalByCurrency key={currency} currency={currency} amount={amount} />
+                ))}
               </YStack>
             </YStack>
           )}
@@ -129,7 +82,7 @@ export function ExpensesView() {
             <Text color="$mutedForeground" fontSize={14} marginBottom="$4">
               날짜별 지출 목록
             </Text>
-            {filteredExpenses.length === 0 ? (
+            {expenses.length === 0 ? (
               <YStack alignItems="center" paddingVertical={32}>
                 <Text fontSize={48} marginBottom="$3">
                   🛍️
@@ -139,30 +92,9 @@ export function ExpensesView() {
             ) : (
               <YStack gap="$4">
                 {Object.entries(expensesByDate).map(([date, dayExpenses]) => {
-                  const dayTotal = dayExpenses.reduce((sum, e) => sum + e.amount, 0);
-                  const mainCurrency = dayExpenses[0]?.currency || 'KRW';
-
                   return (
                     <YStack key={date}>
-                      <XStack
-                        alignItems="center"
-                        justifyContent="space-between"
-                        marginBottom="$2"
-                        paddingHorizontal="$1"
-                      >
-                        <Text color="$foreground">
-                          📅{' '}
-                          {new Date(date).toLocaleDateString('ko-KR', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            weekday: 'short',
-                          })}
-                        </Text>
-                        <Text color="$mutedForeground">
-                          {getCurrencySymbol(mainCurrency)} {dayTotal.toLocaleString()}
-                        </Text>
-                      </XStack>
+                      <ExpenseDayTotal date={date} dayExpenses={dayExpenses} />
                       <YStack gap="$2">
                         {dayExpenses.map((expense) => (
                           <ExpenseCard key={expense.id} expense={expense} />

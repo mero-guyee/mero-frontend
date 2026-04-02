@@ -16,6 +16,7 @@ interface BudgetContextType {
   deleteBudget: (budgetId: string) => void;
   deleteBudgetsByTripId: (tripId: string) => void;
   getBudgetsByTripId: (tripId: string) => Budget[];
+  getBudgetByCurrency: (currency: string) => Budget | undefined;
 }
 
 export function BudgetProvider({ children }: { children: ReactNode }) {
@@ -41,5 +42,6 @@ export function useBudgets(): BudgetContextType {
       new BudgetRepository(db).deleteByTripId(tripId);
     },
     getBudgetsByTripId: (tripId) => budgets.filter((b) => b.tripId === tripId),
+    getBudgetByCurrency: (currency: string) => budgets.find((b) => b.currency === currency),
   };
 }
