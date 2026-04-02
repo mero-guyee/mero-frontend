@@ -83,7 +83,7 @@ export default function LocationPicker({ onConfirm }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  map: { flex: 1 },
+  map: { flex: 1, aspectRatio: 1 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   hint: {
     position: 'absolute',

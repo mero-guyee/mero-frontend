@@ -1,4 +1,5 @@
 import More from '@/components/ui/More';
+import { formattedLocation } from '@/utils/location/location';
 import { ArrowLeft, Cloud, MapPin } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -154,9 +155,7 @@ export default function FootprintDetailScreen() {
           {footprint.locations.map((loc, i) => (
             <XStack key={i} alignItems="center" gap="$2">
               <MapPin size={16} color="$foreground" />
-              <Text color="$foreground">
-                {[loc.placeName, loc.city, loc.country].filter(Boolean).join(', ')}
-              </Text>
+              <Text color="$foreground">{formattedLocation(loc)}</Text>
             </XStack>
           ))}
           {footprint.weatherInfo && (

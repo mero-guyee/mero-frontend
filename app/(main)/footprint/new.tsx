@@ -1,6 +1,7 @@
 import LocationPicker from '@/components/location/LocationPicker';
+import { formatGeocode } from '@/utils/location/location';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { ArrowLeft, Camera, MapPin, X } from '@tamagui/lucide-icons';
+import { ArrowLeft, Camera, X } from '@tamagui/lucide-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -115,25 +116,6 @@ export default function FootprintFormScreen() {
     }
   };
 
-  const handleSelectLocation = (locString: string) => {
-    const parts = locString.split(', ');
-    const newLocation: FootprintLocation = {
-      placeName: parts[0],
-      country: parts[1],
-    };
-    const alreadyAdded = locations.some((l) => l.placeName === newLocation.placeName);
-    if (!alreadyAdded) {
-      setLocations([...locations, newLocation]);
-    }
-    setSearchQuery('');
-    setSearchResults([]);
-    setShowLocationModal(false);
-  };
-
-  const handleRemoveLocation = (index: number) => {
-    setLocations(locations.filter((_, i) => i !== index));
-  };
-
   const handleDateChange = (event: any, selectedDate?: Date) => {
     setShowDatePicker(Platform.OS === 'ios');
     if (selectedDate) {
@@ -141,8 +123,17 @@ export default function FootprintFormScreen() {
     }
   };
 
-  const handleConfirm = (coord: { latitude: number; longitude: number }) => {
-    console.log('선택된 위치:', coord);
+  const handleConfirm = ({ latitude, longitude }: { latitude: number; longitude: number }) => {
+    formatGeocode(latitude, longitude).then(({ placeName, city, country }) => {
+      const newLocation: FootprintLocation = {
+        placeName,
+        country,
+        city,
+        latitude: latitude,
+        longitude: longitude,
+      };
+      setLocations([...locations, newLocation]);
+    });
   };
 
   return (
@@ -209,34 +200,8 @@ export default function FootprintFormScreen() {
             <Text color="$foreground" fontWeight="500">
               📍 머문 곳
             </Text>
-            <LocationPicker onConfirm={handleConfirm} />
           </XStack>
-
-          {locations.length > 0 && (
-            <XStack flexWrap="wrap" gap="$2" marginBottom="$3">
-              {locations.map((loc, index) => (
-                <XStack
-                  key={index}
-                  alignItems="center"
-                  gap="$2"
-                  paddingHorizontal="$3"
-                  paddingVertical="$2"
-                  backgroundColor="$accent"
-                  borderRadius="$3"
-                  opacity={0.4}
-                >
-                  <MapPin size={14} color="$foreground" />
-                  <Text color="$foreground" fontSize={14}>
-                    {loc.placeName}
-                    {loc.country ? `, ${loc.country}` : ''}
-                  </Text>
-                  <Pressable onPress={() => handleRemoveLocation(index)}>
-                    <X size={14} color="$foreground" />
-                  </Pressable>
-                </XStack>
-              ))}
-            </XStack>
-          )}
+          <LocationPicker onConfirm={handleConfirm} />
         </YStack>
 
         {/* Title */}
@@ -408,35 +373,6 @@ export default function FootprintFormScreen() {
                     fontSize={14}
                   >
                     검색 결과가 없습니다
-                  </Text>
-                )}
-                {searchResults.map((result, index) => (
-                  <Pressable key={index} onPress={() => handleSelectLocation(result)}>
-                    <XStack
-                      backgroundColor="$muted"
-                      borderRadius="$4"
-                      padding="$3"
-                      alignItems="center"
-                      gap="$3"
-                      marginBottom="$2"
-                      borderWidth={2}
-                      borderColor="$border"
-                    >
-                      <MapPin size={16} color="$primary" />
-                      <Text color="$foreground" fontSize={14}>
-                        {result}
-                      </Text>
-                    </XStack>
-                  </Pressable>
-                ))}
-                {!searchQuery && (
-                  <Text
-                    textAlign="center"
-                    color="$mutedForeground"
-                    paddingVertical="$4"
-                    fontSize={14}
-                  >
-                    장소를 검색해보세요
                   </Text>
                 )}
               </ScrollView>
