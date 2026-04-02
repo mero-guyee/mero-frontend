@@ -1,5 +1,6 @@
+import LocationPicker from '@/components/location/LocationPicker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { ArrowLeft, Camera, MapPin, Plus, X } from '@tamagui/lucide-icons';
+import { ArrowLeft, Camera, MapPin, X } from '@tamagui/lucide-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -140,6 +141,10 @@ export default function FootprintFormScreen() {
     }
   };
 
+  const handleConfirm = (coord: { latitude: number; longitude: number }) => {
+    console.log('선택된 위치:', coord);
+  };
+
   return (
     <YStack flex={1} backgroundColor="$background">
       {/* Header */}
@@ -204,14 +209,7 @@ export default function FootprintFormScreen() {
             <Text color="$foreground" fontWeight="500">
               📍 머문 곳
             </Text>
-            <FilledButton size="$3" borderRadius="$3" onPress={() => setShowLocationModal(true)}>
-              <XStack alignItems="center" gap="$1.5">
-                <Plus size={16} color="$foreground" />
-                <Text color="$foreground" fontSize={14}>
-                  위치 추가
-                </Text>
-              </XStack>
-            </FilledButton>
+            <LocationPicker onConfirm={handleConfirm} />
           </XStack>
 
           {locations.length > 0 && (

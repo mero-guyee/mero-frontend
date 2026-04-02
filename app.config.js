@@ -1,0 +1,62 @@
+export default module.exports = {
+  expo: {
+    name: 'mero',
+    slug: 'mero',
+    version: '1.0.0',
+    orientation: 'portrait',
+    icon: './assets/images/icon.jpeg',
+    scheme: 'mero',
+    userInterfaceStyle: 'automatic',
+    newArchEnabled: true,
+    ios: {
+      supportsTablet: true,
+    },
+    android: {
+      adaptiveIcon: {
+        backgroundColor: '#E6F4FE',
+      },
+      edgeToEdgeEnabled: true,
+      predictiveBackGestureEnabled: false,
+      package: 'com.dhguswo555.mero',
+      config: {
+        googleMaps: {
+          apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+        },
+      },
+    },
+    web: {
+      output: 'static',
+      favicon: './assets/images/icon.jpeg',
+    },
+    plugins: [
+      'expo-router',
+      '@react-native-community/datetimepicker',
+      'expo-navigation-bar',
+      [
+        'expo-splash-screen',
+        {
+          image: './assets/images/icon.jpeg',
+          imageWidth: 200,
+          resizeMode: 'contain',
+          backgroundColor: '#ffffff',
+          dark: {
+            backgroundColor: '#000000',
+          },
+        },
+      ],
+      'expo-sqlite',
+      'expo-secure-store',
+    ],
+    experiments: {
+      typedRoutes: true,
+      reactCompiler: true,
+    },
+    extra: {
+      router: {},
+      eas: {
+        projectId: '5ba8d587-bc5e-4311-8b9d-103f51be898a',
+      },
+    },
+    owner: 'meroguyee',
+  },
+};
