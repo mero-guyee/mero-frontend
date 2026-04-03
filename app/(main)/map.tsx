@@ -19,13 +19,13 @@ export default function MapViewScreen() {
   const [showTimelineModal, setShowTimelineModal] = useState(false);
 
   const activeTripData = activeTrip ? trips.find((t) => t.id === activeTrip) : null;
-  const filteredFootprints = footprints.filter((f) => !activeTrip || f.tripId === activeTrip);
 
   const footprintsByCountry = useMemo(() => {
-    return filteredFootprints.reduce(
+    return footprints.reduce(
       (acc, footprint) => {
         for (const loc of footprint.locations) {
           const country = loc.country;
+
           if (country) {
             if (!acc[country]) {
               acc[country] = [];
@@ -39,7 +39,7 @@ export default function MapViewScreen() {
       },
       {} as Record<string, Footprint[]>
     );
-  }, [filteredFootprints]);
+  }, [footprints]);
 
   const handleCountryClick = (country: string) => {
     setSelectedCountry(country);
@@ -55,13 +55,11 @@ export default function MapViewScreen() {
 
   const getFilteredMemosForTimeline = () => {
     if (!selectedCountry) return [];
-    const countryMemos = footprintsByCountry[selectedCountry] || [];
+    const country = footprintsByCountry[selectedCountry] || [];
     if (selectedLocation) {
-      return countryMemos.filter((m) =>
-        m.locations.some((loc) => loc.placeName === selectedLocation)
-      );
+      return country.filter((m) => m.locations.some((loc) => loc.placeName === selectedLocation));
     }
-    return countryMemos;
+    return country;
   };
 
   const timelineMemos = getFilteredMemosForTimeline().sort(
@@ -164,7 +162,7 @@ export default function MapViewScreen() {
           </YStack>
         </YStack>
 
-        {filteredFootprints.length === 0 && (
+        {footprints.length === 0 && (
           <YStack alignItems="center" justifyContent="center" paddingVertical={80}>
             <Text fontSize={48} marginBottom="$4">
               🌍

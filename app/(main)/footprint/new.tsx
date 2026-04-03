@@ -1,7 +1,7 @@
 import LocationPicker from '@/components/location/LocationPicker';
 import { formatGeocode } from '@/utils/location/location';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { ArrowLeft, Camera, X } from '@tamagui/lucide-icons';
+import { ArrowLeft, Camera, MapPin, X } from '@tamagui/lucide-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -123,6 +123,10 @@ export default function FootprintFormScreen() {
     }
   };
 
+  const handleRemoveLocation = (index: number) => {
+    setLocations((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleConfirm = ({ latitude, longitude }: { latitude: number; longitude: number }) => {
     formatGeocode(latitude, longitude).then(({ placeName, city, country }) => {
       const newLocation: FootprintLocation = {
@@ -132,6 +136,7 @@ export default function FootprintFormScreen() {
         latitude: latitude,
         longitude: longitude,
       };
+
       setLocations([...locations, newLocation]);
     });
   };
@@ -208,6 +213,32 @@ export default function FootprintFormScreen() {
             </Text>
           </XStack>
           <LocationPicker onConfirm={handleConfirm} />
+
+          {locations.length > 0 && (
+            <XStack flexWrap="wrap" gap="$2" marginBottom="$3">
+              {locations.map((loc, index) => (
+                <XStack
+                  key={index}
+                  alignItems="center"
+                  gap="$2"
+                  paddingHorizontal="$3"
+                  paddingVertical="$2"
+                  backgroundColor="$accent"
+                  borderRadius="$3"
+                  opacity={0.4}
+                >
+                  <MapPin size={14} color="$foreground" />
+                  <Text color="$foreground" fontSize={14}>
+                    {loc.placeName}
+                    {loc.country ? `, ${loc.country}` : ''}
+                  </Text>
+                  <Pressable onPress={() => handleRemoveLocation(index)}>
+                    <X size={14} color="$foreground" />
+                  </Pressable>
+                </XStack>
+              ))}
+            </XStack>
+          )}
         </YStack>
 
         {/* Title */}
