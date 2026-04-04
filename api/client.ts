@@ -1,11 +1,13 @@
+import Constants from 'expo-constants';
 import { tokenStorage } from './tokenStorage';
 
 export { tokenStorage } from './tokenStorage';
 
-const PC_LOCAL_BASE_URL = 'http://10.0.2.2:8080';
-const TEST_BASE_URL = 'https://mero-dev-development.up.railway.app';
-
-export const BASE_URL = __DEV__ ? PC_LOCAL_BASE_URL : TEST_BASE_URL;
+export const BASE_URL = Constants.expoGoConfig
+  ? process.env.EXPO_PUBLIC_MOBILE_LOCAL_BASE_URL
+  : __DEV__
+    ? process.env.EXPO_PUBLIC_PC_LOCAL_BASE_URL
+    : process.env.EXPO_PUBLIC_TEST_BASE_URL;
 
 export class ApiError extends Error {
   constructor(
