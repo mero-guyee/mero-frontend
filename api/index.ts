@@ -42,7 +42,6 @@ export { tripsApi } from './trips';
 export type {
   TripCreateRequest,
   TripDetailResponse,
-  TripDocumentResponse,
   TripResponse,
   TripUpdateRequest,
 } from './trips';
