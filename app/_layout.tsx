@@ -1,5 +1,6 @@
+import { setNavigationColorByPath } from '@/utils/setNavigationColorByPath';
 import { TamaguiProvider } from '@tamagui/core';
-import { Stack } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -11,6 +12,7 @@ import config from '../tamagui.config';
 
 function AppContent() {
   const isReady = useDbReady();
+  const currentPath = usePathname();
 
   if (!isReady) {
     return (
@@ -20,6 +22,7 @@ function AppContent() {
     );
   }
 
+  setNavigationColorByPath(currentPath);
   return (
     <AuthProvider>
       <TripProvider>
