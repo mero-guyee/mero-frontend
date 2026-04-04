@@ -2,9 +2,10 @@ import useLocation from '@/hooks/useLocation';
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
-import MapView, { MapPressEvent, Marker } from 'react-native-maps';
+import MapView, { MapPressEvent } from 'react-native-maps';
 import { YStack } from 'tamagui';
+import LocationSearch from './LocationSearch';
+import LocationView from './LocationView';
 
 function SkeletonBox({
   width,
@@ -105,64 +106,15 @@ export default function LocationPicker({ onConfirm }: Props) {
         </YStack>
       ) : (
         <>
-          <MapView
-            ref={mapRef}
-            style={styles.map}
-            initialRegion={initialLocation!}
-            onPress={handleMapPress}
-          >
-            {selected && <Marker coordinate={selected} />}
-          </MapView>
-          <GooglePlacesAutocomplete
-            listViewDisplayed="auto"
-            styles={{
-              container: {
-                position: 'absolute',
-                top: 16,
-                width: '90%',
-                alignSelf: 'center',
-                zIndex: 1,
-
-                listView: {
-                  maxHeight: 200, // 이 값이 없으면 리스트가 무한 늘어나서 스크롤이 안 생김
-                },
-              },
-              textInput: { backgroundColor: '#fff', borderRadius: 8, paddingHorizontal: 12 },
-            }}
-            placeholder="장소 검색"
-            query={{
-              key: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY!,
-              language: ['ko', 'en'],
-            }}
-            onPress={(_, details = null) => {
-              const lat = details?.geometry?.location.lat;
-              const lng = details?.geometry?.location.lng;
-
-              mapRef.current?.animateToRegion({
-                latitude: lat!,
-                longitude: lng!,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              });
-
-              setSelected({ latitude: lat!, longitude: lng! });
-            }}
-            fetchDetails={true}
-            renderRow={(rowData) => (
-              <View style={{ padding: 12 }}>
-                <Text>{rowData.structured_formatting.main_text}</Text>
-                <Text style={{ color: '#666', fontSize: 12 }}>
-                  {rowData.structured_formatting.secondary_text}
-                </Text>
-              </View>
-            )}
+          <LocationView
+            mapRef={mapRef}
+            initialLocation={initialLocation}
+            onMapPress={handleMapPress}
+            selected={selected}
           />
-          {!selected && (
-            <View style={styles.hint}>
-              <Text style={styles.hintText}>지도를 탭해서 위치를 선택하세요</Text>
-            </View>
-          )}
-          {selected && (
+          <LocationSearch mapRef={mapRef} setSelected={setSelected} />
+
+          {selected ? (
             <TouchableOpacity
               style={styles.button}
               onPress={() => {
@@ -171,6 +123,10 @@ export default function LocationPicker({ onConfirm }: Props) {
             >
               <Text style={styles.buttonText}>이 위치로 선택</Text>
             </TouchableOpacity>
+          ) : (
+            <View style={styles.hint}>
+              <Text style={styles.hintText}>지도를 탭해서 위치를 선택하세요</Text>
+            </View>
           )}
         </>
       )}
@@ -185,9 +141,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     backgroundColor: '#EDF6F9',
     borderRadius: 16,
-    overflow: 'hidden',
   },
-  map: { flex: 1, aspectRatio: 1 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   hint: {
     position: 'absolute',
