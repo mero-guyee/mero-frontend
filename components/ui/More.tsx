@@ -25,7 +25,7 @@ export default function More({ children }: { children: ReactNode }) {
     buttonRef.current?.measure((_x, _y, width, height, pageX, pageY) => {
       const screenWidth = Dimensions.get('window').width;
       setMenuPos({
-        top: pageY + height + 20,
+        top: pageY + height,
         right: screenWidth - pageX - width,
       });
       setShowMenu(true);
