@@ -1,11 +1,24 @@
 import { Trip } from '@/types';
 import { Calendar, MapPin } from '@tamagui/lucide-icons';
+import { useState } from 'react';
 import { Image, Text, XStack, YStack } from 'tamagui';
 
+const placeholderImage = require('@/assets/images/mountain.jpg');
+
 export default function TripDetailCoverImage({ trip }: { trip: Trip }) {
+  const [uri, setUri] = useState(trip.imageUrl || placeholderImage);
+
   return (
     <YStack height={192} position="relative" overflow="hidden">
-      <Image source={{ uri: trip.imageUrl }} width="100%" height="100%" objectFit="cover" />
+      <Image
+        source={{ uri }}
+        onError={() => {
+          setUri(placeholderImage);
+        }}
+        width="100%"
+        height="100%"
+        objectFit="cover"
+      />
       <YStack
         position="absolute"
         bottom={0}

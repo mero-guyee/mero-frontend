@@ -1,7 +1,8 @@
 import { MapPin } from '@tamagui/lucide-icons';
 import { Pressable } from 'react-native';
-import { Image, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { Trip } from '../../types';
+import TripDetailCoverImage from './detail/TripDetailCoverImage';
 
 interface TripCardProps {
   trip: Trip;
@@ -39,17 +40,7 @@ export function TripCard({ trip, onPress }: TripCardProps) {
       >
         {/* Cover Image */}
         <YStack height={180} overflow="hidden">
-          <Image source={{ uri: trip.imageUrl }} width="100%" height="100%" objectFit="cover" />
-          <YStack
-            position="absolute"
-            bottom={0}
-            left={0}
-            right={0}
-            height={80}
-            style={{
-              background: 'linear-gradient(to top, rgba(92, 64, 51, 0.4), transparent)',
-            }}
-          />
+          <TripDetailCoverImage trip={trip} />
         </YStack>
 
         {/* Content */}
