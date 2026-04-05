@@ -34,13 +34,6 @@ export default function LoadingScreen() {
         alignItems="center"
         justifyContent="center"
         marginBottom="$8"
-        style={{
-          shadowColor: '#5C4033',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 12,
-          elevation: 8,
-        }}
       >
         <Text fontSize={80}>🎒</Text>
       </YStack>

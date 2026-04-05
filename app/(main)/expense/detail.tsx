@@ -50,18 +50,7 @@ export default function ExpenseDetailScreen() {
   return (
     <YStack flex={1} backgroundColor="$background" px={4}>
       {/* Header */}
-      <YStack
-        backgroundColor="$card"
-        borderBottomWidth={2}
-        borderBottomColor="$border"
-        style={{
-          shadowColor: '#5C4033',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.05,
-          shadowRadius: 4,
-          elevation: 2,
-        }}
-      >
+      <YStack backgroundColor="$card" borderBottomWidth={2} borderBottomColor="$border">
         <XStack
           paddingTop={insets.top}
           paddingHorizontal="$4"
@@ -94,14 +83,6 @@ export default function ExpenseDetailScreen() {
                 borderWidth={1}
                 borderColor="$border"
                 overflow="hidden"
-                style={{
-                  shadowColor: '#000',
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.12,
-                  shadowRadius: 8,
-                  elevation: 8,
-                  minWidth: 100,
-                }}
               >
                 <Pressable onPress={handleEdit}>
                   <YStack paddingHorizontal="$4" paddingVertical="$3">

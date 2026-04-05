@@ -122,11 +122,6 @@ export function ExpensesView() {
             borderRadius: 28,
             alignItems: 'center',
             justifyContent: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
-            elevation: 4,
           }}
         >
           <Plus size={24} color="#5C4033" />

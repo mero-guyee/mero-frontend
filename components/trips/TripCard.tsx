@@ -30,13 +30,6 @@ export function TripCard({ trip, onPress }: TripCardProps) {
         borderColor="$border"
         overflow="hidden"
         marginBottom="$4"
-        style={{
-          shadowColor: '#5C4033',
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 4,
-        }}
       >
         {/* Cover Image */}
         <YStack height={180} overflow="hidden">

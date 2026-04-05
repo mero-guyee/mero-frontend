@@ -260,11 +260,6 @@ export function BudgetView() {
             borderRadius: 28,
             alignItems: 'center',
             justifyContent: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
-            elevation: 4,
           }}
         >
           <Text fontSize={24}>+</Text>

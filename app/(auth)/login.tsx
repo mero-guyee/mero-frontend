@@ -79,13 +79,6 @@ export default function LoginScreen() {
             alignItems="center"
             justifyContent="center"
             marginBottom="$4"
-            style={{
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.15,
-              shadowRadius: 8,
-              elevation: 4,
-            }}
           >
             <Compass size={32} color="white" />
           </YStack>

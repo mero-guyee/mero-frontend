@@ -251,13 +251,6 @@ export default function MapViewScreen() {
                               alignItems="center"
                               justifyContent="center"
                               marginRight="$3"
-                              style={{
-                                shadowColor: '#000',
-                                shadowOffset: { width: 0, height: 2 },
-                                shadowOpacity: 0.1,
-                                shadowRadius: 4,
-                                elevation: 2,
-                              }}
                             >
                               <MapPin size={20} color="white" />
                             </YStack>
