@@ -1,9 +1,8 @@
-import Constants from 'expo-constants';
+import * as Device from 'expo-device';
+
 import { tokenStorage } from './tokenStorage';
 
-export { tokenStorage } from './tokenStorage';
-
-export const BASE_URL = Constants.expoGoConfig
+export const BASE_URL = Device.isDevice
   ? process.env.EXPO_PUBLIC_MOBILE_LOCAL_BASE_URL
   : __DEV__
     ? process.env.EXPO_PUBLIC_PC_LOCAL_BASE_URL
