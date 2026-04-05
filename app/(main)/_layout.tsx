@@ -1,8 +1,8 @@
+import { toastConfig } from '@/components/ui/CustomToast';
 import useBackHandler from '@/hooks/useBackHandler';
 import { Backpack, BookOpen, Map, Settings, Wallet } from '@tamagui/lucide-icons';
 import { Tabs } from 'expo-router';
 import Toast from 'react-native-toast-message';
-import { toastConfig } from '@/components/ui/CustomToast';
 import { useActiveTripGuard } from '../../hooks/useActiveTripGuard';
 
 export default function MainLayout() {

@@ -28,7 +28,7 @@ export default function TripListScreen() {
 
   const handleSelectTrip = (tripId: string) => {
     setActiveTrip(tripId);
-    router.push(`/(main)/backpack/${tripId}`);
+    router.push('/(main)/backpack');
   };
 
   const handleCreateTrip = () => {
