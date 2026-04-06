@@ -1,5 +1,5 @@
-import { Pressable } from 'react-native';
-import { Text, XStack, YStack } from 'tamagui';
+import { ArrowDownUp } from '@tamagui/lucide-icons';
+import { Text, XStack } from 'tamagui';
 
 type FilterType = 'all' | 'ongoing' | 'completed';
 type SortType = 'newest' | 'oldest';
@@ -11,44 +11,59 @@ interface TripFiltersProps {
   onSortChange: (sort: SortType) => void;
 }
 
+const filterOptions: { value: FilterType; label: string }[] = [
+  { value: 'all', label: '전체' },
+  { value: 'ongoing', label: '진행 중' },
+  { value: 'completed', label: '완료됨' },
+];
+
 export function TripFilters({ filter, sort, onFilterChange, onSortChange }: TripFiltersProps) {
-  const nextFilter: FilterType =
-    filter === 'all' ? 'ongoing' : filter === 'ongoing' ? 'completed' : 'all';
-  const filterLabel = filter === 'all' ? '전체' : filter === 'ongoing' ? '진행 중' : '완료됨';
-  const sortLabel = sort === 'newest' ? '최신순' : '오래된 순';
+  const toggleSort = () => onSortChange(sort === 'newest' ? 'oldest' : 'newest');
 
   return (
-    <XStack padding="$4" paddingTop={0} gap="$2">
-      <YStack
-        flex={1}
-        backgroundColor="$muted"
-        borderRadius="$4"
-        borderWidth={2}
-        borderColor="$border"
-        paddingHorizontal="$4"
-        paddingVertical="$2.5"
+    <XStack gap="$2" ai="center" jc="space-between">
+      {/* 세그먼트 컨트롤 */}
+      <XStack br="$4" bg="$muted" p="$1" gap="$0">
+        {filterOptions.map((opt) => {
+          const isActive = filter === opt.value;
+          return (
+            <XStack
+              key={opt.value}
+              px="$3"
+              py="$1.5"
+              br="$3"
+              bg={isActive ? '$background' : 'transparent'}
+              onPress={() => onFilterChange(opt.value)}
+              pressStyle={{ opacity: 0.7 }}
+            >
+              <Text
+                fontSize={13}
+                fontWeight={isActive ? '600' : '400'}
+                color={isActive ? '$color' : '$mutedForeground'}
+              >
+                {opt.label}
+              </Text>
+            </XStack>
+          );
+        })}
+      </XStack>
+
+      {/* 정렬 토글 */}
+      <XStack
+        ai="center"
+        gap="$1.5"
+        px="$3"
+        py="$1.5"
+        br="$4"
+        bg="$muted"
+        onPress={toggleSort}
+        pressStyle={{ opacity: 0.7 }}
       >
-        <Pressable onPress={() => onFilterChange(nextFilter)}>
-          <Text color="$foreground" fontSize={14}>
-            {filterLabel}
-          </Text>
-        </Pressable>
-      </YStack>
-      <YStack
-        flex={1}
-        backgroundColor="$muted"
-        borderRadius="$4"
-        borderWidth={2}
-        borderColor="$border"
-        paddingHorizontal="$4"
-        paddingVertical="$2.5"
-      >
-        <Pressable onPress={() => onSortChange(sort === 'newest' ? 'oldest' : 'newest')}>
-          <Text color="$foreground" fontSize={14}>
-            {sortLabel}
-          </Text>
-        </Pressable>
-      </YStack>
+        <ArrowDownUp size={13} color="$mutedForeground" />
+        <Text fontSize={13} color="$mutedForeground">
+          {sort === 'newest' ? '최신순' : '오래된 순'}
+        </Text>
+      </XStack>
     </XStack>
   );
 }

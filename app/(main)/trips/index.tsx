@@ -1,3 +1,4 @@
+import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList } from 'react-native';
@@ -42,21 +43,20 @@ export default function TripListScreen() {
   return (
     <YStack flex={1} backgroundColor="$background" paddingTop={insets.top}>
       <TripHeader
+        filter={filter}
+        setFilter={setFilter}
+        sort={sort}
+        setSort={setSort}
         onSettings={handleSettings}
         onCreateTrip={handleCreateTrip}
-        filter={filter}
-        sort={sort}
-        onFilterChange={setFilter}
-        onSortChange={setSort}
       />
-
       <FlatList
         data={filteredTrips}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={{ padding: paddingHorizontalGeneral }}
         renderItem={({ item }) => (
           <TripCard trip={item} onPress={() => handleSelectTrip(item.id)} />
         )}
-        contentContainerStyle={{ padding: 16 }}
         ListEmptyComponent={<TripEmptyState onCreateTrip={handleCreateTrip} />}
         showsVerticalScrollIndicator={false}
       />
