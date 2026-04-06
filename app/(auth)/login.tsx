@@ -91,19 +91,7 @@ export default function LoginScreen() {
         </YStack>
 
         {/* Login form card */}
-        <YStack
-          backgroundColor="$card"
-          borderRadius="$6"
-          padding="$6"
-          marginBottom="$6"
-          style={{
-            shadowColor: '#5C4033',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 4,
-          }}
-        >
+        <YStack backgroundColor="$card" borderRadius="$6" padding="$6" marginBottom="$6">
           {/* Email Input */}
           <YStack marginBottom="$5">
             <Text fontSize={14} color="$foreground" marginBottom="$2" fontWeight="500">
