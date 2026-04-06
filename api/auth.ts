@@ -1,4 +1,5 @@
-import { apiRequest, tokenStorage } from './client';
+import { apiRequest } from './client';
+import { tokenStorage } from './tokenStorage';
 
 export type Currency =
   | 'KRW'
