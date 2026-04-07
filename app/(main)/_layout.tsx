@@ -1,5 +1,5 @@
 import { toastConfig } from '@/components/ui/CustomToast';
-import CustomTabBar from '@/components/ui/tabbar/CustomTabBar';
+import CompassTabBar from '@/components/ui/tabbar/CompassTabBar';
 import useBackHandler from '@/hooks/useBackHandler';
 import { Tabs } from 'expo-router';
 import Toast from 'react-native-toast-message';
@@ -12,7 +12,7 @@ export default function MainLayout() {
   return (
     <>
       <Tabs
-        tabBar={(props) => <CustomTabBar {...props} />}
+        tabBar={(props) => <CompassTabBar {...props} />}
         screenOptions={{
           headerShown: false,
           tabBarStyle: {},

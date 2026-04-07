@@ -34,7 +34,7 @@ function getNeedleRot(idx: number) {
   return 90 + ANGLES_DEG[idx];
 }
 
-export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
+export default function CompassTabBar({ state, navigation }: BottomTabBarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const activeIdx = Math.max(
