@@ -1,5 +1,5 @@
 import { toastConfig } from '@/components/ui/CustomToast';
-import { paddingHorizontalGeneral } from '@/constants/theme';
+import CustomTabBar from '@/components/ui/tabbar/CustomTabBar';
 import useBackHandler from '@/hooks/useBackHandler';
 import { Backpack, BookOpen, Map, Settings, Wallet } from '@tamagui/lucide-icons';
 import { Tabs } from 'expo-router';
@@ -13,25 +13,15 @@ export default function MainLayout() {
   return (
     <>
       <Tabs
+        tabBar={(props) => <CustomTabBar {...props} />}
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: '#9BC4D1',
-          tabBarInactiveTintColor: '#8B7355',
-          tabBarStyle: {
-            backgroundColor: '#FFFBF0',
-            paddingTop: 8,
-            paddingBottom: 8,
-            paddingHorizontal: paddingHorizontalGeneral,
-            height: 60,
-            borderTopLeftRadius: 16,
-            borderTopRightRadius: 16,
-            borderTopWidth: 0,
-            borderBottomWidth: 0,
-            borderWidth: 0,
-          },
-          tabBarLabelStyle: {
-            fontSize: 12,
-            fontWeight: '500',
+          animation: 'shift',
+          transitionSpec: {
+            animation: 'spring',
+            config: {
+              speed: 130,
+            },
           },
         }}
       >
@@ -73,6 +63,7 @@ export default function MainLayout() {
         <Tabs.Screen
           name="trips"
           options={{
+            tabBarLabel: '여행',
             href: null,
             tabBarStyle: { display: 'none' },
           }}
