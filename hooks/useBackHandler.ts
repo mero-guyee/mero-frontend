@@ -45,12 +45,12 @@ export default function useBackHandler() {
         }
 
         const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
-          router.push('/(main)/trips');
+          router.navigate('/(main)/trips');
           return true;
         });
 
         return () => backHandler.remove();
       }
-    }, [backPressConditions.nestedPath, backPressConditions.onTripsMain])
+    }, [path, backPressConditions.nestedPath, backPressConditions.onTripsMain])
   );
 }

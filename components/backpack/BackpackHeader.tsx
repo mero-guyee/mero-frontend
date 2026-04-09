@@ -1,4 +1,5 @@
 import { CircularButton } from '@/components/ui';
+import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useTrips } from '@/contexts';
 import { Trip } from '@/types';
 import { ArrowLeft } from '@tamagui/lucide-icons';
@@ -18,7 +19,7 @@ export default function BackpackHeader({ trip }: { trip: Trip }) {
   };
 
   const handleEdit = () => {
-    router.push(`/trips/${trip.id}/edit`);
+    router.navigate(`/trips/${trip.id}/edit`);
   };
 
   const handleDelete = () => {
@@ -41,7 +42,7 @@ export default function BackpackHeader({ trip }: { trip: Trip }) {
   return (
     <XStack
       backgroundColor="$card"
-      paddingTop={insets.top}
+      paddingTop={paddingHorizontalGeneral + insets.top}
       paddingHorizontal="$4"
       paddingBottom="$3"
       alignItems="center"
