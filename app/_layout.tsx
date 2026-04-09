@@ -3,8 +3,7 @@ import { TamaguiProvider } from '@tamagui/core';
 import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { YStack } from 'tamagui';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider, BudgetProvider, ExpenseProvider, TripProvider } from '../contexts';
 import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
 import { QueryProvider } from '../providers/QueryProvider';
@@ -29,17 +28,13 @@ function AppContent() {
       <TripProvider>
         <ExpenseProvider>
           <BudgetProvider>
-            <YStack paddingTop="$4" backgroundColor="transparent" />
-            <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-              <StatusBar style="dark" backgroundColor="transparent" translucent />
-
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="index" />
-                <Stack.Screen name="(auth)" />
-                <Stack.Screen name="(main)" />
-                <Stack.Screen name="auth/naver/callback" />
-              </Stack>
-            </SafeAreaView>
+            <StatusBar style="dark" backgroundColor="transparent" translucent />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="(main)" />
+              <Stack.Screen name="auth/naver/callback" />
+            </Stack>
           </BudgetProvider>
         </ExpenseProvider>
       </TripProvider>

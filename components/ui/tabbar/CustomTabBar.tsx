@@ -2,13 +2,15 @@ import { paddingHorizontalGeneral } from '@/constants/theme';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View } from 'tamagui';
 
 export default function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+  const insets = useSafeAreaInsets();
+  const tabBarPadding = state.index === 5 ? 0 : insets.bottom;
   const animsX = useRef(state.routes.map(() => new Animated.Value(1))).current;
   const animsY = useRef(state.routes.map(() => new Animated.Value(1))).current;
   const animsOpacity = useRef(state.routes.map(() => new Animated.Value(0))).current;
-
   function handlePress(index: number, route: (typeof state.routes)[number], isFocused: boolean) {
     const sx = animsX[index];
     const sy = animsY[index];
@@ -52,7 +54,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
   if (state.index === 5) return null;
 
   return (
-    <View style={styles.container}>
+    <View style={{ ...styles.container, paddingBottom: tabBarPadding }}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         if (options.tabBarLabel === '여행') return null;
@@ -97,9 +99,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#FFFBF0',
     paddingTop: 8,
-    paddingBottom: 8,
     paddingHorizontal: paddingHorizontalGeneral,
-    height: 60,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
   },
