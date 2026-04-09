@@ -24,6 +24,7 @@ export default function MainLayout() {
             },
           },
         }}
+        detachInactiveScreens={false}
       >
         <Tabs.Screen
           name="backpack"
@@ -64,7 +65,6 @@ export default function MainLayout() {
           name="trips"
           options={{
             tabBarLabel: '여행',
-            href: null,
             tabBarStyle: { display: 'none' },
           }}
         />
