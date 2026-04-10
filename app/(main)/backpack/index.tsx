@@ -29,7 +29,7 @@ export default function TripHomeScreen() {
     <YStack flex={1} backgroundColor="$background">
       <BackpackHeader trip={trip} />
       <ScrollView style={{ flex: 1 }}>
-        <TripDetailCoverImage trip={trip} />
+        <TripDetailCoverImage uri={trip.imageUrl} />
 
         <TripSubTabs activeTab={subTab} onTabChange={setSubTab} />
 
