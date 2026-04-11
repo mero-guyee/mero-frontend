@@ -36,7 +36,7 @@ export default function More({ children }: { children: ReactNode }) {
     <>
       <View ref={buttonRef}>
         <CircularButton onPress={openMenu}>
-          <MoreVertical size={20} color="$foreground" />
+          <MoreVertical size="$7" color="$foreground" />
         </CircularButton>
       </View>
 

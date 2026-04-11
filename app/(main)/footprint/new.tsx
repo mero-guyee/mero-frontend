@@ -1,8 +1,9 @@
 import LocationPicker from '@/components/location/LocationPicker';
 import SubmitButton from '@/components/ui/button/SubmitButton';
+import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { formatGeocode } from '@/utils/location/location';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { ArrowLeft, Camera, MapPin, X } from '@tamagui/lucide-icons';
+import { Camera, MapPin, X } from '@tamagui/lucide-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -145,25 +146,12 @@ export default function FootprintFormScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       {/* Header */}
-      <XStack
-        backgroundColor="$card"
-        paddingTop={insets.top}
-        paddingHorizontal="$4"
-        paddingBottom="$3"
-        alignItems="center"
-        justifyContent="space-between"
-        borderBottomWidth={2}
-        borderBottomColor="$primary"
-        style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
+      <BackActionHeader
+        label={existingFootprint ? '유랑 수정' : '새 유랑'}
+        onBack={() => router.back()}
       >
-        <CircularButton onPress={() => router.back()}>
-          <ArrowLeft size={20} color="$foreground" />
-        </CircularButton>
-        <Text color="$foreground" fontSize={16} fontWeight="500">
-          {existingFootprint ? '유랑 수정' : '새 유랑'}
-        </Text>
         <SubmitButton onPress={handleSubmit} />
-      </XStack>
+      </BackActionHeader>
 
       {/* 성능 문제시 리팩토링 필요 */}
       <ScrollView

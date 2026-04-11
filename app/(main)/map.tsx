@@ -1,3 +1,4 @@
+import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { BookOpen, Calendar, MapPin, X } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -74,24 +75,7 @@ export default function MapViewScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       {/* Header */}
-      <YStack
-        backgroundColor="$card"
-        paddingTop={insets.top}
-        paddingHorizontal="$4"
-        paddingBottom="$3"
-        borderBottomWidth={2}
-        borderBottomColor="$primary"
-        style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
-      >
-        <Text color="$foreground" fontSize={18} fontWeight="600">
-          👣 지도
-        </Text>
-        {activeTripData && (
-          <Text color="$mutedForeground" fontSize={14} marginTop="$0.5">
-            {activeTripData.title}
-          </Text>
-        )}
-      </YStack>
+      <TabScreenHeader label="지도" />
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
         {/* Map Placeholder */}

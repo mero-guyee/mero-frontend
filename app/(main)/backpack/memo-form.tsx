@@ -1,11 +1,11 @@
 import SubmitButton from '@/components/ui/button/SubmitButton';
-import { ArrowLeft } from '@tamagui/lucide-icons';
+import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Text, TextArea, XStack, YStack } from 'tamagui';
-import { CircularButton, Input } from '../../../components/ui';
+import { Text, TextArea, YStack } from 'tamagui';
+import { Input } from '../../../components/ui';
 import { useMemos } from '../../../contexts';
 
 export default function MemoFormScreen() {
@@ -48,29 +48,13 @@ export default function MemoFormScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      <XStack
-        backgroundColor="$card"
-        paddingTop={insets.top}
-        paddingHorizontal="$4"
-        paddingBottom="$3"
-        alignItems="center"
-        justifyContent="space-between"
-        borderBottomWidth={2}
-        borderBottomColor="$primary"
-        style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
-      >
-        <CircularButton onPress={() => router.back()}>
-          <ArrowLeft size={20} color="$foreground" />
-        </CircularButton>
-        <Text color="$foreground" fontSize={16} fontWeight="500">
-          {existingMemo ? '메모 수정' : '새 메모'}
-        </Text>
+      <BackActionHeader label={existingMemo ? '메모 수정' : '새 메모'} onBack={() => router.back()}>
         <SubmitButton
           onPress={handleSubmit}
           disabled={!title.trim()}
           opacity={title.trim() ? 1 : 0.5}
         />
-      </XStack>
+      </BackActionHeader>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
         <YStack marginBottom="$4">

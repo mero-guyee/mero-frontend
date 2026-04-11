@@ -1,12 +1,12 @@
 import SubmitButton from '@/components/ui/button/SubmitButton';
+import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { ArrowLeft } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
-import { CircularButton, Input } from '../../../components/ui';
+import { Input } from '../../../components/ui';
 import { useExpenses, useTrips } from '../../../contexts';
 
 const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY', 'GBP', 'CNY', 'THB', 'VND', 'PEN', 'BRL'];
@@ -62,25 +62,9 @@ export default function ExpenseFormScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       {/* Header */}
-      <XStack
-        backgroundColor="$card"
-        paddingTop={insets.top}
-        paddingHorizontal="$4"
-        paddingBottom="$3"
-        alignItems="center"
-        justifyContent="space-between"
-        borderBottomWidth={2}
-        borderBottomColor="$primary"
-        style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
-      >
-        <CircularButton onPress={() => router.back()}>
-          <ArrowLeft size={20} color="$foreground" />
-        </CircularButton>
-        <Text color="$foreground" fontSize={16} fontWeight="500">
-          경비 추가
-        </Text>
+      <BackActionHeader label="경비 추가" onBack={() => router.back()}>
         <SubmitButton onPress={handleSubmit} />
-      </XStack>
+      </BackActionHeader>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
         {/* Date */}

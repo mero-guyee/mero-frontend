@@ -1,13 +1,11 @@
-import { CircularButton } from '@/components/ui';
-import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useTrips } from '@/contexts';
 import { Trip } from '@/types';
-import { ArrowLeft } from '@tamagui/lucide-icons';
 import { router } from 'expo-router';
 import { Alert, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack } from 'tamagui';
 import More from '../ui/More';
+import BackActionHeader from '../ui/header/BackActionHeader';
 
 export default function BackpackHeader({ trip }: { trip: Trip }) {
   const { deleteTrip } = useTrips();
@@ -40,23 +38,7 @@ export default function BackpackHeader({ trip }: { trip: Trip }) {
     );
   };
   return (
-    <XStack
-      backgroundColor="$card"
-      paddingTop={paddingHorizontalGeneral + insets.top}
-      paddingHorizontal="$4"
-      paddingBottom="$3"
-      alignItems="center"
-      justifyContent="space-between"
-      borderBottomWidth={2}
-      borderBottomColor="$primary"
-      style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
-    >
-      <CircularButton onPress={handleBack}>
-        <ArrowLeft size={20} color="$foreground" />
-      </CircularButton>
-      <Text flex={1} textAlign="center" color="$foreground" fontSize={16} fontWeight="500">
-        {trip.title}
-      </Text>
+    <BackActionHeader label={trip.title} onBack={handleBack}>
       <More>
         <Pressable onPress={handleEdit}>
           <XStack padding="$3" hoverStyle={{ backgroundColor: '$accent' }}>
@@ -73,6 +55,6 @@ export default function BackpackHeader({ trip }: { trip: Trip }) {
           </XStack>
         </Pressable>
       </More>
-    </XStack>
+    </BackActionHeader>
   );
 }

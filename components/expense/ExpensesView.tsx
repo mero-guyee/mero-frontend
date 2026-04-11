@@ -1,7 +1,6 @@
-import { Plus } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
-import { Pressable, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Text, YStack } from 'tamagui';
 import { useExpenses, useTrips } from '../../contexts';
 import { Expense } from '../../types';
@@ -38,10 +37,6 @@ export function ExpensesView() {
         {} as Record<string, Expense[]>
       );
   }, [expenses]);
-
-  const handleAddExpense = () => {
-    router.push({ pathname: '/expense/new', params: { tripId: activeTrip } });
-  };
 
   return (
     <YStack flex={1}>
@@ -108,25 +103,6 @@ export function ExpensesView() {
           </YStack>
         </YStack>
       </ScrollView>
-
-      {activeTrip && (
-        <Pressable
-          onPress={handleAddExpense}
-          style={{
-            position: 'absolute',
-            bottom: 100,
-            right: 20,
-            width: 56,
-            height: 56,
-            backgroundColor: '#C8DEE6',
-            borderRadius: 28,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Plus size={24} color="#5C4033" />
-        </Pressable>
-      )}
     </YStack>
   );
 }

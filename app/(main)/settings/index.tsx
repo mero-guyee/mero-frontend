@@ -1,3 +1,4 @@
+import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { Bell, ChevronRight, Globe, HelpCircle, Lock, Tag, User } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { Alert, Pressable, ScrollView } from 'react-native';
@@ -65,19 +66,7 @@ export default function SettingsScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       {/* Header */}
-      <YStack
-        backgroundColor="$card"
-        paddingTop={insets.top}
-        paddingHorizontal="$4"
-        paddingBottom="$3"
-        borderBottomWidth={2}
-        borderBottomColor="$primary"
-        style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
-      >
-        <Text color="$foreground" fontSize={18} fontWeight="600" textAlign="center">
-          ⚙️ 설정
-        </Text>
-      </YStack>
+      <TabScreenHeader label="설정" />
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>
         {/* Account Section */}
