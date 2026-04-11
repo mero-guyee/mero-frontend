@@ -3,9 +3,11 @@ import { TripStatus } from '@/types';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 
+import { useIsFocused } from '@react-navigation/native';
+import { Plane } from '@tamagui/lucide-icons';
 import { FlatList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { YStack } from 'tamagui';
+import { View, YStack } from 'tamagui';
 import { TripCard } from '../../../components/trips/card/TripCard';
 import { TripEmptyState } from '../../../components/trips/TripEmptyState';
 import { TripHeader } from '../../../components/trips/TripHeader';
@@ -14,6 +16,8 @@ import { useTrips } from '../../../contexts';
 export default function TripListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const isFocused = useIsFocused();
+
   const { tripsByProgress, trips, setActiveTrip } = useTrips();
 
   const [filter, setFilter] = useState<'all' | TripStatus>('all');
@@ -41,6 +45,13 @@ export default function TripListScreen() {
     router.push('/(main)/settings');
   };
 
+  if (!isFocused) {
+    return (
+      <View flex={1} alignItems="center" justifyContent="center" backgroundColor="$background">
+        <Plane size={44} color="$mutedForeground" />
+      </View>
+    ); // 화면이 포커스되지 않았을 때는 아무것도 렌더링하지 않음
+  }
   return (
     <YStack flex={1} backgroundColor="$background" paddingTop={insets.top}>
       <TripHeader

@@ -1,8 +1,9 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { TripStatus } from '@/types';
-import { Backpack, Plus, Settings } from '@tamagui/lucide-icons';
+import { Backpack, Settings } from '@tamagui/lucide-icons';
 import { Text, XStack, YStack } from 'tamagui';
-import { CircularButton, FilledButton } from '../ui';
+import { CircularButton } from '../ui';
+import PlusButton from '../ui/button/PlusButton';
 import { TripFilters } from './TripFilters';
 
 type FilterType = 'all' | TripStatus;
@@ -54,17 +55,11 @@ export function TripHeader({
             </Text>
           </YStack>
         </XStack>
-        <XStack gap="$2">
+        <XStack gap="$4" flex={1} justifyContent="flex-end" alignItems="center">
           <CircularButton pressStyle={{ backgroundColor: '$muted' }} onPress={onSettings}>
             <Settings size="$7" color="$foreground" />
           </CircularButton>
-          <FilledButton
-            backgroundColor="$accent"
-            pressStyle={{ backgroundColor: '$accentHover' }}
-            onPress={onCreateTrip}
-          >
-            <Plus size={20} color="$foreground" />
-          </FilledButton>
+          <PlusButton onPress={onCreateTrip} />
         </XStack>
       </XStack>
       <TripFilters filter={filter} sort={sort} onFilterChange={setFilter} onSortChange={setSort} />

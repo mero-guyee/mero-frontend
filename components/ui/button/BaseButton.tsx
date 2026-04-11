@@ -1,7 +1,7 @@
 import { Button as TamaguiButton, styled } from 'tamagui';
 
 export const FilledButton = styled(TamaguiButton, {
-  height: 48,
+  height: '$12',
   borderRadius: '$4',
   backgroundColor: '$accent',
   pressStyle: { backgroundColor: '$accentHover' },

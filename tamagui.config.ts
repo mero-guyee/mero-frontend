@@ -15,6 +15,8 @@ const bodyFont = createFont({
     8: 28,
     9: 32,
     10: 40,
+    11: 44,
+    12: 48,
     true: 16,
   },
   lineHeight: {
