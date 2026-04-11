@@ -3,7 +3,7 @@ import { createFont, createTamagui, createTokens } from '@tamagui/core';
 
 // 기본 폰트 설정
 const bodyFont = createFont({
-  family: 'System',
+  family: 'Pretendard',
   size: {
     1: 12,
     2: 14,
@@ -37,6 +37,12 @@ const bodyFont = createFont({
     5: '500',
     6: '600',
     7: '700',
+  },
+  face: {
+    400: { normal: 'Pretendard-Regular' },
+    500: { normal: 'Pretendard-Medium' },
+    600: { normal: 'Pretendard-SemiBold' },
+    700: { normal: 'Pretendard-Bold' },
   },
   letterSpacing: {
     4: 0,
