@@ -1,3 +1,4 @@
+import PlusButton from '@/components/ui/button/PlusButton';
 import { Plus, Search } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -167,17 +168,16 @@ export default function FootprintListScreen() {
               </Text>
             )}
           </YStack>
-          <XStack alignItems="center" gap="$2">
-            <CircularButton onPress={() => setShowSearch(!showSearch)}>
-              <Search size={20} color="$foreground" />
-            </CircularButton>
+          <XStack alignItems="center" gap="$4">
             <CircularButton
-              backgroundColor="$accent"
-              pressStyle={{ backgroundColor: '$accentHover' }}
-              onPress={handleCreateFootprint}
+              pressStyle={{ backgroundColor: '$muted' }}
+              onPress={() => setShowSearch(!showSearch)}
             >
-              <Plus size={20} color="$foreground" />
+              <Search size="$7" color="$foreground" />
             </CircularButton>
+            <PlusButton onPress={handleCreateFootprint}>
+              <Plus size={20} color="$foreground" />
+            </PlusButton>
           </XStack>
         </XStack>
 

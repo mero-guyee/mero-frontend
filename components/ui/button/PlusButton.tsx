@@ -1,10 +1,6 @@
-import { Plane } from '@tamagui/lucide-icons';
+import { ComponentProps } from 'react';
 import { FilledButton } from './BaseButton';
 
-export default function PlusButton({ onPress }: { onPress: () => void }) {
-  return (
-    <FilledButton onPress={onPress}>
-      <Plane strokeWidth={1.8} size={24} color="$foreground" />
-    </FilledButton>
-  );
+export default function PlusButton(props: ComponentProps<typeof FilledButton>) {
+  return <FilledButton {...props} />;
 }

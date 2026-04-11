@@ -1,10 +1,11 @@
+import SubmitButton from '@/components/ui/button/SubmitButton';
 import { ArrowLeft } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, TextArea, XStack, YStack } from 'tamagui';
-import { CircularButton, FilledButton, Input } from '../../../components/ui';
+import { CircularButton, Input } from '../../../components/ui';
 import { useMemos } from '../../../contexts';
 
 export default function MemoFormScreen() {
@@ -64,17 +65,11 @@ export default function MemoFormScreen() {
         <Text color="$foreground" fontSize={16} fontWeight="500">
           {existingMemo ? '메모 수정' : '새 메모'}
         </Text>
-        <FilledButton
-          paddingHorizontal="$4"
-          paddingVertical="$2"
+        <SubmitButton
           onPress={handleSubmit}
           disabled={!title.trim()}
           opacity={title.trim() ? 1 : 0.5}
-        >
-          <Text color="$foreground" fontWeight="500">
-            저장
-          </Text>
-        </FilledButton>
+        />
       </XStack>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>

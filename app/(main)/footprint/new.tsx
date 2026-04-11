@@ -1,4 +1,5 @@
 import LocationPicker from '@/components/location/LocationPicker';
+import SubmitButton from '@/components/ui/button/SubmitButton';
 import { formatGeocode } from '@/utils/location/location';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ArrowLeft, Camera, MapPin, X } from '@tamagui/lucide-icons';
@@ -8,7 +9,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Modal, Platform, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image, Text, TextArea, XStack, YStack } from 'tamagui';
-import { CircularButton, FilledButton, Input } from '../../../components/ui';
+import { CircularButton, Input } from '../../../components/ui';
 import { useFootprints, useTrips } from '../../../contexts';
 import { FootprintLocation } from '../../../types';
 
@@ -161,11 +162,7 @@ export default function FootprintFormScreen() {
         <Text color="$foreground" fontSize={16} fontWeight="500">
           {existingFootprint ? '유랑 수정' : '새 유랑'}
         </Text>
-        <FilledButton paddingHorizontal="$4" paddingVertical="$2" onPress={handleSubmit}>
-          <Text color="$foreground" fontWeight="500">
-            저장
-          </Text>
-        </FilledButton>
+        <SubmitButton onPress={handleSubmit} />
       </XStack>
 
       {/* 성능 문제시 리팩토링 필요 */}

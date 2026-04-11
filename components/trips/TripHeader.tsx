@@ -1,6 +1,6 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { TripStatus } from '@/types';
-import { Backpack, Settings } from '@tamagui/lucide-icons';
+import { Backpack, Plane, Settings } from '@tamagui/lucide-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import { CircularButton } from '../ui';
 import PlusButton from '../ui/button/PlusButton';
@@ -59,7 +59,9 @@ export function TripHeader({
           <CircularButton pressStyle={{ backgroundColor: '$muted' }} onPress={onSettings}>
             <Settings size="$7" color="$foreground" />
           </CircularButton>
-          <PlusButton onPress={onCreateTrip} />
+          <PlusButton onPress={onCreateTrip}>
+            <Plane strokeWidth={1.8} size={24} color="$foreground" />
+          </PlusButton>
         </XStack>
       </XStack>
       <TripFilters filter={filter} sort={sort} onFilterChange={setFilter} onSortChange={setSort} />

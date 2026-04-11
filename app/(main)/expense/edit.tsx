@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/ui/button/SubmitButton';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ArrowLeft } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -5,7 +6,7 @@ import { useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
-import { CircularButton, FilledButton, Input } from '../../../components/ui';
+import { CircularButton, Input } from '../../../components/ui';
 import { useExpenses } from '../../../contexts';
 
 const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY', 'GBP', 'CNY', 'THB', 'VND', 'PEN', 'BRL'];
@@ -84,11 +85,7 @@ export default function ExpenseEditScreen() {
         <Text color="$foreground" fontSize={16} fontWeight="500">
           경비 수정
         </Text>
-        <FilledButton paddingHorizontal="$4" paddingVertical="$2" onPress={handleSubmit}>
-          <Text color="$foreground" fontWeight="500">
-            저장
-          </Text>
-        </FilledButton>
+        <SubmitButton onPress={handleSubmit} />
       </XStack>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>

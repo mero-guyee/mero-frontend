@@ -1,3 +1,4 @@
+import SubmitButton from '@/components/ui/button/SubmitButton';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ArrowLeft, Image as ImageIcon, X } from '@tamagui/lucide-icons';
 import { Asset } from 'expo-asset';
@@ -117,11 +118,7 @@ export default function NewTripScreen() {
         <Text color="$foreground" fontSize={16} fontWeight="500">
           새 모험
         </Text>
-        <FilledButton paddingHorizontal="$4" paddingVertical="$2" onPress={handleSubmit}>
-          <Text color="$foreground" fontWeight="500">
-            저장
-          </Text>
-        </FilledButton>
+        <SubmitButton onPress={handleSubmit} />
       </XStack>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
