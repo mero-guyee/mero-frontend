@@ -9,7 +9,7 @@ import {
   useTripsQuery,
   useUpdateTrip,
 } from '../hooks/queries/useTrips';
-import { Trip, TripDocument, TripDocumentFile } from '../types';
+import { Trip, TripDocument, TripDocumentFile, TripStatus } from '../types';
 
 interface TripContextType {
   trips: Trip[];
@@ -23,7 +23,10 @@ interface TripContextType {
   getTripById: (tripId: string) => Trip | undefined;
   documents: TripDocument[];
   createDocument: (tripId: string, document: TripDocumentFile) => void;
+  tripsByProgress: TripByProgressObj;
 }
+
+type TripByProgressObj = Record<TripStatus, Trip[]>;
 
 const TripUIContext = createContext<{
   activeTrip: string | null;
@@ -88,6 +91,13 @@ export function useTrips(): TripContextType {
           },
         }
       );
+    },
+    tripsByProgress: {
+      ongoing: trips.filter(
+        (t) => new Date(t.startDate) <= new Date() && new Date(t.endDate) >= new Date()
+      ),
+      completed: trips.filter((t) => new Date(t.endDate) < new Date()),
+      planned: trips.filter((t) => new Date(t.startDate) > new Date()),
     },
   };
 }

@@ -1,7 +1,8 @@
+import { TripStatus } from '@/types';
 import { ArrowDownUp } from '@tamagui/lucide-icons';
 import { Text, XStack } from 'tamagui';
 
-type FilterType = 'all' | 'ongoing' | 'completed';
+type FilterType = 'all' | TripStatus;
 type SortType = 'newest' | 'oldest';
 
 interface TripFiltersProps {

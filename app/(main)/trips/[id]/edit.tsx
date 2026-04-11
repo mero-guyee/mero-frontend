@@ -1,3 +1,4 @@
+import { TripStatus } from '@/types';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ArrowLeft, Image as ImageIcon, X } from '@tamagui/lucide-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -23,7 +24,7 @@ export default function EditTripScreen() {
   const [imageUrl, setCoverImage] = useState<string | undefined>('');
   const [countries, setCountries] = useState<string[]>([]);
   const [newCountry, setNewCountry] = useState('');
-  const [status, setStatus] = useState<'ongoing' | 'completed'>('ongoing');
+  const [status, setStatus] = useState<TripStatus>('ongoing');
 
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
@@ -288,7 +289,7 @@ export default function EditTripScreen() {
                 justifyContent="center"
               >
                 <Text color="$foreground" fontWeight={status === 'ongoing' ? '600' : '400'}>
-                  진행중
+                  진행 중
                 </Text>
               </XStack>
             </Pressable>

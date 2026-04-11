@@ -1,10 +1,12 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
+import { TripStatus } from '@/types';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
+
 import { FlatList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { YStack } from 'tamagui';
-import { TripCard } from '../../../components/trips/TripCard';
+import { TripCard } from '../../../components/trips/card/TripCard';
 import { TripEmptyState } from '../../../components/trips/TripEmptyState';
 import { TripHeader } from '../../../components/trips/TripHeader';
 import { useTrips } from '../../../contexts';
@@ -12,20 +14,19 @@ import { useTrips } from '../../../contexts';
 export default function TripListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { trips, setActiveTrip } = useTrips();
+  const { tripsByProgress, trips, setActiveTrip } = useTrips();
 
-  const [filter, setFilter] = useState<'all' | 'ongoing' | 'completed'>('all');
+  const [filter, setFilter] = useState<'all' | TripStatus>('all');
   const [sort, setSort] = useState<'newest' | 'oldest'>('newest');
 
-  const filteredTrips = trips
-    .filter(() => filter === 'all')
-    .sort((a, b) => {
-      if (sort === 'newest') {
-        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
-      } else {
-        return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
-      }
-    });
+  const filteredTrips = [...(filter === 'all' ? trips : tripsByProgress[filter])];
+  const filteredAndSortedTrips = filteredTrips.sort((a, b) => {
+    if (sort === 'newest') {
+      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+    } else {
+      return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+    }
+  });
 
   const handleSelectTrip = (tripId: string) => {
     setActiveTrip(tripId);
@@ -51,7 +52,7 @@ export default function TripListScreen() {
         onCreateTrip={handleCreateTrip}
       />
       <FlatList
-        data={filteredTrips}
+        data={filteredAndSortedTrips}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ padding: paddingHorizontalGeneral }}
         renderItem={({ item }) => (

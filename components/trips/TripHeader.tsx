@@ -1,10 +1,11 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
+import { TripStatus } from '@/types';
 import { Backpack, Plus, Settings } from '@tamagui/lucide-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import { CircularButton, FilledButton } from '../ui';
 import { TripFilters } from './TripFilters';
 
-type FilterType = 'all' | 'ongoing' | 'completed';
+type FilterType = 'all' | TripStatus;
 type SortType = 'newest' | 'oldest';
 
 interface TripHeaderProps {

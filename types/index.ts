@@ -19,6 +19,8 @@ export type Trip = {
   documents?: TripDocument[];
 };
 
+export type TripStatus = 'planned' | 'ongoing' | 'completed';
+
 export type TripDocument = {
   id: number;
   fileName: string;
