@@ -46,6 +46,7 @@ export default module.exports = {
       ],
       'expo-sqlite',
       'expo-secure-store',
+      'expo-asset',
     ],
     experiments: {
       typedRoutes: true,
