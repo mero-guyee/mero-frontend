@@ -5,6 +5,7 @@ import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { PortalProvider } from 'tamagui';
 import { AuthProvider, BudgetProvider, ExpenseProvider, TripProvider } from '../contexts';
 import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
 import { QueryProvider } from '../providers/QueryProvider';
@@ -30,12 +31,14 @@ function AppContent() {
         <ExpenseProvider>
           <BudgetProvider>
             <StatusBar style="dark" backgroundColor="transparent" translucent />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="(auth)" />
-              <Stack.Screen name="(main)" />
-              <Stack.Screen name="auth/naver/callback" />
-            </Stack>
+            <PortalProvider>
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="(main)" />
+                <Stack.Screen name="auth/naver/callback" />
+              </Stack>
+            </PortalProvider>
           </BudgetProvider>
         </ExpenseProvider>
       </TripProvider>

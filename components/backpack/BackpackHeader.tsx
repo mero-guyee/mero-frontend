@@ -2,15 +2,12 @@ import { useTrips } from '@/contexts';
 import { Trip } from '@/types';
 import { router } from 'expo-router';
 import { Alert, Pressable } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack } from 'tamagui';
 import More from '../ui/More';
 import BackActionHeader from '../ui/header/BackActionHeader';
 
 export default function BackpackHeader({ trip }: { trip: Trip }) {
   const { deleteTrip } = useTrips();
-
-  const insets = useSafeAreaInsets();
 
   const handleBack = () => {
     router.navigate('/(main)/trips');
@@ -37,20 +34,17 @@ export default function BackpackHeader({ trip }: { trip: Trip }) {
       ]
     );
   };
+
   return (
     <BackActionHeader label={trip.title} onBack={handleBack}>
       <More>
         <Pressable onPress={handleEdit}>
-          <XStack padding="$3" hoverStyle={{ backgroundColor: '$accent' }}>
+          <XStack paddingHorizontal="$4" paddingVertical="$4">
             <Text color="$foreground">수정</Text>
           </XStack>
         </Pressable>
-        <Pressable
-          onPress={() => {
-            handleDelete();
-          }}
-        >
-          <XStack padding="$3" hoverStyle={{ backgroundColor: '$destructive' }}>
+        <Pressable onPress={handleDelete}>
+          <XStack paddingHorizontal="$4" paddingVertical="$4">
             <Text color="$destructive">삭제</Text>
           </XStack>
         </Pressable>

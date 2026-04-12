@@ -4,7 +4,7 @@ import { TripDocumentsTab } from '@/components/trips/documents/TripDocumentsTab'
 import MemoTab from '@/components/trips/memos/MemoTab';
 import { useTripQuery } from '@/hooks/queries/useTrips';
 import { useState } from 'react';
-import { Pressable, ScrollView } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Text, YStack } from 'tamagui';
 import { SubTab, TripSubTabs } from '../../../components/trips/TripSubTabs';
 import { useMemos, useTrips } from '../../../contexts';
@@ -14,7 +14,6 @@ export default function TripHomeScreen() {
   const { data: trip } = useTripQuery(activeTrip || '');
   const { memos } = useMemos();
 
-  const [showMenu, setShowMenu] = useState(false);
   const [subTab, setSubTab] = useState<SubTab>('memos');
 
   if (!trip) {
@@ -43,20 +42,6 @@ export default function TripHomeScreen() {
 
         <YStack height={100} />
       </ScrollView>
-
-      {showMenu && (
-        <Pressable
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 50,
-          }}
-          onPress={() => setShowMenu(false)}
-        />
-      )}
     </YStack>
   );
 }
