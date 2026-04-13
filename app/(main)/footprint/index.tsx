@@ -1,4 +1,3 @@
-import PlusButton from '@/components/ui/button/PlusButton';
 import { XCard } from '@/components/ui/Card';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { Plus, Search } from '@tamagui/lucide-icons';
@@ -7,7 +6,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, SectionList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image, Text, XStack, YStack } from 'tamagui';
-import { CircularButton, Input } from '../../../components/ui';
+import { CircularButton, FilledButton, Input } from '../../../components/ui';
 import { useExpenses, useFootprints, useTrips } from '../../../contexts';
 import { Footprint } from '../../../types';
 
@@ -135,9 +134,9 @@ export default function FootprintListScreen() {
           >
             <Search size="$7" color="$foreground" />
           </CircularButton>
-          <PlusButton onPress={handleCreateFootprint}>
+          <FilledButton onPress={handleCreateFootprint}>
             <Plus size={20} color="$foreground" />
-          </PlusButton>
+          </FilledButton>
         </XStack>
       </TabScreenHeader>
       {showSearch && (

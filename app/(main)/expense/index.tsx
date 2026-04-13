@@ -1,5 +1,5 @@
 import { ExpenseSubTabs } from '@/components/expense/ExpenseSubTabs';
-import PlusButton from '@/components/ui/button/PlusButton';
+import { FilledButton } from '@/components/ui';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { useTrips } from '@/contexts';
 import { Plus } from '@tamagui/lucide-icons';
@@ -21,9 +21,9 @@ export default function ExpenseScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       <TabScreenHeader label="지갑">
-        <PlusButton onPress={handleAddExpense}>
+        <FilledButton onPress={handleAddExpense}>
           <Plus size="$5" />
-        </PlusButton>
+        </FilledButton>
       </TabScreenHeader>
 
       <ExpenseSubTabs activeTab={activeTab} onTabChange={setActiveTab} />
