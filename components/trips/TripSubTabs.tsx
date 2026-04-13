@@ -1,5 +1,4 @@
-import { Text, XStack, YStack } from 'tamagui';
-import { Button } from 'tamagui';
+import { Button, Text, XStack, YStack } from 'tamagui';
 
 export type SubTab = 'memos' | 'files';
 
@@ -22,6 +21,7 @@ export function TripSubTabs({ activeTab, onTabChange }: TripSubTabsProps) {
           flex={1}
           height={40}
           borderRadius="$3"
+          borderWidth={0}
           backgroundColor={activeTab === 'memos' ? '$accent' : 'transparent'}
           pressStyle={{ backgroundColor: activeTab === 'memos' ? '$accent' : '$muted' }}
           onPress={() => onTabChange('memos')}
@@ -31,13 +31,14 @@ export function TripSubTabs({ activeTab, onTabChange }: TripSubTabsProps) {
             fontSize={14}
             fontWeight="500"
           >
-            📝 메모
+            메모
           </Text>
         </Button>
         <Button
           flex={1}
           height={40}
           borderRadius="$3"
+          borderWidth={0}
           backgroundColor={activeTab === 'files' ? '$accent' : 'transparent'}
           pressStyle={{ backgroundColor: activeTab === 'files' ? '$accent' : '$muted' }}
           onPress={() => onTabChange('files')}
@@ -47,7 +48,7 @@ export function TripSubTabs({ activeTab, onTabChange }: TripSubTabsProps) {
             fontSize={14}
             fontWeight="500"
           >
-            📂 서류
+            서류
           </Text>
         </Button>
       </XStack>

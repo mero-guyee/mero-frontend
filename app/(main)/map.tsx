@@ -1,4 +1,6 @@
+import { YCard } from '@/components/ui/Card';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
+import { paddingHorizontalGeneral } from '@/constants/theme';
 import { BookOpen, Calendar, MapPin, X } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -77,18 +79,12 @@ export default function MapViewScreen() {
       {/* Header */}
       <TabScreenHeader label="지도" />
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ padding: paddingHorizontalGeneral, paddingBottom: 100 }}
+      >
         {/* Map Placeholder */}
-        <YStack
-          backgroundColor="$card"
-          borderRadius="$6"
-          aspectRatio={4 / 3}
-          alignItems="center"
-          justifyContent="center"
-          borderWidth={2}
-          borderColor="$border"
-          marginBottom="$4"
-        >
+        <YCard alignItems="center" justifyContent="center" marginBottom="$4">
           <Text fontSize={48} marginBottom="$2">
             🗺️
           </Text>
@@ -96,7 +92,7 @@ export default function MapViewScreen() {
           <Text color="$mutedForeground" fontSize={14} marginTop="$1">
             (지도 라이브러리 연동 필요)
           </Text>
-        </YStack>
+        </YCard>
 
         {/* Countries List */}
         <YStack>
@@ -105,14 +101,7 @@ export default function MapViewScreen() {
           </Text>
           <YStack gap="$3">
             {Object.entries(footprintsByCountry).map(([country, countryMemos]) => (
-              <YStack
-                key={country}
-                backgroundColor="$card"
-                borderRadius="$6"
-                padding="$4"
-                borderWidth={2}
-                borderColor="$border"
-              >
+              <YCard key={country} padding="$4">
                 <Pressable onPress={() => handleCountryClick(country)}>
                   <XStack alignItems="center" justifyContent="space-between" marginBottom="$2">
                     <Text color="$foreground" fontSize={16} fontWeight="500">
@@ -141,7 +130,7 @@ export default function MapViewScreen() {
                     <Text color="$mutedForeground">외 {countryMemos.length - 3}개 장소</Text>
                   )}
                 </YStack>
-              </YStack>
+              </YCard>
             ))}
           </YStack>
         </YStack>

@@ -1,3 +1,4 @@
+import { XCard, YCard } from '@/components/ui/Card';
 import { useTrips } from '@/contexts';
 import { File, Upload, X } from '@tamagui/lucide-icons';
 import * as DocumentPicker from 'expo-document-picker';
@@ -42,16 +43,7 @@ export function TripDocumentsTab({ tripId }: { tripId: string }) {
         </Text>
 
         <Pressable onPress={handleFileSelect}>
-          <YStack
-            borderWidth={2}
-            borderStyle="dashed"
-            borderColor="$primary"
-            borderRadius="$6"
-            padding="$8"
-            alignItems="center"
-            backgroundColor="$card"
-            opacity={0.4}
-          >
+          <YCard padding="$8" alignItems="center" opacity={0.4}>
             <YStack
               width={48}
               height={48}
@@ -77,20 +69,12 @@ export function TripDocumentsTab({ tripId }: { tripId: string }) {
                 <Text color="$foreground">파일 선택</Text>
               </YStack>
             </YStack>
-          </YStack>
+          </YCard>
         </Pressable>
 
         {selectedDocument && (
           <YStack marginTop="$4" gap="$2">
-            <XStack
-              backgroundColor="$card"
-              borderRadius="$4"
-              padding="$3"
-              alignItems="center"
-              justifyContent="space-between"
-              borderWidth={1}
-              borderColor="$border"
-            >
+            <XCard padding="$3" alignItems="center" justifyContent="space-between">
               <XStack alignItems="center" gap="$3" flex={1}>
                 <YStack
                   width={40}
@@ -115,7 +99,7 @@ export function TripDocumentsTab({ tripId }: { tripId: string }) {
               <Pressable onPress={() => removeFile(1)} style={{ padding: 8 }}>
                 <X size={16} color="$destructive" />
               </Pressable>
-            </XStack>
+            </XCard>
 
             <FilledButton
               marginTop="$3"

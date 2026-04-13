@@ -68,9 +68,6 @@ export function ExpensesView() {
             </Text>
             {expenses.length === 0 ? (
               <YStack alignItems="center" paddingVertical={32}>
-                <Text fontSize={48} marginBottom="$3">
-                  🛍️
-                </Text>
                 <Text color="$mutedForeground">아직 지출 내역이 없습니다</Text>
               </YStack>
             ) : (

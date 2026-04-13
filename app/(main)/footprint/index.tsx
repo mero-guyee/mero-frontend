@@ -106,19 +106,6 @@ export default function FootprintListScreen() {
     );
   };
 
-  const renderSectionHeader = ({ section }: { section: FootprintSection }) => (
-    <YStack
-      backgroundColor="$card"
-      paddingHorizontal="$5"
-      paddingVertical="$3"
-      borderBottomWidth={2}
-      borderBottomColor="$border"
-      style={{ borderBottomColor: 'rgba(155, 196, 209, 0.2)' }}
-    >
-      <Text color="$foreground">📅 {section.title}</Text>
-    </YStack>
-  );
-
   const renderEmptyList = () => (
     <YStack
       flex={1}
@@ -176,7 +163,6 @@ export default function FootprintListScreen() {
         sections={footprintsByMonth}
         keyExtractor={(item) => item.id}
         renderItem={renderFootprintItem}
-        renderSectionHeader={renderSectionHeader}
         ListEmptyComponent={renderEmptyList}
         contentContainerStyle={{
           paddingHorizontal: 16,

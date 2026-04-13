@@ -21,7 +21,6 @@ export default function ExpenseDayTotal({
         paddingHorizontal="$1"
       >
         <Text color="$foreground">
-          📅{' '}
           {new Date(date).toLocaleDateString('ko-KR', {
             year: 'numeric',
             month: 'long',
