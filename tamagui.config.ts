@@ -180,6 +180,15 @@ const animations = createAnimations({
     damping: 20,
     stiffness: 60,
   },
+  pressed: {
+    type: 'timing',
+    duration: 1500,
+  },
+  slowReturn: {
+    damping: 60, // 높을수록 진동 없이 부드럽게 감속
+    mass: 1,
+    stiffness: 40, // 낮을수록 느리게 복귀
+  },
 });
 
 export const config = createTamagui({
