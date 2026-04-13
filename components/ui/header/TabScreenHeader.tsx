@@ -17,7 +17,7 @@ export default function TabScreenHeader({
       backgroundColor="$card"
       paddingTop={insets.top}
       paddingHorizontal="$4"
-      paddingBottom="$2"
+      paddingBottom="$1"
       borderBottomWidth={2}
       borderBottomColor="$primary"
       style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}

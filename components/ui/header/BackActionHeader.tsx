@@ -17,8 +17,9 @@ export default function BackActionHeader({
   return (
     <XStack
       backgroundColor="$card"
-      paddingTop={10 + insets.top}
-      paddingHorizontal="$4"
+      paddingTop={insets.top}
+      paddingBottom="$1"
+      paddingHorizontal="$3"
       borderBottomWidth={2}
       borderBottomColor="$primary"
       style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}

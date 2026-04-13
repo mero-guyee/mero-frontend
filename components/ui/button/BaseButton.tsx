@@ -17,9 +17,10 @@ export const CircularButton = styled(TamaguiButton, {
 });
 
 export const IconButton = styled(FilledButton, {
-  size: '$2',
-  height: '$12',
+  size: '$1',
+  height: '$10',
   borderRadius: '$4',
-  backgroundColor: 'transparent',
+  backgroundColor: '$transparent',
   pressStyle: { backgroundColor: '$backgroundPress' },
+  hitSlop: 25,
 });
