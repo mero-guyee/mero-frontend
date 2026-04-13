@@ -1,3 +1,4 @@
+import { YCard } from '@/components/ui/Card';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { Bell, ChevronRight, Globe, HelpCircle, Lock, Tag, User } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
@@ -74,19 +75,13 @@ export default function SettingsScreen() {
           <Text color="$mutedForeground" marginBottom="$3">
             계정
           </Text>
-          <YStack
-            backgroundColor="$card"
-            borderRadius="$4"
-            overflow="hidden"
-            borderWidth={1}
-            borderColor="$border"
-          >
+          <YCard borderRadius="$4">
             <SettingItem
               icon={<User size={20} color="$foreground" />}
               label="프로필 설정"
               onPress={() => handleComingSoon('프로필 설정')}
             />
-          </YStack>
+          </YCard>
         </YStack>
 
         {/* Expense Section */}
@@ -94,19 +89,13 @@ export default function SettingsScreen() {
           <Text color="$mutedForeground" marginBottom="$3">
             경비
           </Text>
-          <YStack
-            backgroundColor="$card"
-            borderRadius="$4"
-            overflow="hidden"
-            borderWidth={1}
-            borderColor="$border"
-          >
+          <YCard borderRadius="$4">
             <SettingItem
               icon={<Tag size={20} color="$foreground" />}
               label="카테고리 관리"
               onPress={handleManageCategories}
             />
-          </YStack>
+          </YCard>
         </YStack>
 
         {/* General Section */}
@@ -114,13 +103,7 @@ export default function SettingsScreen() {
           <Text color="$mutedForeground" marginBottom="$3">
             일반
           </Text>
-          <YStack
-            backgroundColor="$card"
-            borderRadius="$4"
-            overflow="hidden"
-            borderWidth={1}
-            borderColor="$border"
-          >
+          <YCard borderRadius="$4">
             <SettingItem
               icon={<Globe size={20} color="$foreground" />}
               label="언어 설정"
@@ -132,7 +115,7 @@ export default function SettingsScreen() {
               label="알림 설정"
               onPress={() => handleComingSoon('알림 설정')}
             />
-          </YStack>
+          </YCard>
         </YStack>
 
         {/* Security Section */}
@@ -140,19 +123,13 @@ export default function SettingsScreen() {
           <Text color="$mutedForeground" marginBottom="$3">
             보안
           </Text>
-          <YStack
-            backgroundColor="$card"
-            borderRadius="$4"
-            overflow="hidden"
-            borderWidth={1}
-            borderColor="$border"
-          >
+          <YCard borderRadius="$4">
             <SettingItem
               icon={<Lock size={20} color="$foreground" />}
               label="개인정보 보호"
               onPress={() => handleComingSoon('개인정보 보호')}
             />
-          </YStack>
+          </YCard>
         </YStack>
 
         {/* Support Section */}
@@ -160,13 +137,7 @@ export default function SettingsScreen() {
           <Text color="$mutedForeground" marginBottom="$3">
             지원
           </Text>
-          <YStack
-            backgroundColor="$card"
-            borderRadius="$4"
-            overflow="hidden"
-            borderWidth={1}
-            borderColor="$border"
-          >
+          <YCard borderRadius="$4">
             <SettingItem
               icon={<HelpCircle size={20} color="$foreground" />}
               label="도움말"
@@ -178,7 +149,7 @@ export default function SettingsScreen() {
               label="앱 정보"
               onPress={() => handleComingSoon('앱 정보')}
             />
-          </YStack>
+          </YCard>
         </YStack>
 
         {/* Logout Button */}

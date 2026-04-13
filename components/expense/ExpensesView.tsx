@@ -4,6 +4,7 @@ import { ScrollView } from 'react-native';
 import { Text, YStack } from 'tamagui';
 import { useExpenses, useTrips } from '../../contexts';
 import { Expense } from '../../types';
+import { YCard } from '../ui/Card';
 import { ExpenseCard } from './ExpenseCard';
 import ExpenseDayTotal from './ExpenseDayTotal';
 import ExpenseTotalByCurrency from './ExpenseTotalByCurrency';
@@ -43,13 +44,7 @@ export function ExpensesView() {
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
         <YStack gap="$4">
           {Object.keys(expensesByCurrency).length > 0 && (
-            <YStack
-              backgroundColor="$card"
-              borderRadius="$6"
-              padding="$5"
-              borderWidth={1}
-              borderColor="$border"
-            >
+            <YCard padding="$5">
               <Text color="$foreground" fontSize={16} fontWeight="600" marginBottom="$1">
                 화폐별 총액
               </Text>
@@ -61,16 +56,10 @@ export function ExpensesView() {
                   <ExpenseTotalByCurrency key={currency} currency={currency} amount={amount} />
                 ))}
               </YStack>
-            </YStack>
+            </YCard>
           )}
 
-          <YStack
-            backgroundColor="$card"
-            borderRadius="$6"
-            padding="$5"
-            borderWidth={1}
-            borderColor="$border"
-          >
+          <YCard padding="$5">
             <Text color="$foreground" fontSize={16} fontWeight="600" marginBottom="$1">
               지출 내역
             </Text>
@@ -100,7 +89,7 @@ export function ExpensesView() {
                 })}
               </YStack>
             )}
-          </YStack>
+          </YCard>
         </YStack>
       </ScrollView>
     </YStack>

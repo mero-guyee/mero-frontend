@@ -6,6 +6,7 @@ import { useBudgets, useExpenses, useTrips } from '../../contexts';
 import { CURRENCY_NAMES, CURRENCY_SYMBOLS } from '../../data/constants';
 import { Budget } from '../../types';
 import { CircularButton, FilledButton, Input } from '../ui';
+import { YCard } from '../ui/Card';
 
 export function BudgetView() {
   const { activeTrip } = useTrips();
@@ -81,28 +82,14 @@ export function BudgetView() {
           </YStack>
 
           {!activeTrip ? (
-            <YStack
-              backgroundColor="$card"
-              borderRadius="$6"
-              padding={40}
-              alignItems="center"
-              borderWidth={1}
-              borderColor="$border"
-            >
+            <YCard padding="$10" alignItems="center">
               <Text fontSize={48} marginBottom="$3">
                 🎒
               </Text>
               <Text color="$mutedForeground">여행을 선택해주세요</Text>
-            </YStack>
+            </YCard>
           ) : filteredBudgets.length === 0 ? (
-            <YStack
-              backgroundColor="$card"
-              borderRadius="$6"
-              padding={40}
-              alignItems="center"
-              borderWidth={1}
-              borderColor="$border"
-            >
+            <YCard padding="$10" alignItems="center">
               <Text fontSize={48} marginBottom="$3">
                 💰
               </Text>
@@ -123,7 +110,7 @@ export function BudgetView() {
                   첫 예산 추가하기
                 </Text>
               </FilledButton>
-            </YStack>
+            </YCard>
           ) : (
             <YStack gap="$3">
               {filteredBudgets.map((budget) => {
@@ -132,14 +119,7 @@ export function BudgetView() {
                 const isOverBudget = percentage > 100;
 
                 return (
-                  <YStack
-                    key={budget.id}
-                    backgroundColor="$card"
-                    borderRadius="$6"
-                    padding="$5"
-                    borderWidth={1}
-                    borderColor="$border"
-                  >
+                  <YCard key={budget.id} padding="$5">
                     <XStack
                       alignItems="flex-start"
                       justifyContent="space-between"
@@ -239,7 +219,7 @@ export function BudgetView() {
                           : `${getCurrencySymbol(budget.currency)} ${(budget.amount - spent).toLocaleString()} 남음`}
                       </Text>
                     </XStack>
-                  </YStack>
+                  </YCard>
                 );
               })}
             </YStack>

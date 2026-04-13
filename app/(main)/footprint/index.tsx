@@ -1,4 +1,5 @@
 import PlusButton from '@/components/ui/button/PlusButton';
+import { XCard } from '@/components/ui/Card';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { Plus, Search } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
@@ -75,15 +76,7 @@ export default function FootprintListScreen() {
     const firstLocation = footprint.locations[0];
     return (
       <Pressable onPress={() => handleSelectFootprint(footprint.id)}>
-        <XStack
-          backgroundColor="$card"
-          borderRadius="$6"
-          padding="$4"
-          gap="$3"
-          marginBottom="$3"
-          borderWidth={2}
-          borderColor="$border"
-        >
+        <XCard padding="$4" gap="$3" marginBottom="$3">
           {footprint.photoUrls[0] && (
             <Image
               source={{ uri: footprint.photoUrls[0] }}
@@ -108,7 +101,7 @@ export default function FootprintListScreen() {
               {footprint.content}
             </Text>
           </YStack>
-        </XStack>
+        </XCard>
       </Pressable>
     );
   };

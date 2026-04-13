@@ -1,7 +1,8 @@
+import { YCard } from '@/components/ui/Card';
 import { Memo } from '@/types';
 import { Trash2 } from '@tamagui/lucide-icons';
 import { Pressable } from 'react-native';
-import { Text, XStack, YStack } from 'tamagui';
+import { Text, XStack } from 'tamagui';
 
 export default function MemoCard({
   memo,
@@ -15,13 +16,7 @@ export default function MemoCard({
   const { id, title, content } = memo;
   return (
     <Pressable key={id} onPress={() => onPress(memo.id)}>
-      <YStack
-        backgroundColor="$card"
-        borderRadius="$6"
-        padding="$4"
-        borderWidth={1}
-        borderColor="$border"
-      >
+      <YCard padding="$4">
         <XStack alignItems="flex-start" justifyContent="space-between" marginBottom="$2">
           <Text color="$foreground" fontWeight="500" flex={1} paddingRight="$2">
             {title}
@@ -39,7 +34,7 @@ export default function MemoCard({
         <Text color="$mutedForeground" fontSize={14} numberOfLines={2} marginBottom="$2">
           {content}
         </Text>
-      </YStack>
+      </YCard>
     </Pressable>
   );
 }
