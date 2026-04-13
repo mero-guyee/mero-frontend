@@ -1,3 +1,4 @@
+import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import { XCard } from '@/components/ui/Card';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { Plus, Search } from '@tamagui/lucide-icons';
@@ -6,7 +7,7 @@ import { useMemo, useState } from 'react';
 import { Pressable, SectionList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image, Text, XStack, YStack } from 'tamagui';
-import { CircularButton, FilledButton, Input } from '../../../components/ui';
+import { CircularButton, Input } from '../../../components/ui';
 import { useExpenses, useFootprints, useTrips } from '../../../contexts';
 import { Footprint } from '../../../types';
 
@@ -124,7 +125,7 @@ export default function FootprintListScreen() {
   );
 
   return (
-    <YStack flex={1} backgroundColor="$background">
+    <YStack flex={1} backgroundColor="$background" position="relative">
       {/* App Bar */}
       <TabScreenHeader label="일지">
         <XStack alignItems="center" gap="$4">
@@ -134,9 +135,6 @@ export default function FootprintListScreen() {
           >
             <Search size="$7" color="$foreground" />
           </CircularButton>
-          <FilledButton onPress={handleCreateFootprint}>
-            <Plus size={20} color="$foreground" />
-          </FilledButton>
         </XStack>
       </TabScreenHeader>
       {showSearch && (
@@ -171,6 +169,12 @@ export default function FootprintListScreen() {
         }}
         stickySectionHeadersEnabled={true}
       />
+      <FloatingActionButton onPress={handleCreateFootprint}>
+        <XStack alignItems="center" gap="$2">
+          <Plus />
+          <Text>새 일지</Text>
+        </XStack>
+      </FloatingActionButton>
     </YStack>
   );
 }

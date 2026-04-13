@@ -1,9 +1,11 @@
+import { Plus } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { ScrollView } from 'react-native';
-import { Text, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { useExpenses, useTrips } from '../../contexts';
 import { Expense } from '../../types';
+import FloatingActionButton from '../ui/button/FloatingActionButton';
 import { YCard } from '../ui/Card';
 import { ExpenseCard } from './ExpenseCard';
 import ExpenseDayTotal from './ExpenseDayTotal';
@@ -39,8 +41,12 @@ export function ExpensesView() {
       );
   }, [expenses]);
 
+  const handleAddExpense = () => {
+    router.push({ pathname: '/expense/new', params: { tripId: activeTrip } });
+  };
+
   return (
-    <YStack flex={1}>
+    <YStack flex={1} position="relative">
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
         <YStack gap="$4">
           {Object.keys(expensesByCurrency).length > 0 && (
@@ -89,6 +95,12 @@ export function ExpensesView() {
           </YCard>
         </YStack>
       </ScrollView>
+      <FloatingActionButton onPress={() => handleAddExpense()}>
+        <XStack alignItems="center" gap="$2">
+          <Plus />
+          <Text>지출 내역 추가</Text>
+        </XStack>
+      </FloatingActionButton>
     </YStack>
   );
 }

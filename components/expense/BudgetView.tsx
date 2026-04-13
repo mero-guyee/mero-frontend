@@ -1,4 +1,4 @@
-import { Edit3, Trash2, X } from '@tamagui/lucide-icons';
+import { Edit3, Plus, Trash2, X } from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
@@ -7,6 +7,7 @@ import { CURRENCY_NAMES, CURRENCY_SYMBOLS } from '../../data/constants';
 import { Budget } from '../../types';
 import { CircularButton, FilledButton, Input } from '../ui';
 import { YCard } from '../ui/Card';
+import FloatingActionButton from '../ui/button/FloatingActionButton';
 
 export function BudgetView() {
   const { activeTrip } = useTrips();
@@ -228,22 +229,12 @@ export function BudgetView() {
       </ScrollView>
 
       {activeTrip && (
-        <Pressable
-          onPress={() => handleOpenBudgetModal()}
-          style={{
-            position: 'absolute',
-            bottom: 100,
-            right: 20,
-            width: 56,
-            height: 56,
-            backgroundColor: '#C8DEE6',
-            borderRadius: 28,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text fontSize={24}>+</Text>
-        </Pressable>
+        <FloatingActionButton onPress={() => handleOpenBudgetModal()}>
+          <XStack alignItems="center" gap="$2">
+            <Plus />
+            <Text>예산 추가</Text>
+          </XStack>
+        </FloatingActionButton>
       )}
 
       <Modal visible={showBudgetModal} transparent animationType="fade">
