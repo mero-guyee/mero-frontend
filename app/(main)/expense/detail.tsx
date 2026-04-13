@@ -1,3 +1,4 @@
+import { IconButton } from '@/components/ui/button/BaseButton';
 import { ArrowLeft, MoreVertical } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -58,9 +59,9 @@ export default function ExpenseDetailScreen() {
           alignItems="center"
           justifyContent="space-between"
         >
-          <CircularButton onPress={() => router.back()}>
+          <IconButton onPress={() => router.back()}>
             <ArrowLeft size={20} color="$foreground" />
-          </CircularButton>
+          </IconButton>
           <Text color="$foreground" fontSize={16} fontWeight="500">
             경비 상세
           </Text>

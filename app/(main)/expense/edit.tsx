@@ -1,3 +1,4 @@
+import { IconButton } from '@/components/ui/button/BaseButton';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ArrowLeft } from '@tamagui/lucide-icons';
@@ -6,7 +7,7 @@ import { useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
-import { CircularButton, Input } from '../../../components/ui';
+import { Input } from '../../../components/ui';
 import { useExpenses } from '../../../contexts';
 
 const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY', 'GBP', 'CNY', 'THB', 'VND', 'PEN', 'BRL'];
@@ -79,9 +80,9 @@ export default function ExpenseEditScreen() {
         borderBottomColor="$primary"
         style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
       >
-        <CircularButton onPress={() => router.back()}>
+        <IconButton onPress={() => router.back()}>
           <ArrowLeft size={20} color="$foreground" />
-        </CircularButton>
+        </IconButton>
         <Text color="$foreground" fontSize={16} fontWeight="500">
           경비 수정
         </Text>

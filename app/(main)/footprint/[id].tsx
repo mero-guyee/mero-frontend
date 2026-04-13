@@ -1,3 +1,4 @@
+import { IconButton } from '@/components/ui/button/BaseButton';
 import More from '@/components/ui/More';
 import { formattedLocation } from '@/utils/location/location';
 import { ArrowLeft, Cloud, MapPin } from '@tamagui/lucide-icons';
@@ -6,7 +7,7 @@ import { useMemo, useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image, Text, XStack, YStack } from 'tamagui';
-import { CircularButton, FilledButton } from '../../../components/ui';
+import { FilledButton } from '../../../components/ui';
 import { useExpenses, useFootprints, useTrips } from '../../../contexts';
 
 export default function FootprintDetailScreen() {
@@ -114,9 +115,9 @@ export default function FootprintDetailScreen() {
         borderBottomColor="$primary"
         style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
       >
-        <CircularButton onPress={() => router.back()}>
+        <IconButton onPress={() => router.back()}>
           <ArrowLeft size={20} color="$foreground" />
-        </CircularButton>
+        </IconButton>
         <Text flex={1} textAlign="center" color="$foreground" fontSize={16} fontWeight="500">
           {new Date(footprint.date).toLocaleDateString('ko-KR', {
             month: 'long',

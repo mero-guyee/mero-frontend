@@ -1,3 +1,4 @@
+import { IconButton } from '@/components/ui/button/BaseButton';
 import { ArrowLeft, Edit3, GripVertical, Plus, Trash2 } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -58,9 +59,9 @@ export default function CategoryManagerScreen() {
           alignItems="center"
           justifyContent="space-between"
         >
-          <CircularButton onPress={() => router.back()}>
+          <IconButton onPress={() => router.back()}>
             <ArrowLeft size={20} color="$foreground" />
-          </CircularButton>
+          </IconButton>
           <Text color="$foreground" fontSize={16} fontWeight="500">
             카테고리 관리
           </Text>

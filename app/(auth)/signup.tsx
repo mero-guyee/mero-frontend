@@ -1,3 +1,4 @@
+import { IconButton } from '@/components/ui/button/BaseButton';
 import { ArrowLeft, ChevronDown, DollarSign, Globe, Lock, Mail, User } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -5,7 +6,7 @@ import { Alert, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
 import { authApi, Currency, Timezone } from '../../api';
-import { CircularButton, FilledButton, Input } from '../../components/ui';
+import { FilledButton, Input } from '../../components/ui';
 import { useAuth } from '../../contexts';
 
 const CURRENCIES: { value: Currency; label: string }[] = [
@@ -77,13 +78,9 @@ export default function SignUpScreen() {
         <YStack width="100%" maxWidth={400} alignSelf="center">
           {/* Header */}
           <XStack alignItems="center" marginBottom="$6" marginTop="$4">
-            <CircularButton
-              backgroundColor="$card"
-              pressStyle={{ backgroundColor: '$muted' }}
-              onPress={handleBackToLogin}
-            >
+            <IconButton onPress={handleBackToLogin}>
               <ArrowLeft size={20} color="$foreground" />
-            </CircularButton>
+            </IconButton>
             <Text marginLeft="$4" fontSize={20} fontWeight="600" color="$foreground">
               회원가입
             </Text>
