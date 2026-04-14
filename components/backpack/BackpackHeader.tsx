@@ -14,7 +14,7 @@ export default function BackpackHeader({ trip }: { trip: Trip }) {
   };
 
   const handleEdit = () => {
-    router.navigate(`/trips/${trip.id}/edit`);
+    router.navigate(`/backpack/edit`);
   };
 
   const handleDelete = () => {
