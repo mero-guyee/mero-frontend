@@ -1,4 +1,5 @@
 import { ExpenseSubTabs } from '@/components/expense/ExpenseSubTabs';
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { useState } from 'react';
 import { YStack } from 'tamagui';
@@ -15,8 +16,7 @@ export default function ExpenseScreen() {
       <TabScreenHeader label="지갑" />
 
       <ExpenseSubTabs activeTab={activeTab} onTabChange={setActiveTab} />
-
-      {activeTab === 'expenses' ? <ExpensesView /> : <BudgetView />}
+      <FadeWrapper>{activeTab === 'expenses' ? <ExpensesView /> : <BudgetView />}</FadeWrapper>
     </YStack>
   );
 }

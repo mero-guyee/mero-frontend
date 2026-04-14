@@ -3,6 +3,7 @@ import { TripStatus } from '@/types';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import { useIsFocused } from '@react-navigation/native';
 import { Plane } from '@tamagui/lucide-icons';
 import { FlatList } from 'react-native';
@@ -62,16 +63,18 @@ export default function TripListScreen() {
         onSettings={handleSettings}
         onCreateTrip={handleCreateTrip}
       />
-      <FlatList
-        data={filteredAndSortedTrips}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={{ padding: paddingHorizontalGeneral }}
-        renderItem={({ item }) => (
-          <TripCard trip={item} onPress={() => handleSelectTrip(item.id)} />
-        )}
-        ListEmptyComponent={<TripEmptyState onCreateTrip={handleCreateTrip} />}
-        showsVerticalScrollIndicator={false}
-      />
+      <FadeWrapper>
+        <FlatList
+          data={filteredAndSortedTrips}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ padding: paddingHorizontalGeneral }}
+          renderItem={({ item }) => (
+            <TripCard trip={item} onPress={() => handleSelectTrip(item.id)} />
+          )}
+          ListEmptyComponent={<TripEmptyState onCreateTrip={handleCreateTrip} />}
+          showsVerticalScrollIndicator={false}
+        />
+      </FadeWrapper>
     </YStack>
   );
 }

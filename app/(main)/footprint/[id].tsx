@@ -1,4 +1,5 @@
 import { IconButton } from '@/components/ui/button/BaseButton';
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import More from '@/components/ui/More';
 import { formattedLocation } from '@/utils/location/location';
 import { ArrowLeft, Cloud, MapPin } from '@tamagui/lucide-icons';
@@ -142,130 +143,135 @@ export default function FootprintDetailScreen() {
         </More>
       </XStack>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
-        {/* Title */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" fontSize={20} fontWeight="600" marginBottom="$2">
-            {footprint.title}
-          </Text>
-          <YStack height={1} backgroundColor="$border" opacity={0.3} />
-        </YStack>
-
-        {/* Location & Weather */}
-        <YStack gap="$2" marginBottom="$6">
-          {footprint.locations.map((loc, i) => (
-            <XStack key={i} alignItems="center" gap="$2">
-              <MapPin size={16} color="$foreground" />
-              <Text color="$foreground">{formattedLocation(loc)}</Text>
-            </XStack>
-          ))}
-          {footprint.weatherInfo && (
-            <XStack alignItems="center" gap="$2">
-              <Cloud size={16} color="$foreground" />
-              <Text color="$foreground">{footprint.weatherInfo}</Text>
-            </XStack>
-          )}
-        </YStack>
-
-        <YStack height={1} backgroundColor="$border" opacity={0.3} marginBottom="$6" />
-
-        {/* Content with Photos */}
-        <YStack gap="$4" marginBottom="$6">
-          {contentWithPhotos.map((item, idx) => (
-            <YStack key={idx}>
-              {item.type === 'text' ? (
-                <Text color="$foreground" lineHeight={24}>
-                  {item.content}
-                </Text>
-              ) : (
-                <Pressable onPress={() => setSelectedPhoto(item.content)}>
-                  <YStack
-                    aspectRatio={4 / 3}
-                    overflow="hidden"
-                    borderRadius="$4"
-                    borderWidth={2}
-                    borderColor="$border"
-                    marginVertical="$4"
-                  >
-                    <Image
-                      source={{ uri: item.content }}
-                      width="100%"
-                      height="100%"
-                      resizeMode="cover"
-                    />
-                  </YStack>
-                </Pressable>
-              )}
-            </YStack>
-          ))}
-        </YStack>
-
-        <YStack height={1} backgroundColor="$border" opacity={0.3} marginBottom="$6" />
-
-        {/* Expenses */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" fontSize={16} fontWeight="600" marginBottom="$3">
-            💰 사용한 돈
-          </Text>
-          {expenses.length > 0 ? (
-            <YStack
-              backgroundColor="$card"
-              borderRadius="$4"
-              borderWidth={1}
-              borderColor="$border"
-              overflow="hidden"
-            >
-              {expenses.map((expense, index) => (
-                <YStack
-                  key={expense.id}
-                  padding="$4"
-                  borderBottomWidth={index < expenses.length - 1 ? 1 : 0}
-                  borderBottomColor="$border"
-                >
-                  <XStack alignItems="flex-start" justifyContent="space-between" marginBottom="$1">
-                    <Text color="$foreground">{expense.description || '지출'}</Text>
-                    <Pressable onPress={() => handleDeleteExpense(expense.id)}>
-                      <Text color="$destructive" fontSize={14}>
-                        삭제
-                      </Text>
-                    </Pressable>
-                  </XStack>
-                  <Text color="$foreground">
-                    {expense.currency} {expense.amount.toLocaleString()}
-                  </Text>
-                </YStack>
-              ))}
-              <YStack padding="$4" borderTopWidth={1} borderTopColor="$border">
-                <XStack justifyContent="space-between">
-                  <Text color="$foreground" fontWeight="500">
-                    합계
-                  </Text>
-                  <Text color="$foreground" fontWeight="500">
-                    {currency} {totalExpense.toLocaleString()}
-                  </Text>
-                </XStack>
-              </YStack>
-            </YStack>
-          ) : (
-            <YStack
-              backgroundColor="$card"
-              borderRadius="$4"
-              padding="$4"
-              alignItems="center"
-              borderWidth={1}
-              borderColor="$border"
-            >
-              <Text color="$mutedForeground">지출 기록이 없습니다</Text>
-            </YStack>
-          )}
-          <FilledButton marginTop="$3" onPress={handleAddExpense}>
-            <Text color="$foreground" fontWeight="500">
-              + 지출 남기기
+      <FadeWrapper>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
+          {/* Title */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" fontSize={20} fontWeight="600" marginBottom="$2">
+              {footprint.title}
             </Text>
-          </FilledButton>
-        </YStack>
-      </ScrollView>
+            <YStack height={1} backgroundColor="$border" opacity={0.3} />
+          </YStack>
 
+          {/* Location & Weather */}
+          <YStack gap="$2" marginBottom="$6">
+            {footprint.locations.map((loc, i) => (
+              <XStack key={i} alignItems="center" gap="$2">
+                <MapPin size={16} color="$foreground" />
+                <Text color="$foreground">{formattedLocation(loc)}</Text>
+              </XStack>
+            ))}
+            {footprint.weatherInfo && (
+              <XStack alignItems="center" gap="$2">
+                <Cloud size={16} color="$foreground" />
+                <Text color="$foreground">{footprint.weatherInfo}</Text>
+              </XStack>
+            )}
+          </YStack>
+
+          <YStack height={1} backgroundColor="$border" opacity={0.3} marginBottom="$6" />
+
+          {/* Content with Photos */}
+          <YStack gap="$4" marginBottom="$6">
+            {contentWithPhotos.map((item, idx) => (
+              <YStack key={idx}>
+                {item.type === 'text' ? (
+                  <Text color="$foreground" lineHeight={24}>
+                    {item.content}
+                  </Text>
+                ) : (
+                  <Pressable onPress={() => setSelectedPhoto(item.content)}>
+                    <YStack
+                      aspectRatio={4 / 3}
+                      overflow="hidden"
+                      borderRadius="$4"
+                      borderWidth={2}
+                      borderColor="$border"
+                      marginVertical="$4"
+                    >
+                      <Image
+                        source={{ uri: item.content }}
+                        width="100%"
+                        height="100%"
+                        resizeMode="cover"
+                      />
+                    </YStack>
+                  </Pressable>
+                )}
+              </YStack>
+            ))}
+          </YStack>
+
+          <YStack height={1} backgroundColor="$border" opacity={0.3} marginBottom="$6" />
+
+          {/* Expenses */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" fontSize={16} fontWeight="600" marginBottom="$3">
+              💰 사용한 돈
+            </Text>
+            {expenses.length > 0 ? (
+              <YStack
+                backgroundColor="$card"
+                borderRadius="$4"
+                borderWidth={1}
+                borderColor="$border"
+                overflow="hidden"
+              >
+                {expenses.map((expense, index) => (
+                  <YStack
+                    key={expense.id}
+                    padding="$4"
+                    borderBottomWidth={index < expenses.length - 1 ? 1 : 0}
+                    borderBottomColor="$border"
+                  >
+                    <XStack
+                      alignItems="flex-start"
+                      justifyContent="space-between"
+                      marginBottom="$1"
+                    >
+                      <Text color="$foreground">{expense.description || '지출'}</Text>
+                      <Pressable onPress={() => handleDeleteExpense(expense.id)}>
+                        <Text color="$destructive" fontSize={14}>
+                          삭제
+                        </Text>
+                      </Pressable>
+                    </XStack>
+                    <Text color="$foreground">
+                      {expense.currency} {expense.amount.toLocaleString()}
+                    </Text>
+                  </YStack>
+                ))}
+                <YStack padding="$4" borderTopWidth={1} borderTopColor="$border">
+                  <XStack justifyContent="space-between">
+                    <Text color="$foreground" fontWeight="500">
+                      합계
+                    </Text>
+                    <Text color="$foreground" fontWeight="500">
+                      {currency} {totalExpense.toLocaleString()}
+                    </Text>
+                  </XStack>
+                </YStack>
+              </YStack>
+            ) : (
+              <YStack
+                backgroundColor="$card"
+                borderRadius="$4"
+                padding="$4"
+                alignItems="center"
+                borderWidth={1}
+                borderColor="$border"
+              >
+                <Text color="$mutedForeground">지출 기록이 없습니다</Text>
+              </YStack>
+            )}
+            <FilledButton marginTop="$3" onPress={handleAddExpense}>
+              <Text color="$foreground" fontWeight="500">
+                + 지출 남기기
+              </Text>
+            </FilledButton>
+          </YStack>
+        </ScrollView>
+      </FadeWrapper>
       {/* Photo Modal */}
       <Modal visible={!!selectedPhoto} transparent animationType="fade">
         <Pressable

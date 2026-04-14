@@ -1,5 +1,6 @@
 import { IconButton } from '@/components/ui/button/BaseButton';
 import SubmitButton from '@/components/ui/button/SubmitButton';
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { ArrowLeft } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -89,42 +90,131 @@ export default function ExpenseEditScreen() {
         <SubmitButton onPress={handleSubmit} />
       </XStack>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
-        {/* Date */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            날짜
-          </Text>
-          <Pressable onPress={() => setShowDatePicker(true)}>
-            <XStack
-              backgroundColor="$muted"
-              borderWidth={2}
-              borderColor="$border"
-              borderRadius="$4"
-              paddingHorizontal="$4"
-              paddingVertical="$3"
-              minHeight={48}
-              alignItems="center"
-            >
-              <Text color="$foreground">{date}</Text>
-            </XStack>
-          </Pressable>
-        </YStack>
-
-        {showDatePicker && (
-          <DateTimePicker
-            value={date ? new Date(date) : new Date()}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
-          />
-        )}
-
-        {/* Amount and Currency */}
-        <XStack gap="$3" marginBottom="$6">
-          <YStack flex={1}>
+      <FadeWrapper>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
+          {/* Date */}
+          <YStack marginBottom="$6">
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              금액
+              날짜
+            </Text>
+            <Pressable onPress={() => setShowDatePicker(true)}>
+              <XStack
+                backgroundColor="$muted"
+                borderWidth={2}
+                borderColor="$border"
+                borderRadius="$4"
+                paddingHorizontal="$4"
+                paddingVertical="$3"
+                minHeight={48}
+                alignItems="center"
+              >
+                <Text color="$foreground">{date}</Text>
+              </XStack>
+            </Pressable>
+          </YStack>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={date ? new Date(date) : new Date()}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
+            />
+          )}
+
+          {/* Amount and Currency */}
+          <XStack gap="$3" marginBottom="$6">
+            <YStack flex={1}>
+              <Text color="$foreground" marginBottom="$2" fontWeight="500">
+                금액
+              </Text>
+              <Input
+                backgroundColor="$muted"
+                borderWidth={2}
+                borderColor="$border"
+                borderRadius="$4"
+                paddingHorizontal="$4"
+                paddingVertical="$3"
+                placeholder="0"
+                placeholderTextColor="$mutedForeground"
+                value={amount}
+                onChangeText={setAmount}
+                keyboardType="numeric"
+                color="$foreground"
+              />
+            </YStack>
+            <YStack width={120}>
+              <Text color="$foreground" marginBottom="$2" fontWeight="500">
+                통화
+              </Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={{
+                  backgroundColor: '#F5EFE0',
+                  borderRadius: 16,
+                  borderWidth: 2,
+                  borderColor: 'rgba(155, 196, 209, 0.2)',
+                  height: 48,
+                }}
+                contentContainerStyle={{ alignItems: 'center', paddingHorizontal: 8 }}
+              >
+                <XStack gap="$1">
+                  {CURRENCIES.map((curr) => (
+                    <Pressable key={curr} onPress={() => setCurrency(curr)}>
+                      <YStack
+                        paddingHorizontal="$2"
+                        paddingVertical="$1"
+                        borderRadius="$2"
+                        backgroundColor={currency === curr ? '$primary' : 'transparent'}
+                      >
+                        <Text color={currency === curr ? 'white' : '$foreground'} fontSize={12}>
+                          {curr}
+                        </Text>
+                      </YStack>
+                    </Pressable>
+                  ))}
+                </XStack>
+              </ScrollView>
+            </YStack>
+          </XStack>
+
+          {/* Category */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$3" fontWeight="500">
+              카테고리
+            </Text>
+            <XStack flexWrap="wrap" gap="$3">
+              {categories.map((cat) => (
+                <Pressable
+                  key={cat.id}
+                  onPress={() => setCategoryId(cat.id)}
+                  style={{ width: '22%' }}
+                >
+                  <YStack
+                    padding="$3"
+                    borderRadius="$4"
+                    borderWidth={2}
+                    borderColor={categoryId === cat.id ? '$primary' : '$border'}
+                    backgroundColor={categoryId === cat.id ? '$accent' : '$muted'}
+                    alignItems="center"
+                    gap="$1"
+                    opacity={categoryId === cat.id ? 0.8 : 1}
+                  >
+                    <Text fontSize={20}>{cat.icon}</Text>
+                    <Text color="$foreground" fontSize={12} textAlign="center" numberOfLines={1}>
+                      {cat.name}
+                    </Text>
+                  </YStack>
+                </Pressable>
+              ))}
+            </XStack>
+          </YStack>
+
+          {/* Description */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$2" fontWeight="500">
+              설명
             </Text>
             <Input
               backgroundColor="$muted"
@@ -133,122 +223,35 @@ export default function ExpenseEditScreen() {
               borderRadius="$4"
               paddingHorizontal="$4"
               paddingVertical="$3"
-              placeholder="0"
+              placeholder="예: 점심 식사"
               placeholderTextColor="$mutedForeground"
-              value={amount}
-              onChangeText={setAmount}
-              keyboardType="numeric"
+              value={description}
+              onChangeText={setDescription}
               color="$foreground"
             />
           </YStack>
-          <YStack width={120}>
+
+          {/* Location */}
+          <YStack marginBottom="$6">
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              통화
+              장소
             </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={{
-                backgroundColor: '#F5EFE0',
-                borderRadius: 16,
-                borderWidth: 2,
-                borderColor: 'rgba(155, 196, 209, 0.2)',
-                height: 48,
-              }}
-              contentContainerStyle={{ alignItems: 'center', paddingHorizontal: 8 }}
-            >
-              <XStack gap="$1">
-                {CURRENCIES.map((curr) => (
-                  <Pressable key={curr} onPress={() => setCurrency(curr)}>
-                    <YStack
-                      paddingHorizontal="$2"
-                      paddingVertical="$1"
-                      borderRadius="$2"
-                      backgroundColor={currency === curr ? '$primary' : 'transparent'}
-                    >
-                      <Text color={currency === curr ? 'white' : '$foreground'} fontSize={12}>
-                        {curr}
-                      </Text>
-                    </YStack>
-                  </Pressable>
-                ))}
-              </XStack>
-            </ScrollView>
+            <Input
+              backgroundColor="$muted"
+              borderWidth={2}
+              borderColor="$border"
+              borderRadius="$4"
+              paddingHorizontal="$4"
+              paddingVertical="$3"
+              placeholder="예: 마추픽추"
+              placeholderTextColor="$mutedForeground"
+              value={location}
+              onChangeText={setLocation}
+              color="$foreground"
+            />
           </YStack>
-        </XStack>
-
-        {/* Category */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$3" fontWeight="500">
-            카테고리
-          </Text>
-          <XStack flexWrap="wrap" gap="$3">
-            {categories.map((cat) => (
-              <Pressable
-                key={cat.id}
-                onPress={() => setCategoryId(cat.id)}
-                style={{ width: '22%' }}
-              >
-                <YStack
-                  padding="$3"
-                  borderRadius="$4"
-                  borderWidth={2}
-                  borderColor={categoryId === cat.id ? '$primary' : '$border'}
-                  backgroundColor={categoryId === cat.id ? '$accent' : '$muted'}
-                  alignItems="center"
-                  gap="$1"
-                  opacity={categoryId === cat.id ? 0.8 : 1}
-                >
-                  <Text fontSize={20}>{cat.icon}</Text>
-                  <Text color="$foreground" fontSize={12} textAlign="center" numberOfLines={1}>
-                    {cat.name}
-                  </Text>
-                </YStack>
-              </Pressable>
-            ))}
-          </XStack>
-        </YStack>
-
-        {/* Description */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            설명
-          </Text>
-          <Input
-            backgroundColor="$muted"
-            borderWidth={2}
-            borderColor="$border"
-            borderRadius="$4"
-            paddingHorizontal="$4"
-            paddingVertical="$3"
-            placeholder="예: 점심 식사"
-            placeholderTextColor="$mutedForeground"
-            value={description}
-            onChangeText={setDescription}
-            color="$foreground"
-          />
-        </YStack>
-
-        {/* Location */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            장소
-          </Text>
-          <Input
-            backgroundColor="$muted"
-            borderWidth={2}
-            borderColor="$border"
-            borderRadius="$4"
-            paddingHorizontal="$4"
-            paddingVertical="$3"
-            placeholder="예: 마추픽추"
-            placeholderTextColor="$mutedForeground"
-            value={location}
-            onChangeText={setLocation}
-            color="$foreground"
-          />
-        </YStack>
-      </ScrollView>
+        </ScrollView>
+      </FadeWrapper>
     </YStack>
   );
 }

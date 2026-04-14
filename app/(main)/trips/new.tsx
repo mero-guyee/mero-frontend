@@ -1,4 +1,5 @@
 import SubmitButton from '@/components/ui/button/SubmitButton';
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Image as ImageIcon, X } from '@tamagui/lucide-icons';
@@ -106,205 +107,212 @@ export default function NewTripScreen() {
         <SubmitButton onPress={handleSubmit} />
       </BackActionHeader>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            모험의 이름
-          </Text>
-          <Input
-            height={48}
-            backgroundColor="$muted"
-            borderWidth={2}
-            borderColor="$border"
-            borderRadius="$4"
-            paddingHorizontal="$4"
-            paddingVertical="$3"
-            placeholder="예: 2026 남미 여행"
-            placeholderTextColor="$mutedForeground"
-            value={title}
-            onChangeText={setTitle}
-            color="$foreground"
-          />
-        </YStack>
-
-        {/* Dates */}
-        <XStack gap="$4" marginBottom="$6">
-          <YStack flex={1}>
+      <FadeWrapper>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
+          <YStack marginBottom="$6">
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              출발일
+              모험의 이름
             </Text>
-            <Pressable onPress={() => setShowStartPicker(true)}>
-              <XStack
-                backgroundColor="$muted"
-                borderWidth={2}
-                borderColor="$border"
-                borderRadius="$4"
-                paddingHorizontal="$4"
-                paddingVertical="$3"
-                minHeight={48}
-                alignItems="center"
-              >
-                <Text color={startDate ? '$foreground' : '$mutedForeground'}>
-                  {startDate || 'YYYY-MM-DD'}
-                </Text>
-              </XStack>
-            </Pressable>
-          </YStack>
-          <YStack flex={1}>
-            <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              귀환일
-            </Text>
-            <Pressable onPress={() => setShowEndPicker(true)}>
-              <XStack
-                backgroundColor="$muted"
-                borderWidth={2}
-                borderColor="$border"
-                borderRadius="$4"
-                paddingHorizontal="$4"
-                paddingVertical="$3"
-                minHeight={48}
-                alignItems="center"
-              >
-                <Text color={endDate ? '$foreground' : '$mutedForeground'}>
-                  {endDate || 'YYYY-MM-DD'}
-                </Text>
-              </XStack>
-            </Pressable>
-          </YStack>
-        </XStack>
-
-        {showStartPicker && (
-          <DateTimePicker
-            value={startDate ? new Date(startDate) : new Date()}
-            mode="date"
-            display="default"
-            onChange={handleStartDateChange}
-          />
-        )}
-        {showEndPicker && (
-          <DateTimePicker
-            value={endDate ? new Date(endDate) : new Date()}
-            mode="date"
-            display="default"
-            onChange={handleEndDateChange}
-          />
-        )}
-
-        {/* Countries */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            거쳐갈 땅
-          </Text>
-          {countries.length > 0 && (
-            <XStack flexWrap="wrap" gap="$2" marginBottom="$3">
-              {countries.map((country) => (
-                <XStack
-                  key={country}
-                  alignItems="center"
-                  gap="$1"
-                  paddingHorizontal="$3"
-                  paddingVertical="$1.5"
-                  backgroundColor="$accent"
-                  borderRadius={20}
-                >
-                  <Text color="$foreground">{country}</Text>
-                  <Pressable onPress={() => handleRemoveCountry(country)}>
-                    <X size={12} color="$foreground" />
-                  </Pressable>
-                </XStack>
-              ))}
-            </XStack>
-          )}
-          <XStack gap="$2">
             <Input
-              flex={1}
+              height={48}
               backgroundColor="$muted"
               borderWidth={2}
               borderColor="$border"
               borderRadius="$4"
               paddingHorizontal="$4"
               paddingVertical="$3"
-              placeholder="국가명을 입력하세요"
+              placeholder="예: 2026 남미 여행"
               placeholderTextColor="$mutedForeground"
-              value={newCountry}
-              onChangeText={setNewCountry}
+              value={title}
+              onChangeText={setTitle}
               color="$foreground"
-              onSubmitEditing={handleAddCountry}
             />
-            <FilledButton paddingHorizontal="$4" paddingVertical="$3" onPress={handleAddCountry}>
-              <Text color="$foreground" fontWeight="500">
-                추가
-              </Text>
-            </FilledButton>
-          </XStack>
-        </YStack>
+          </YStack>
 
-        {/* Cover Image */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            📸 대표 풍경
-          </Text>
-          <Pressable onPress={handleImagePick}>
-            <YStack
-              backgroundColor="$muted"
-              borderWidth={2}
-              borderColor="$border"
-              borderRadius="$4"
-              overflow="hidden"
-              minHeight={imageUrl ? undefined : 192}
-            >
-              {imageUrl ? (
-                <YStack position="relative" aspectRatio={16 / 9}>
-                  <Image source={{ uri: imageUrl }} width="100%" height="100%" resizeMode="cover" />
-                  <Pressable
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      setCoverImage('');
-                    }}
-                    style={{
-                      position: 'absolute',
-                      top: 12,
-                      right: 12,
-                      backgroundColor: '#E89B8F',
-                      borderRadius: 12,
-                      padding: 8,
-                    }}
-                  >
-                    <X size={16} color="white" />
-                  </Pressable>
-                </YStack>
-              ) : (
-                <YStack
-                  flex={1}
+          {/* Dates */}
+          <XStack gap="$4" marginBottom="$6">
+            <YStack flex={1}>
+              <Text color="$foreground" marginBottom="$2" fontWeight="500">
+                출발일
+              </Text>
+              <Pressable onPress={() => setShowStartPicker(true)}>
+                <XStack
+                  backgroundColor="$muted"
+                  borderWidth={2}
+                  borderColor="$border"
+                  borderRadius="$4"
+                  paddingHorizontal="$4"
+                  paddingVertical="$3"
+                  minHeight={48}
                   alignItems="center"
-                  justifyContent="center"
-                  padding="$6"
-                  minHeight={192}
                 >
-                  <YStack
-                    width={64}
-                    height={64}
+                  <Text color={startDate ? '$foreground' : '$mutedForeground'}>
+                    {startDate || 'YYYY-MM-DD'}
+                  </Text>
+                </XStack>
+              </Pressable>
+            </YStack>
+            <YStack flex={1}>
+              <Text color="$foreground" marginBottom="$2" fontWeight="500">
+                귀환일
+              </Text>
+              <Pressable onPress={() => setShowEndPicker(true)}>
+                <XStack
+                  backgroundColor="$muted"
+                  borderWidth={2}
+                  borderColor="$border"
+                  borderRadius="$4"
+                  paddingHorizontal="$4"
+                  paddingVertical="$3"
+                  minHeight={48}
+                  alignItems="center"
+                >
+                  <Text color={endDate ? '$foreground' : '$mutedForeground'}>
+                    {endDate || 'YYYY-MM-DD'}
+                  </Text>
+                </XStack>
+              </Pressable>
+            </YStack>
+          </XStack>
+
+          {showStartPicker && (
+            <DateTimePicker
+              value={startDate ? new Date(startDate) : new Date()}
+              mode="date"
+              display="default"
+              onChange={handleStartDateChange}
+            />
+          )}
+          {showEndPicker && (
+            <DateTimePicker
+              value={endDate ? new Date(endDate) : new Date()}
+              mode="date"
+              display="default"
+              onChange={handleEndDateChange}
+            />
+          )}
+
+          {/* Countries */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$2" fontWeight="500">
+              거쳐갈 땅
+            </Text>
+            {countries.length > 0 && (
+              <XStack flexWrap="wrap" gap="$2" marginBottom="$3">
+                {countries.map((country) => (
+                  <XStack
+                    key={country}
+                    alignItems="center"
+                    gap="$1"
+                    paddingHorizontal="$3"
+                    paddingVertical="$1.5"
                     backgroundColor="$accent"
-                    borderRadius={32}
+                    borderRadius={20}
+                  >
+                    <Text color="$foreground">{country}</Text>
+                    <Pressable onPress={() => handleRemoveCountry(country)}>
+                      <X size={12} color="$foreground" />
+                    </Pressable>
+                  </XStack>
+                ))}
+              </XStack>
+            )}
+            <XStack gap="$2">
+              <Input
+                flex={1}
+                backgroundColor="$muted"
+                borderWidth={2}
+                borderColor="$border"
+                borderRadius="$4"
+                paddingHorizontal="$4"
+                paddingVertical="$3"
+                placeholder="국가명을 입력하세요"
+                placeholderTextColor="$mutedForeground"
+                value={newCountry}
+                onChangeText={setNewCountry}
+                color="$foreground"
+                onSubmitEditing={handleAddCountry}
+              />
+              <FilledButton paddingHorizontal="$4" paddingVertical="$3" onPress={handleAddCountry}>
+                <Text color="$foreground" fontWeight="500">
+                  추가
+                </Text>
+              </FilledButton>
+            </XStack>
+          </YStack>
+
+          {/* Cover Image */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$2" fontWeight="500">
+              📸 대표 풍경
+            </Text>
+            <Pressable onPress={handleImagePick}>
+              <YStack
+                backgroundColor="$muted"
+                borderWidth={2}
+                borderColor="$border"
+                borderRadius="$4"
+                overflow="hidden"
+                minHeight={imageUrl ? undefined : 192}
+              >
+                {imageUrl ? (
+                  <YStack position="relative" aspectRatio={16 / 9}>
+                    <Image
+                      source={{ uri: imageUrl }}
+                      width="100%"
+                      height="100%"
+                      resizeMode="cover"
+                    />
+                    <Pressable
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        setCoverImage('');
+                      }}
+                      style={{
+                        position: 'absolute',
+                        top: 12,
+                        right: 12,
+                        backgroundColor: '#E89B8F',
+                        borderRadius: 12,
+                        padding: 8,
+                      }}
+                    >
+                      <X size={16} color="white" />
+                    </Pressable>
+                  </YStack>
+                ) : (
+                  <YStack
+                    flex={1}
                     alignItems="center"
                     justifyContent="center"
-                    marginBottom="$3"
-                    opacity={0.4}
+                    padding="$6"
+                    minHeight={192}
                   >
-                    <ImageIcon size={32} color="$primary" />
+                    <YStack
+                      width={64}
+                      height={64}
+                      backgroundColor="$accent"
+                      borderRadius={32}
+                      alignItems="center"
+                      justifyContent="center"
+                      marginBottom="$3"
+                      opacity={0.4}
+                    >
+                      <ImageIcon size={32} color="$primary" />
+                    </YStack>
+                    <Text color="$foreground" marginBottom="$1">
+                      이미지를 탭하여 업로드
+                    </Text>
+                    <Text color="$mutedForeground" fontSize={14}>
+                      PNG, JPG, WEBP 파일 지원
+                    </Text>
                   </YStack>
-                  <Text color="$foreground" marginBottom="$1">
-                    이미지를 탭하여 업로드
-                  </Text>
-                  <Text color="$mutedForeground" fontSize={14}>
-                    PNG, JPG, WEBP 파일 지원
-                  </Text>
-                </YStack>
-              )}
-            </YStack>
-          </Pressable>
-        </YStack>
-      </ScrollView>
+                )}
+              </YStack>
+            </Pressable>
+          </YStack>
+        </ScrollView>
+      </FadeWrapper>
     </YStack>
   );
 }

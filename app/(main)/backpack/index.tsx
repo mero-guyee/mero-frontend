@@ -2,6 +2,8 @@ import BackpackHeader from '@/components/backpack/BackpackHeader';
 import TripDetailCoverImage from '@/components/trips/detail/TripDetailCoverImage';
 import { TripDocumentsTab } from '@/components/trips/documents/TripDocumentsTab';
 import MemoTab from '@/components/trips/memos/MemoTab';
+import FadeWrapper from '@/components/ui/FadeWrapper';
+import Loading from '@/components/ui/Loading';
 import { useTripQuery } from '@/hooks/queries/useTrips';
 import { useState } from 'react';
 import { ScrollView } from 'react-native';
@@ -11,10 +13,14 @@ import { useMemos, useTrips } from '../../../contexts';
 
 export default function TripHomeScreen() {
   const { activeTrip } = useTrips();
-  const { data: trip } = useTripQuery(activeTrip || '');
+  const { data: trip, isLoading } = useTripQuery(activeTrip || '');
   const { memos } = useMemos();
 
   const [subTab, setSubTab] = useState<SubTab>('memos');
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   if (!trip) {
     return (
@@ -27,21 +33,23 @@ export default function TripHomeScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       <BackpackHeader trip={trip} />
-      <ScrollView style={{ flex: 1 }}>
-        <TripDetailCoverImage uri={trip.imageUrl} />
+      <FadeWrapper>
+        <ScrollView style={{ flex: 1 }}>
+          <TripDetailCoverImage uri={trip.imageUrl} />
 
-        <TripSubTabs activeTab={subTab} onTabChange={setSubTab} />
+          <TripSubTabs activeTab={subTab} onTabChange={setSubTab} />
 
-        <YStack padding="$5" paddingTop="$4">
-          {subTab === 'memos' ? (
-            <MemoTab memos={memos} tripId={activeTrip!} />
-          ) : (
-            <TripDocumentsTab tripId={trip.id} />
-          )}
-        </YStack>
+          <YStack padding="$5" paddingTop="$4">
+            {subTab === 'memos' ? (
+              <MemoTab memos={memos} tripId={activeTrip!} />
+            ) : (
+              <TripDocumentsTab tripId={trip.id} />
+            )}
+          </YStack>
 
-        <YStack height={100} />
-      </ScrollView>
+          <YStack height={100} />
+        </ScrollView>
+      </FadeWrapper>
     </YStack>
   );
 }

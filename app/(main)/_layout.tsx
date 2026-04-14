@@ -20,7 +20,7 @@ export default function MainLayout() {
           transitionSpec: {
             animation: 'spring',
             config: {
-              speed: 130,
+              speed: 220,
             },
           },
         }}

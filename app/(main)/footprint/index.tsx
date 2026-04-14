@@ -1,6 +1,8 @@
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import { XCard } from '@/components/ui/Card';
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
+import Loading from '@/components/ui/Loading';
 import { Plus, Search } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -20,7 +22,7 @@ export default function FootprintListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { activeTrip } = useTrips();
-  const { footprints } = useFootprints();
+  const { footprints, isFoorPrintLoading } = useFootprints();
   const { expenses } = useExpenses();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -124,6 +126,10 @@ export default function FootprintListScreen() {
     </YStack>
   );
 
+  if (isFoorPrintLoading) {
+    return <Loading />;
+  }
+
   return (
     <YStack flex={1} backgroundColor="$background" position="relative">
       {/* App Bar */}
@@ -156,25 +162,27 @@ export default function FootprintListScreen() {
         </XStack>
       )}
       {/* Footprint List */}
-      <SectionList
-        sections={footprintsByMonth}
-        keyExtractor={(item) => item.id}
-        renderItem={renderFootprintItem}
-        ListEmptyComponent={renderEmptyList}
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingTop: 16,
-          paddingBottom: 100,
-          flexGrow: filteredFootprints.length === 0 ? 1 : undefined,
-        }}
-        stickySectionHeadersEnabled={true}
-      />
-      <FloatingActionButton onPress={handleCreateFootprint}>
-        <XStack alignItems="center" gap="$2">
-          <Plus />
-          <Text>새 일지</Text>
-        </XStack>
-      </FloatingActionButton>
+      <FadeWrapper>
+        <SectionList
+          sections={footprintsByMonth}
+          keyExtractor={(item) => item.id}
+          renderItem={renderFootprintItem}
+          ListEmptyComponent={renderEmptyList}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingTop: 16,
+            paddingBottom: 100,
+            flexGrow: filteredFootprints.length === 0 ? 1 : undefined,
+          }}
+          stickySectionHeadersEnabled={true}
+        />
+        <FloatingActionButton onPress={handleCreateFootprint}>
+          <XStack alignItems="center" gap="$2">
+            <Plus />
+            <Text>새 일지</Text>
+          </XStack>
+        </FloatingActionButton>
+      </FadeWrapper>
     </YStack>
   );
 }

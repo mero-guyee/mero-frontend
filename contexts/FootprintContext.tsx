@@ -13,11 +13,14 @@ interface FootprintContextType {
   updateFootprint: (footprint: Footprint) => void;
   deleteFootprint: (footprintId: string) => void;
   getFootprintsByTripId: (tripId: string) => Footprint[];
+  isFoorPrintLoading: boolean;
 }
 
 export function useFootprints(): FootprintContextType {
   const { activeTrip } = useTrips();
-  const { data: footprints = [] } = useFootprintsByTripQuery(activeTrip ?? '');
+  const { data: footprints = [], isLoading: isFoorPrintLoading } = useFootprintsByTripQuery(
+    activeTrip ?? ''
+  );
 
   const createFootprint = useCreateFootprint();
   const updateFootprintMut = useUpdateFootprint();
@@ -32,5 +35,6 @@ export function useFootprints(): FootprintContextType {
       if (footprint) deleteFootprintMut.mutate({ id: footprintId, tripId: footprint.tripId });
     },
     getFootprintsByTripId: (tripId) => footprints.filter((f) => f.tripId === tripId),
+    isFoorPrintLoading,
   };
 }

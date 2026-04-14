@@ -1,5 +1,6 @@
 import LocationPicker from '@/components/location/LocationPicker';
 import SubmitButton from '@/components/ui/button/SubmitButton';
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { formatGeocode } from '@/utils/location/location';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -154,254 +155,261 @@ export default function FootprintFormScreen() {
       </BackActionHeader>
 
       {/* 성능 문제시 리팩토링 필요 */}
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        nestedScrollEnabled={true}
-        style={{ flex: 1 }}
-        contentContainerStyle={{ padding: 24 }}
-      >
-        {/* Date */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            📅 머문 날
-          </Text>
-          <Pressable onPress={() => setShowDatePicker(true)}>
-            <XStack
+      <FadeWrapper>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          nestedScrollEnabled={true}
+          style={{ flex: 1 }}
+          contentContainerStyle={{ padding: 24 }}
+        >
+          {/* Date */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$2" fontWeight="500">
+              📅 머문 날
+            </Text>
+            <Pressable onPress={() => setShowDatePicker(true)}>
+              <XStack
+                backgroundColor="$muted"
+                borderWidth={2}
+                borderColor="$border"
+                borderRadius="$4"
+                paddingHorizontal="$4"
+                paddingVertical="$3"
+                minHeight={48}
+                alignItems="center"
+              >
+                <Text color={date ? '$foreground' : '$mutedForeground'}>
+                  {date || 'YYYY-MM-DD'}
+                </Text>
+              </XStack>
+            </Pressable>
+          </YStack>
+
+          {showDatePicker && (
+            <DateTimePicker
+              value={date ? new Date(date) : new Date()}
+              mode="date"
+              display="default"
+              onChange={handleDateChange}
+            />
+          )}
+
+          {/* Location */}
+          <YStack marginBottom="$6">
+            <XStack alignItems="center" justifyContent="space-between" marginBottom="$2">
+              <Text color="$foreground" fontWeight="500">
+                📍 머문 곳
+              </Text>
+            </XStack>
+            <LocationPicker onConfirm={handleConfirm} />
+
+            {locations.length > 0 && (
+              <XStack flexWrap="wrap" gap="$2" marginBottom="$3">
+                {locations.map((loc, index) => (
+                  <XStack
+                    key={index}
+                    alignItems="center"
+                    gap="$2"
+                    paddingHorizontal="$3"
+                    paddingVertical="$2"
+                    backgroundColor="$accent"
+                    borderRadius="$3"
+                    opacity={0.4}
+                  >
+                    <MapPin size={14} color="$foreground" />
+                    <Text color="$foreground" fontSize={14}>
+                      {loc.placeName}
+                      {loc.country ? `, ${loc.country}` : ''}
+                    </Text>
+                    <Pressable onPress={() => handleRemoveLocation(index)}>
+                      <X size={14} color="$foreground" />
+                    </Pressable>
+                  </XStack>
+                ))}
+              </XStack>
+            )}
+          </YStack>
+
+          {/* Title */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$2" fontWeight="500">
+              이야기 제목
+            </Text>
+            <Input
               backgroundColor="$muted"
               borderWidth={2}
               borderColor="$border"
               borderRadius="$4"
               paddingHorizontal="$4"
               paddingVertical="$3"
-              minHeight={48}
-              alignItems="center"
-            >
-              <Text color={date ? '$foreground' : '$mutedForeground'}>{date || 'YYYY-MM-DD'}</Text>
-            </XStack>
-          </Pressable>
-        </YStack>
+              placeholder="제목을 입력하세요"
+              placeholderTextColor="$mutedForeground"
+              value={title}
+              onChangeText={setTitle}
+              color="$foreground"
+            />
+          </YStack>
 
-        {showDatePicker && (
-          <DateTimePicker
-            value={date ? new Date(date) : new Date()}
-            mode="date"
-            display="default"
-            onChange={handleDateChange}
-          />
-        )}
-
-        {/* Location */}
-        <YStack marginBottom="$6">
-          <XStack alignItems="center" justifyContent="space-between" marginBottom="$2">
-            <Text color="$foreground" fontWeight="500">
-              📍 머문 곳
+          {/* Weather */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$2" fontWeight="500">
+              🌤 날씨
             </Text>
-          </XStack>
-          <LocationPicker onConfirm={handleConfirm} />
+            <Input
+              backgroundColor="$muted"
+              borderWidth={2}
+              borderColor="$border"
+              borderRadius="$4"
+              paddingHorizontal="$4"
+              paddingVertical="$3"
+              placeholder="예: 맑음 18°C"
+              placeholderTextColor="$mutedForeground"
+              value={weatherInfo}
+              onChangeText={setWeatherInfo}
+              color="$foreground"
+            />
+          </YStack>
 
-          {locations.length > 0 && (
-            <XStack flexWrap="wrap" gap="$2" marginBottom="$3">
-              {locations.map((loc, index) => (
-                <XStack
-                  key={index}
-                  alignItems="center"
-                  gap="$2"
-                  paddingHorizontal="$3"
-                  paddingVertical="$2"
-                  backgroundColor="$accent"
-                  borderRadius="$3"
-                  opacity={0.4}
-                >
-                  <MapPin size={14} color="$foreground" />
-                  <Text color="$foreground" fontSize={14}>
-                    {loc.placeName}
-                    {loc.country ? `, ${loc.country}` : ''}
+          {/* Content */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$2" fontWeight="500">
+              이야기
+            </Text>
+            <TextArea
+              backgroundColor="$muted"
+              borderWidth={2}
+              borderColor="$border"
+              borderRadius="$4"
+              paddingHorizontal="$4"
+              paddingVertical="$3"
+              placeholder="이야기를 작성하세요..."
+              placeholderTextColor="$mutedForeground"
+              value={content}
+              onChangeText={setContent}
+              color="$foreground"
+              minHeight={200}
+              textAlignVertical="top"
+            />
+          </YStack>
+
+          {/* Photos */}
+          <YStack marginBottom="$6">
+            <XStack alignItems="center" justifyContent="space-between" marginBottom="$2">
+              <Text color="$foreground" fontWeight="500">
+                📸 사진
+              </Text>
+              <Pressable onPress={handleAddPhoto}>
+                <XStack alignItems="center" gap="$1">
+                  <Camera size={16} color="$primary" />
+                  <Text color="$primary" fontSize={14}>
+                    사진 추가
                   </Text>
-                  <Pressable onPress={() => handleRemoveLocation(index)}>
-                    <X size={14} color="$foreground" />
-                  </Pressable>
                 </XStack>
-              ))}
+              </Pressable>
             </XStack>
-          )}
-        </YStack>
 
-        {/* Title */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            이야기 제목
-          </Text>
-          <Input
-            backgroundColor="$muted"
-            borderWidth={2}
-            borderColor="$border"
-            borderRadius="$4"
-            paddingHorizontal="$4"
-            paddingVertical="$3"
-            placeholder="제목을 입력하세요"
-            placeholderTextColor="$mutedForeground"
-            value={title}
-            onChangeText={setTitle}
-            color="$foreground"
-          />
-        </YStack>
-
-        {/* Weather */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            🌤 날씨
-          </Text>
-          <Input
-            backgroundColor="$muted"
-            borderWidth={2}
-            borderColor="$border"
-            borderRadius="$4"
-            paddingHorizontal="$4"
-            paddingVertical="$3"
-            placeholder="예: 맑음 18°C"
-            placeholderTextColor="$mutedForeground"
-            value={weatherInfo}
-            onChangeText={setWeatherInfo}
-            color="$foreground"
-          />
-        </YStack>
-
-        {/* Content */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            이야기
-          </Text>
-          <TextArea
-            backgroundColor="$muted"
-            borderWidth={2}
-            borderColor="$border"
-            borderRadius="$4"
-            paddingHorizontal="$4"
-            paddingVertical="$3"
-            placeholder="이야기를 작성하세요..."
-            placeholderTextColor="$mutedForeground"
-            value={content}
-            onChangeText={setContent}
-            color="$foreground"
-            minHeight={200}
-            textAlignVertical="top"
-          />
-        </YStack>
-
-        {/* Photos */}
-        <YStack marginBottom="$6">
-          <XStack alignItems="center" justifyContent="space-between" marginBottom="$2">
-            <Text color="$foreground" fontWeight="500">
-              📸 사진
-            </Text>
-            <Pressable onPress={handleAddPhoto}>
-              <XStack alignItems="center" gap="$1">
-                <Camera size={16} color="$primary" />
-                <Text color="$primary" fontSize={14}>
-                  사진 추가
-                </Text>
-              </XStack>
-            </Pressable>
-          </XStack>
-
-          {photoUrls.length > 0 && (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <XStack gap="$2">
-                {photoUrls.map((uri, index) => (
-                  <YStack key={index} position="relative">
-                    <Image
-                      source={{ uri }}
-                      width={100}
-                      height={100}
-                      borderRadius={8}
-                      objectFit="cover"
-                    />
-                    <Pressable
-                      onPress={() => handleRemovePhoto(index)}
-                      style={{
-                        position: 'absolute',
-                        top: 4,
-                        right: 4,
-                        backgroundColor: 'rgba(0,0,0,0.5)',
-                        borderRadius: 10,
-                        padding: 3,
-                      }}
-                    >
-                      <X size={12} color="white" />
-                    </Pressable>
-                  </YStack>
-                ))}
-              </XStack>
-            </ScrollView>
-          )}
-        </YStack>
-      </ScrollView>
-
-      {/* Location Modal */}
-      <Modal visible={showLocationModal} transparent animationType="fade">
-        <Pressable
-          style={{
-            flex: 1,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: 16,
-          }}
-          onPress={() => setShowLocationModal(false)}
-        >
-          <Pressable style={{ width: '100%', maxWidth: 400 }} onPress={(e) => e.stopPropagation()}>
-            <YStack backgroundColor="$card" borderRadius="$6" padding="$6">
-              <XStack alignItems="center" justifyContent="space-between" marginBottom="$5">
-                <Text color="$foreground" fontSize={18} fontWeight="600">
-                  위치 추가
-                </Text>
-                <CircularButton
-                  size="$3"
-                  onPress={() => {
-                    setShowLocationModal(false);
-                    setSearchQuery('');
-                    setSearchResults([]);
-                  }}
-                >
-                  <X size={20} color="$foreground" />
-                </CircularButton>
-              </XStack>
-
-              <YStack marginBottom="$3">
-                <Text color="$foreground" fontSize={14} marginBottom="$2">
-                  장소 검색
-                </Text>
-                <Input
-                  backgroundColor="$muted"
-                  borderWidth={2}
-                  borderColor="$border"
-                  borderRadius="$4"
-                  paddingHorizontal="$4"
-                  paddingVertical="$3"
-                  placeholder="장소명을 입력하세요"
-                  placeholderTextColor="$mutedForeground"
-                  value={searchQuery}
-                  onChangeText={handleSearchQueryChange}
-                  color="$foreground"
-                />
-              </YStack>
-
-              <ScrollView style={{ maxHeight: 256 }}>
-                {searchQuery && searchResults.length === 0 && (
-                  <Text
-                    textAlign="center"
-                    color="$mutedForeground"
-                    paddingVertical="$4"
-                    fontSize={14}
-                  >
-                    검색 결과가 없습니다
-                  </Text>
-                )}
+            {photoUrls.length > 0 && (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <XStack gap="$2">
+                  {photoUrls.map((uri, index) => (
+                    <YStack key={index} position="relative">
+                      <Image
+                        source={{ uri }}
+                        width={100}
+                        height={100}
+                        borderRadius={8}
+                        objectFit="cover"
+                      />
+                      <Pressable
+                        onPress={() => handleRemovePhoto(index)}
+                        style={{
+                          position: 'absolute',
+                          top: 4,
+                          right: 4,
+                          backgroundColor: 'rgba(0,0,0,0.5)',
+                          borderRadius: 10,
+                          padding: 3,
+                        }}
+                      >
+                        <X size={12} color="white" />
+                      </Pressable>
+                    </YStack>
+                  ))}
+                </XStack>
               </ScrollView>
-            </YStack>
+            )}
+          </YStack>
+        </ScrollView>
+
+        {/* Location Modal */}
+        <Modal visible={showLocationModal} transparent animationType="fade">
+          <Pressable
+            style={{
+              flex: 1,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: 16,
+            }}
+            onPress={() => setShowLocationModal(false)}
+          >
+            <Pressable
+              style={{ width: '100%', maxWidth: 400 }}
+              onPress={(e) => e.stopPropagation()}
+            >
+              <YStack backgroundColor="$card" borderRadius="$6" padding="$6">
+                <XStack alignItems="center" justifyContent="space-between" marginBottom="$5">
+                  <Text color="$foreground" fontSize={18} fontWeight="600">
+                    위치 추가
+                  </Text>
+                  <CircularButton
+                    size="$3"
+                    onPress={() => {
+                      setShowLocationModal(false);
+                      setSearchQuery('');
+                      setSearchResults([]);
+                    }}
+                  >
+                    <X size={20} color="$foreground" />
+                  </CircularButton>
+                </XStack>
+
+                <YStack marginBottom="$3">
+                  <Text color="$foreground" fontSize={14} marginBottom="$2">
+                    장소 검색
+                  </Text>
+                  <Input
+                    backgroundColor="$muted"
+                    borderWidth={2}
+                    borderColor="$border"
+                    borderRadius="$4"
+                    paddingHorizontal="$4"
+                    paddingVertical="$3"
+                    placeholder="장소명을 입력하세요"
+                    placeholderTextColor="$mutedForeground"
+                    value={searchQuery}
+                    onChangeText={handleSearchQueryChange}
+                    color="$foreground"
+                  />
+                </YStack>
+
+                <ScrollView style={{ maxHeight: 256 }}>
+                  {searchQuery && searchResults.length === 0 && (
+                    <Text
+                      textAlign="center"
+                      color="$mutedForeground"
+                      paddingVertical="$4"
+                      fontSize={14}
+                    >
+                      검색 결과가 없습니다
+                    </Text>
+                  )}
+                </ScrollView>
+              </YStack>
+            </Pressable>
           </Pressable>
-        </Pressable>
-      </Modal>
+        </Modal>
+      </FadeWrapper>
     </YStack>
   );
 }
