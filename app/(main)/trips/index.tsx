@@ -19,7 +19,7 @@ export default function TripListScreen() {
   const insets = useSafeAreaInsets();
   const isFocused = useIsFocused();
 
-  const { tripsByProgress, trips, setActiveTrip } = useTrips();
+  const { tripsByProgress, trips, setActiveTrip, isTripsLoading } = useTrips();
 
   const [filter, setFilter] = useState<'all' | TripStatus>('all');
   const [sort, setSort] = useState<'newest' | 'oldest'>('newest');
@@ -39,7 +39,7 @@ export default function TripListScreen() {
   };
 
   const handleCreateTrip = () => {
-    router.push('/(main)/trips/new');
+    router.push('/(main)/trips/new/Country');
   };
 
   const handleSettings = () => {
@@ -51,7 +51,7 @@ export default function TripListScreen() {
       <View flex={1} alignItems="center" justifyContent="center" backgroundColor="$background">
         <Plane size={44} color="$mutedForeground" />
       </View>
-    ); // 화면이 포커스되지 않았을 때는 아무것도 렌더링하지 않음
+    );
   }
   return (
     <YStack flex={1} backgroundColor="$background" paddingTop={insets.top}>
@@ -63,18 +63,24 @@ export default function TripListScreen() {
         onSettings={handleSettings}
         onCreateTrip={handleCreateTrip}
       />
-      <FadeWrapper>
-        <FlatList
-          data={filteredAndSortedTrips}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ padding: paddingHorizontalGeneral }}
-          renderItem={({ item }) => (
-            <TripCard trip={item} onPress={() => handleSelectTrip(item.id)} />
-          )}
-          ListEmptyComponent={<TripEmptyState onCreateTrip={handleCreateTrip} />}
-          showsVerticalScrollIndicator={false}
-        />
-      </FadeWrapper>
+      {isTripsLoading ? (
+        <View flex={1} alignItems="center" justifyContent="center" backgroundColor="$background">
+          <Plane size={44} color="$mutedForeground" />
+        </View>
+      ) : (
+        <FadeWrapper>
+          <FlatList
+            data={filteredAndSortedTrips}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={{ padding: paddingHorizontalGeneral }}
+            renderItem={({ item }) => (
+              <TripCard trip={item} onPress={() => handleSelectTrip(item.id)} />
+            )}
+            ListEmptyComponent={<TripEmptyState onCreateTrip={handleCreateTrip} />}
+            showsVerticalScrollIndicator={false}
+          />
+        </FadeWrapper>
+      )}
     </YStack>
   );
 }

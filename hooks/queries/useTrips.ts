@@ -8,6 +8,13 @@ import { tripKeys } from './queryKeys';
 
 export { tripKeys } from './queryKeys';
 
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
+  ]);
+}
+
 export function useTripsQuery() {
   const db = useDb();
   return useQuery({
@@ -15,10 +22,10 @@ export function useTripsQuery() {
     queryFn: async () => {
       const repo = new TripRepository(db);
       try {
-        const serverTrips = await tripsApi.getAll();
+        const serverTrips = await withTimeout(tripsApi.getAll(), 5000);
         await Promise.all(serverTrips.map((t) => repo.upsertFromServer(t)));
       } catch {
-        // offline — use local cache
+        // offline or timeout — use local cache
       }
       return repo.getAllTrips();
     },

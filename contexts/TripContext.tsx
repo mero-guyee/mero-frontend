@@ -24,6 +24,7 @@ interface TripContextType {
   documents: TripDocument[];
   createDocument: (tripId: string, document: TripDocumentFile) => void;
   tripsByProgress: TripByProgressObj;
+  isTripsLoading: boolean;
 }
 
 type TripByProgressObj = Record<TripStatus, Trip[]>;
@@ -50,7 +51,8 @@ export function useTrips(): TripContextType {
   const ui = useContext(TripUIContext);
   if (!ui) throw new Error('useTrips must be used within a TripProvider');
 
-  const { data: trips = [] } = useTripsQuery();
+  const { data: trips = [], isLoading: isTripsLoading } = useTripsQuery();
+
   const { data: documents = [] } = useDocumentsQuery(ui.activeTrip ?? '');
 
   const createTrip = useCreateTrip();
@@ -99,7 +101,6 @@ export function useTrips(): TripContextType {
       completed: trips.filter((t) => new Date(t.endDate) < new Date()),
       planned: trips.filter((t) => new Date(t.startDate) > new Date()),
     },
+    isTripsLoading,
   };
 }
-
-export default TripUIContext;
