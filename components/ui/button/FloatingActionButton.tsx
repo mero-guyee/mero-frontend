@@ -1,5 +1,6 @@
 import { ComponentProps, useRef } from 'react';
 import { Animated } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Stack } from 'tamagui';
 import { FilledButton } from './BaseButton';
 
@@ -7,10 +8,12 @@ export default function FloatingActionButton({
   children,
   onPressIn,
   onPressOut,
+  noBottomTabBar,
   ...props
-}: ComponentProps<typeof FilledButton>) {
+}: ComponentProps<typeof FilledButton> & { noBottomTabBar?: boolean }) {
   const translate = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   const shadowOpacity = useRef(new Animated.Value(1)).current;
+  const insets = useSafeAreaInsets();
 
   const handlePressIn = (e: any) => {
     Animated.parallel([
@@ -45,7 +48,11 @@ export default function FloatingActionButton({
   };
 
   return (
-    <Stack position="absolute" bottom={10} right={10}>
+    <Stack
+      position="absolute"
+      bottom={noBottomTabBar ? insets.bottom + 10 : 10}
+      right={noBottomTabBar ? insets.right + 16 : 10}
+    >
       <Animated.View
         style={{
           opacity: shadowOpacity,

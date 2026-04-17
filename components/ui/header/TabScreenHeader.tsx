@@ -24,7 +24,7 @@ export default function TabScreenHeader({
     >
       <XStack alignItems="center" justifyContent="space-between">
         <YStack flex={1}>
-          <Text color="$foreground" fontSize={24} fontWeight="600">
+          <Text color="$foreground" fontSize={'$6'} fontWeight="500">
             {label}
           </Text>
         </YStack>

@@ -3,6 +3,7 @@ import { TripStatus } from '@/types';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 
+import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import { useIsFocused } from '@react-navigation/native';
 import { Plane } from '@tamagui/lucide-icons';
@@ -61,7 +62,6 @@ export default function TripListScreen() {
         sort={sort}
         setSort={setSort}
         onSettings={handleSettings}
-        onCreateTrip={handleCreateTrip}
       />
       {isTripsLoading ? (
         <View flex={1} alignItems="center" justifyContent="center" backgroundColor="$background">
@@ -79,6 +79,9 @@ export default function TripListScreen() {
             ListEmptyComponent={<TripEmptyState onCreateTrip={handleCreateTrip} />}
             showsVerticalScrollIndicator={false}
           />
+          <FloatingActionButton onPress={() => handleCreateTrip()} noBottomTabBar>
+            <Plane size={44} strokeWidth={1} />
+          </FloatingActionButton>
         </FadeWrapper>
       )}
     </YStack>
