@@ -1,6 +1,7 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { useRef } from 'react';
+import { StackActions } from '@react-navigation/native';
+import { useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View } from 'tamagui';
@@ -11,6 +12,23 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
   const animsX = useRef(state.routes.map(() => new Animated.Value(1))).current;
   const animsY = useRef(state.routes.map(() => new Animated.Value(1))).current;
   const animsOpacity = useRef(state.routes.map(() => new Animated.Value(0))).current;
+
+  const prevIndexRef = useRef(state.index);
+
+  useEffect(() => {
+    const prevIndex = prevIndexRef.current;
+
+    if (prevIndex !== state.index) {
+      const prevRoute = state.routes[prevIndex];
+      if (prevRoute.state?.key)
+        navigation.dispatch({
+          ...StackActions.popToTop(),
+          target: prevRoute.state?.key,
+        });
+      prevIndexRef.current = state.index;
+    }
+  }, [state.index, navigation, state.routes]);
+
   function handlePress(index: number, route: (typeof state.routes)[number], isFocused: boolean) {
     const sx = animsX[index];
     const sy = animsY[index];
