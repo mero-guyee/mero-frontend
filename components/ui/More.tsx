@@ -31,6 +31,7 @@ export default function More({ children }: { children: ReactNode }) {
     useCallback(() => {
       return () => {
         opacity.setValue(0);
+        setShowMenu(false);
       };
     }, [opacity])
   );
