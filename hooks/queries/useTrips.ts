@@ -60,6 +60,7 @@ export function useCreateTrip() {
     mutationFn: async (data: Omit<Trip, 'id'>) => {
       const repo = new TripRepository(db);
       const localTrip = await repo.createTrip(data);
+
       try {
         const serverTrip = await tripsApi.create({
           clientId: localTrip.id,
@@ -78,7 +79,9 @@ export function useCreateTrip() {
       }
       return localTrip;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: tripKeys.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: tripKeys.all });
+    },
   });
 }
 

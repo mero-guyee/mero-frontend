@@ -1,12 +1,16 @@
 import { Trip } from '@/types';
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from 'react';
 
-interface NewTripFormContextType {
+interface NewTripFormContextProviderType {
   newTrip: Omit<Trip, 'id'>;
   setNewTrip: Dispatch<SetStateAction<Omit<Trip, 'id'>>>;
 }
 
-const NewTripFormContext = createContext<NewTripFormContextType | null>(null);
+interface NewTripFormContextType extends NewTripFormContextProviderType {
+  initNewTripForm: () => void;
+}
+
+const NewTripFormContext = createContext<NewTripFormContextProviderType | null>(null);
 
 export function NewTripFormProvider({ children }: { children: ReactNode }) {
   const [newTrip, setNewTrip] = useState<Omit<Trip, 'id'>>({
@@ -17,8 +21,6 @@ export function NewTripFormProvider({ children }: { children: ReactNode }) {
     imageUrl: '',
   });
 
-  console.log('NewTripFormProvider rendered with newTrip:', newTrip);
-
   return (
     <NewTripFormContext.Provider value={{ newTrip, setNewTrip }}>
       {children}
@@ -28,11 +30,23 @@ export function NewTripFormProvider({ children }: { children: ReactNode }) {
 
 export function useNewTripForm(): NewTripFormContextType {
   const ctx = useContext(NewTripFormContext);
+
   if (!ctx) throw new Error('useNewTripForm must be used within a NewTripFormProvider');
   const { newTrip, setNewTrip } = ctx;
+
+  const initNewTripForm = () => {
+    setNewTrip({
+      title: '',
+      startDate: '',
+      endDate: '',
+      countries: [],
+      imageUrl: '',
+    });
+  };
 
   return {
     newTrip,
     setNewTrip,
+    initNewTripForm,
   };
 }

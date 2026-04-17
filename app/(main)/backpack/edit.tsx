@@ -19,7 +19,6 @@ export default function EditBackPackScreen() {
 
   const { activeTrip, updateTrip } = useTrips();
   const { data: trip } = useTripQuery(activeTrip || '');
-  console.log(trip);
 
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');

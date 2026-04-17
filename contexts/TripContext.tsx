@@ -17,7 +17,7 @@ interface TripContextType {
   currentTab: 'home' | 'footprint' | 'map' | 'expense';
   setCurrentTab: (tab: 'home' | 'footprint' | 'map' | 'expense') => void;
   setActiveTrip: (tripId: string | null) => void;
-  addTrip: (trip: Omit<Trip, 'id'>) => void;
+  addTrip: (trip: Omit<Trip, 'id'>, onSuccess?: () => void) => void;
   updateTrip: (trip: Trip) => void;
   deleteTrip: (tripId: string) => void;
   getTripById: (tripId: string) => Trip | undefined;
@@ -66,9 +66,12 @@ export function useTrips(): TripContextType {
     currentTab: ui.currentTab,
     setCurrentTab: ui.setCurrentTab,
     setActiveTrip: ui.setActiveTrip,
-    addTrip: (trip) => {
+    addTrip: (trip, onSuccess?: () => void) => {
       createTrip.mutate(trip, {
-        onSuccess: (newTrip) => ui.setActiveTrip(newTrip.id),
+        onSuccess: (newTrip) => {
+          if (onSuccess) onSuccess();
+          ui.setActiveTrip(newTrip.id);
+        },
       });
     },
     updateTrip: (trip) => updateTripMut.mutate(trip),
