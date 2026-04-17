@@ -3,7 +3,7 @@ import { XCard } from '@/components/ui/Card';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import Loading from '@/components/ui/Loading';
-import { Plus, Search } from '@tamagui/lucide-icons';
+import { Plus } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, SectionList } from 'react-native';
@@ -139,7 +139,7 @@ export default function FootprintListScreen() {
             pressStyle={{ backgroundColor: '$muted' }}
             onPress={() => setShowSearch(!showSearch)}
           >
-            <Search size="$7" color="$foreground" />
+            {/* <Search size="$7" color="$foreground" /> */}
           </CircularButton>
         </XStack>
       </TabScreenHeader>
