@@ -3,7 +3,7 @@ import { MapPin } from '@tamagui/lucide-icons';
 import { Pressable } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 import { Trip } from '../../../types';
-import TripDetailCoverImage from '../detail/TripDetailCoverImage';
+import TripCoverImage from '../TripCoverImage';
 import TripProgress from './TripProgress';
 
 interface TripCardProps {
@@ -17,7 +17,7 @@ export function TripCard({ trip, onPress }: TripCardProps) {
       <YCard marginBottom="$4">
         {/* Cover Image */}
         <YStack height={180} overflow="hidden">
-          <TripDetailCoverImage uri={trip.imageUrl} />
+          <TripCoverImage uri={trip.imageUrl} />
         </YStack>
 
         {/* Content */}

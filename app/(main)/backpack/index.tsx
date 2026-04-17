@@ -1,12 +1,11 @@
 import BackpackHeader from '@/components/backpack/BackpackHeader';
-import TripDetailCoverImage from '@/components/trips/detail/TripDetailCoverImage';
+import TripCoverImage from '@/components/trips/TripCoverImage';
 import { TripDocumentsTab } from '@/components/trips/documents/TripDocumentsTab';
 import MemoTab from '@/components/trips/memos/MemoTab';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import Loading from '@/components/ui/Loading';
 import { useTripQuery } from '@/hooks/queries/useTrips';
 import { useState } from 'react';
-import { ScrollView } from 'react-native';
 import { Text, YStack } from 'tamagui';
 import { SubTab, TripSubTabs } from '../../../components/trips/TripSubTabs';
 import { useMemos, useTrips } from '../../../contexts';
@@ -34,8 +33,8 @@ export default function TripHomeScreen() {
     <YStack flex={1} backgroundColor="$background">
       <BackpackHeader trip={trip} />
       <FadeWrapper>
-        <ScrollView style={{ flex: 1 }}>
-          <TripDetailCoverImage uri={trip.imageUrl} />
+        <YStack flex={1}>
+          <TripCoverImage uri={trip.imageUrl} />
 
           <TripSubTabs activeTab={subTab} onTabChange={setSubTab} />
 
@@ -48,7 +47,7 @@ export default function TripHomeScreen() {
           </YStack>
 
           <YStack height={100} />
-        </ScrollView>
+        </YStack>
       </FadeWrapper>
     </YStack>
   );
