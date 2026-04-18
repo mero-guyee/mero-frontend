@@ -1,26 +1,22 @@
-import { IconButton } from '@/components/ui/button/BaseButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
+import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import More from '@/components/ui/More';
 import { formattedLocation } from '@/utils/location/location';
-import { ArrowLeft, Cloud, MapPin } from '@tamagui/lucide-icons';
+import { Cloud, MapPin } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { FilledButton } from '../../../components/ui';
-import { useExpenses, useFootprints, useTrips } from '../../../contexts';
+import { useExpenses, useFootprints } from '../../../contexts';
 
 export default function FootprintDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const { getTripById } = useTrips();
   const { footprints, deleteFootprint } = useFootprints();
   const { getExpensesByFootprintId, deleteExpense } = useExpenses();
 
   const footprint = footprints.find((f) => f.id === (id || ''));
-  const trip = footprint ? getTripById(footprint.tripId) : undefined;
   const expenses = getExpensesByFootprintId(id || '');
 
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
@@ -105,26 +101,7 @@ export default function FootprintDetailScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       {/* Header */}
-      <XStack
-        backgroundColor="$card"
-        paddingTop={insets.top}
-        paddingHorizontal="$4"
-        paddingBottom="$3"
-        alignItems="center"
-        justifyContent="space-between"
-        borderBottomWidth={2}
-        borderBottomColor="$primary"
-        style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
-      >
-        <IconButton onPress={() => router.back()}>
-          <ArrowLeft size={20} color="$foreground" />
-        </IconButton>
-        <Text flex={1} textAlign="center" color="$foreground" fontSize={16} fontWeight="500">
-          {new Date(footprint.date).toLocaleDateString('ko-KR', {
-            month: 'long',
-            day: 'numeric',
-          })}
-        </Text>
+      <BackActionHeader label={footprint.title} onBack={() => router.back()}>
         <More>
           <Pressable onPress={handleEdit}>
             <XStack padding="$3">
@@ -141,7 +118,7 @@ export default function FootprintDetailScreen() {
             </XStack>
           </Pressable>
         </More>
-      </XStack>
+      </BackActionHeader>
 
       <FadeWrapper>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
