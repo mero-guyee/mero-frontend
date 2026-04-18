@@ -18,13 +18,7 @@ interface TripHeaderProps {
 
 export function TripHeader({ filter, sort, setFilter, setSort, onSettings }: TripHeaderProps) {
   return (
-    <YStack
-      backgroundColor="$card"
-      borderBottomWidth={2}
-      borderBottomColor="$border"
-      padding={paddingHorizontalGeneral}
-      rowGap="$3"
-    >
+    <YStack backgroundColor="$background" padding={paddingHorizontalGeneral} rowGap="$3">
       <XStack alignItems="center" justifyContent="space-between">
         <XStack alignItems="center" gap="$3">
           <YStack

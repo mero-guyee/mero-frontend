@@ -14,13 +14,10 @@ export default function TabScreenHeader({
   const insets = useSafeAreaInsets();
   return (
     <YStack
-      backgroundColor="$card"
+      backgroundColor="$background"
       paddingTop={insets.top}
       paddingHorizontal="$4"
       paddingBottom="$1"
-      borderBottomWidth={2}
-      borderBottomColor="$primary"
-      style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
     >
       <XStack alignItems="center" justifyContent="space-between">
         <YStack flex={1}>

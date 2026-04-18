@@ -56,9 +56,9 @@ const bodyFont = createFont({
 const tokens = createTokens({
   color: {
     // 라이트 테마 색상 (globals.css에서 가져옴)
-    background: '#EDF6F9',
-    foreground: '#5C4033',
-    card: '#FFFBF0',
+    background: '#F6F3EE',
+    foreground: '#30221B',
+    card: '#ffffff',
     cardForeground: '#5C4033',
     popover: '#FFFBF0',
     popoverForeground: '#5C4033',

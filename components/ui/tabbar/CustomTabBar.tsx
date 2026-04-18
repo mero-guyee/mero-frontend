@@ -115,11 +115,12 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#FFFBF0',
+    backgroundColor: '$ffffff',
     paddingTop: 8,
     paddingHorizontal: paddingHorizontalGeneral,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
+    boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
   },
   tab: {
     flex: 1,

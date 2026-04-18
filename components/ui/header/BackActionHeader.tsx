@@ -16,13 +16,10 @@ export default function BackActionHeader({
   const insets = useSafeAreaInsets();
   return (
     <XStack
-      backgroundColor="$card"
+      backgroundColor="$background"
       paddingTop={insets.top}
       paddingBottom="$1"
       paddingHorizontal="$3"
-      borderBottomWidth={2}
-      borderBottomColor="$primary"
-      style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
     >
       <View flex={1} height={48} alignItems="flex-start" justifyContent="center">
         <IconButton onPress={onBack}>
