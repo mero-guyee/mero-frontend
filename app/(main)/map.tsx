@@ -152,7 +152,7 @@ export default function MapViewScreen() {
         </ScrollView>
 
         {/* Timeline Modal */}
-        <Modal visible={showTimelineModal} transparent animationType="slide">
+        <Modal visible={showTimelineModal} animationType="slide" transparent>
           <Pressable
             style={{
               flex: 1,
@@ -161,7 +161,7 @@ export default function MapViewScreen() {
             }}
             onPress={() => setShowTimelineModal(false)}
           >
-            <Pressable style={{ maxHeight: '85%' }} onPress={(e) => e.stopPropagation()}>
+            <Pressable onPress={(e) => e.stopPropagation()} style={{ height: '75%' }}>
               <YStack
                 backgroundColor="$card"
                 borderTopLeftRadius="$6"
