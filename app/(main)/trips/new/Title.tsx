@@ -1,7 +1,7 @@
 import { Input } from '@/components/ui';
 import FadeWrapper from '@/components/ui/FadeWrapper';
-import FormLabel from '@/components/ui/multiStepForm/FormLabel';
-import PrevNextButtons from '@/components/ui/multiStepForm/PrevNextButtons';
+import FormLabel from '@/components/ui/form/FormLabel';
+import PrevNextButtons from '@/components/ui/form/multiStepForm/PrevNextButtons';
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useTrips } from '@/contexts';
 import { useNewTripForm } from '@/contexts/MultiStepForm/NewTripFormContext';
@@ -52,11 +52,7 @@ export default function Title() {
         <YStack>
           <FormLabel marginBottom="$2">모험의 이름</FormLabel>
           <Input
-            height={48}
-            backgroundColor="$muted"
-            borderWidth={2}
-            borderColor={titleError ? '$destructive' : '$border'}
-            borderRadius="$4"
+            borderColor={titleError ? '$destructive' : '$foreground'}
             paddingHorizontal="$4"
             paddingVertical="$3"
             placeholder="예: 2026 남미 여행"

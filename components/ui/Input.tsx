@@ -1,11 +1,28 @@
-import { Input as TamaguiInput, styled } from 'tamagui';
+import { GetProps, Stack, Input as TamaguiInput, styled } from 'tamagui';
+
+export const inputStyle: GetProps<typeof Stack> = {
+  backgroundColor: '$transparent',
+  borderWidth: 1.5,
+  borderColor: '$foreground',
+  borderRadius: '$2',
+  height: 48,
+  paddingHorizontal: '$3',
+  paddingVertical: '$2.5',
+};
+
+export const inputTextColor = 'foreground';
 
 export const Input = styled(TamaguiInput, {
   color: '$foreground',
-  backgroundColor: '$muted',
-  borderWidth: 2,
-  borderColor: '$border',
-  borderRadius: '$4',
-  placeholderTextColor: '$mutedForeground',
+  backgroundColor: '$transparent',
+  borderWidth: 1.5,
+  borderColor: '$foreground',
+  borderRadius: '$2',
   height: 48,
+  placeholderTextColor: '$mutedForeground',
+  paddingHorizontal: '$3',
+  paddingVertical: '$2.5',
+  focusStyle: {
+    borderColor: '$foreground',
+  },
 });

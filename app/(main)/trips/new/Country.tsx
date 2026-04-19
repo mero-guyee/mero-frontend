@@ -1,7 +1,7 @@
 import TripCountrySearch from '@/components/trips/TripCountrySearch';
 import FadeWrapper from '@/components/ui/FadeWrapper';
-import FormLabel from '@/components/ui/multiStepForm/FormLabel';
-import PrevNextButtons from '@/components/ui/multiStepForm/PrevNextButtons';
+import FormLabel from '@/components/ui/form/FormLabel';
+import PrevNextButtons from '@/components/ui/form/multiStepForm/PrevNextButtons';
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useNewTripForm } from '@/contexts/MultiStepForm/NewTripFormContext';
 import { validateCountries } from '@/contexts/MultiStepForm/newTripValidation';

@@ -3,8 +3,9 @@ import isoCountries from 'i18n-iso-countries';
 import koLocale from 'i18n-iso-countries/langs/ko.json';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, TextInput, useWindowDimensions } from 'react-native';
-import { ScrollView, Text, XStack, YStack, useTheme } from 'tamagui';
-import ErrorText from '../ui/multiStepForm/ErrorText';
+import { Input, ScrollView, Text, XStack, YStack, useTheme } from 'tamagui';
+import { inputStyle } from '../ui/Input';
+import ErrorText from '../ui/form/ErrorText';
 
 isoCountries.registerLocale(koLocale);
 
@@ -24,7 +25,7 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
   const theme = useTheme();
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const textInputRef = useRef<TextInput>(null);
+  const textInputRef = useRef<Input>(null);
 
   const handleQueryChange = (text: string) => {
     setQuery(text);
@@ -64,16 +65,15 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
         <YStack>
           <Pressable onPress={() => textInputRef.current?.focus()}>
             <XStack
+              {...inputStyle}
               flexWrap="wrap"
               gap="$2"
-              backgroundColor="$muted"
-              borderWidth={2}
-              borderColor={error ? '$destructive' : '$border'}
-              borderRadius="$4"
+              backgroundColor="$transparent"
               paddingHorizontal="$3"
               paddingVertical="$2.5"
               minHeight="$5"
               alignItems="center"
+              height="auto"
             >
               {selectedCountries.map((country) => (
                 <XStack

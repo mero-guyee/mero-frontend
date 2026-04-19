@@ -5,8 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Text, TextArea, YStack } from 'tamagui';
-import { Input } from '../../../components/ui';
+import { TextArea, YStack } from 'tamagui';
 import { useMemos } from '../../../contexts';
 
 export default function MemoFormScreen() {
@@ -58,43 +57,27 @@ export default function MemoFormScreen() {
       </BackActionHeader>
       <FadeWrapper>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
-          <YStack marginBottom="$4">
-            <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              제목
-            </Text>
-            <Input
-              backgroundColor="$card"
-              borderWidth={1}
-              borderColor="$border"
-              borderRadius="$4"
-              paddingHorizontal="$4"
-              paddingVertical="$3"
-              placeholder="메모 제목을 입력하세요"
+          <YStack flex={1} justifyContent="flex-start" gap="$3">
+            <TextArea
+              placeholder="제목을 입력해주세요"
               placeholderTextColor="$mutedForeground"
               value={title}
               onChangeText={setTitle}
               color="$foreground"
+              borderWidth={0}
+              padding={0}
             />
-          </YStack>
-
-          <YStack marginBottom="$4">
-            <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              내용
-            </Text>
+            <YStack borderBottomWidth={1} borderColor="$secondary" />
             <TextArea
-              backgroundColor="$card"
-              borderWidth={1}
-              borderColor="$border"
-              borderRadius="$4"
-              paddingHorizontal="$4"
-              paddingVertical="$3"
-              placeholder="내용을 입력하세요"
+              placeholder="여행에 도움이 될 만한 간단한 메모를 남겨보세요"
               placeholderTextColor="$mutedForeground"
               value={content}
               onChangeText={setContent}
               color="$foreground"
               minHeight={200}
-              textAlignVertical="top"
+              padding={0}
+              verticalAlign={'top'}
+              borderWidth={0}
             />
           </YStack>
         </ScrollView>

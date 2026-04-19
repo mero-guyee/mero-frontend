@@ -1,6 +1,7 @@
 import { FilledButton, Input } from '@/components/ui';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
+import { inputStyle } from '@/components/ui/Input';
 import { useTrips } from '@/contexts';
 import { useTripQuery } from '@/hooks/queries/useTrips';
 import { TripStatus } from '@/types';
@@ -127,12 +128,6 @@ export default function EditBackPackScreen() {
             모험의 이름
           </Text>
           <Input
-            backgroundColor="$muted"
-            borderWidth={2}
-            borderColor="$border"
-            borderRadius="$4"
-            paddingHorizontal="$4"
-            paddingVertical="$3"
             placeholder="예: 2026 남미 여행"
             placeholderTextColor="$mutedForeground"
             value={title}
@@ -148,16 +143,7 @@ export default function EditBackPackScreen() {
               출발일
             </Text>
             <Pressable onPress={() => setShowStartPicker(true)}>
-              <XStack
-                backgroundColor="$muted"
-                borderWidth={2}
-                borderColor="$border"
-                borderRadius="$4"
-                paddingHorizontal="$4"
-                paddingVertical="$3"
-                minHeight={48}
-                alignItems="center"
-              >
+              <XStack {...inputStyle}>
                 <Text color={startDate ? '$foreground' : '$mutedForeground'}>
                   {startDate || 'YYYY-MM-DD'}
                 </Text>
@@ -169,16 +155,7 @@ export default function EditBackPackScreen() {
               귀환일
             </Text>
             <Pressable onPress={() => setShowEndPicker(true)}>
-              <XStack
-                backgroundColor="$muted"
-                borderWidth={2}
-                borderColor="$border"
-                borderRadius="$4"
-                paddingHorizontal="$4"
-                paddingVertical="$3"
-                minHeight={48}
-                alignItems="center"
-              >
+              <XStack {...inputStyle}>
                 <Text color={endDate ? '$foreground' : '$mutedForeground'}>
                   {endDate || 'YYYY-MM-DD'}
                 </Text>
@@ -232,17 +209,10 @@ export default function EditBackPackScreen() {
           <XStack gap="$2">
             <Input
               flex={1}
-              backgroundColor="$muted"
-              borderWidth={2}
-              borderColor="$border"
-              borderRadius="$4"
-              paddingHorizontal="$4"
-              paddingVertical="$3"
               placeholder="국가명을 입력하세요"
               placeholderTextColor="$mutedForeground"
               value={newCountry}
               onChangeText={setNewCountry}
-              color="$foreground"
               onSubmitEditing={handleAddCountry}
             />
             <FilledButton paddingHorizontal="$4" paddingVertical="$3" onPress={handleAddCountry}>
@@ -262,11 +232,9 @@ export default function EditBackPackScreen() {
             <Pressable style={{ flex: 1 }} onPress={() => setStatus('ongoing')}>
               <XStack
                 flex={1}
+                {...inputStyle}
                 backgroundColor={status === 'ongoing' ? '$accent' : '$muted'}
-                borderWidth={2}
                 borderColor={status === 'ongoing' ? '$primary' : '$border'}
-                borderRadius="$4"
-                paddingVertical="$3"
                 alignItems="center"
                 justifyContent="center"
               >
@@ -278,11 +246,9 @@ export default function EditBackPackScreen() {
             <Pressable style={{ flex: 1 }} onPress={() => setStatus('completed')}>
               <XStack
                 flex={1}
+                {...inputStyle}
                 backgroundColor={status === 'completed' ? '$accent' : '$muted'}
-                borderWidth={2}
                 borderColor={status === 'completed' ? '$primary' : '$border'}
-                borderRadius="$4"
-                paddingVertical="$3"
                 alignItems="center"
                 justifyContent="center"
               >

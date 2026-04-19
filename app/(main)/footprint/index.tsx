@@ -1,5 +1,6 @@
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
-import { XCard } from '@/components/ui/Card';
+
+import { YCard } from '@/components/ui/Card';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import Loading from '@/components/ui/Loading';
@@ -74,37 +75,87 @@ export default function FootprintListScreen() {
     router.push(`/(main)/footprint/${footprintId}`);
   };
 
-  const renderFootprintItem = ({ item: footprint }: { item: Footprint }) => {
+  const renderFootprintItem = ({
+    item: footprint,
+    index,
+    section,
+  }: {
+    item: Footprint;
+    index: number;
+    section: FootprintSection;
+  }) => {
     const firstLocation = footprint.locations[0];
+    const badge = firstLocation?.placeName || footprint.serverId;
+    const date = new Date(footprint.date);
+    const dateLabel = date.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
+    const { total, currency } = getFootprintExpense(footprint.id);
+    const isLast = index === section.data.length - 1;
+
     return (
-      <Pressable onPress={() => handleSelectFootprint(footprint.id)}>
-        <XCard padding="$4" gap="$3" marginBottom="$3">
-          {footprint.photoUrls[0] && (
-            <Image
-              source={{ uri: footprint.photoUrls[0] }}
-              width={96}
-              height={96}
-              borderRadius="$4"
-              resizeMode="cover"
-            />
-          )}
-          <YStack flex={1}>
-            <Text color="$mutedForeground" fontSize={14}>
-              {new Date(footprint.date).toLocaleDateString('ko-KR', {
-                month: 'long',
-                day: 'numeric',
-              })}{' '}
-              {firstLocation ? `· ${firstLocation.placeName || firstLocation.country || ''}` : ''}
-            </Text>
-            <Text color="$foreground" fontWeight="500" marginTop="$1" numberOfLines={1}>
-              {footprint.title}
-            </Text>
-            <Text color="$mutedForeground" fontSize={14} marginTop="$1" numberOfLines={1}>
-              {footprint.content}
-            </Text>
-          </YStack>
-        </XCard>
-      </Pressable>
+      <XStack marginBottom="$3">
+        {/* 타임라인 스트립 */}
+        <YStack alignItems="center" width={20} marginRight="$3">
+          <YStack
+            width={8}
+            height={8}
+            borderRadius={4}
+            backgroundColor="$mutedForeground"
+            marginTop={18}
+          />
+          {!isLast && <YStack flex={1} width={1} backgroundColor="$border" marginTop="$1" />}
+        </YStack>
+
+        {/* 카드 */}
+        <Pressable style={{ flex: 1 }} onPress={() => handleSelectFootprint(footprint.id)}>
+          <YCard paddingHorizontal="$4" paddingVertical="$4" gap="$2">
+            <XStack gap="$3">
+              <YStack flex={1} gap="$2">
+                <XStack alignItems="center" gap="$3">
+                  <Text color="$mutedForeground" fontSize={14}>
+                    {dateLabel}
+                  </Text>
+                  {badge && (
+                    <Text color="$mutedForeground" fontSize={14}>
+                      {badge}
+                    </Text>
+                  )}
+                </XStack>
+                <Text color="$foreground" fontSize={20} fontWeight="700" numberOfLines={1}>
+                  {footprint.title}
+                </Text>
+                <Text color="$mutedForeground" fontSize={14} numberOfLines={1}>
+                  {footprint.content}
+                </Text>
+                <XStack gap="$2" marginTop="$1">
+                  {total > 0 && (
+                    <YStack
+                      backgroundColor="$muted"
+                      borderRadius="$2"
+                      paddingHorizontal="$2"
+                      paddingVertical="$1"
+                    >
+                      <Text color="$mutedForeground" fontSize={12}>
+                        {currency === 'KRW' ? '₩' : currency}
+                        {total.toLocaleString()}
+                      </Text>
+                    </YStack>
+                  )}
+                </XStack>
+              </YStack>
+              {footprint.photoUrls[0] && (
+                <Image
+                  source={{ uri: footprint.photoUrls[0] }}
+                  width={72}
+                  height={72}
+                  borderRadius="$3"
+                  objectFit="cover"
+                  alignSelf="center"
+                />
+              )}
+            </XStack>
+          </YCard>
+        </Pressable>
+      </XStack>
     );
   };
 

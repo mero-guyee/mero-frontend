@@ -1,7 +1,8 @@
 import FadeWrapper from '@/components/ui/FadeWrapper';
-import ErrorText from '@/components/ui/multiStepForm/ErrorText';
-import FormLabel from '@/components/ui/multiStepForm/FormLabel';
-import PrevNextButtons from '@/components/ui/multiStepForm/PrevNextButtons';
+import { inputStyle } from '@/components/ui/Input';
+import ErrorText from '@/components/ui/form/ErrorText';
+import FormLabel from '@/components/ui/form/FormLabel';
+import PrevNextButtons from '@/components/ui/form/multiStepForm/PrevNextButtons';
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useNewTripForm } from '@/contexts/MultiStepForm/NewTripFormContext';
 import { validateEndDate, validateStartDate } from '@/contexts/MultiStepForm/newTripValidation';
@@ -107,14 +108,11 @@ export default function NewTripFormDate() {
               <FormLabel marginBottom="$2">출발일</FormLabel>
               <Pressable onPress={() => setShowStartPicker(true)}>
                 <XStack
-                  backgroundColor="$muted"
-                  borderWidth={2}
-                  borderColor={startDateError ? '$destructive' : '$border'}
-                  borderRadius="$4"
                   paddingHorizontal="$4"
                   paddingVertical="$3"
                   minHeight={48}
                   alignItems="center"
+                  {...inputStyle}
                 >
                   <Text color={newTrip.startDate ? '$foreground' : '$mutedForeground'}>
                     {newTrip.startDate || 'YYYY-MM-DD'}
@@ -127,14 +125,11 @@ export default function NewTripFormDate() {
               <FormLabel marginBottom="$2">귀환일</FormLabel>
               <Pressable onPress={() => setShowEndPicker(true)}>
                 <XStack
-                  backgroundColor="$muted"
-                  borderWidth={2}
-                  borderColor={endDateError ? '$destructive' : '$border'}
-                  borderRadius="$4"
                   paddingHorizontal="$4"
                   paddingVertical="$3"
                   minHeight={48}
                   alignItems="center"
+                  {...inputStyle}
                 >
                   <Text color={newTrip.endDate ? '$foreground' : '$mutedForeground'}>
                     {newTrip.endDate || 'YYYY-MM-DD'}

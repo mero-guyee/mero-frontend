@@ -297,18 +297,11 @@ export function BudgetView() {
                     </Text>
                     <Input
                       flex={1}
-                      backgroundColor="$muted"
-                      borderWidth={2}
-                      borderColor="$border"
-                      borderRadius="$4"
-                      paddingHorizontal="$4"
-                      paddingVertical="$3"
                       placeholder="0"
                       placeholderTextColor="$mutedForeground"
                       value={budgetForm.amount}
                       onChangeText={(text) => setBudgetForm({ ...budgetForm, amount: text })}
                       keyboardType="numeric"
-                      color="$foreground"
                     />
                   </XStack>
                 </YStack>
