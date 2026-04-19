@@ -1,9 +1,19 @@
 import useLocation from '@/hooks/useLocation';
+import { ArrowLeft } from '@tamagui/lucide-icons';
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Animated,
+  BackHandler,
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import MapView, { MapPressEvent } from 'react-native-maps';
-import { YStack } from 'tamagui';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Stack, XStack, YStack } from 'tamagui';
 import LocationSearch from './LocationSearch';
 import LocationView from './LocationView';
 
@@ -38,10 +48,12 @@ type Coordinate = {
 };
 
 type Props = {
+  visible: boolean;
+  onClose: () => void;
   onConfirm: (coord: Coordinate) => void;
 };
 
-export default function LocationPicker({ onConfirm }: Props) {
+export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
   const [initialLocation, setInitialLocation] = useState<null | {
     latitude: number;
     longitude: number;
@@ -51,34 +63,40 @@ export default function LocationPicker({ onConfirm }: Props) {
   const [selected, setSelected] = useState<Coordinate | null>(null);
   const [loading, setLoading] = useState(true);
   const mapRef = useRef<MapView>(null);
+  const insets = useSafeAreaInsets();
+  const [showHint, setShowHint] = useState(false);
 
   const { status: locationPermissionStatus } = useLocation();
 
   useEffect(() => {
+    if (locationPermissionStatus === null) return;
+
     (async () => {
       try {
-        const timeout = new Promise((_, reject) =>
+        if (locationPermissionStatus !== 'granted') {
+          await Location.requestForegroundPermissionsAsync();
+          return;
+        }
+
+        const timeout = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Timeout')), 1000)
         );
 
-        if (locationPermissionStatus === 'granted') {
-          const loc = (await Promise.race([
-            await Location.getCurrentPositionAsync({
-              accuracy: Location.Accuracy.Balanced,
-            }),
-            timeout,
-          ])) as Location.LocationObject;
+        const loc = (await Promise.race([
+          Location.getCurrentPositionAsync({
+            accuracy: Location.Accuracy.Balanced,
+          }),
+          timeout,
+        ])) as Location.LocationObject;
 
-          setInitialLocation({
-            latitude: loc.coords.latitude,
-            longitude: loc.coords.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          });
-        } else {
-          await Location.requestForegroundPermissionsAsync();
-        }
+        setInitialLocation({
+          latitude: loc.coords.latitude,
+          longitude: loc.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
       } catch (e) {
+        console.warn('Failed to get location, using default. Error:', e);
         setInitialLocation({
           latitude: 37.5665,
           longitude: 126.978,
@@ -89,63 +107,139 @@ export default function LocationPicker({ onConfirm }: Props) {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [locationPermissionStatus]);
+
+  useEffect(() => {
+    if (!visible) return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      onClose();
+      return true;
+    });
+    return () => subscription.remove();
+  }, [visible, onClose]);
 
   const handleMapPress = (e: MapPressEvent) => {
     setSelected(e.nativeEvent.coordinate);
   };
 
-  return (
-    <View style={styles.container}>
-      {loading ? (
-        <YStack flex={1} position="relative">
-          <SkeletonBox width="100%" height="100%" borderRadius={0} />
-          <YStack position="absolute" top={16} width="90%" alignSelf="center">
-            <SkeletonBox width="100%" height={44} />
-          </YStack>
-        </YStack>
-      ) : (
-        <>
-          <LocationView
-            mapRef={mapRef}
-            initialLocation={initialLocation}
-            onMapPress={handleMapPress}
-            selected={selected}
-          />
-          <LocationSearch mapRef={mapRef} setSelected={setSelected} />
+  if (!visible) return null;
 
-          {selected ? (
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => {
-                onConfirm(selected);
-              }}
-            >
-              <Text style={styles.buttonText}>이 위치로 선택</Text>
-            </TouchableOpacity>
+  return (
+    <View
+      style={styles.fullscreen}
+      onTouchStart={() => {
+        setShowHint((prev) => !prev);
+      }}
+      onTouchEnd={() => {
+        setShowHint((prev) => !prev);
+      }}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.container}>
+          {loading ? (
+            <YStack flex={1} position="relative">
+              <SkeletonBox width="100%" height="100%" borderRadius={0} />
+              <YStack position="absolute" top={16} width="90%" alignSelf="center">
+                <SkeletonBox width="100%" height={44} />
+              </YStack>
+            </YStack>
           ) : (
-            <View style={styles.hint}>
-              <Text style={styles.hintText}>지도를 탭해서 위치를 선택하세요</Text>
-            </View>
+            <>
+              <LocationView
+                mapRef={mapRef}
+                initialLocation={initialLocation}
+                onMapPress={handleMapPress}
+                selected={selected}
+              />
+              <Stack position="absolute" width="100%">
+                <XStack
+                  flex={1}
+                  alignItems="flex-start"
+                  justifyContent="space-between"
+                  gap="$3.5"
+                  paddingHorizontal={16}
+                  paddingTop={insets.top + 8}
+                >
+                  <View style={{ height: 44, justifyContent: 'center' }}>
+                    <Pressable onPress={() => onClose()} hitSlop={16}>
+                      <ArrowLeft />
+                    </Pressable>
+                  </View>
+                  <LocationSearch mapRef={mapRef} setSelected={setSelected} />
+                </XStack>
+              </Stack>
+
+              {selected && (
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() => {
+                    onConfirm(selected);
+                    onClose();
+                  }}
+                >
+                  <Text style={styles.buttonText} pointerEvents="none">
+                    이 위치로 선택
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {!selected && showHint && (
+                <View style={{ ...styles.hint, bottom: insets.bottom + 16 }} pointerEvents="none">
+                  <Text style={styles.hintText}>지도를 탭해서 위치를 선택하세요</Text>
+                </View>
+              )}
+            </>
           )}
-        </>
-      )}
+        </View>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  fullscreen: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    top: 0,
+    left: 0,
+    zIndex: 999,
+    backgroundColor: '#fff',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E0E0E0',
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111',
+  },
+  closeButton: {
+    width: 48,
+  },
+  closeText: {
+    // position: 'absolute',
+
+    color: '#007AFF',
+  },
   container: {
     flex: 1,
-    aspectRatio: 1,
     position: 'relative',
     backgroundColor: '#EDF6F9',
-    borderRadius: 16,
   },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   hint: {
     position: 'absolute',
-    top: 16,
+    bottom: 16,
     alignSelf: 'center',
     backgroundColor: 'rgba(0,0,0,0.55)',
     paddingHorizontal: 16,

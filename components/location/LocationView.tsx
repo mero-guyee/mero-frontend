@@ -21,7 +21,6 @@ export default function LocationView({
     <View
       style={{
         flex: 1,
-        aspectRatio: 1,
         position: 'relative',
         backgroundColor: '#EDF6F9',
         borderRadius: 16,
@@ -31,7 +30,7 @@ export default function LocationView({
       <View style={{ flex: 1, width: '100%', height: '100%', position: 'absolute' }}>
         <MapView
           ref={mapRef}
-          style={{ flex: 1, aspectRatio: 1 }}
+          style={{ flex: 1 }}
           initialRegion={initialLocation!}
           onPress={onMapPress}
           zoomEnabled

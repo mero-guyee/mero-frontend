@@ -133,7 +133,11 @@ export default function FootprintFormScreen() {
       >
         <SubmitButton onPress={handleSubmit} />
       </BackActionHeader>
-
+      <LocationPicker
+        visible={showLocationPicker}
+        onClose={() => setShowLocationPicker(false)}
+        onConfirm={handleConfirm}
+      />
       <FadeWrapper>
         <YStack flex={1}>
           {/* 섹션 간 스냅 스크롤 */}
@@ -154,7 +158,7 @@ export default function FootprintFormScreen() {
             <ScrollView
               style={{ height: pageHeight }}
               contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 28, paddingBottom: 40 }}
-              keyboardShouldPersistTaps="handled"
+              keyboardShouldPersistTaps="always"
               nestedScrollEnabled={true}
               showsVerticalScrollIndicator={false}
             >
@@ -194,11 +198,7 @@ export default function FootprintFormScreen() {
                     </Text>
                   </XStack>
                 </Pressable>
-                <LocationPicker
-                  visible={showLocationPicker}
-                  onClose={() => setShowLocationPicker(false)}
-                  onConfirm={handleConfirm}
-                />
+
                 {locations.length > 0 && (
                   <XStack flexWrap="wrap" gap="$2" marginTop="$3">
                     {locations.map((loc, index) => (
