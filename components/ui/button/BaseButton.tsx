@@ -1,4 +1,12 @@
-import { Button as TamaguiButton, styled } from 'tamagui';
+import { GetProps, Stack, Button as TamaguiButton, styled } from 'tamagui';
+
+export const filledButtonStyle: GetProps<typeof Stack> = {
+  height: '$12',
+  borderRadius: '$4',
+  borderWidth: 0,
+  backgroundColor: '$accent',
+  pressStyle: { backgroundColor: '$accentHover' },
+};
 
 export const FilledButton = styled(TamaguiButton, {
   height: '$12',
