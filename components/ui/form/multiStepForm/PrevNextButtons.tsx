@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { XStack } from 'tamagui';
-import { FilledButton } from '../button/BaseButton';
+import { FilledButton } from '../../button/BaseButton';
 
 export default function PrevNextButtons({
   isFirst = false,
