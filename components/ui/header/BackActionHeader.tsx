@@ -11,7 +11,7 @@ export default function BackActionHeader({
 }: {
   onBack: () => void;
   label: string;
-  children: ReactNode;
+  children?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
   return (
