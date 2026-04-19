@@ -6,9 +6,19 @@ import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { View } from 'tamagui';
 
+function shouldHideTabBar(state: BottomTabBarProps['state']): boolean {
+  const currentRoute = state.routes[state.index];
+  const nestedRoute = currentRoute.state?.routes[currentRoute.state?.index ?? 0];
+
+  if (currentRoute.name === 'trips') return true;
+  if (currentRoute.name === 'footprint' && nestedRoute?.name === 'new') return true;
+
+  return false;
+}
+
 export default function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const tabBarPadding = state.index === 5 ? 0 : insets.bottom;
+  const tabBarPadding = insets.bottom;
   const animsX = useRef(state.routes.map(() => new Animated.Value(1))).current;
   const animsY = useRef(state.routes.map(() => new Animated.Value(1))).current;
   const animsOpacity = useRef(state.routes.map(() => new Animated.Value(0))).current;
@@ -69,7 +79,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
     }
   }
 
-  if (state.index === 5) return null;
+  if (shouldHideTabBar(state)) return null;
 
   return (
     <View style={{ ...styles.container, paddingBottom: tabBarPadding }}>
