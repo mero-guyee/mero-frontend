@@ -9,7 +9,7 @@ interface CustomPolylineProps {
   onPress: () => void;
 }
 
-function darkenHex(hex: string, amount: number = 0.4): string {
+export function darkenHex(hex: string, amount: number = 0.4): string {
   const clean = hex.replace('#', '');
   const r = parseInt(clean.substring(0, 2), 16);
   const g = parseInt(clean.substring(2, 4), 16);
@@ -29,25 +29,23 @@ export default function CustomPolyline({
 }: CustomPolylineProps) {
   if (coordinates.length < 2) return null;
 
-  const borderColor = isSelected ? darkenHex(color, 0.4) : isDeselected ? '#ffffff30' : '#30221B';
-
-  const mainColor = isDeselected ? `${color}40` : color;
-
   return (
     <>
       <Polyline
+        style={{ position: 'absolute', zIndex: 999 }}
         coordinates={coordinates}
-        strokeColor={borderColor}
-        strokeWidth={isSelected ? 14 : 12}
-        tappable={!isSelected && !isDeselected}
+        strokeColor={darkenHex(color, 0.65)}
+        strokeWidth={isSelected ? 16 : 12}
+        tappable
         onPress={onPress}
         geodesic={true}
       />
       <Polyline
+        style={{ position: 'absolute', zIndex: 999 }}
         coordinates={coordinates}
-        strokeColor={mainColor}
+        strokeColor={color}
         strokeWidth={isSelected ? 10 : 9}
-        tappable={!isSelected && !isDeselected}
+        tappable
         onPress={onPress}
         geodesic={true}
       />

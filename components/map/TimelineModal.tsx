@@ -26,28 +26,33 @@ export default function TimelineModal({
       <Pressable
         style={{
           flex: 1,
-          // backgroundColor: 'rgba(0,0,0,0.5)',
           justifyContent: 'flex-end',
         }}
         onPress={onClose}
       >
         <Pressable onPress={(e) => e.stopPropagation()} style={{ height: '45%' }}>
           <YStack
+            style={{
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 10 },
+              shadowOpacity: 0.92,
+              shadowRadius: 20,
+              elevation: 24,
+            }}
             backgroundColor="$card"
             borderTopLeftRadius="$6"
             borderTopRightRadius="$6"
             flex={1}
           >
-            {/* Modal Header */}
             <XStack
-              alignItems="center"
+              alignItems="flex-start"
               justifyContent="space-between"
               padding="$5"
               borderBottomWidth={2}
               borderBottomColor="$border"
               style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
             >
-              <YStack>
+              <YStack alignItems="flex-start">
                 <XStack alignItems="center" gap="$2">
                   <BookOpen size={20} color="$foreground" />
                   <Text color="$foreground" fontSize={18} fontWeight="600">
@@ -59,11 +64,11 @@ export default function TimelineModal({
                 </Text>
               </YStack>
               <CircularButton size="$3" onPress={onClose}>
-                <X size={20} color="$foreground" />
+                <X size={28} color="$foreground" />
               </CircularButton>
             </XStack>
 
-            {/* Timeline Content */}
+            {/*  Content */}
             <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
               {timelineMemos.length === 0 ? (
                 <YStack alignItems="center" paddingVertical={48}>
