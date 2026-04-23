@@ -4,15 +4,32 @@ import More from '@/components/ui/More';
 import { formattedLocation } from '@/utils/location/location';
 import { Cloud, MapPin } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { Alert, Modal, Pressable, ScrollView } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Alert, BackHandler, Modal, Pressable, ScrollView } from 'react-native';
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { FilledButton } from '../../../components/ui';
 import { useExpenses, useFootprints } from '../../../contexts';
 
 export default function FootprintDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
+
   const router = useRouter();
+
+  const handleBack = useCallback(() => {
+    if (from === 'map') {
+      router.push('/(main)/map');
+    } else {
+      router.back();
+    }
+  }, [from, router]);
+
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      handleBack();
+      return true;
+    });
+    return () => subscription.remove();
+  }, [handleBack]);
   const { footprints, deleteFootprint } = useFootprints();
   const { getExpensesByFootprintId, deleteExpense } = useExpenses();
 
@@ -74,7 +91,7 @@ export default function FootprintDetailScreen() {
         style: 'destructive',
         onPress: () => {
           deleteFootprint(footprint.id);
-          router.back();
+          handleBack();
         },
       },
     ]);
@@ -101,7 +118,7 @@ export default function FootprintDetailScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       {/* Header */}
-      <BackActionHeader label={footprint.title} onBack={() => router.back()}>
+      <BackActionHeader label={footprint.title} onBack={() => handleBack()}>
         <More>
           <Pressable onPress={handleEdit}>
             <XStack padding="$3">

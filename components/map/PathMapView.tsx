@@ -1,12 +1,11 @@
 import { Footprint } from '@/types';
 import { ChevronLeft, ChevronRight, Plane } from '@tamagui/lucide-icons';
-import { useRouter } from 'expo-router';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import MapView from 'react-native-maps';
 import CustomPolyline from './CustomPolyline';
 import FootprintMarker from './FootprintMarker';
-import TimelineModal from './TimelineModal';
+import MapFootprintModal from './MapFootprintModal';
 
 const FOOTPRINT_COLORS = [
   '#9BC4D1', // primary
@@ -27,8 +26,6 @@ const toDateKey = (date: string) => date.split('T')[0];
 
 export default function PathMapView({ footprints }: PathMapViewProps) {
   const mapRef = useRef<MapView>(null);
-  const router = useRouter();
-
   const [selectedFootprint, setSelectedFootprint] = useState<Footprint | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [focusedDateIndex, setFocusedDateIndex] = useState(0);
@@ -123,12 +120,6 @@ export default function PathMapView({ footprints }: PathMapViewProps) {
   const handleCloseModal = () => {
     setSelectedFootprint(null);
     setShowModal(false);
-  };
-
-  const handleViewFootprint = (footprintId: string) => {
-    setShowModal(false);
-    setSelectedFootprint(null);
-    router.push(`/(main)/footprint/${footprintId}`);
   };
 
   const isPrevDisabled = focusedDateIndex === 0;
@@ -253,13 +244,10 @@ export default function PathMapView({ footprints }: PathMapViewProps) {
         </View>
       )}
 
-      <TimelineModal
+      <MapFootprintModal
         visible={showModal}
         onClose={handleCloseModal}
-        selectedCountry={selectedFootprint?.title ?? null}
-        selectedLocation={null}
-        timelineMemos={selectedFootprint ? [selectedFootprint] : []}
-        onViewFootprint={handleViewFootprint}
+        footprint={selectedFootprint}
       />
     </View>
   );

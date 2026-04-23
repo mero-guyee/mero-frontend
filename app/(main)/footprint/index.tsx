@@ -22,6 +22,7 @@ interface FootprintSection {
 export default function FootprintListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
   const { activeTrip } = useTrips();
   const { footprints, isFoorPrintLoading } = useFootprints();
   const { expenses } = useExpenses();
