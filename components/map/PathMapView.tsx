@@ -1,7 +1,7 @@
 import { Footprint } from '@/types';
-import { ChevronLeft, ChevronRight, Plane } from '@tamagui/lucide-icons';
+import { Plane } from '@tamagui/lucide-icons';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
 import CustomPolyline from './CustomPolyline';
 import FootprintMarker from './FootprintMarker';
@@ -122,16 +122,6 @@ export default function PathMapView({ footprints }: PathMapViewProps) {
     setShowModal(false);
   };
 
-  const isPrevDisabled = focusedDateIndex === 0;
-  const isNextDisabled = focusedDateIndex === uniqueDates.length - 1;
-  const focusedDateLabel = uniqueDates[focusedDateIndex]
-    ? new Date(uniqueDates[focusedDateIndex]).toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
-    : '';
-
   if (footprints.length === 0 || !footprints) {
     return (
       <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
@@ -221,28 +211,6 @@ export default function PathMapView({ footprints }: PathMapViewProps) {
           ));
         })}
       </MapView>
-
-      {uniqueDates.length > 1 && (
-        <View style={styles.navOverlay}>
-          <TouchableOpacity
-            style={[styles.navButton, isPrevDisabled && styles.navButtonDisabled]}
-            onPress={() => handleNavigate('prev')}
-            disabled={isPrevDisabled}
-          >
-            <ChevronLeft size={18} color={isPrevDisabled ? '#C0B8B0' : '#30221B'} />
-          </TouchableOpacity>
-
-          <Text style={styles.navCounter}>{focusedDateLabel}</Text>
-
-          <TouchableOpacity
-            style={[styles.navButton, isNextDisabled && styles.navButtonDisabled]}
-            onPress={() => handleNavigate('next')}
-            disabled={isNextDisabled}
-          >
-            <ChevronRight size={18} color={isNextDisabled ? '#C0B8B0' : '#30221B'} />
-          </TouchableOpacity>
-        </View>
-      )}
 
       <MapFootprintModal
         visible={showModal}
