@@ -50,7 +50,7 @@ export default function MapFootprintModal({ visible, onClose, footprint }: MapFo
 
   return (
     <>
-      <Modal visible={visible} animationType="slide" transparent>
+      <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
         <Pressable style={{ flex: 1, justifyContent: 'flex-end' }} onPress={onClose}>
           <Pressable onPress={(e) => e.stopPropagation()} style={{ height: '85%' }}>
             <YStack
