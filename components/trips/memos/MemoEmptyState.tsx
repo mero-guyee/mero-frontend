@@ -1,17 +1,11 @@
+import { YCard } from '@/components/ui/Card';
 import { BookOpen, Pencil } from '@tamagui/lucide-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import { FilledButton } from '../../ui';
 
 export function MemoEmptyState({ onPress }: { onPress: () => void }) {
   return (
-    <YStack
-      backgroundColor="$card"
-      borderRadius="$6"
-      padding="$8"
-      alignItems="center"
-      borderWidth={1}
-      borderColor="$border"
-    >
+    <YCard padding="$8" alignItems="center">
       <YStack
         width={64}
         height={64}
@@ -35,6 +29,6 @@ export function MemoEmptyState({ onPress }: { onPress: () => void }) {
           </Text>
         </XStack>
       </FilledButton>
-    </YStack>
+    </YCard>
   );
 }

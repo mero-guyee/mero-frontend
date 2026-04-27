@@ -4,6 +4,7 @@ import { TripDocumentsTab } from '@/components/trips/documents/TripDocumentsTab'
 import MemoTab from '@/components/trips/memos/MemoTab';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import Loading from '@/components/ui/Loading';
+import { TabPager } from '@/components/ui/TabPager';
 import { useTripQuery } from '@/hooks/queries/useTrips';
 import { useState } from 'react';
 import { Text, YStack } from 'tamagui';
@@ -38,15 +39,16 @@ export default function TripHomeScreen() {
 
           <TripSubTabs activeTab={subTab} onTabChange={setSubTab} />
 
-          <YStack padding="$5" paddingTop="$4">
-            {subTab === 'memos' ? (
+          <TabPager tabValues={['memos', 'files']} activeTab={subTab}>
+            <YStack padding="$5" paddingTop="$4">
               <MemoTab memos={memos} tripId={activeTrip!} />
-            ) : (
+              <YStack height={100} />
+            </YStack>
+            <YStack padding="$5" paddingTop="$4">
               <TripDocumentsTab tripId={trip.id} />
-            )}
-          </YStack>
-
-          <YStack height={100} />
+              <YStack height={100} />
+            </YStack>
+          </TabPager>
         </YStack>
       </FadeWrapper>
     </YStack>

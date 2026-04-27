@@ -1,8 +1,8 @@
 import { useMemos } from '@/contexts';
 import { Memo } from '@/types';
 import { router } from 'expo-router';
-import { Alert, Pressable } from 'react-native';
-import { Text, XStack, YStack } from 'tamagui';
+import { Alert } from 'react-native';
+import { YStack } from 'tamagui';
 import MemoCard from './MemoCard';
 import { MemoEmptyState } from './MemoEmptyState';
 
@@ -33,18 +33,7 @@ export default function MemoTab({ memos, tripId }: { memos: Memo[]; tripId: stri
     ]);
   };
   return (
-    <YStack gap="$3">
-      <XStack alignItems="center" justifyContent="space-between" marginBottom="$1">
-        <Text color="$foreground" fontSize={14}>
-          {memos.length > 0 ? `총 ${memos.length}개의 메모` : '메모'}
-        </Text>
-        <Pressable onPress={handleCreateMemo}>
-          <Text color="$primary" fontSize={14}>
-            + 새 메모
-          </Text>
-        </Pressable>
-      </XStack>
-
+    <YStack gap="$3" marginTop="$4">
       {memos.length === 0 ? (
         <MemoEmptyState onPress={handleCreateMemo} />
       ) : (
