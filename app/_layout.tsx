@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ActivityIndicator, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PortalProvider } from 'tamagui';
 import { AuthProvider, BudgetProvider, ExpenseProvider, TripProvider } from '../contexts';
@@ -63,14 +64,16 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <TamaguiProvider config={config} defaultTheme="light">
-        <DatabaseProvider>
-          <QueryProvider>
-            <AppContent />
-          </QueryProvider>
-        </DatabaseProvider>
-      </TamaguiProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <TamaguiProvider config={config} defaultTheme="light">
+          <DatabaseProvider>
+            <QueryProvider>
+              <AppContent />
+            </QueryProvider>
+          </DatabaseProvider>
+        </TamaguiProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

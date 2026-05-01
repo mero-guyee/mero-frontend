@@ -46,7 +46,7 @@ export function ExpensesView() {
   };
 
   return (
-    <YStack flex={1} position="relative">
+    <YStack flex={1} position="relative" paddingTop={20}>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
         <YStack gap="$4">
           {Object.keys(expensesByCurrency).length > 0 && (

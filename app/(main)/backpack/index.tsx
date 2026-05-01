@@ -4,19 +4,26 @@ import { TripDocumentsTab } from '@/components/trips/documents/TripDocumentsTab'
 import MemoTab from '@/components/trips/memos/MemoTab';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import Loading from '@/components/ui/Loading';
-import { TabPager } from '@/components/ui/TabPager';
+import { SubTabs } from '@/components/ui/tabbar/subTabs/SubTabs';
 import { useTripQuery } from '@/hooks/queries/useTrips';
 import { useState } from 'react';
+import { useWindowDimensions } from 'react-native';
+import { TabView } from 'react-native-tab-view';
 import { Text, YStack } from 'tamagui';
-import { SubTab, TripSubTabs } from '../../../components/trips/TripSubTabs';
 import { useMemos, useTrips } from '../../../contexts';
+
+const routes = [
+  { key: 'memos', title: '메모' },
+  { key: 'files', title: '서류' },
+];
 
 export default function TripHomeScreen() {
   const { activeTrip } = useTrips();
   const { data: trip, isLoading } = useTripQuery(activeTrip || '');
   const { memos } = useMemos();
+  const layout = useWindowDimensions();
 
-  const [subTab, setSubTab] = useState<SubTab>('memos');
+  const [index, setIndex] = useState(0);
 
   if (isLoading) {
     return <Loading />;
@@ -37,18 +44,29 @@ export default function TripHomeScreen() {
         <YStack flex={1}>
           <TripCoverImage uri={trip.imageUrl} />
 
-          <TripSubTabs activeTab={subTab} onTabChange={setSubTab} />
-
-          <TabPager tabValues={['memos', 'files']} activeTab={subTab}>
-            <YStack padding="$5" paddingTop="$4">
-              <MemoTab memos={memos} tripId={activeTrip!} />
-              <YStack height={100} />
-            </YStack>
-            <YStack padding="$5" paddingTop="$4">
-              <TripDocumentsTab tripId={trip.id} />
-              <YStack height={100} />
-            </YStack>
-          </TabPager>
+          <TabView
+            navigationState={{ index, routes }}
+            renderScene={({ route }) => {
+              switch (route.key) {
+                case 'memos':
+                  return <MemoTab memos={memos} tripId={activeTrip!} />;
+                case 'files':
+                  return <TripDocumentsTab tripId={trip.id} />;
+                default:
+                  return null;
+              }
+            }}
+            renderTabBar={(props) => (
+              <SubTabs
+                tabs={props.navigationState.routes.map((r) => ({ value: r.key, label: r.title! }))}
+                activeTab={props.navigationState.routes[props.navigationState.index].key}
+                onTabChange={props.jumpTo}
+                swipePosition={props.position}
+              />
+            )}
+            onIndexChange={setIndex}
+            initialLayout={{ width: layout.width }}
+          />
         </YStack>
       </FadeWrapper>
     </YStack>

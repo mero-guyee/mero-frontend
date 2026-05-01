@@ -1,3 +1,4 @@
+import { YCard } from '@/components/ui/Card';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import More from '@/components/ui/More';
@@ -201,16 +202,10 @@ export default function FootprintDetailScreen() {
           {/* Expenses */}
           <YStack marginBottom="$6">
             <Text color="$foreground" fontSize={16} fontWeight="600" marginBottom="$3">
-              💰 사용한 돈
+              사용한 돈
             </Text>
             {expenses.length > 0 ? (
-              <YStack
-                backgroundColor="$card"
-                borderRadius="$4"
-                borderWidth={1}
-                borderColor="$border"
-                overflow="hidden"
-              >
+              <YCard backgroundColor="$card" overflow="hidden">
                 {expenses.map((expense, index) => (
                   <YStack
                     key={expense.id}
@@ -245,7 +240,7 @@ export default function FootprintDetailScreen() {
                     </Text>
                   </XStack>
                 </YStack>
-              </YStack>
+              </YCard>
             ) : (
               <YStack
                 backgroundColor="$card"

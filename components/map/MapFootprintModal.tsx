@@ -158,7 +158,7 @@ export default function MapFootprintModal({ visible, onClose, footprint }: MapFo
                     {/* Expenses */}
                     <YStack marginBottom="$6">
                       <Text color="$foreground" fontSize={16} fontWeight="600" marginBottom="$3">
-                        💰 사용한 돈
+                        사용한 돈
                       </Text>
                       {expenses.length > 0 ? (
                         <YStack
