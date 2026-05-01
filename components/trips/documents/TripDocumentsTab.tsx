@@ -35,7 +35,7 @@ export function TripDocumentsTab({ tripId }: { tripId: string }) {
   const removeFile = (index: number) => {};
 
   return (
-    <YStack gap="$6">
+    <YStack gap="$6" px="$4">
       {/* File Upload */}
       <YStack>
         <Text color="$foreground" fontSize={14} marginBottom="$3">

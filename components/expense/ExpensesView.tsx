@@ -1,3 +1,4 @@
+import { paddingHorizontalGeneral } from '@/constants/theme';
 import { Plus } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
@@ -46,8 +47,11 @@ export function ExpensesView() {
   };
 
   return (
-    <YStack flex={1} position="relative" paddingTop={20}>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
+    <YStack flex={1} position="relative">
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: paddingHorizontalGeneral, paddingBottom: 100 }}
+      >
         <YStack gap="$4">
           {Object.keys(expensesByCurrency).length > 0 && (
             <YCard padding="$5">

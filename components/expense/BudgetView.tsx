@@ -1,3 +1,4 @@
+import { paddingHorizontalGeneral } from '@/constants/theme';
 import { Edit3, Plus, Trash2, X } from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView } from 'react-native';
@@ -71,7 +72,10 @@ export function BudgetView() {
 
   return (
     <YStack flex={1}>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20, paddingBottom: 100 }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: paddingHorizontalGeneral, paddingBottom: 100 }}
+      >
         <YStack gap="$4">
           <YStack>
             <Text color="$foreground" fontSize={16} fontWeight="600">

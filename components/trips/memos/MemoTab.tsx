@@ -33,7 +33,7 @@ export default function MemoTab({ memos, tripId }: { memos: Memo[]; tripId: stri
     ]);
   };
   return (
-    <YStack gap="$3" marginTop="$4">
+    <YStack gap="$3" px="$4">
       {memos.length === 0 ? (
         <MemoEmptyState onPress={handleCreateMemo} />
       ) : (

@@ -2,7 +2,7 @@ import { Animated } from 'react-native';
 
 const PILL_HEIGHT = 32;
 const PILL_RADIUS = 8;
-const PILL_COLOR = '#C8DEE6';
+const PILL_COLOR = '#ebdcb8';
 
 export namespace TabButtonOverlay {
   export const Click = ClickTabButtonOverlay;

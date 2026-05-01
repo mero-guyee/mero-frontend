@@ -67,7 +67,7 @@ export function SubTabs<T extends string>({
   };
 
   return (
-    <YStack padding="$3" {...containerProps}>
+    <YStack padding="$4" {...containerProps}>
       <XStack columnGap="$3" position="relative">
         {allLayoutsReady && swipePosition && (
           <TabButtonOverlay.Swipe
@@ -100,7 +100,11 @@ export function SubTabs<T extends string>({
             onPress={() => handleTabChange(tab.value)}
             zIndex={1}
           >
-            <Text color="$foreground" fontSize={14} fontWeight="500">
+            <Text
+              color={activeTab === tab.value ? '$foreground' : '$mutedForeground'}
+              fontSize={14}
+              fontWeight="500"
+            >
               {tab.label}
             </Text>
           </XStack>
