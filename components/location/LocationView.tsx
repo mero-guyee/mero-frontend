@@ -26,8 +26,12 @@ export default function LocationView({
         borderRadius: 16,
         overflow: 'hidden',
       }}
+      onPress={(e) => e.preventDefault()}
     >
-      <View style={{ flex: 1, width: '100%', height: '100%', position: 'absolute' }}>
+      <View
+        style={{ flex: 1, width: '100%', height: '100%', position: 'absolute' }}
+        onPress={(e) => e.preventDefault()}
+      >
         <MapView
           ref={mapRef}
           style={{ flex: 1 }}
@@ -36,7 +40,7 @@ export default function LocationView({
           zoomEnabled
           scrollEnabled
           rotateEnabled
-          pointerEvents="box-none"
+          box-only
         >
           {selected && <Marker coordinate={selected} />}
         </MapView>

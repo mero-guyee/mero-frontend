@@ -1,5 +1,5 @@
 import useLocation from '@/hooks/useLocation';
-import { ArrowLeft } from '@tamagui/lucide-icons';
+import { ArrowLeft, Plane } from '@tamagui/lucide-icons';
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -13,34 +13,10 @@ import {
 } from 'react-native';
 import MapView, { MapPressEvent } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { Stack, XStack, YStack } from 'tamagui';
 import LocationSearch from './LocationSearch';
 import LocationView from './LocationView';
-
-function SkeletonBox({
-  width,
-  height,
-  borderRadius = 8,
-}: {
-  width: number | `${number}%`;
-  height: number | `${number}%`;
-  borderRadius?: number;
-}) {
-  const opacity = useRef(new Animated.Value(0.4)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, { toValue: 1, duration: 800, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 0.4, duration: 800, useNativeDriver: true }),
-      ])
-    ).start();
-  }, [opacity]);
-
-  return (
-    <Animated.View style={{ width, height, borderRadius, backgroundColor: '#D0D0D0', opacity }} />
-  );
-}
 
 type Coordinate = {
   latitude: number;
@@ -62,11 +38,11 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
   }>(null);
   const [selected, setSelected] = useState<Coordinate | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isMapSuccessfullyLoaded, setIsMapSuccessfullyLoaded] = useState(false);
   const mapRef = useRef<MapView>(null);
   const insets = useSafeAreaInsets();
-  const [showHint, setShowHint] = useState(false);
 
-  const { status: locationPermissionStatus } = useLocation();
+  const { status: locationPermissionStatus, getCurrentPositionWithRetry } = useLocation();
 
   useEffect(() => {
     if (locationPermissionStatus === null) return;
@@ -77,17 +53,7 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
           await Location.requestForegroundPermissionsAsync();
           return;
         }
-
-        const timeout = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), 1000)
-        );
-
-        const loc = (await Promise.race([
-          Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
-          }),
-          timeout,
-        ])) as Location.LocationObject;
+        const loc = await getCurrentPositionWithRetry({ accuracy: Location.Accuracy.Balanced });
 
         setInitialLocation({
           latitude: loc.coords.latitude,
@@ -95,18 +61,26 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         });
-      } catch (e) {
-        console.warn('Failed to get location, using default. Error:', e);
-        setInitialLocation({
-          latitude: 37.5665,
-          longitude: 126.978,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05,
-        });
+        setIsMapSuccessfullyLoaded(true);
+        Toast.show({ type: 'success', text1: '현재 위치를 불러왔어요' });
+      } catch {
+        setIsMapSuccessfullyLoaded(false);
+        Toast.show({ type: 'error', text1: '위치를 불러오지 못했어요' });
+        (async () => {
+          const loc = await Location.getLastKnownPositionAsync();
+          if (loc)
+            setInitialLocation({
+              latitude: loc.coords.latitude,
+              longitude: loc.coords.longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            });
+        })();
       } finally {
         setLoading(false);
       }
     })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locationPermissionStatus]);
 
   useEffect(() => {
@@ -125,21 +99,15 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
   if (!visible) return null;
 
   return (
-    <View
-      style={styles.fullscreen}
-      onTouchStart={() => {
-        setShowHint((prev) => !prev);
-      }}
-      onTouchEnd={() => {
-        setShowHint((prev) => !prev);
-      }}
-    >
+    <View style={styles.fullscreen}>
       <View style={styles.modalContainer}>
         <View style={styles.container}>
           {loading ? (
             <YStack flex={1} position="relative">
               <SkeletonBox width="100%" height="100%" borderRadius={0} />
               <YStack position="absolute" top={16} width="90%" alignSelf="center">
+                <Text>지도를 가져오는 중</Text>
+                <Plane width={24} height={24} color="#A0A0A0" />
                 <SkeletonBox width="100%" height={44} />
               </YStack>
             </YStack>
@@ -182,15 +150,11 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
                   </Text>
                 </TouchableOpacity>
               )}
-              {!selected && showHint && (
-                <View style={{ ...styles.hint, bottom: insets.bottom + 16 }} pointerEvents="none">
-                  <Text style={styles.hintText}>지도를 탭해서 위치를 선택하세요</Text>
-                </View>
-              )}
             </>
           )}
         </View>
       </View>
+      <Toast />
     </View>
   );
 }
@@ -258,3 +222,28 @@ const styles = StyleSheet.create({
   },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });
+
+function SkeletonBox({
+  width,
+  height,
+  borderRadius = 8,
+}: {
+  width: number | `${number}%`;
+  height: number | `${number}%`;
+  borderRadius?: number;
+}) {
+  const opacity = useRef(new Animated.Value(0.4)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 1, duration: 800, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.4, duration: 800, useNativeDriver: true }),
+      ])
+    ).start();
+  }, [opacity]);
+
+  return (
+    <Animated.View style={{ width, height, borderRadius, backgroundColor: '#D0D0D0', opacity }} />
+  );
+}
