@@ -1,7 +1,7 @@
 import { toastConfig } from '@/components/ui/CustomToast';
 import CustomTabBar from '@/components/ui/tabbar/CustomTabBar';
 import useBackHandler from '@/hooks/useBackHandler';
-import { Backpack, BookOpen, Settings, Wallet } from '@tamagui/lucide-icons';
+import { Backpack, BookOpen, Wallet } from '@tamagui/lucide-icons';
 import { Tabs } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import { useActiveTripGuard } from '../../hooks/useActiveTripGuard';
@@ -51,7 +51,7 @@ export default function MainLayout() {
           name="settings"
           options={{
             tabBarLabel: '설정',
-            tabBarIcon: ({ color, size }) => <Settings size={size} color={color} />,
+            tabBarStyle: { display: 'none' },
           }}
         />
         <Tabs.Screen

@@ -66,7 +66,7 @@ export default function SettingsScreen() {
   );
 
   return (
-    <YStack flex={1} backgroundColor="$background">
+    <YStack flex={1} backgroundColor="$background" pb={insets.bottom}>
       {/* Header */}
       <TabScreenHeader label="설정" />
 

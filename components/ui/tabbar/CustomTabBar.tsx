@@ -11,6 +11,7 @@ function shouldHideTabBar(state: BottomTabBarProps['state']): boolean {
   const nestedRoute = currentRoute.state?.routes[currentRoute.state?.index ?? 0];
 
   if (currentRoute.name === 'trips') return true;
+  if (currentRoute.name === 'settings') return true;
   if (currentRoute.name === 'footprint' && nestedRoute?.name === 'new') return true;
 
   return false;
@@ -85,7 +86,9 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
     <View style={{ ...styles.container, paddingBottom: tabBarPadding }}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
+        console.log(options);
         if (options.tabBarLabel === '여행') return null;
+        if (options.tabBarLabel === '설정') return null;
 
         const isFocused = state.index === index;
         const color = isFocused ? '#9BC4D1' : '#8B7355';
