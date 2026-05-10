@@ -1,5 +1,5 @@
 import useLocation from '@/hooks/useLocation';
-import { ArrowLeft, Plane } from '@tamagui/lucide-icons';
+import { ArrowLeft, Clock, MapPin, Plane } from '@tamagui/lucide-icons';
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -38,11 +38,17 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
   }>(null);
   const [selected, setSelected] = useState<Coordinate | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isMapSuccessfullyLoaded, setIsMapSuccessfullyLoaded] = useState(false);
+  const [locationSource, setLocationSource] = useState<'current' | 'lastKnown' | 'fallback'>(
+    'current'
+  );
   const mapRef = useRef<MapView>(null);
   const insets = useSafeAreaInsets();
 
-  const { status: locationPermissionStatus, getCurrentPositionWithRetry } = useLocation();
+  const {
+    status: locationPermissionStatus,
+    getCurrentPositionWithRetry,
+    getLastKnownPositionWithRetry,
+  } = useLocation();
 
   useEffect(() => {
     if (locationPermissionStatus === null) return;
@@ -53,7 +59,10 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
           await Location.requestForegroundPermissionsAsync();
           return;
         }
-        const loc = await getCurrentPositionWithRetry({ accuracy: Location.Accuracy.Balanced });
+        const loc = await getCurrentPositionWithRetry(
+          { accuracy: Location.Accuracy.Balanced },
+          { timeoutMs: 600 }
+        );
 
         setInitialLocation({
           latitude: loc.coords.latitude,
@@ -61,26 +70,31 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         });
-        setIsMapSuccessfullyLoaded(true);
-        Toast.show({ type: 'success', text1: '현재 위치를 불러왔어요' });
+        setLocationSource('current');
       } catch {
-        setIsMapSuccessfullyLoaded(false);
-        Toast.show({ type: 'error', text1: '위치를 불러오지 못했어요' });
-        (async () => {
-          const loc = await Location.getLastKnownPositionAsync();
-          if (loc)
-            setInitialLocation({
-              latitude: loc.coords.latitude,
-              longitude: loc.coords.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
-            });
-        })();
+        const loc = await getLastKnownPositionWithRetry({}, { timeoutMs: 600 });
+        if (loc) {
+          setInitialLocation({
+            latitude: loc.coords.latitude,
+            longitude: loc.coords.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          });
+          setLocationSource('lastKnown');
+        } else {
+          setInitialLocation({
+            latitude: 37.5,
+            longitude: 127.0,
+            latitudeDelta: 5.0,
+            longitudeDelta: 5.0,
+          });
+          setLocationSource('fallback');
+        }
       } finally {
         setLoading(false);
       }
     })();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locationPermissionStatus]);
 
   useEffect(() => {
@@ -91,6 +105,28 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
     });
     return () => subscription.remove();
   }, [visible, onClose]);
+
+  useEffect(() => {
+    if (!visible) return;
+    if (locationSource === 'lastKnown') {
+      Toast.show({
+        type: 'info',
+        text1: '실시간 위치를 가져올 수 없어요',
+        text2: '이전 위치를 기준으로 지도가 열립니다',
+        position: 'bottom',
+        visibilityTime: 3000,
+      });
+    }
+    if (locationSource === 'fallback') {
+      Toast.show({
+        type: 'error',
+        text1: '위치를 가져올 수 없어요',
+        text2: '지도가 서울 중심으로 열립니다',
+        position: 'bottom',
+        visibilityTime: 3000,
+      });
+    }
+  }, [visible, locationSource]);
 
   const handleMapPress = (e: MapPressEvent) => {
     setSelected(e.nativeEvent.coordinate);
@@ -103,13 +139,8 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
       <View style={styles.modalContainer}>
         <View style={styles.container}>
           {loading ? (
-            <YStack flex={1} position="relative">
-              <SkeletonBox width="100%" height="100%" borderRadius={0} />
-              <YStack position="absolute" top={16} width="90%" alignSelf="center">
-                <Text>지도를 가져오는 중</Text>
-                <Plane width={24} height={24} color="#A0A0A0" />
-                <SkeletonBox width="100%" height={44} />
-              </YStack>
+            <YStack flex={1} justifyContent="center" alignItems="center">
+              <Plane width={24} height={24} color="#A0A0A0" />
             </YStack>
           ) : (
             <>
@@ -135,7 +166,23 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
                   </View>
                   <LocationSearch mapRef={mapRef} setSelected={setSelected} />
                 </XStack>
+                {locationSource === 'lastKnown' && (
+                  <View style={styles.amberChip}>
+                    <Clock size={12} color="#92400E" />
+                    <Text style={styles.amberChipText}>이전 위치 기준</Text>
+                  </View>
+                )}
               </Stack>
+
+              {locationSource === 'fallback' && !selected && (
+                <View style={styles.fallbackCard}>
+                  <MapPin size={20} color="#6B7280" />
+                  <Text style={styles.fallbackCardTitle}>위치를 가져올 수 없어요</Text>
+                  <Text style={styles.fallbackCardSub}>
+                    검색하거나 지도를 탭해서 직접 선택해 주세요
+                  </Text>
+                </View>
+              )}
 
               {selected && (
                 <TouchableOpacity
@@ -221,6 +268,38 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  amberChip: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: '#FEF3C7',
+    borderColor: '#F59E0B',
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    marginTop: 8,
+  },
+  amberChipText: { color: '#92400E', fontSize: 12, fontWeight: '500' },
+  fallbackCard: {
+    position: 'absolute',
+    top: '30%',
+    alignSelf: 'center',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  fallbackCardTitle: { color: '#374151', fontSize: 15, fontWeight: '600' },
+  fallbackCardSub: { color: '#6B7280', fontSize: 13, textAlign: 'center' },
 });
 
 function SkeletonBox({

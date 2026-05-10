@@ -86,7 +86,6 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
     <View style={{ ...styles.container, paddingBottom: tabBarPadding }}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
-        console.log(options);
         if (options.tabBarLabel === '여행') return null;
         if (options.tabBarLabel === '설정') return null;
 

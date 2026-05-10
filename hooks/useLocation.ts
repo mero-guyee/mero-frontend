@@ -1,40 +1,44 @@
+import retryAsync from '@/utils/retryAsync';
 import * as Location from 'expo-location';
 
 interface RetryOptions {
   retries?: number;
   delayMs?: number;
+  timeoutMs?: number;
 }
 
 export default function useLocation() {
   const [locationPermissionsInfo] = Location.useForegroundPermissions();
 
-  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
   async function getCurrentPositionWithRetry(
     options?: Location.LocationOptions,
     retryOptions: RetryOptions = {}
   ): Promise<Location.LocationObject> {
-    const { retries = 5, delayMs = 1000 } = retryOptions;
+    const { retries = 5, delayMs = 200, timeoutMs } = retryOptions;
 
-    let lastError: unknown;
+    return retryAsync(() => Location.getCurrentPositionAsync(options), {
+      retries,
+      delayMs,
+      timeoutMs,
+    });
+  }
 
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        return await Location.getCurrentPositionAsync(options);
-      } catch (error) {
-        lastError = error;
+  async function getLastKnownPositionWithRetry(
+    options?: Location.LocationLastKnownOptions,
+    retryOptions: RetryOptions = {}
+  ): Promise<Location.LocationObject | null> {
+    const { retries = 1, delayMs = 100, timeoutMs } = retryOptions;
 
-        if (attempt < retries) {
-          await sleep(delayMs);
-        }
-      }
-    }
-
-    throw lastError;
+    return retryAsync(() => Location.getLastKnownPositionAsync(options), {
+      retries,
+      delayMs,
+      timeoutMs,
+    });
   }
 
   return {
     status: locationPermissionsInfo ? locationPermissionsInfo.status : null,
     getCurrentPositionWithRetry,
+    getLastKnownPositionWithRetry,
   };
 }
