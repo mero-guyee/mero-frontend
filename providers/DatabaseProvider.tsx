@@ -14,10 +14,15 @@ export function DatabaseProvider({ children }: { children: ReactNode }) {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    getDatabase().then((database) => {
-      setDb(database);
-      setIsReady(true);
-    });
+    getDatabase()
+      .then((database) => {
+        setDb(database);
+        setIsReady(true);
+      })
+      .catch((error) => {
+        console.error('[DatabaseProvider] Failed to initialize database:', error);
+        setIsReady(true);
+      });
   }, []);
 
   return <DatabaseContext.Provider value={{ db, isReady }}>{children}</DatabaseContext.Provider>;
