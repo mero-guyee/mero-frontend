@@ -5,7 +5,7 @@ import { YStack } from 'tamagui';
 import { useFootprints } from '../../contexts';
 
 export default function MapViewScreen() {
-  const { footprints } = useFootprints();
+  const { footprints, isFootPrintLoading } = useFootprints();
 
   return (
     <YStack flex={1} backgroundColor="$background">

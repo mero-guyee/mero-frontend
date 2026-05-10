@@ -24,7 +24,7 @@ export default function FootprintListScreen() {
   const insets = useSafeAreaInsets();
 
   const { activeTrip } = useTrips();
-  const { footprints, isFoorPrintLoading } = useFootprints();
+  const { footprints, isFootPrintLoading } = useFootprints();
   const { expenses } = useExpenses();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -178,7 +178,7 @@ export default function FootprintListScreen() {
     </YStack>
   );
 
-  if (isFoorPrintLoading) {
+  if (isFootPrintLoading) {
     return <Loading />;
   }
 
