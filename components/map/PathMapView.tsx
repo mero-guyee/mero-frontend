@@ -3,6 +3,8 @@ import { Plane } from '@tamagui/lucide-icons';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
+import { Text } from 'tamagui';
+import FadeWrapper from '../ui/FadeWrapper';
 import CustomPolyline from './CustomPolyline';
 import FootprintMarker from './FootprintMarker';
 import MapFootprintModal from './MapFootprintModal';
@@ -19,12 +21,13 @@ const FOOTPRINT_COLORS = [
 ];
 
 interface PathMapViewProps {
+  isLoading: boolean;
   footprints: Footprint[];
 }
 
 const toDateKey = (date: string) => date.split('T')[0];
 
-export default function PathMapView({ footprints }: PathMapViewProps) {
+export default function PathMapView({ isLoading, footprints }: PathMapViewProps) {
   const mapRef = useRef<MapView>(null);
   const [selectedFootprint, setSelectedFootprint] = useState<Footprint | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -122,7 +125,7 @@ export default function PathMapView({ footprints }: PathMapViewProps) {
     setShowModal(false);
   };
 
-  if (footprints.length === 0 || !footprints) {
+  if (isLoading) {
     return (
       <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
         <Plane size={48} color="#C0B8B0" />
@@ -130,94 +133,104 @@ export default function PathMapView({ footprints }: PathMapViewProps) {
     );
   }
 
+  if (footprints.length === 0 || !footprints) {
+    return (
+      <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
+        <Text>일지가 없습니다.</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <MapView
-        ref={mapRef}
-        showsPointsOfInterest={false} // ← 이거 추가 후 테스트
-        style={StyleSheet.absoluteFillObject}
-        onMapReady={handleMapReady}
-        onPress={() => {
-          handleDeselect();
-        }}
-      >
-        {/* 1. non-selected polylines */}
-        {validFootprints
-          .filter((f) => f.id !== selectedFootprint?.id)
-          .map((footprint) => {
+    <FadeWrapper>
+      <View style={styles.container}>
+        <MapView
+          ref={mapRef}
+          showsPointsOfInterest={false} // ← 이거 추가 후 테스트
+          style={StyleSheet.absoluteFillObject}
+          onMapReady={handleMapReady}
+          onPress={() => {
+            handleDeselect();
+          }}
+        >
+          {/* 1. non-selected polylines */}
+          {validFootprints
+            .filter((f) => f.id !== selectedFootprint?.id)
+            .map((footprint) => {
+              const color = footprintColors[footprint.id];
+              const coords = footprint.locations.map((loc) => ({
+                latitude: loc.latitude!,
+                longitude: loc.longitude!,
+              }));
+              return (
+                <CustomPolyline
+                  key={`${footprint.id}-${selectedFootprint !== null ? 'dim' : 'normal'}`}
+                  coordinates={coords}
+                  color={color}
+                  isSelected={false}
+                  isDeselected={selectedFootprint !== null}
+                  onPress={() => {
+                    handleSelectFootprint(footprint);
+                  }}
+                />
+              );
+            })}
+
+          {/* 2. dim overlay */}
+          {/* <MapDimOverlay visible={selectedFootprint !== null} onPress={handleDeselect} /> */}
+
+          {/* 3. selected polyline (above dim overlay) */}
+          {selectedFootprint &&
+            (() => {
+              const color = footprintColors[selectedFootprint.id];
+              const coords = selectedFootprint.locations.map((loc) => ({
+                latitude: loc.latitude!,
+                longitude: loc.longitude!,
+              }));
+              return (
+                <CustomPolyline
+                  key={selectedFootprint.id}
+                  coordinates={coords}
+                  color={color}
+                  isSelected={true}
+                  isDeselected={false}
+                  onPress={() => {
+                    if (selectedFootprint) {
+                      handleDeselect();
+                    }
+                    handleSelectFootprint(selectedFootprint);
+                  }}
+                />
+              );
+            })()}
+
+          {/* 4. markers (always on top) */}
+          {validFootprints.map((footprint) => {
             const color = footprintColors[footprint.id];
-            const coords = footprint.locations.map((loc) => ({
-              latitude: loc.latitude!,
-              longitude: loc.longitude!,
-            }));
-            return (
-              <CustomPolyline
-                key={`${footprint.id}-${selectedFootprint !== null ? 'dim' : 'normal'}`}
-                coordinates={coords}
+            const isSelected = selectedFootprint?.id === footprint.id;
+
+            return footprint.locations.map((loc, index) => (
+              <FootprintMarker
+                key={`${footprint.id}-${index}`}
+                coordinate={{ latitude: loc.latitude!, longitude: loc.longitude! }}
                 color={color}
-                isSelected={false}
-                isDeselected={selectedFootprint !== null}
+                isSelected={isSelected}
+                index={index}
                 onPress={() => {
                   handleSelectFootprint(footprint);
                 }}
               />
-            );
+            ));
           })}
+        </MapView>
 
-        {/* 2. dim overlay */}
-        {/* <MapDimOverlay visible={selectedFootprint !== null} onPress={handleDeselect} /> */}
-
-        {/* 3. selected polyline (above dim overlay) */}
-        {selectedFootprint &&
-          (() => {
-            const color = footprintColors[selectedFootprint.id];
-            const coords = selectedFootprint.locations.map((loc) => ({
-              latitude: loc.latitude!,
-              longitude: loc.longitude!,
-            }));
-            return (
-              <CustomPolyline
-                key={selectedFootprint.id}
-                coordinates={coords}
-                color={color}
-                isSelected={true}
-                isDeselected={false}
-                onPress={() => {
-                  if (selectedFootprint) {
-                    handleDeselect();
-                  }
-                  handleSelectFootprint(selectedFootprint);
-                }}
-              />
-            );
-          })()}
-
-        {/* 4. markers (always on top) */}
-        {validFootprints.map((footprint) => {
-          const color = footprintColors[footprint.id];
-          const isSelected = selectedFootprint?.id === footprint.id;
-
-          return footprint.locations.map((loc, index) => (
-            <FootprintMarker
-              key={`${footprint.id}-${index}`}
-              coordinate={{ latitude: loc.latitude!, longitude: loc.longitude! }}
-              color={color}
-              isSelected={isSelected}
-              index={index}
-              onPress={() => {
-                handleSelectFootprint(footprint);
-              }}
-            />
-          ));
-        })}
-      </MapView>
-
-      <MapFootprintModal
-        visible={showModal}
-        onClose={handleCloseModal}
-        footprint={selectedFootprint}
-      />
-    </View>
+        <MapFootprintModal
+          visible={showModal}
+          onClose={handleCloseModal}
+          footprint={selectedFootprint}
+        />
+      </View>
+    </FadeWrapper>
   );
 }
 

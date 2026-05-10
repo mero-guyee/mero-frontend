@@ -1,7 +1,7 @@
 import { toastConfig } from '@/components/ui/CustomToast';
 import CustomTabBar from '@/components/ui/tabbar/CustomTabBar';
 import useBackHandler from '@/hooks/useBackHandler';
-import { Backpack, BookOpen, Map, Settings, Wallet } from '@tamagui/lucide-icons';
+import { Backpack, BookOpen, Settings, Wallet } from '@tamagui/lucide-icons';
 import { Tabs } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import { useActiveTripGuard } from '../../hooks/useActiveTripGuard';
@@ -38,13 +38,6 @@ export default function MainLayout() {
           options={{
             tabBarLabel: '일지',
             tabBarIcon: ({ color, size }) => <BookOpen size={size} color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="map"
-          options={{
-            tabBarLabel: '지도',
-            tabBarIcon: ({ color, size }) => <Map size={size} color={color} />,
           }}
         />
         <Tabs.Screen
