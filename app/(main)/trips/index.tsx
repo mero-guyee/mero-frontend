@@ -1,15 +1,14 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
-import { TripStatus } from '@/types';
+import { Trip } from '@/types';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { SectionList } from 'react-native';
 
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import { useIsFocused } from '@react-navigation/native';
 import { Plane } from '@tamagui/lucide-icons';
-import { FlatList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { View, YStack } from 'tamagui';
+import { Text, View, YStack } from 'tamagui';
 import { TripCard } from '../../../components/trips/card/TripCard';
 import { TripEmptyState } from '../../../components/trips/TripEmptyState';
 import { TripHeader } from '../../../components/trips/TripHeader';
@@ -22,17 +21,11 @@ export default function TripListScreen() {
 
   const { tripsByProgress, trips, setActiveTrip, isTripsLoading } = useTrips();
 
-  const [filter, setFilter] = useState<'all' | TripStatus>('all');
-  const [sort, setSort] = useState<'newest' | 'oldest'>('newest');
-
-  const filteredTrips = [...(filter === 'all' ? trips : tripsByProgress[filter])];
-  const filteredAndSortedTrips = filteredTrips.sort((a, b) => {
-    if (sort === 'newest') {
-      return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
-    } else {
-      return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
-    }
-  });
+  const sections: { title: string; data: Trip[] }[] = [
+    { title: '여행 중', data: tripsByProgress.ongoing },
+    { title: '곧 갈 여행', data: tripsByProgress.planned },
+    { title: '다녀온 여행', data: tripsByProgress.completed },
+  ].filter((s) => s.data.length > 0);
 
   const handleSelectTrip = (tripId: string) => {
     setActiveTrip(tripId);
@@ -43,10 +36,6 @@ export default function TripListScreen() {
     router.push('/(main)/trips/new/Country');
   };
 
-  const handleSettings = () => {
-    router.push('/(main)/settings');
-  };
-
   if (!isFocused) {
     return (
       <View flex={1} alignItems="center" justifyContent="center" backgroundColor="$background">
@@ -54,32 +43,37 @@ export default function TripListScreen() {
       </View>
     );
   }
+
   return (
     <YStack flex={1} backgroundColor="$background" paddingTop={insets.top}>
-      <TripHeader
-        filter={filter}
-        setFilter={setFilter}
-        sort={sort}
-        setSort={setSort}
-        onSettings={handleSettings}
-      />
+      <TripHeader onSettings={() => router.push('/(main)/settings')} />
       {isTripsLoading ? (
         <View flex={1} alignItems="center" justifyContent="center" backgroundColor="$background">
           <Plane size={44} color="$mutedForeground" />
         </View>
       ) : (
         <FadeWrapper>
-          <FlatList
-            data={filteredAndSortedTrips}
-            keyExtractor={(item) => item.id}
-            contentContainerStyle={{ padding: paddingHorizontalGeneral }}
-            renderItem={({ item }) => (
-              <TripCard trip={item} onPress={() => handleSelectTrip(item.id)} />
-            )}
-            ListEmptyComponent={<TripEmptyState onCreateTrip={handleCreateTrip} />}
-            showsVerticalScrollIndicator={false}
-          />
-          <FloatingActionButton onPress={() => handleCreateTrip()} noBottomTabBar>
+          {trips.length === 0 ? (
+            <YStack flex={1} alignItems="center" justifyContent="center">
+              <TripEmptyState onCreateTrip={handleCreateTrip} />
+            </YStack>
+          ) : (
+            <SectionList
+              sections={sections}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={{ padding: paddingHorizontalGeneral, paddingTop: 0 }}
+              renderSectionHeader={({ section }) => (
+                <Text fontSize={20} fontWeight="600" color="$input" paddingVertical="$2">
+                  {section.title}
+                </Text>
+              )}
+              renderItem={({ item }) => (
+                <TripCard trip={item} onPress={() => handleSelectTrip(item.id)} />
+              )}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
+          <FloatingActionButton onPress={handleCreateTrip} noBottomTabBar>
             <Plane size={44} strokeWidth={1} />
           </FloatingActionButton>
         </FadeWrapper>
