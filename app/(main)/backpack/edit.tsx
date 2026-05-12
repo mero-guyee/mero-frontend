@@ -1,19 +1,23 @@
+import TripCountrySearch from '@/components/trips/TripCountrySearch';
+import TripCountrySearchChip from '@/components/trips/TripCountrySearchChip';
 import { FilledButton, Input } from '@/components/ui';
 import SubmitButton from '@/components/ui/button/SubmitButton';
+import { YCard } from '@/components/ui/Card';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
+import ImagePickerSheet from '@/components/ui/ImagePickerSheet';
 import { inputStyle } from '@/components/ui/Input';
 import { useTrips } from '@/contexts';
 import { useTripQuery } from '@/hooks/queries/useTrips';
-import { TripStatus } from '@/types';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Image as ImageIcon, X } from '@tamagui/lucide-icons';
-import * as ImagePicker from 'expo-image-picker';
+import { Image as ImageIcon, Plus, X } from '@tamagui/lucide-icons';
+import { Asset } from 'expo-asset';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Image, Text, XStack, YStack } from 'tamagui';
+import { Image, Sheet, Text, XStack, YStack } from 'tamagui';
 
+const DEFAULT_IMAGE = Asset.fromModule(require('@/assets/images/mountain.jpg')).uri;
 export default function EditBackPackScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -24,20 +28,20 @@ export default function EditBackPackScreen() {
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [imageUrl, setCoverImage] = useState<string | undefined>('');
+  const [imageUrl, setImageUrl] = useState<string | undefined>('');
   const [countries, setCountries] = useState<string[]>([]);
-  const [newCountry, setNewCountry] = useState('');
-  const [status, setStatus] = useState<TripStatus>('ongoing');
-
+  const [showCountrySheet, setShowCountrySheet] = useState(false);
+  const [draftCountries, setDraftCountries] = useState<string[]>([]);
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+  const [showImagePicker, setShowImagePicker] = useState(false);
 
   useEffect(() => {
     if (trip) {
       setTitle(trip.title);
       setStartDate(trip.startDate);
       setEndDate(trip.endDate);
-      setCoverImage(trip.imageUrl);
+      setImageUrl(trip.imageUrl || DEFAULT_IMAGE);
       setCountries(trip.countries);
     }
   }, [trip]);
@@ -49,25 +53,6 @@ export default function EditBackPackScreen() {
       </YStack>
     );
   }
-
-  const handleImagePick = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert('권한 필요', '이미지를 선택하려면 갤러리 접근 권한이 필요합니다.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setCoverImage(result.assets[0].uri);
-    }
-  };
 
   const handleSubmit = () => {
     if (!title.trim() || !startDate || !endDate) {
@@ -81,16 +66,10 @@ export default function EditBackPackScreen() {
       startDate,
       endDate,
       countries,
+      imageUrl,
     });
 
     router.back();
-  };
-
-  const handleAddCountry = () => {
-    if (newCountry.trim() && !countries.includes(newCountry.trim())) {
-      setCountries([...countries, newCountry.trim()]);
-      setNewCountry('');
-    }
   };
 
   const handleRemoveCountry = (country: string) => {
@@ -143,7 +122,7 @@ export default function EditBackPackScreen() {
               출발일
             </Text>
             <Pressable onPress={() => setShowStartPicker(true)}>
-              <XStack {...inputStyle}>
+              <XStack {...inputStyle} alignItems="center">
                 <Text color={startDate ? '$foreground' : '$mutedForeground'}>
                   {startDate || 'YYYY-MM-DD'}
                 </Text>
@@ -155,7 +134,7 @@ export default function EditBackPackScreen() {
               귀환일
             </Text>
             <Pressable onPress={() => setShowEndPicker(true)}>
-              <XStack {...inputStyle}>
+              <XStack {...inputStyle} alignItems="center">
                 <Text color={endDate ? '$foreground' : '$mutedForeground'}>
                   {endDate || 'YYYY-MM-DD'}
                 </Text>
@@ -186,101 +165,61 @@ export default function EditBackPackScreen() {
           <Text color="$foreground" marginBottom="$2" fontWeight="500">
             거쳐갈 땅
           </Text>
-          {countries.length > 0 && (
-            <XStack flexWrap="wrap" gap="$2" marginBottom="$3">
-              {countries.map((country) => (
-                <XStack
-                  key={country}
-                  alignItems="center"
-                  gap="$1"
-                  paddingHorizontal="$3"
-                  paddingVertical="$1.5"
-                  backgroundColor="$accent"
-                  borderRadius={20}
-                >
-                  <Text color="$foreground">{country}</Text>
-                  <Pressable onPress={() => handleRemoveCountry(country)}>
-                    <X size={12} color="$foreground" />
-                  </Pressable>
-                </XStack>
-              ))}
-            </XStack>
-          )}
-          <XStack gap="$2">
-            <Input
-              flex={1}
-              placeholder="국가명을 입력하세요"
-              placeholderTextColor="$mutedForeground"
-              value={newCountry}
-              onChangeText={setNewCountry}
-              onSubmitEditing={handleAddCountry}
-            />
-            <FilledButton paddingHorizontal="$4" paddingVertical="$3" onPress={handleAddCountry}>
-              <Text color="$foreground" fontWeight="500">
-                추가
-              </Text>
-            </FilledButton>
-          </XStack>
-        </YStack>
 
-        {/* Status */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            상태
-          </Text>
-          <XStack gap="$2">
-            <Pressable style={{ flex: 1 }} onPress={() => setStatus('ongoing')}>
-              <XStack
-                flex={1}
-                {...inputStyle}
-                backgroundColor={status === 'ongoing' ? '$accent' : '$muted'}
-                borderColor={status === 'ongoing' ? '$primary' : '$border'}
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Text color="$foreground" fontWeight={status === 'ongoing' ? '600' : '400'}>
-                  진행 중
-                </Text>
-              </XStack>
-            </Pressable>
-            <Pressable style={{ flex: 1 }} onPress={() => setStatus('completed')}>
-              <XStack
-                flex={1}
-                {...inputStyle}
-                backgroundColor={status === 'completed' ? '$accent' : '$muted'}
-                borderColor={status === 'completed' ? '$primary' : '$border'}
-                alignItems="center"
-                justifyContent="center"
-              >
-                <Text color="$foreground" fontWeight={status === 'completed' ? '600' : '400'}>
-                  완료
-                </Text>
-              </XStack>
-            </Pressable>
+          <XStack flex={1} flexWrap="wrap" gap="$2" alignItems="center">
+            {countries.map((country) => (
+              <TripCountrySearchChip
+                key={country}
+                country={country}
+                onRemove={handleRemoveCountry}
+              />
+            ))}
+
+            <FilledButton
+              backgroundColor={'$accent'}
+              height={'$40'}
+              borderRadius={'$3'}
+              aspectRatio={1}
+              hitSlop={8}
+              onPress={() => {
+                setDraftCountries([...countries]);
+                setShowCountrySheet(true);
+              }}
+            >
+              <Plus size={'$5'} color="$foreground" />
+            </FilledButton>
           </XStack>
         </YStack>
 
         {/* Cover Image */}
         <YStack marginBottom="$6">
           <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            📸 대표 풍경
+            대표 풍경
           </Text>
-          <Pressable onPress={handleImagePick}>
-            <YStack
-              backgroundColor="$muted"
-              borderWidth={2}
-              borderColor="$border"
-              borderRadius="$4"
-              overflow="hidden"
-              minHeight={imageUrl ? undefined : 192}
-            >
+          <Pressable onPress={() => setShowImagePicker(true)}>
+            <YCard overflow="hidden" minHeight={imageUrl ? undefined : 192}>
               {imageUrl ? (
                 <YStack position="relative" aspectRatio={16 / 9}>
                   <Image source={{ uri: imageUrl }} width="100%" height="100%" resizeMode="cover" />
+                  <YStack
+                    position="absolute"
+                    top={0}
+                    left={0}
+                    width="100%"
+                    height="100%"
+                    backgroundColor="rgba(0,0,0,0.3)"
+                    opacity={1}
+                    hoverStyle={{ opacity: 1 }}
+                    justifyContent="center"
+                    alignItems="center"
+                    zIndex={1}
+                  >
+                    <Text>이미지를 탭하여 업로드</Text>
+                  </YStack>
                   <Pressable
                     onPress={(e) => {
                       e.stopPropagation();
-                      setCoverImage('');
+                      setImageUrl('');
                     }}
                     style={{
                       position: 'absolute',
@@ -289,6 +228,7 @@ export default function EditBackPackScreen() {
                       backgroundColor: '#E89B8F',
                       borderRadius: 12,
                       padding: 8,
+                      zIndex: 2,
                     }}
                   >
                     <X size={16} color="white" />
@@ -322,10 +262,55 @@ export default function EditBackPackScreen() {
                   </Text>
                 </YStack>
               )}
-            </YStack>
+            </YCard>
           </Pressable>
         </YStack>
       </ScrollView>
+      <ImagePickerSheet
+        open={showImagePicker}
+        onOpenChange={setShowImagePicker}
+        onSelect={setImageUrl}
+      />
+      <Sheet
+        modal
+        open={showCountrySheet}
+        onOpenChange={setShowCountrySheet}
+        snapPoints={[85]}
+        dismissOnSnapToBottom
+      >
+        <Sheet.Overlay
+          animation="lazy"
+          bg="rgba(0,0,0,0.6)"
+          enterStyle={{ opacity: 0 }}
+          exitStyle={{ opacity: 0 }}
+        />
+        <Sheet.Handle />
+        <Sheet.Frame padding="$4" paddingBottom={insets.bottom || 8}>
+          <XStack justifyContent="space-between" alignItems="center" marginBottom="$3">
+            <Text color="$foreground" fontWeight="600" fontSize={16}>
+              국가 선택
+            </Text>
+            <FilledButton
+              paddingHorizontal="$4"
+              paddingVertical="$2"
+              onPress={() => {
+                setCountries(draftCountries);
+                setShowCountrySheet(false);
+              }}
+            >
+              <Text color="$foreground" fontWeight="500">
+                확인
+              </Text>
+            </FilledButton>
+          </XStack>
+          <TripCountrySearch
+            selectedCountries={draftCountries}
+            onAdd={(c) => setDraftCountries((prev) => [...prev, c])}
+            onRemove={(c) => setDraftCountries((prev) => prev.filter((x) => x !== c))}
+            error={null}
+          />
+        </Sheet.Frame>
+      </Sheet>
     </YStack>
   );
 }
