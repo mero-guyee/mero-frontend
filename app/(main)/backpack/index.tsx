@@ -1,6 +1,6 @@
 import BackpackHeader from '@/components/backpack/BackpackHeader';
 import TripCoverImage from '@/components/trips/TripCoverImage';
-import { TripDocumentsTab } from '@/components/trips/documents/TripDocumentsTab';
+import { DocumentsTab } from '@/components/trips/documents/DocumentsTab';
 import MemoTab from '@/components/trips/memos/MemoTab';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import Loading from '@/components/ui/Loading';
@@ -51,7 +51,7 @@ export default function TripHomeScreen() {
                 case 'memos':
                   return <MemoTab memos={memos} tripId={activeTrip!} />;
                 case 'files':
-                  return <TripDocumentsTab tripId={trip.id} />;
+                  return <DocumentsTab tripId={trip.id} />;
                 default:
                   return null;
               }

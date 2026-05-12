@@ -50,8 +50,8 @@ export default function FloatingActionButton({
   return (
     <Stack
       position="absolute"
-      bottom={noBottomTabBar ? insets.bottom + 10 : 10}
-      right={noBottomTabBar ? insets.right + 16 : 10}
+      bottom={noBottomTabBar ? insets.bottom + 16 : 16}
+      right={noBottomTabBar ? insets.right + 16 : 16}
     >
       <Animated.View
         style={{

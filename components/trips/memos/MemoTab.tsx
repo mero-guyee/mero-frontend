@@ -1,10 +1,12 @@
+import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import { useMemos } from '@/contexts';
 import { Memo } from '@/types';
+import { Plus } from '@tamagui/lucide-icons';
 import { router } from 'expo-router';
 import { Alert } from 'react-native';
-import { YStack } from 'tamagui';
+import { ScrollView, Text, XStack, YStack } from 'tamagui';
 import MemoCard from './MemoCard';
-import { MemoEmptyState } from './MemoEmptyState';
+import { MemoEmpty } from './MemoEmpty';
 
 export default function MemoTab({ memos, tripId }: { memos: Memo[]; tripId: string }) {
   const { deleteMemo } = useMemos();
@@ -33,21 +35,31 @@ export default function MemoTab({ memos, tripId }: { memos: Memo[]; tripId: stri
     ]);
   };
   return (
-    <YStack gap="$3" px="$4">
-      {memos.length === 0 ? (
-        <MemoEmptyState onPress={handleCreateMemo} />
-      ) : (
-        <YStack gap="$2">
-          {memos.map((note) => (
-            <MemoCard
-              key={note.id}
-              memo={note}
-              onPress={handleEditMemo}
-              onDelete={handleDeleteMemo}
-            />
-          ))}
+    <>
+      <ScrollView>
+        <YStack gap="$3" px="$4" pt="$3" pb="$24">
+          {memos.length === 0 ? (
+            <MemoEmpty />
+          ) : (
+            <YStack gap="$2">
+              {memos.map((note) => (
+                <MemoCard
+                  key={note.id}
+                  memo={note}
+                  onPress={handleEditMemo}
+                  onDelete={handleDeleteMemo}
+                />
+              ))}
+            </YStack>
+          )}
         </YStack>
-      )}
-    </YStack>
+      </ScrollView>
+      <FloatingActionButton onPress={handleCreateMemo}>
+        <XStack alignItems="center" gap="$2">
+          <Plus />
+          <Text>새 메모</Text>
+        </XStack>
+      </FloatingActionButton>
+    </>
   );
 }
