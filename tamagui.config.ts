@@ -184,6 +184,10 @@ const animations = createAnimations({
     type: 'timing',
     duration: 1500,
   },
+  lazy: {
+    type: 'timing',
+    duration: 200,
+  },
   slowReturn: {
     damping: 60, // 높을수록 진동 없이 부드럽게 감속
     mass: 1,

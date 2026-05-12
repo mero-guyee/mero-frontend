@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
   BackHandler,
+  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -15,6 +16,7 @@ import MapView, { MapPressEvent } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { Stack, XStack, YStack } from 'tamagui';
+import FadeWrapper from '../ui/FadeWrapper';
 import LocationSearch from './LocationSearch';
 import LocationView from './LocationView';
 
@@ -135,74 +137,76 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
   if (!visible) return null;
 
   return (
-    <View style={styles.fullscreen}>
-      <View style={styles.modalContainer}>
-        <View style={styles.container}>
-          {loading ? (
-            <YStack flex={1} justifyContent="center" alignItems="center">
-              <Plane width={24} height={24} color="#A0A0A0" />
-            </YStack>
-          ) : (
-            <>
-              <LocationView
-                mapRef={mapRef}
-                initialLocation={initialLocation}
-                onMapPress={handleMapPress}
-                selected={selected}
-              />
-              <Stack position="absolute" width="100%">
-                <XStack
-                  flex={1}
-                  alignItems="flex-start"
-                  justifyContent="space-between"
-                  gap="$3.5"
-                  paddingHorizontal={16}
-                  paddingTop={insets.top + 8}
-                >
-                  <View style={{ height: 44, justifyContent: 'center' }}>
-                    <Pressable onPress={() => onClose()} hitSlop={16}>
-                      <ArrowLeft />
-                    </Pressable>
-                  </View>
-                  <LocationSearch mapRef={mapRef} setSelected={setSelected} />
-                </XStack>
-                {locationSource === 'lastKnown' && (
-                  <View style={styles.amberChip}>
-                    <Clock size={12} color="#92400E" />
-                    <Text style={styles.amberChipText}>이전 위치 기준</Text>
+    <Modal style={styles.fullscreen}>
+      <FadeWrapper>
+        <View style={styles.modalContainer}>
+          <View style={styles.container}>
+            {loading ? (
+              <YStack flex={1} justifyContent="center" alignItems="center">
+                <Plane width={24} height={24} color="#A0A0A0" />
+              </YStack>
+            ) : (
+              <>
+                <LocationView
+                  mapRef={mapRef}
+                  initialLocation={initialLocation}
+                  onMapPress={handleMapPress}
+                  selected={selected}
+                />
+                <Stack position="absolute" width="100%">
+                  <XStack
+                    flex={1}
+                    alignItems="flex-start"
+                    justifyContent="space-between"
+                    gap="$3.5"
+                    paddingHorizontal={16}
+                    paddingTop={insets.top + 8}
+                  >
+                    <View style={{ height: 44, justifyContent: 'center' }}>
+                      <Pressable onPress={() => onClose()} hitSlop={16}>
+                        <ArrowLeft />
+                      </Pressable>
+                    </View>
+                    <LocationSearch mapRef={mapRef} setSelected={setSelected} />
+                  </XStack>
+                  {locationSource === 'lastKnown' && (
+                    <View style={styles.amberChip}>
+                      <Clock size={12} color="#92400E" />
+                      <Text style={styles.amberChipText}>이전 위치 기준</Text>
+                    </View>
+                  )}
+                </Stack>
+
+                {locationSource === 'fallback' && !selected && (
+                  <View style={styles.fallbackCard}>
+                    <MapPin size={20} color="#6B7280" />
+                    <Text style={styles.fallbackCardTitle}>위치를 가져올 수 없어요</Text>
+                    <Text style={styles.fallbackCardSub}>
+                      검색하거나 지도를 탭해서 직접 선택해 주세요
+                    </Text>
                   </View>
                 )}
-              </Stack>
 
-              {locationSource === 'fallback' && !selected && (
-                <View style={styles.fallbackCard}>
-                  <MapPin size={20} color="#6B7280" />
-                  <Text style={styles.fallbackCardTitle}>위치를 가져올 수 없어요</Text>
-                  <Text style={styles.fallbackCardSub}>
-                    검색하거나 지도를 탭해서 직접 선택해 주세요
-                  </Text>
-                </View>
-              )}
-
-              {selected && (
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    onConfirm(selected);
-                    onClose();
-                  }}
-                >
-                  <Text style={styles.buttonText} pointerEvents="none">
-                    이 위치로 선택
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </>
-          )}
+                {selected && (
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() => {
+                      onConfirm(selected);
+                      onClose();
+                    }}
+                  >
+                    <Text style={styles.buttonText} pointerEvents="none">
+                      이 위치로 선택
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            )}
+          </View>
         </View>
-      </View>
+      </FadeWrapper>
       <Toast />
-    </View>
+    </Modal>
   );
 }
 

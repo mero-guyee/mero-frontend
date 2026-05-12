@@ -13,7 +13,7 @@ export default function LoadingScreen() {
     if (isLoading) return;
     const timer = setTimeout(() => {
       router.replace(isAuthenticated ? '/(main)/trips' : '/(auth)/login');
-    }, 300);
+    }, 700);
     return () => clearTimeout(timer);
   }, [isLoading, isAuthenticated, router]);
 

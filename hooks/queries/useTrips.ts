@@ -45,7 +45,9 @@ export function useTripQuery(id: string) {
           const serverTrip = await tripsApi.getById(parseInt(tripRow.serverId));
           await repo.upsertFromServer(serverTrip);
         }
-      } catch {}
+      } catch (e) {
+        console.error('Failed to fetch trip from server:', e);
+      }
 
       return repo.getTripById(id);
     },
