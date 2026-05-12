@@ -9,7 +9,15 @@ export default module.exports = {
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
     ios: {
+      bundleIdentifier: 'com.dhguswo555.mero',
+      buildNumber: '1',
+      package: 'com.dhguswo555.mero',
       supportsTablet: true,
+      config: {
+        googleMaps: {
+          apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
+        },
+      },
     },
     android: {
       adaptiveIcon: {
