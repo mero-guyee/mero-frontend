@@ -1,6 +1,6 @@
 import { Footprint } from '@/types';
 import { Plane } from '@tamagui/lucide-icons';
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
 import { Text } from 'tamagui';
@@ -84,23 +84,15 @@ export default function PathMapView({ isLoading, footprints }: PathMapViewProps)
     });
   };
 
-  const handleMapReady = useCallback(() => {
+  useEffect(() => {
     if (allCoords.length === 0) return;
-    mapRef.current?.fitToCoordinates(allCoords, {
-      edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
-      animated: false,
-    });
+    setTimeout(() => {
+      mapRef.current?.fitToCoordinates(allCoords, {
+        edgePadding: { top: 300, right: 300, bottom: 300, left: 300 },
+        animated: false,
+      });
+    }, 300);
   }, [allCoords]);
-
-  const handleNavigate = (direction: 'prev' | 'next') => {
-    const newIndex =
-      direction === 'prev'
-        ? Math.max(0, focusedDateIndex - 1)
-        : Math.min(uniqueDates.length - 1, focusedDateIndex + 1);
-    if (newIndex === focusedDateIndex) return;
-    setFocusedDateIndex(newIndex);
-    focusOnDate(newIndex);
-  };
 
   const handleSelectFootprint = (footprint: Footprint) => {
     setSelectedFootprint(footprint);
@@ -148,7 +140,6 @@ export default function PathMapView({ isLoading, footprints }: PathMapViewProps)
           ref={mapRef}
           showsPointsOfInterest={false} // ← 이거 추가 후 테스트
           style={StyleSheet.absoluteFillObject}
-          onMapReady={handleMapReady}
           onPress={() => {
             handleDeselect();
           }}
