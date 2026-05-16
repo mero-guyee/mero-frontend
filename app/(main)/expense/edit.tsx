@@ -2,21 +2,28 @@ import CurrencyPicker from '@/components/expense/CurrencyPicker';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
+import { inputStyle } from '@/components/ui/Input';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 import { Input } from '../../../components/ui';
-import { inputStyle } from '../../../components/ui/Input';
-import { useExpenses } from '../../../contexts';
+import { useExpenses, useTrips } from '../../../contexts';
 
-export default function ExpenseEditScreen() {
-  const { expenseId } = useLocalSearchParams<{ expenseId: string }>();
+export default function ExpenseFormScreen() {
+  const { expenseId, tripId, footprintId } = useLocalSearchParams<{
+    expenseId?: string;
+    tripId?: string;
+    footprintId?: string;
+  }>();
   const router = useRouter();
-  const { expenses, categories, updateExpense } = useExpenses();
+  const { activeTrip } = useTrips();
+  const { expenses, categories, addExpense, updateExpense } = useExpenses();
 
-  const expense = expenses.find((e) => e.id === expenseId);
+  const isEdit = !!expenseId;
+  const expense = isEdit ? expenses.find((e) => e.id === expenseId) : undefined;
+  const effectiveTripId = tripId || activeTrip || '';
 
   const [amount, setAmount] = useState(expense?.amount?.toString() ?? '');
   const [currency, setCurrency] = useState(expense?.currency ?? 'KRW');
@@ -26,7 +33,7 @@ export default function ExpenseEditScreen() {
   const [location, setLocation] = useState(expense?.location ?? '');
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  if (!expense) {
+  if (isEdit && !expense) {
     return (
       <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center">
         <Text color="$mutedForeground">경비를 찾을 수 없습니다.</Text>
@@ -44,15 +51,28 @@ export default function ExpenseEditScreen() {
       return;
     }
 
-    updateExpense({
-      ...expense,
-      date,
-      categoryId,
-      amount: parseFloat(amount),
-      currency,
-      description: description.trim() || undefined,
-      location: location.trim() || undefined,
-    });
+    if (isEdit && expense) {
+      updateExpense({
+        ...expense,
+        date,
+        categoryId,
+        amount: parseFloat(amount),
+        currency,
+        description: description.trim() || undefined,
+        location: location.trim() || undefined,
+      });
+    } else {
+      addExpense({
+        tripId: effectiveTripId,
+        footprintId,
+        date,
+        categoryId,
+        amount: parseFloat(amount),
+        currency,
+        description: description.trim() || undefined,
+        location: location.trim() || undefined,
+      });
+    }
 
     router.back();
   };
@@ -66,7 +86,7 @@ export default function ExpenseEditScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      <BackActionHeader label="경비 수정" onBack={() => router.back()}>
+      <BackActionHeader label={isEdit ? '경비 수정' : '경비 추가'} onBack={() => router.back()}>
         <SubmitButton onPress={handleSubmit} />
       </BackActionHeader>
 
@@ -78,10 +98,15 @@ export default function ExpenseEditScreen() {
               날짜
             </Text>
             <Pressable onPress={() => setShowDatePicker(true)}>
-              <XStack {...inputStyle} alignItems="center">
+              <XStack {...inputStyle} minHeight={48} alignItems="center">
                 <Text color="$foreground">{date}</Text>
               </XStack>
             </Pressable>
+            {!isEdit && footprintId && (
+              <Text color="$mutedForeground" marginTop="$1" fontSize={14}>
+                발자국 날짜로 자동 설정됨
+              </Text>
+            )}
           </YStack>
 
           {showDatePicker && (
@@ -151,7 +176,12 @@ export default function ExpenseEditScreen() {
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               설명
             </Text>
-            <Input placeholder="예: 점심 식사" value={description} onChangeText={setDescription} />
+            <Input
+              placeholder="예: 점심 식사"
+              placeholderTextColor="$mutedForeground"
+              value={description}
+              onChangeText={setDescription}
+            />
           </YStack>
 
           {/* Location */}
@@ -159,7 +189,12 @@ export default function ExpenseEditScreen() {
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               장소
             </Text>
-            <Input placeholder="예: 마추픽추" value={location} onChangeText={setLocation} />
+            <Input
+              placeholder="예: 마추픽추"
+              placeholderTextColor="$mutedForeground"
+              value={location}
+              onChangeText={setLocation}
+            />
           </YStack>
         </ScrollView>
       </FadeWrapper>

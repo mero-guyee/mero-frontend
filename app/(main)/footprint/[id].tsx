@@ -52,7 +52,7 @@ export default function FootprintDetailScreen() {
 
   const handleAddExpense = () => {
     router.push({
-      pathname: '/(main)/expense/new',
+      pathname: '/(main)/expense/edit',
       params: { footprintId: footprint.id, tripId: footprint.tripId },
     });
   };

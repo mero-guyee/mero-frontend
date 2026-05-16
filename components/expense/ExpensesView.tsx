@@ -43,7 +43,7 @@ export function ExpensesView() {
   }, [expenses]);
 
   const handleAddExpense = () => {
-    router.push({ pathname: '/expense/new', params: { tripId: activeTrip } });
+    router.push({ pathname: '/expense/edit', params: { tripId: activeTrip } });
   };
 
   return (
