@@ -1,4 +1,5 @@
 import { IconButton } from '@/components/ui/button/BaseButton';
+import { YCard } from '@/components/ui/Card';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import { ArrowLeft, MoreVertical } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -110,79 +111,76 @@ export default function ExpenseDetailScreen() {
       {/* Content */}
       <FadeWrapper>
         <ScrollView contentContainerStyle={{ padding: 16 }}>
-          <YStack backgroundColor="$card" borderRadius="$6" borderWidth={1} borderColor="$border">
-            <YStack padding="$5" gap="$5">
-              {/* Date */}
-              <YStack gap="$1">
-                <Text color="$mutedForeground" fontSize={13} fontWeight="500">
-                  날짜
-                </Text>
-                <Text color="$foreground" fontSize={16}>
-                  {expense.date}
-                </Text>
-              </YStack>
+          <YCard backgroundColor="$card" padding="$5" gap="$5">
+            {/* Date */}
+            <YStack gap="$1">
+              <Text color="$mutedForeground" fontSize={13} fontWeight="500">
+                날짜
+              </Text>
+              <Text color="$foreground" fontSize={16}>
+                {expense.date}
+              </Text>
+            </YStack>
 
-              {/* Amount & Currency */}
-              <YStack gap="$1">
-                <Text color="$mutedForeground" fontSize={13} fontWeight="500">
-                  금액
-                </Text>
-                <Text color="$foreground" fontSize={16}>
-                  {getCurrencySymbol(expense.currency)} {expense.amount.toLocaleString()} (
-                  {expense.currency})
-                </Text>
-              </YStack>
+            {/* Amount & Currency */}
+            <YStack gap="$1">
+              <Text color="$mutedForeground" fontSize={13} fontWeight="500">
+                금액
+              </Text>
+              <Text color="$foreground" fontSize={16}>
+                {getCurrencySymbol(expense.currency)} {expense.amount.toLocaleString()} (
+                {expense.currency})
+              </Text>
+            </YStack>
 
-              {/* Category */}
-              <YStack gap="$2">
-                <Text color="$mutedForeground" fontSize={13} fontWeight="500">
-                  카테고리
-                </Text>
-                {category && (
-                  <YStack
-                    alignSelf="flex-start"
-                    padding="$3"
-                    borderRadius="$4"
-                    borderWidth={2}
-                    borderColor="$primary"
-                    backgroundColor="$accent"
-                    alignItems="center"
-                    gap="$1"
-                    opacity={0.8}
-                  >
-                    <Text fontSize={20}>{category.icon}</Text>
-                    <Text color="$foreground" fontSize={12} textAlign="center">
-                      {category.name}
-                    </Text>
-                  </YStack>
-                )}
-              </YStack>
-
-              {/* Description */}
-              {expense.description && (
-                <YStack gap="$1">
-                  <Text color="$mutedForeground" fontSize={13} fontWeight="500">
-                    설명
+            {/* Category */}
+            <YStack gap="$2">
+              <Text color="$mutedForeground" fontSize={13} fontWeight="500">
+                카테고리
+              </Text>
+              {category && (
+                <YCard
+                  alignSelf="flex-start"
+                  padding="$3"
+                  borderRadius="$4"
+                  backgroundColor="$accent"
+                  alignItems="center"
+                  gap="$1"
+                  aspectRatio={1}
+                  opacity={0.8}
+                >
+                  <Text fontSize={20}>{category.icon}</Text>
+                  <Text color="$foreground" fontSize={12} textAlign="center">
+                    {category.name}
                   </Text>
-                  <Text color="$foreground" fontSize={16}>
-                    {expense.description}
-                  </Text>
-                </YStack>
-              )}
-
-              {/* Location */}
-              {expense.location && (
-                <YStack gap="$1">
-                  <Text color="$mutedForeground" fontSize={13} fontWeight="500">
-                    장소
-                  </Text>
-                  <Text color="$foreground" fontSize={16}>
-                    {expense.location}
-                  </Text>
-                </YStack>
+                </YCard>
               )}
             </YStack>
-          </YStack>
+
+            {/* Description */}
+            {expense.description && (
+              <YStack gap="$1">
+                <Text color="$mutedForeground" fontSize={13} fontWeight="500">
+                  설명
+                </Text>
+                <Text color="$foreground" fontSize={16}>
+                  {expense.description}
+                </Text>
+              </YStack>
+            )}
+
+            {/* Location */}
+            {expense.location && (
+              <YStack gap="$1">
+                <Text color="$mutedForeground" fontSize={13} fontWeight="500">
+                  장소
+                </Text>
+                <Text color="$foreground" fontSize={16}>
+                  {expense.location}
+                </Text>
+              </YStack>
+            )}
+          </YCard>
         </ScrollView>
       </FadeWrapper>
     </YStack>
