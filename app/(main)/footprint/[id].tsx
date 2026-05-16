@@ -278,7 +278,7 @@ export default function FootprintDetailScreen() {
                       </XStack>
                     </YCard>
                   ) : (
-                    <YStack
+                    <YCard
                       backgroundColor="$card"
                       borderRadius="$4"
                       padding="$4"
@@ -287,7 +287,7 @@ export default function FootprintDetailScreen() {
                       borderColor="$border"
                     >
                       <Text color="$mutedForeground">지출 기록이 없습니다</Text>
-                    </YStack>
+                    </YCard>
                   )}
                   <FilledButton onPress={handleAddExpense}>
                     <Text color="$foreground" fontWeight="500">
