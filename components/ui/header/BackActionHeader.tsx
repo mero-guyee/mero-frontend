@@ -23,7 +23,7 @@ export default function BackActionHeader({
     >
       <View flex={1} height={48} alignItems="flex-start" justifyContent="center">
         <IconButton onPress={onBack}>
-          <ArrowLeft size="$7" color="$foreground" />
+          <ArrowLeft size="6.5" color="$foreground" />
         </IconButton>
       </View>
       <View flex={1} height={48} alignItems="center" justifyContent="center">

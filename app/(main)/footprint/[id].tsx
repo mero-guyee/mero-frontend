@@ -1,7 +1,7 @@
 import { YCard } from '@/components/ui/Card';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
-import More from '@/components/ui/More';
+import MoreEditDelete from '@/components/ui/MoreEditDelete';
 import { formattedLocation } from '@/utils/location/location';
 import { ChevronDown, Cloud, MapPin } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -67,18 +67,7 @@ export default function FootprintDetailScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       <BackActionHeader label={footprint.title} onBack={() => router.back()}>
-        <More>
-          <Pressable onPress={handleEdit}>
-            <XStack padding="$3">
-              <Text color="$foreground">수정</Text>
-            </XStack>
-          </Pressable>
-          <Pressable onPress={handleDelete}>
-            <XStack padding="$3">
-              <Text color="$destructive">삭제</Text>
-            </XStack>
-          </Pressable>
-        </More>
+        <MoreEditDelete onEdit={handleEdit} onDelete={handleDelete} />
       </BackActionHeader>
 
       <FadeWrapper>
