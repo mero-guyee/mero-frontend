@@ -1,3 +1,4 @@
+import CurrencyPicker from '@/components/expense/CurrencyPicker';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
@@ -7,11 +8,9 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Stack, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { Input } from '../../../components/ui';
 import { useExpenses, useTrips } from '../../../contexts';
-
-const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY', 'GBP', 'CNY', 'THB', 'VND', 'PEN', 'BRL'];
 
 export default function ExpenseFormScreen() {
   const { tripId, footprintId } = useLocalSearchParams<{ tripId?: string; footprintId?: string }>();
@@ -97,50 +96,26 @@ export default function ExpenseFormScreen() {
           )}
 
           {/* Amount and Currency */}
-          <XStack gap="$3" marginBottom="$6">
-            <YStack flex={1}>
-              <Text color="$foreground" marginBottom="$2" fontWeight="500">
-                금액
-              </Text>
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$2" fontWeight="500">
+              금액
+            </Text>
+            <XStack {...inputStyle} alignItems="center" paddingHorizontal="$0">
               <Input
+                flex={1}
                 placeholder="0"
                 placeholderTextColor="$mutedForeground"
                 value={amount}
                 onChangeText={setAmount}
                 keyboardType="numeric"
                 color="$foreground"
+                borderWidth={0}
+                height={44}
+                focusStyle={{ borderWidth: 0 }}
               />
-            </YStack>
-            <YStack width={120}>
-              <Text color="$foreground" marginBottom="$2" fontWeight="500">
-                통화
-              </Text>
-              <Stack {...inputStyle}>
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={{ alignItems: 'center', paddingHorizontal: 8 }}
-                >
-                  <XStack gap="$1">
-                    {CURRENCIES.map((curr) => (
-                      <Pressable key={curr} onPress={() => setCurrency(curr)}>
-                        <YStack
-                          paddingHorizontal="$2"
-                          paddingVertical="$1"
-                          borderRadius="$2"
-                          backgroundColor={currency === curr ? '$primary' : 'transparent'}
-                        >
-                          <Text color={currency === curr ? 'white' : '$foreground'} fontSize={12}>
-                            {curr}
-                          </Text>
-                        </YStack>
-                      </Pressable>
-                    ))}
-                  </XStack>
-                </ScrollView>
-              </Stack>
-            </YStack>
-          </XStack>
+              <CurrencyPicker value={currency} onChange={setCurrency} />
+            </XStack>
+          </YStack>
 
           {/* Category */}
           <YStack marginBottom="$6">
