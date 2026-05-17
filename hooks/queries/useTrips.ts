@@ -102,6 +102,11 @@ export function useUpdateTrip() {
             endDate: trip.endDate,
             countries: trip.countries,
           });
+
+          if (trip.imageUrl) {
+            await tripsApi.uploadImage(parseInt(trip.serverId), trip.imageUrl);
+          }
+
           await repo.markSynced(trip.id);
         }
       } catch {
