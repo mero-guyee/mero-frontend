@@ -1,5 +1,6 @@
+import Chip from '@/components/ui/Chip';
 import { Calendar, MapPin } from '@tamagui/lucide-icons';
-import { Text, XStack } from 'tamagui';
+import { XStack } from 'tamagui';
 import { FootprintLocation } from '../../../../types';
 
 function formatDate(iso: string) {
@@ -18,48 +19,15 @@ type Props = {
 export default function MetadataChips({ date, locations, weatherInfo }: Props) {
   return (
     <XStack flexWrap="wrap" gap="$2" marginBottom="$5">
-      <XStack
-        alignItems="center"
-        gap="$1"
-        paddingHorizontal="$3"
-        paddingVertical="$2"
-        backgroundColor="$accent"
-        borderRadius={8}
-      >
-        <Calendar size={12} color="$mutedForeground" />
-        <Text fontSize={13} color="$foreground">
-          {formatDate(date)}
-        </Text>
-      </XStack>
+      <Chip label={formatDate(date)} icon={<Calendar size={12} color="$mutedForeground" />} />
       {locations.map((loc, index) => (
-        <XStack
+        <Chip
           key={index}
-          alignItems="center"
-          gap="$1"
-          paddingHorizontal="$3"
-          paddingVertical="$2"
-          backgroundColor="$accent"
-          borderRadius={8}
-        >
-          <MapPin size={12} color="$mutedForeground" />
-          <Text fontSize={13} color="$foreground">
-            {loc.placeName}
-          </Text>
-        </XStack>
+          label={loc.placeName ?? ''}
+          icon={<MapPin size={12} color="$mutedForeground" />}
+        />
       ))}
-      {weatherInfo ? (
-        <XStack
-          alignItems="center"
-          paddingHorizontal="$3"
-          paddingVertical="$2"
-          backgroundColor="$accent"
-          borderRadius={8}
-        >
-          <Text fontSize={13} color="$foreground">
-            {weatherInfo}
-          </Text>
-        </XStack>
-      ) : null}
+      {weatherInfo ? <Chip label={weatherInfo} /> : null}
     </XStack>
   );
 }

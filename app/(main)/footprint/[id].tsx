@@ -1,4 +1,5 @@
 import { YCard } from '@/components/ui/Card';
+import Chip from '@/components/ui/Chip';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import MoreEditDelete from '@/components/ui/MoreEditDelete';
@@ -81,35 +82,17 @@ export default function FootprintDetailScreen() {
                 contentContainerStyle={{ gap: 8 }}
               >
                 {footprint.locations.map((loc, i) => (
-                  <XStack
+                  <Chip
                     key={i}
-                    alignItems="center"
-                    gap="$1.5"
-                    paddingHorizontal="$3"
-                    paddingVertical="$1.5"
-                    backgroundColor="$accent"
-                    borderRadius={20}
-                  >
-                    <MapPin size={12} color="$mutedForeground" />
-                    <Text color="$input" fontSize={12}>
-                      {formattedLocation(loc)}
-                    </Text>
-                  </XStack>
+                    label={formattedLocation(loc)}
+                    icon={<MapPin size={12} color="$mutedForeground" />}
+                  />
                 ))}
                 {footprint.weatherInfo && (
-                  <XStack
-                    alignItems="center"
-                    gap="$1.5"
-                    paddingHorizontal="$3"
-                    paddingVertical="$1.5"
-                    backgroundColor="$accent"
-                    borderRadius={20}
-                  >
-                    <Cloud size={12} color="$mutedForeground" />
-                    <Text color="$input" fontSize={12}>
-                      {footprint.weatherInfo}
-                    </Text>
-                  </XStack>
+                  <Chip
+                    label={footprint.weatherInfo}
+                    icon={<Cloud size={12} color="$mutedForeground" />}
+                  />
                 )}
               </ScrollView>
             )}
