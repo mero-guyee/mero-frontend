@@ -1,12 +1,6 @@
-import * as Device from 'expo-device';
-
 import { tokenStorage } from './tokenStorage';
 
-export const BASE_URL = Device.isDevice
-  ? process.env.EXPO_PUBLIC_MOBILE_LOCAL_BASE_URL
-  : __DEV__
-    ? process.env.EXPO_PUBLIC_PC_LOCAL_BASE_URL
-    : process.env.EXPO_PUBLIC_TEST_BASE_URL;
+export const BASE_URL = process.env.EXPO_PUBLIC_TEST_BASE_URL;
 
 export class ApiError extends Error {
   constructor(
