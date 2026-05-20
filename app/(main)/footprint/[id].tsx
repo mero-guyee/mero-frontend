@@ -1,36 +1,22 @@
 import { YCard } from '@/components/ui/Card';
+import Chip from '@/components/ui/Chip';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
-import More from '@/components/ui/More';
+import MoreEditDelete from '@/components/ui/MoreEditDelete';
 import { formattedLocation } from '@/utils/location/location';
-import { Cloud, MapPin } from '@tamagui/lucide-icons';
+import { ChevronDown, Cloud, MapPin } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, BackHandler, Modal, Pressable, ScrollView } from 'react-native';
+import { useState } from 'react';
+import { Alert, Modal, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { FilledButton } from '../../../components/ui';
 import { useExpenses, useFootprints } from '../../../contexts';
 
 export default function FootprintDetailScreen() {
-  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
-
+  const { id } = useLocalSearchParams<{ id: string; from?: string }>();
   const router = useRouter();
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
 
-  const handleBack = useCallback(() => {
-    if (from === 'map') {
-      router.push('/(main)/map');
-    } else {
-      router.back();
-    }
-  }, [from, router]);
-
-  useEffect(() => {
-    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
-      handleBack();
-      return true;
-    });
-    return () => subscription.remove();
-  }, [handleBack]);
   const { footprints, deleteFootprint } = useFootprints();
   const { getExpensesByFootprintId, deleteExpense } = useExpenses();
 
@@ -38,36 +24,13 @@ export default function FootprintDetailScreen() {
   const expenses = getExpensesByFootprintId(id || '');
 
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [expenseOpen, setExpenseOpen] = useState(false);
 
   const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
   const currency = expenses[0]?.currency || 'KRW';
 
-  const contentWithPhotos = useMemo(() => {
-    if (!footprint) return [];
-    const paragraphs = footprint.content.split('\n\n').filter((p) => p.trim());
-    const result: { type: 'text' | 'photo'; content: string }[] = [];
-
-    const photoInterval = Math.max(
-      1,
-      Math.floor(paragraphs.length / (footprint.photoUrls.length + 1))
-    );
-    let photoIndex = 0;
-
-    paragraphs.forEach((paragraph, idx) => {
-      result.push({ type: 'text', content: paragraph });
-      if (photoIndex < footprint.photoUrls.length && (idx + 1) % photoInterval === 0) {
-        result.push({ type: 'photo', content: footprint.photoUrls[photoIndex] });
-        photoIndex++;
-      }
-    });
-
-    while (photoIndex < footprint.photoUrls.length) {
-      result.push({ type: 'photo', content: footprint.photoUrls[photoIndex] });
-      photoIndex++;
-    }
-
-    return result;
-  }, [footprint]);
+  const paragraphs = footprint?.content.split('\n\n').filter((p) => p.trim()) ?? [];
 
   if (!footprint) {
     return (
@@ -78,29 +41,19 @@ export default function FootprintDetailScreen() {
   }
 
   const handleEdit = () => {
-    router.push({
-      pathname: '/(main)/footprint/new',
-      params: { footprintId: footprint.id },
-    });
+    router.push({ pathname: '/(main)/footprint/new', params: { footprintId: footprint.id } });
   };
 
   const handleDelete = () => {
     Alert.alert('일지 삭제', '이 기록을 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
-      {
-        text: '삭제',
-        style: 'destructive',
-        onPress: () => {
-          deleteFootprint(footprint.id);
-          handleBack();
-        },
-      },
+      { text: '삭제', style: 'destructive', onPress: () => deleteFootprint(footprint.id) },
     ]);
   };
 
   const handleAddExpense = () => {
     router.push({
-      pathname: '/(main)/expense/new',
+      pathname: '/(main)/expense/edit',
       params: { footprintId: footprint.id, tripId: footprint.tripId },
     });
   };
@@ -108,159 +61,218 @@ export default function FootprintDetailScreen() {
   const handleDeleteExpense = (expenseId: string) => {
     Alert.alert('지출 삭제', '이 지출을 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
-      {
-        text: '삭제',
-        style: 'destructive',
-        onPress: () => deleteExpense(expenseId),
-      },
+      { text: '삭제', style: 'destructive', onPress: () => deleteExpense(expenseId) },
     ]);
   };
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      {/* Header */}
-      <BackActionHeader label={footprint.title} onBack={() => handleBack()}>
-        <More>
-          <Pressable onPress={handleEdit}>
-            <XStack padding="$3">
-              <Text color="$foreground">수정</Text>
-            </XStack>
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              handleDelete();
-            }}
-          >
-            <XStack padding="$3">
-              <Text color="$destructive">삭제</Text>
-            </XStack>
-          </Pressable>
-        </More>
+      <BackActionHeader label={footprint.title} onBack={() => router.back()}>
+        <MoreEditDelete onEdit={handleEdit} onDelete={handleDelete} />
       </BackActionHeader>
 
       <FadeWrapper>
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
-          {/* Title */}
-          <YStack marginBottom="$6">
-            <Text color="$foreground" fontSize={20} fontWeight="600" marginBottom="$2">
-              {footprint.title}
-            </Text>
-            <YStack height={1} backgroundColor="$border" opacity={0.3} />
-          </YStack>
-
-          {/* Location & Weather */}
-          <YStack gap="$2" marginBottom="$6">
-            {footprint.locations.map((loc, i) => (
-              <XStack key={i} alignItems="center" gap="$2">
-                <MapPin size={16} color="$foreground" />
-                <Text color="$foreground">{formattedLocation(loc)}</Text>
-              </XStack>
-            ))}
-            {footprint.weatherInfo && (
-              <XStack alignItems="center" gap="$2">
-                <Cloud size={16} color="$foreground" />
-                <Text color="$foreground">{footprint.weatherInfo}</Text>
-              </XStack>
-            )}
-          </YStack>
-
-          <YStack height={1} backgroundColor="$border" opacity={0.3} marginBottom="$6" />
-
-          {/* Content with Photos */}
-          <YStack gap="$4" marginBottom="$6">
-            {contentWithPhotos.map((item, idx) => (
-              <YStack key={idx}>
-                {item.type === 'text' ? (
-                  <Text color="$foreground" lineHeight={24}>
-                    {item.content}
-                  </Text>
-                ) : (
-                  <Pressable onPress={() => setSelectedPhoto(item.content)}>
-                    <YStack
-                      aspectRatio={4 / 3}
-                      overflow="hidden"
-                      borderRadius="$4"
-                      borderWidth={2}
-                      borderColor="$border"
-                      marginVertical="$4"
-                    >
-                      <Image
-                        source={{ uri: item.content }}
-                        width="100%"
-                        height="100%"
-                        resizeMode="cover"
-                      />
-                    </YStack>
-                  </Pressable>
-                )}
-              </YStack>
-            ))}
-          </YStack>
-
-          <YStack height={1} backgroundColor="$border" opacity={0.3} marginBottom="$6" />
-
-          {/* Expenses */}
-          <YStack marginBottom="$6">
-            <Text color="$foreground" fontSize={16} fontWeight="600" marginBottom="$3">
-              사용한 돈
-            </Text>
-            {expenses.length > 0 ? (
-              <YCard backgroundColor="$card" overflow="hidden">
-                {expenses.map((expense, index) => (
-                  <YStack
-                    key={expense.id}
-                    padding="$4"
-                    borderBottomWidth={index < expenses.length - 1 ? 1 : 0}
-                    borderBottomColor="$border"
-                  >
-                    <XStack
-                      alignItems="flex-start"
-                      justifyContent="space-between"
-                      marginBottom="$1"
-                    >
-                      <Text color="$foreground">{expense.description || '지출'}</Text>
-                      <Pressable onPress={() => handleDeleteExpense(expense.id)}>
-                        <Text color="$destructive" fontSize={14}>
-                          삭제
-                        </Text>
-                      </Pressable>
-                    </XStack>
-                    <Text color="$foreground">
-                      {expense.currency} {expense.amount.toLocaleString()}
-                    </Text>
-                  </YStack>
+        <ScrollView style={{ flex: 1 }}>
+          <YStack padding="$6" gap="$6">
+            {/* Location & Weather chips */}
+            {(footprint.locations.length > 0 || footprint.weatherInfo) && (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{ gap: 8 }}
+              >
+                {footprint.locations.map((loc, i) => (
+                  <Chip
+                    key={i}
+                    label={formattedLocation(loc)}
+                    icon={<MapPin size={12} color="$mutedForeground" />}
+                  />
                 ))}
-                <YStack padding="$4" borderTopWidth={1} borderTopColor="$border">
-                  <XStack justifyContent="space-between">
-                    <Text color="$foreground" fontWeight="500">
-                      합계
-                    </Text>
-                    <Text color="$foreground" fontWeight="500">
-                      {currency} {totalExpense.toLocaleString()}
-                    </Text>
-                  </XStack>
-                </YStack>
+                {footprint.weatherInfo && (
+                  <Chip
+                    label={footprint.weatherInfo}
+                    icon={<Cloud size={12} color="$mutedForeground" />}
+                  />
+                )}
+              </ScrollView>
+            )}
+
+            {/* Text Content */}
+            {paragraphs.length > 0 && (
+              <YCard gap="$4" padding="$3">
+                {paragraphs.map((p, i) => (
+                  <Text key={i} color="$foreground" lineHeight={26} fontSize={15}>
+                    {p}
+                  </Text>
+                ))}
               </YCard>
-            ) : (
-              <YStack
-                backgroundColor="$card"
+            )}
+
+            {/* Photo Slider */}
+            {footprint.photoUrls.length > 0 && (
+              <YCard
+                height={SCREEN_WIDTH * 0.75}
                 borderRadius="$4"
-                padding="$4"
-                alignItems="center"
                 borderWidth={1}
                 borderColor="$border"
+                overflow="hidden"
+                style={{ position: 'relative' }}
               >
-                <Text color="$mutedForeground">지출 기록이 없습니다</Text>
-              </YStack>
+                <ScrollView
+                  horizontal
+                  pagingEnabled
+                  showsHorizontalScrollIndicator={false}
+                  style={{ width: SCREEN_WIDTH - 48 }}
+                  onMomentumScrollEnd={(e) => {
+                    const index = Math.round(e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - 48));
+                    setCurrentPhotoIndex(index);
+                  }}
+                >
+                  {footprint.photoUrls.map((url, i) => (
+                    <Pressable
+                      key={i}
+                      style={{ width: SCREEN_WIDTH - 48, height: SCREEN_WIDTH * 0.75 }}
+                      onPress={() => setSelectedPhoto(url)}
+                    >
+                      <Image source={{ uri: url }} width="100%" height="100%" resizeMode="cover" />
+                    </Pressable>
+                  ))}
+                </ScrollView>
+
+                {footprint.photoUrls.length > 1 && (
+                  <XStack
+                    position="absolute"
+                    bottom="$3"
+                    left={0}
+                    right={0}
+                    justifyContent="center"
+                    gap="$1.5"
+                  >
+                    {footprint.photoUrls.map((_, i) => (
+                      <YStack
+                        key={i}
+                        width={i === currentPhotoIndex ? 8 : 6}
+                        height={i === currentPhotoIndex ? 8 : 6}
+                        borderRadius={4}
+                        backgroundColor={
+                          i === currentPhotoIndex ? 'white' : 'rgba(255,255,255,0.5)'
+                        }
+                      />
+                    ))}
+                  </XStack>
+                )}
+              </YCard>
             )}
-            <FilledButton marginTop="$3" onPress={handleAddExpense}>
-              <Text color="$foreground" fontWeight="500">
-                + 지출 남기기
-              </Text>
-            </FilledButton>
+
+            {/* Expenses Accordion */}
+            <YStack>
+              <Pressable onPress={() => setExpenseOpen((v) => !v)}>
+                <XStack justifyContent="space-between" alignItems="center" paddingVertical="$1">
+                  <Text color="$foreground" fontSize={16} fontWeight="600">
+                    사용한 돈
+                  </Text>
+                  <XStack alignItems="center" gap="$2">
+                    {!expenseOpen && expenses.length > 0 && (
+                      <Text color="$mutedForeground" fontSize={13}>
+                        {currency} {totalExpense.toLocaleString()}
+                      </Text>
+                    )}
+                    <ChevronDown
+                      size={18}
+                      color="$mutedForeground"
+                      style={{
+                        transform: [{ rotate: expenseOpen ? '180deg' : '0deg' }],
+                      }}
+                    />
+                  </XStack>
+                </XStack>
+              </Pressable>
+
+              {expenseOpen && (
+                <YStack gap="$3" marginTop="$3">
+                  {expenses.length > 0 ? (
+                    <YCard backgroundColor="$card" overflow="hidden">
+                      {expenses.map((expense, index) => (
+                        <XStack
+                          key={expense.id}
+                          padding="$4"
+                          alignItems="center"
+                          justifyContent="space-between"
+                          borderBottomWidth={index < expenses.length - 1 ? 1 : 0}
+                          borderBottomColor="$border"
+                        >
+                          <XStack alignItems="center" gap="$3" flex={1}>
+                            {expense.categoryIcon ? (
+                              <Text fontSize={20}>{expense.categoryIcon}</Text>
+                            ) : (
+                              <YStack
+                                width={8}
+                                height={8}
+                                borderRadius={4}
+                                backgroundColor={expense.categoryColor ?? '$muted'}
+                              />
+                            )}
+                            <YStack flex={1}>
+                              <Text color="$foreground" fontSize={14}>
+                                {expense.description || expense.categoryName || '지출'}
+                              </Text>
+                              {expense.description && expense.categoryName && (
+                                <Text color="$mutedForeground" fontSize={12}>
+                                  {expense.categoryName}
+                                </Text>
+                              )}
+                            </YStack>
+                          </XStack>
+                          <XStack alignItems="center" gap="$3">
+                            <Text color="$foreground" fontWeight="500">
+                              {expense.currency} {expense.amount.toLocaleString()}
+                            </Text>
+                            <Pressable onPress={() => handleDeleteExpense(expense.id)}>
+                              <Text color="$destructive" fontSize={13}>
+                                삭제
+                              </Text>
+                            </Pressable>
+                          </XStack>
+                        </XStack>
+                      ))}
+                      <XStack
+                        padding="$4"
+                        justifyContent="space-between"
+                        borderTopWidth={1}
+                        borderTopColor="$border"
+                      >
+                        <Text color="$foreground" fontWeight="500">
+                          합계
+                        </Text>
+                        <Text color="$foreground" fontWeight="500">
+                          {currency} {totalExpense.toLocaleString()}
+                        </Text>
+                      </XStack>
+                    </YCard>
+                  ) : (
+                    <YCard
+                      backgroundColor="$card"
+                      borderRadius="$4"
+                      padding="$4"
+                      alignItems="center"
+                      borderWidth={1}
+                      borderColor="$border"
+                    >
+                      <Text color="$mutedForeground">지출 기록이 없습니다</Text>
+                    </YCard>
+                  )}
+                  <FilledButton onPress={handleAddExpense}>
+                    <Text color="$foreground" fontWeight="500">
+                      + 지출 남기기
+                    </Text>
+                  </FilledButton>
+                </YStack>
+              )}
+            </YStack>
           </YStack>
         </ScrollView>
       </FadeWrapper>
+
       {/* Photo Modal */}
       <Modal visible={!!selectedPhoto} transparent animationType="fade">
         <Pressable

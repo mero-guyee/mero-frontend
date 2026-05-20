@@ -1,9 +1,10 @@
-import { Check, X } from '@tamagui/lucide-icons';
+import { Check } from '@tamagui/lucide-icons';
 import isoCountries from 'i18n-iso-countries';
 import koLocale from 'i18n-iso-countries/langs/ko.json';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, TextInput, useWindowDimensions } from 'react-native';
 import { Input, ScrollView, Text, XStack, YStack, useTheme } from 'tamagui';
+import Chip from '../ui/Chip';
 import { inputStyle } from '../ui/Input';
 import ErrorText from '../ui/form/ErrorText';
 
@@ -76,22 +77,7 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
               height="auto"
             >
               {selectedCountries.map((country) => (
-                <XStack
-                  key={country}
-                  alignItems="center"
-                  gap="$1"
-                  paddingHorizontal="$3"
-                  paddingVertical="$1.5"
-                  backgroundColor="$accent"
-                  borderRadius={20}
-                >
-                  <Text color="$accentForeground" fontSize={13}>
-                    {country}
-                  </Text>
-                  <Pressable onPress={() => onRemove(country)} hitSlop={8}>
-                    <X size={12} color="$accentForeground" />
-                  </Pressable>
-                </XStack>
+                <Chip key={country} label={country} onRemove={() => onRemove(country)} />
               ))}
               <TextInput
                 ref={textInputRef}

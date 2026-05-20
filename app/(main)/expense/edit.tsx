@@ -1,25 +1,29 @@
-import { IconButton } from '@/components/ui/button/BaseButton';
+import CurrencyPicker from '@/components/expense/CurrencyPicker';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
+import BackActionHeader from '@/components/ui/header/BackActionHeader';
+import { inputStyle } from '@/components/ui/Input';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { ArrowLeft } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
 import { Input } from '../../../components/ui';
-import { useExpenses } from '../../../contexts';
+import { useExpenses, useTrips } from '../../../contexts';
 
-const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY', 'GBP', 'CNY', 'THB', 'VND', 'PEN', 'BRL'];
-
-export default function ExpenseEditScreen() {
-  const { expenseId } = useLocalSearchParams<{ expenseId: string }>();
+export default function ExpenseFormScreen() {
+  const { expenseId, tripId, footprintId } = useLocalSearchParams<{
+    expenseId?: string;
+    tripId?: string;
+    footprintId?: string;
+  }>();
   const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const { expenses, categories, updateExpense } = useExpenses();
+  const { activeTrip } = useTrips();
+  const { expenses, categories, addExpense, updateExpense } = useExpenses();
 
-  const expense = expenses.find((e) => e.id === expenseId);
+  const isEdit = !!expenseId;
+  const expense = isEdit ? expenses.find((e) => e.id === expenseId) : undefined;
+  const effectiveTripId = tripId || activeTrip || '';
 
   const [amount, setAmount] = useState(expense?.amount?.toString() ?? '');
   const [currency, setCurrency] = useState(expense?.currency ?? 'KRW');
@@ -29,7 +33,7 @@ export default function ExpenseEditScreen() {
   const [location, setLocation] = useState(expense?.location ?? '');
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  if (!expense) {
+  if (isEdit && !expense) {
     return (
       <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center">
         <Text color="$mutedForeground">경비를 찾을 수 없습니다.</Text>
@@ -47,15 +51,28 @@ export default function ExpenseEditScreen() {
       return;
     }
 
-    updateExpense({
-      ...expense,
-      date,
-      categoryId,
-      amount: parseFloat(amount),
-      currency,
-      description: description.trim() || undefined,
-      location: location.trim() || undefined,
-    });
+    if (isEdit && expense) {
+      updateExpense({
+        ...expense,
+        date,
+        categoryId,
+        amount: parseFloat(amount),
+        currency,
+        description: description.trim() || undefined,
+        location: location.trim() || undefined,
+      });
+    } else {
+      addExpense({
+        tripId: effectiveTripId,
+        footprintId,
+        date,
+        categoryId,
+        amount: parseFloat(amount),
+        currency,
+        description: description.trim() || undefined,
+        location: location.trim() || undefined,
+      });
+    }
 
     router.back();
   };
@@ -69,26 +86,9 @@ export default function ExpenseEditScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      {/* Header */}
-      <XStack
-        backgroundColor="$card"
-        paddingTop={insets.top}
-        paddingHorizontal="$4"
-        paddingBottom="$3"
-        alignItems="center"
-        justifyContent="space-between"
-        borderBottomWidth={2}
-        borderBottomColor="$primary"
-        style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
-      >
-        <IconButton onPress={() => router.back()}>
-          <ArrowLeft size={20} color="$foreground" />
-        </IconButton>
-        <Text color="$foreground" fontSize={16} fontWeight="500">
-          경비 수정
-        </Text>
+      <BackActionHeader label={isEdit ? '경비 수정' : '경비 추가'} onBack={() => router.back()}>
         <SubmitButton onPress={handleSubmit} />
-      </XStack>
+      </BackActionHeader>
 
       <FadeWrapper>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
@@ -98,19 +98,15 @@ export default function ExpenseEditScreen() {
               날짜
             </Text>
             <Pressable onPress={() => setShowDatePicker(true)}>
-              <XStack
-                backgroundColor="$muted"
-                borderWidth={2}
-                borderColor="$border"
-                borderRadius="$4"
-                paddingHorizontal="$4"
-                paddingVertical="$3"
-                minHeight={48}
-                alignItems="center"
-              >
+              <XStack {...inputStyle} minHeight={48} alignItems="center">
                 <Text color="$foreground">{date}</Text>
               </XStack>
             </Pressable>
+            {!isEdit && footprintId && (
+              <Text color="$mutedForeground" marginTop="$1" fontSize={14}>
+                발자국 날짜로 자동 설정됨
+              </Text>
+            )}
           </YStack>
 
           {showDatePicker && (
@@ -123,61 +119,26 @@ export default function ExpenseEditScreen() {
           )}
 
           {/* Amount and Currency */}
-          <XStack gap="$3" marginBottom="$6">
-            <YStack flex={1}>
-              <Text color="$foreground" marginBottom="$2" fontWeight="500">
-                금액
-              </Text>
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$2" fontWeight="500">
+              금액
+            </Text>
+            <XStack {...inputStyle} alignItems="center" paddingHorizontal="$0">
               <Input
-                backgroundColor="$muted"
-                borderWidth={2}
-                borderColor="$border"
-                borderRadius="$4"
-                paddingHorizontal="$4"
-                paddingVertical="$3"
+                flex={1}
                 placeholder="0"
                 placeholderTextColor="$mutedForeground"
                 value={amount}
                 onChangeText={setAmount}
                 keyboardType="numeric"
                 color="$foreground"
+                borderWidth={0}
+                height={44}
+                focusStyle={{ borderWidth: 0 }}
               />
-            </YStack>
-            <YStack width={120}>
-              <Text color="$foreground" marginBottom="$2" fontWeight="500">
-                통화
-              </Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={{
-                  backgroundColor: '#F5EFE0',
-                  borderRadius: 16,
-                  borderWidth: 2,
-                  borderColor: 'rgba(155, 196, 209, 0.2)',
-                  height: 48,
-                }}
-                contentContainerStyle={{ alignItems: 'center', paddingHorizontal: 8 }}
-              >
-                <XStack gap="$1">
-                  {CURRENCIES.map((curr) => (
-                    <Pressable key={curr} onPress={() => setCurrency(curr)}>
-                      <YStack
-                        paddingHorizontal="$2"
-                        paddingVertical="$1"
-                        borderRadius="$2"
-                        backgroundColor={currency === curr ? '$primary' : 'transparent'}
-                      >
-                        <Text color={currency === curr ? 'white' : '$foreground'} fontSize={12}>
-                          {curr}
-                        </Text>
-                      </YStack>
-                    </Pressable>
-                  ))}
-                </XStack>
-              </ScrollView>
-            </YStack>
-          </XStack>
+              <CurrencyPicker value={currency} onChange={setCurrency} />
+            </XStack>
+          </YStack>
 
           {/* Category */}
           <YStack marginBottom="$6">
@@ -194,11 +155,10 @@ export default function ExpenseEditScreen() {
                   <YStack
                     padding="$3"
                     borderRadius="$4"
-                    borderWidth={2}
-                    borderColor={categoryId === cat.id ? '$primary' : '$border'}
                     backgroundColor={categoryId === cat.id ? '$accent' : '$muted'}
                     alignItems="center"
                     gap="$1"
+                    boxShadow="0 1px 4px rgba(0,0,0,0.08)"
                     opacity={categoryId === cat.id ? 0.8 : 1}
                   >
                     <Text fontSize={20}>{cat.icon}</Text>
@@ -217,17 +177,10 @@ export default function ExpenseEditScreen() {
               설명
             </Text>
             <Input
-              backgroundColor="$muted"
-              borderWidth={2}
-              borderColor="$border"
-              borderRadius="$4"
-              paddingHorizontal="$4"
-              paddingVertical="$3"
               placeholder="예: 점심 식사"
               placeholderTextColor="$mutedForeground"
               value={description}
               onChangeText={setDescription}
-              color="$foreground"
             />
           </YStack>
 
@@ -237,17 +190,10 @@ export default function ExpenseEditScreen() {
               장소
             </Text>
             <Input
-              backgroundColor="$muted"
-              borderWidth={2}
-              borderColor="$border"
-              borderRadius="$4"
-              paddingHorizontal="$4"
-              paddingVertical="$3"
               placeholder="예: 마추픽추"
               placeholderTextColor="$mutedForeground"
               value={location}
               onChangeText={setLocation}
-              color="$foreground"
             />
           </YStack>
         </ScrollView>

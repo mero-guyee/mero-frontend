@@ -1,9 +1,8 @@
 import { useTrips } from '@/contexts';
 import { Trip } from '@/types';
 import { router } from 'expo-router';
-import { Alert, Pressable } from 'react-native';
-import { Text, XStack } from 'tamagui';
-import More from '../ui/More';
+import { Alert } from 'react-native';
+import MoreEditDelete from '../ui/MoreEditDelete';
 import BackActionHeader from '../ui/header/BackActionHeader';
 
 export default function BackpackHeader({ trip }: { trip: Trip }) {
@@ -37,18 +36,7 @@ export default function BackpackHeader({ trip }: { trip: Trip }) {
 
   return (
     <BackActionHeader label={trip.title} onBack={handleBack}>
-      <More>
-        <Pressable onPress={handleEdit}>
-          <XStack paddingHorizontal="$4" paddingVertical="$4">
-            <Text color="$foreground">수정</Text>
-          </XStack>
-        </Pressable>
-        <Pressable onPress={handleDelete}>
-          <XStack paddingHorizontal="$4" paddingVertical="$4">
-            <Text color="$destructive">삭제</Text>
-          </XStack>
-        </Pressable>
-      </More>
+      <MoreEditDelete onEdit={handleEdit} onDelete={handleDelete} />
     </BackActionHeader>
   );
 }

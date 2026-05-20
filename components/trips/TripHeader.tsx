@@ -1,24 +1,15 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
-import { TripStatus } from '@/types';
 import { Backpack, Settings } from '@tamagui/lucide-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import { CircularButton } from '../ui';
-import { TripFilters } from './TripFilters';
-
-type FilterType = 'all' | TripStatus;
-type SortType = 'newest' | 'oldest';
 
 interface TripHeaderProps {
   onSettings: () => void;
-  filter: FilterType;
-  sort: SortType;
-  setFilter: (filter: FilterType) => void;
-  setSort: (sort: SortType) => void;
 }
 
-export function TripHeader({ filter, sort, setFilter, setSort, onSettings }: TripHeaderProps) {
+export function TripHeader({ onSettings }: TripHeaderProps) {
   return (
-    <YStack backgroundColor="$background" padding={paddingHorizontalGeneral} rowGap="$3">
+    <YStack backgroundColor="$background" padding={paddingHorizontalGeneral}>
       <XStack alignItems="center" justifyContent="space-between">
         <XStack alignItems="center" gap="$3">
           <YStack
@@ -40,13 +31,11 @@ export function TripHeader({ filter, sort, setFilter, setSort, onSettings }: Tri
             </Text>
           </YStack>
         </XStack>
-        <XStack gap="$4" flex={1} justifyContent="flex-end" alignItems="center">
-          <CircularButton pressStyle={{ backgroundColor: '$muted' }} onPress={onSettings}>
-            <Settings size="$7" color="$foreground" />
-          </CircularButton>
-        </XStack>
+
+        <CircularButton mr="$1" pressStyle={{ backgroundColor: '$muted' }} onPress={onSettings}>
+          <Settings size="$7" color="$foreground" />
+        </CircularButton>
       </XStack>
-      <TripFilters filter={filter} sort={sort} onFilterChange={setFilter} onSortChange={setSort} />
     </YStack>
   );
 }

@@ -1,4 +1,5 @@
 import FadeWrapper from '@/components/ui/FadeWrapper';
+import ImagePickerSheet from '@/components/ui/ImagePickerSheet';
 import { inputStyle } from '@/components/ui/Input';
 import ErrorText from '@/components/ui/form/ErrorText';
 import FormLabel from '@/components/ui/form/FormLabel';
@@ -9,10 +10,9 @@ import { validateEndDate, validateStartDate } from '@/contexts/MultiStepForm/new
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Image as ImageIcon, X } from '@tamagui/lucide-icons';
 import { Asset } from 'expo-asset';
-import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Platform, Pressable } from 'react-native';
+import { Platform, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image, Text, XStack, YStack } from 'tamagui';
 
@@ -20,6 +20,7 @@ export default function NewTripFormDate() {
   const { newTrip, setNewTrip } = useNewTripForm();
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
+  const [showImagePicker, setShowImagePicker] = useState(false);
   const [startDateError, setStartDateError] = useState<string | null>(null);
   const [endDateError, setEndDateError] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
@@ -58,25 +59,6 @@ export default function NewTripFormDate() {
     }
   };
 
-  const handleImagePick = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert('권한 필요', '이미지를 선택하려면 갤러리 접근 권한이 필요합니다.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      setNewTrip({ ...newTrip, imageUrl: result.assets[0].uri });
-    }
-  };
-
   return (
     <FadeWrapper>
       {showStartPicker && (
@@ -107,13 +89,7 @@ export default function NewTripFormDate() {
             <YStack flex={1}>
               <FormLabel marginBottom="$2">출발일</FormLabel>
               <Pressable onPress={() => setShowStartPicker(true)}>
-                <XStack
-                  paddingHorizontal="$4"
-                  paddingVertical="$3"
-                  minHeight={48}
-                  alignItems="center"
-                  {...inputStyle}
-                >
+                <XStack alignItems="center" {...inputStyle}>
                   <Text color={newTrip.startDate ? '$foreground' : '$mutedForeground'}>
                     {newTrip.startDate || 'YYYY-MM-DD'}
                   </Text>
@@ -124,13 +100,7 @@ export default function NewTripFormDate() {
             <YStack flex={1}>
               <FormLabel marginBottom="$2">귀환일</FormLabel>
               <Pressable onPress={() => setShowEndPicker(true)}>
-                <XStack
-                  paddingHorizontal="$4"
-                  paddingVertical="$3"
-                  minHeight={48}
-                  alignItems="center"
-                  {...inputStyle}
-                >
+                <XStack alignItems="center" {...inputStyle}>
                   <Text color={newTrip.endDate ? '$foreground' : '$mutedForeground'}>
                     {newTrip.endDate || 'YYYY-MM-DD'}
                   </Text>
@@ -141,7 +111,7 @@ export default function NewTripFormDate() {
           </XStack>
           <YStack>
             <FormLabel marginBottom="$2">풍경</FormLabel>
-            <Pressable onPress={handleImagePick}>
+            <Pressable onPress={() => setShowImagePicker(true)}>
               <YStack
                 backgroundColor="$muted"
                 borderWidth={2}
@@ -209,6 +179,11 @@ export default function NewTripFormDate() {
         </YStack>
         <PrevNextButtons onNext={handleNext} />
       </YStack>
+      <ImagePickerSheet
+        open={showImagePicker}
+        onOpenChange={setShowImagePicker}
+        onSelect={(uri) => setNewTrip({ ...newTrip, imageUrl: uri })}
+      />
     </FadeWrapper>
   );
 }

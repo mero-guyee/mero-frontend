@@ -39,7 +39,7 @@ export default function More({ children }: { children: ReactNode }) {
   return (
     <>
       <IconButton onPress={openMenu}>
-        <MoreVertical size="$7" color="$foreground" />
+        <MoreVertical size="$6.5" color="$foreground" />
       </IconButton>
 
       {showMenu && (
