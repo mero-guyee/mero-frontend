@@ -1,5 +1,7 @@
-import { TripDocument } from '@/types';
 import { apiFormRequest, apiRequest } from './client';
+import { ServerTripDocument } from './documents';
+
+export type { ServerTripDocument };
 
 export interface TripCreateRequest {
   clientId: string;
@@ -29,12 +31,7 @@ export interface TripResponse {
 }
 
 export interface TripDetailResponse extends TripResponse {
-  documents: TripDocument[];
-}
-
-export interface TripDocumentCreateRequest {
-  tripId: number;
-  file: Omit<TripDocument, 'id' | 'fileSize'>;
+  documents: ServerTripDocument[];
 }
 
 export const tripsApi = {
@@ -78,20 +75,4 @@ export const tripsApi = {
 
   deleteImage: (tripId: number): Promise<void> =>
     apiRequest(`/api/trips/${tripId}/image`, { method: 'DELETE' }),
-
-  uploadDocument: (params: TripDocumentCreateRequest): Promise<TripDocument> => {
-    const { tripId, file } = params;
-    const { fileName, fileUri } = file;
-    const extension = file.fileName.split('.').pop()?.toLowerCase();
-    let mimeType = 'application/octet-stream'; // 기본
-    if (extension === 'jpg' || extension === 'jpeg') mimeType = 'image/jpeg';
-    else if (extension === 'png') mimeType = 'image/png';
-    else if (extension === 'pdf') mimeType = 'application/pdf';
-    const form = new FormData();
-    form.append('file', { uri: fileUri, name: fileName, type: mimeType } as any);
-    return apiFormRequest(`/api/trips/${tripId}/documents`, form);
-  },
-
-  deleteDocument: (tripId: number, documentId: number): Promise<void> =>
-    apiRequest(`/api/trips/${tripId}/documents/${documentId}`, { method: 'DELETE' }),
 };

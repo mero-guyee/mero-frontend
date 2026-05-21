@@ -30,6 +30,7 @@ async function runMigrations(database: SQLite.SQLiteDatabase): Promise<void> {
   const currentVersion = row ? parseInt(row.value, 10) : 0;
 
   if (currentVersion < SCHEMA_VERSION) {
+    await database.execAsync('PRAGMA foreign_keys = OFF;');
     if (currentVersion > 0) {
       await database.execAsync(DROP_TABLES);
     }
@@ -39,6 +40,7 @@ async function runMigrations(database: SQLite.SQLiteDatabase): Promise<void> {
       `INSERT OR REPLACE INTO _meta (key, value) VALUES ('schema_version', ?)`,
       [String(SCHEMA_VERSION)]
     );
+    await database.execAsync('PRAGMA foreign_keys = ON;');
   }
 }
 

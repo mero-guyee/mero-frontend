@@ -1,11 +1,12 @@
-import { QueryClient } from '@tanstack/react-query';
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 import {
-  tripKeys,
   useCreateDocument,
+  useDeleteDocument,
+  useDocumentsQuery,
+} from '../hooks/queries/useDocuments';
+import {
   useCreateTrip,
   useDeleteTrip,
-  useDocumentsQuery,
   useTripsQuery,
   useUpdateTrip,
 } from '../hooks/queries/useTrips';
@@ -23,6 +24,7 @@ interface TripContextType {
   getTripById: (tripId: string) => Trip | undefined;
   documents: TripDocument[];
   createDocument: (tripId: string, document: TripDocumentFile) => void;
+  deleteDocument: (documentId: string) => void;
   tripsByProgress: TripByProgressObj;
   isTripsLoading: boolean;
 }
@@ -52,13 +54,13 @@ export function useTrips(): TripContextType {
   if (!ui) throw new Error('useTrips must be used within a TripProvider');
 
   const { data: trips = [], isLoading: isTripsLoading } = useTripsQuery();
-
   const { data: documents = [] } = useDocumentsQuery(ui.activeTrip ?? '');
 
   const createTrip = useCreateTrip();
   const updateTripMut = useUpdateTrip();
   const deleteTripMut = useDeleteTrip();
   const createDocumentMut = useCreateDocument();
+  const deleteDocumentMut = useDeleteDocument();
 
   return {
     trips,
@@ -86,16 +88,12 @@ export function useTrips(): TripContextType {
     },
     getTripById: (tripId) => trips.find((t) => t.id === tripId),
     documents,
-    createDocument: async (tripId: string, document: TripDocumentFile) => {
-      createDocumentMut.mutate(
-        { tripId, data: document },
-        {
-          onSuccess: () => {
-            const qc = new QueryClient();
-            qc.invalidateQueries({ queryKey: tripKeys.detail(tripId) });
-          },
-        }
-      );
+    createDocument: (tripId, document) => {
+      createDocumentMut.mutate({ tripId, data: document });
+    },
+    deleteDocument: (documentId) => {
+      if (!ui.activeTrip) return;
+      deleteDocumentMut.mutate({ id: documentId, tripId: ui.activeTrip });
     },
     tripsByProgress: {
       ongoing: trips.filter(

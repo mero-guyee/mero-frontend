@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { tripsApi } from '../../api/trips';
 import { useDb } from '../../providers/DatabaseProvider';
 import { MemoRepository, TripRepository } from '../../repositories';
-import { Trip, TripDocumentFile } from '../../types';
+import { Trip } from '../../types';
 import { tripKeys } from './queryKeys';
 
 export { tripKeys } from './queryKeys';
@@ -121,25 +121,6 @@ export function useUpdateTrip() {
   });
 }
 
-export function useDocumentsQuery(tripId: string) {
-  const db = useDb();
-  return useQuery({
-    queryKey: tripKeys.documents(tripId),
-    queryFn: async () => {
-      const repo = new TripRepository(db);
-      const trip = await repo.getTripById(tripId);
-      try {
-        if (trip?.serverId) {
-          const serverTrip = await tripsApi.getById(parseInt(trip!.serverId!));
-          await repo.upsertFromServer(serverTrip);
-        }
-      } catch {}
-
-      return repo.getDocumentsByTripId(tripId);
-    },
-  });
-}
-
 export function useDeleteTrip() {
   const db = useDb();
   const qc = useQueryClient();
@@ -160,41 +141,5 @@ export function useDeleteTrip() {
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: tripKeys.all }),
-  });
-}
-
-export function useCreateDocument() {
-  const db = useDb();
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async ({
-      tripId,
-      data,
-    }: {
-      tripId: string;
-      data: TripDocumentFile;
-    }): Promise<Trip | null> => {
-      const repo = new TripRepository(db);
-      const updated = await repo.createDocument(tripId, data);
-
-      const localTrip = await repo.getTripById(tripId);
-      try {
-        if (localTrip?.serverId) {
-          tripsApi.uploadDocument({
-            tripId: parseInt(localTrip.serverId),
-            file: {
-              fileUri: data.fileUri,
-              fileName: data.fileName,
-            },
-          });
-        }
-      } catch (e) {
-        if (e instanceof ApiError) {
-          console.error('Failed to create trip on server:', e);
-        }
-      }
-      return updated;
-    },
-    onSuccess: (_, params) => qc.invalidateQueries({ queryKey: tripKeys.detail(params.tripId) }),
   });
 }

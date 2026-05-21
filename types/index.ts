@@ -16,19 +16,23 @@ export type Trip = {
   startDate: string;
   endDate: string;
   countries: string[];
-  documents?: TripDocument[];
 };
 
 export type TripStatus = 'planned' | 'ongoing' | 'completed';
 
 export type TripDocument = {
-  id: number;
+  id: string;
+  serverId?: string;
+  tripId: string;
   fileName: string;
   fileUri: string;
-  fileSize: number;
+  fileSize?: number;
 };
 
-export type TripDocumentFile = Omit<TripDocument, 'id' | 'fileSize'>;
+export type TripDocumentFile = {
+  fileName: string;
+  fileUri: string;
+};
 
 export type Footprint = {
   id: string;

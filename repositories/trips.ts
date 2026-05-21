@@ -1,6 +1,6 @@
 import * as SQLite from 'expo-sqlite';
-import type { TripDetailResponse, TripResponse } from '../api/trips';
-import { Trip, TripDocument, TripDocumentFile } from '../types';
+import type { TripResponse } from '../api/trips';
+import { Trip } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
 export interface TripRow extends BaseEntity {
@@ -10,7 +10,6 @@ export interface TripRow extends BaseEntity {
   startDate: string;
   endDate: string;
   countries: string;
-  documents?: string;
 }
 
 export interface MemoRow extends BaseEntity {
@@ -29,7 +28,6 @@ function rowToTrip(row: TripRow): Trip {
     startDate: row.startDate,
     endDate: row.endDate,
     countries: typeof row.countries === 'string' ? JSON.parse(row.countries) : row.countries,
-    documents: typeof row.documents === 'string' ? JSON.parse(row.documents) : row.documents,
   };
 }
 
@@ -57,7 +55,6 @@ export class TripRepository extends BaseRepository<TripRow> {
       ...data,
       serverId: null,
       countries: JSON.stringify(data.countries),
-      documents: JSON.stringify([]),
     } as Omit<TripRow, keyof BaseEntity>);
     return rowToTrip(row);
   }
@@ -75,21 +72,6 @@ export class TripRepository extends BaseRepository<TripRow> {
 
   async deleteTrip(id: string): Promise<void> {
     await this.delete(id);
-  }
-
-  async getDocumentsByTripId(tripId: string): Promise<TripDocument[]> {
-    const trip = await this.getTripById(tripId);
-    return trip?.documents ?? [];
-  }
-
-  async createDocument(tripId: string, document: TripDocumentFile): Promise<Trip | null> {
-    const existing = await this.getTripById(tripId);
-    const docs = existing?.documents ?? [];
-    const row = await this.update(tripId, {
-      documents: JSON.stringify([...docs, { ...document }]),
-    });
-
-    return row ? rowToTrip(row) : null;
   }
 
   async upsertFromServer(serverTrip: TripResponse): Promise<void> {
@@ -122,43 +104,6 @@ export class TripRepository extends BaseRepository<TripRow> {
           JSON.stringify(serverTrip.countries),
           serverTrip.createdAt,
           serverTrip.createdAt,
-        ]
-      );
-    }
-  }
-
-  async upsertDetailFromServer(serverTrip: TripDetailResponse): Promise<void> {
-    if (!serverTrip.clientId) return;
-    const existing = await this.findById(serverTrip.clientId);
-    if (existing) {
-      if (existing.syncStatus === 'pending') return;
-      await this.db.runAsync(
-        `UPDATE trips SET serverId=?, title=?, startDate=?, endDate=?, countries=?, imageUrl=?, syncStatus='synced', documents=? WHERE id=?`,
-        [
-          String(serverTrip.id),
-          serverTrip.title,
-          serverTrip.startDate,
-          serverTrip.endDate,
-          JSON.stringify(serverTrip.countries),
-          serverTrip.imageUrl ?? '',
-          JSON.stringify(serverTrip.documents),
-          serverTrip.clientId,
-        ]
-      );
-    } else {
-      await this.db.runAsync(
-        `INSERT OR IGNORE INTO trips (id, serverId, title, imageUrl, startDate, endDate, countries, createdAt, updatedAt, syncStatus, deletedAt, documents) VALUES (?,?,?,?,?,?,?,?,?,'synced',NULL,?)`,
-        [
-          serverTrip.clientId,
-          String(serverTrip.id),
-          serverTrip.title,
-          serverTrip.imageUrl ?? '',
-          serverTrip.startDate,
-          serverTrip.endDate,
-          JSON.stringify(serverTrip.countries),
-          serverTrip.createdAt,
-          serverTrip.createdAt,
-          JSON.stringify(serverTrip.documents),
         ]
       );
     }
