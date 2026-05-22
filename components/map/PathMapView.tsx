@@ -59,30 +59,55 @@ export default function PathMapView({ isLoading, footprints }: PathMapViewProps)
   useEffect(() => {
     if (allCoords.length === 0) return;
     setTimeout(() => {
-      mapRef.current?.fitToCoordinates(allCoords, {
-        edgePadding: {
-          top: MAP_PADDING,
-          right: MAP_PADDING,
-          bottom: MAP_PADDING,
-          left: MAP_PADDING,
-        },
-        animated: false,
-      });
+      if (allCoords.length === 1) {
+        mapRef.current?.animateToRegion(
+          {
+            latitude: allCoords[0].latitude,
+            longitude: allCoords[0].longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          },
+          300
+        );
+      } else {
+        mapRef.current?.fitToCoordinates(allCoords, {
+          edgePadding: {
+            top: MAP_PADDING,
+            right: MAP_PADDING,
+            bottom: MAP_PADDING,
+            left: MAP_PADDING,
+          },
+          animated: false,
+        });
+      }
     }, 300);
   }, [allCoords]);
 
-  const handleSelectFootprint = (footprint: Footprint) => {
-    setSelectedFootprint(footprint);
+  const handleSelectFootprint = (selectedFootprint: Footprint) => {
+    setSelectedFootprint(selectedFootprint);
     setShowModal(true);
+    console.log('Selected footprint:', selectedFootprint);
 
-    const coords = footprint.locations.map((loc) => ({
+    const coords = selectedFootprint.locations.map((loc) => ({
       latitude: loc.latitude!,
       longitude: loc.longitude!,
     }));
-    mapRef.current?.fitToCoordinates(coords, {
-      edgePadding: { top: 80, right: 80, bottom: 320, left: 80 },
-      animated: true,
-    });
+    if (coords.length === 1) {
+      mapRef.current?.animateToRegion(
+        {
+          latitude: coords[0].latitude,
+          longitude: coords[0].longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+        300
+      );
+    } else {
+      mapRef.current?.fitToCoordinates(coords, {
+        edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
+        animated: true,
+      });
+    }
   };
 
   const handleDeselect = () => {
