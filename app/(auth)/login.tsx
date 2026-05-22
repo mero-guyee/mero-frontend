@@ -12,7 +12,7 @@ const DEEP_LINK = 'mero://auth/naver/callback';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -51,8 +51,18 @@ export default function LoginScreen() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+    } catch (e: any) {
+      Alert.alert('Google 로그인 실패', e?.message ?? '다시 시도해주세요.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleAppleLogin = () => {
-    // Apple 로그인 미구현
     Alert.alert('알림', 'Apple 로그인은 준비 중입니다.');
   };
 
@@ -155,6 +165,21 @@ export default function LoginScreen() {
             </Text>
             <Separator flex={1} />
           </XStack>
+          {/* Google Login */}
+          <FilledButton
+            onPress={handleGoogleLogin}
+            disabled={loading}
+            opacity={loading ? 0.6 : 1}
+            marginBottom="$3"
+          >
+            <XStack alignItems="center" gap="$2">
+              <Text fontSize={20}>G</Text>
+              <Text color="$foreground" fontWeight="600" fontSize={16}>
+                Google로 로그인
+              </Text>
+            </XStack>
+          </FilledButton>
+
           {/* Apple Login */}
           <FilledButton onPress={handleAppleLogin}>
             <XStack alignItems="center" gap="$2">

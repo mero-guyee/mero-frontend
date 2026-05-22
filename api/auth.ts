@@ -157,6 +157,15 @@ export const authApi = {
     return res;
   },
 
+  googleLogin: async (idToken: string): Promise<LoginResponse> => {
+    const res = await apiRequest<LoginResponse>('/api/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ idToken }),
+    });
+    await tokenStorage.setTokens(res.accessToken, res.refreshToken);
+    return res;
+  },
+
   logout: async (): Promise<void> => {
     const refreshToken = await tokenStorage.getRefreshToken();
     if (refreshToken) {
