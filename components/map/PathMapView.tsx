@@ -34,7 +34,6 @@ export default function PathMapView({ isLoading, footprints }: PathMapViewProps)
   const mapRef = useRef<MapView>(null);
   const [selectedFootprint, setSelectedFootprint] = useState<Footprint | null>(null);
   const [showModal, setShowModal] = useState(false);
-  const [focusedDateIndex, setFocusedDateIndex] = useState(0);
 
   const validFootprints = useMemo(
     () =>
@@ -71,21 +70,6 @@ export default function PathMapView({ isLoading, footprints }: PathMapViewProps)
       ),
     [validFootprints]
   );
-
-  const focusOnDate = (dateIndex: number, animated: boolean = true) => {
-    const date = uniqueDates[dateIndex];
-    if (!date) return;
-    const coords = validFootprints
-      .filter((f) => toDateKey(f.date) === date)
-      .flatMap((f) =>
-        f.locations.map((loc) => ({ latitude: loc.latitude!, longitude: loc.longitude! }))
-      );
-    if (coords.length === 0) return;
-    mapRef.current?.fitToCoordinates(coords, {
-      edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
-      animated,
-    });
-  };
 
   useEffect(() => {
     if (allCoords.length === 0) return;

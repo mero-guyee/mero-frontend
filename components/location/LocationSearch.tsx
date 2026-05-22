@@ -7,7 +7,7 @@ export default function LocationSearch({
   setSelected,
 }: {
   mapRef: React.RefObject<MapView | null>;
-  setSelected: (coord: { latitude: number; longitude: number }) => void;
+  setSelected: (coord: { latitude: number; longitude: number; placeName?: string }) => void;
 }) {
   return (
     <ScrollView keyboardShouldPersistTaps="always" scrollEnabled={false}>
@@ -31,6 +31,7 @@ export default function LocationSearch({
         onPlaceSelect={(place) => {
           const lat = place.details?.location.latitude;
           const lng = place.details?.location.longitude;
+          const placeName = place.structuredFormat.mainText.text;
 
           mapRef.current?.animateToRegion({
             latitude: lat!,
@@ -39,7 +40,7 @@ export default function LocationSearch({
             longitudeDelta: 0.01,
           });
 
-          setSelected({ latitude: lat!, longitude: lng! });
+          setSelected({ latitude: lat!, longitude: lng!, placeName });
         }}
       />
     </ScrollView>

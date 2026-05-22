@@ -12,9 +12,23 @@ interface LocationButtonProps {
 export default function LocationButton({ onAdd }: LocationButtonProps) {
   const [open, setOpen] = useState(false);
 
-  const handleConfirm = ({ latitude, longitude }: { latitude: number; longitude: number }) => {
-    formatGeocode(latitude, longitude).then(({ placeName, city, country }) => {
-      onAdd({ placeName, country, city, latitude, longitude });
+  const handleConfirm = ({
+    latitude,
+    longitude,
+    placeName: searchedPlaceName,
+  }: {
+    latitude: number;
+    longitude: number;
+    placeName?: string;
+  }) => {
+    formatGeocode(latitude, longitude).then(({ placeName: geocodedPlaceName, city, country }) => {
+      onAdd({
+        placeName: searchedPlaceName || geocodedPlaceName,
+        country,
+        city,
+        latitude,
+        longitude,
+      });
     });
   };
 
