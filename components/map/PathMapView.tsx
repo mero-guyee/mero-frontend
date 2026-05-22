@@ -5,7 +5,6 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
 import { Text } from 'tamagui';
 import FadeWrapper from '../ui/FadeWrapper';
-import CustomPolyline from './CustomPolyline';
 import FootprintMarker from './FootprintMarker';
 import MapFootprintModal from './MapFootprintModal';
 
@@ -28,8 +27,6 @@ interface PathMapViewProps {
   footprints: Footprint[];
 }
 
-const toDateKey = (date: string) => date.split('T')[0];
-
 export default function PathMapView({ isLoading, footprints }: PathMapViewProps) {
   const mapRef = useRef<MapView>(null);
   const [selectedFootprint, setSelectedFootprint] = useState<Footprint | null>(null);
@@ -42,18 +39,6 @@ export default function PathMapView({ isLoading, footprints }: PathMapViewProps)
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()),
     [footprints]
   );
-
-  // 중복 제거된 날짜 배열 (오래된 순)
-  const uniqueDates = useMemo(() => {
-    const seen = new Set<string>();
-    return validFootprints
-      .map((f) => toDateKey(f.date))
-      .filter((date) => {
-        if (seen.has(date)) return false;
-        seen.add(date);
-        return true;
-      });
-  }, [validFootprints]);
 
   const footprintColors = useMemo(() => {
     const colorMap: Record<string, string> = {};
@@ -136,57 +121,6 @@ export default function PathMapView({ isLoading, footprints }: PathMapViewProps)
             handleDeselect();
           }}
         >
-          {/* 1. non-selected polylines */}
-          {validFootprints
-            .filter((f) => f.id !== selectedFootprint?.id)
-            .map((footprint) => {
-              const color = footprintColors[footprint.id];
-              const coords = footprint.locations.map((loc) => ({
-                latitude: loc.latitude!,
-                longitude: loc.longitude!,
-              }));
-              return (
-                <CustomPolyline
-                  key={`${footprint.id}-${selectedFootprint !== null ? 'dim' : 'normal'}`}
-                  coordinates={coords}
-                  color={color}
-                  isSelected={false}
-                  isDeselected={selectedFootprint !== null}
-                  onPress={() => {
-                    handleSelectFootprint(footprint);
-                  }}
-                />
-              );
-            })}
-
-          {/* 2. dim overlay */}
-          {/* <MapDimOverlay visible={selectedFootprint !== null} onPress={handleDeselect} /> */}
-
-          {/* 3. selected polyline (above dim overlay) */}
-          {selectedFootprint &&
-            (() => {
-              const color = footprintColors[selectedFootprint.id];
-              const coords = selectedFootprint.locations.map((loc) => ({
-                latitude: loc.latitude!,
-                longitude: loc.longitude!,
-              }));
-              return (
-                <CustomPolyline
-                  key={selectedFootprint.id}
-                  coordinates={coords}
-                  color={color}
-                  isSelected={true}
-                  isDeselected={false}
-                  onPress={() => {
-                    if (selectedFootprint) {
-                      handleDeselect();
-                    }
-                    handleSelectFootprint(selectedFootprint);
-                  }}
-                />
-              );
-            })()}
-
           {/* 4. markers (always on top) */}
           {validFootprints.map((footprint) => {
             const color = footprintColors[footprint.id];
