@@ -1,13 +1,16 @@
 import { Footprint } from '@/types';
 import { Plane } from '@tamagui/lucide-icons';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
 import { Text } from 'tamagui';
 import FadeWrapper from '../ui/FadeWrapper';
 import CustomPolyline from './CustomPolyline';
 import FootprintMarker from './FootprintMarker';
 import MapFootprintModal from './MapFootprintModal';
+
+const { width, height } = Dimensions.get('window');
+const MAP_PADDING = Math.min(width, height) * 0.1;
 
 const FOOTPRINT_COLORS = [
   '#9BC4D1', // primary
@@ -88,7 +91,12 @@ export default function PathMapView({ isLoading, footprints }: PathMapViewProps)
     if (allCoords.length === 0) return;
     setTimeout(() => {
       mapRef.current?.fitToCoordinates(allCoords, {
-        edgePadding: { top: 300, right: 300, bottom: 300, left: 300 },
+        edgePadding: {
+          top: MAP_PADDING,
+          right: MAP_PADDING,
+          bottom: MAP_PADDING,
+          left: MAP_PADDING,
+        },
         animated: false,
       });
     }, 300);
