@@ -56,6 +56,14 @@ export default module.exports = {
       'expo-secure-store',
       'expo-asset',
       'expo-location',
+      [
+        '@react-native-google-signin/google-signin',
+        {
+          iosUrlScheme:
+            process.env.GOOGLE_IOS_REVERSED_CLIENT_ID ||
+            'com.googleusercontent.apps.89104074447-ec63e3sg97ka1r3kes7tsittkg2lbg8a',
+        },
+      ],
     ],
     experiments: {
       typedRoutes: true,
