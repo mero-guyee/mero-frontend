@@ -3,17 +3,16 @@ import TripCountrySearchChip from '@/components/trips/TripCountrySearchChip';
 import { FilledButton, Input } from '@/components/ui';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import { YCard } from '@/components/ui/Card';
+import DatePickerInput from '@/components/ui/DatePickerInput';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import ImagePickerSheet from '@/components/ui/ImagePickerSheet';
-import { inputStyle } from '@/components/ui/Input';
 import { useTrips } from '@/contexts';
 import { useTripQuery } from '@/hooks/queries/useTrips';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Image as ImageIcon, Plus, X } from '@tamagui/lucide-icons';
 import { Asset } from 'expo-asset';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Platform, Pressable, ScrollView } from 'react-native';
+import { Alert, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image, Sheet, Text, XStack, YStack } from 'tamagui';
 
@@ -32,8 +31,6 @@ export default function EditBackPackScreen() {
   const [countries, setCountries] = useState<string[]>([]);
   const [showCountrySheet, setShowCountrySheet] = useState(false);
   const [draftCountries, setDraftCountries] = useState<string[]>([]);
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
   const [showImagePicker, setShowImagePicker] = useState(false);
 
   useEffect(() => {
@@ -76,24 +73,6 @@ export default function EditBackPackScreen() {
     setCountries(countries.filter((c) => c !== country));
   };
 
-  const formatDate = (date: Date) => {
-    return date.toISOString().split('T')[0];
-  };
-
-  const handleStartDateChange = (event: any, selectedDate?: Date) => {
-    setShowStartPicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setStartDate(formatDate(selectedDate));
-    }
-  };
-
-  const handleEndDateChange = (event: any, selectedDate?: Date) => {
-    setShowEndPicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setEndDate(formatDate(selectedDate));
-    }
-  };
-
   return (
     <YStack flex={1} backgroundColor="$background">
       {/* Header */}
@@ -121,44 +100,15 @@ export default function EditBackPackScreen() {
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               출발일
             </Text>
-            <Pressable onPress={() => setShowStartPicker(true)}>
-              <XStack {...inputStyle} alignItems="center">
-                <Text color={startDate ? '$foreground' : '$mutedForeground'}>
-                  {startDate || 'YYYY-MM-DD'}
-                </Text>
-              </XStack>
-            </Pressable>
+            <DatePickerInput value={startDate} onChange={setStartDate} />
           </YStack>
           <YStack flex={1}>
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               귀환일
             </Text>
-            <Pressable onPress={() => setShowEndPicker(true)}>
-              <XStack {...inputStyle} alignItems="center">
-                <Text color={endDate ? '$foreground' : '$mutedForeground'}>
-                  {endDate || 'YYYY-MM-DD'}
-                </Text>
-              </XStack>
-            </Pressable>
+            <DatePickerInput value={endDate} onChange={setEndDate} />
           </YStack>
         </XStack>
-
-        {showStartPicker && (
-          <DateTimePicker
-            value={startDate ? new Date(startDate) : new Date()}
-            mode="date"
-            display="default"
-            onChange={handleStartDateChange}
-          />
-        )}
-        {showEndPicker && (
-          <DateTimePicker
-            value={endDate ? new Date(endDate) : new Date()}
-            mode="date"
-            display="default"
-            onChange={handleEndDateChange}
-          />
-        )}
 
         {/* Countries */}
         <YStack marginBottom="$6">

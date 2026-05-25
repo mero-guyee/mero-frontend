@@ -1,12 +1,12 @@
 import CurrencyPicker from '@/components/expense/CurrencyPicker';
 import SubmitButton from '@/components/ui/button/SubmitButton';
+import DatePickerInput from '@/components/ui/DatePickerInput';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { inputStyle } from '@/components/ui/Input';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Platform, Pressable, ScrollView } from 'react-native';
+import { Alert, Pressable, Text as RNText, ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 import { Input } from '../../../components/ui';
 import { useExpenses, useTrips } from '../../../contexts';
@@ -31,8 +31,6 @@ export default function ExpenseFormScreen() {
   const [date, setDate] = useState(expense?.date ?? new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState(expense?.description ?? '');
   const [location, setLocation] = useState(expense?.location ?? '');
-  const [showDatePicker, setShowDatePicker] = useState(false);
-
   if (isEdit && !expense) {
     return (
       <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center">
@@ -77,13 +75,6 @@ export default function ExpenseFormScreen() {
     router.back();
   };
 
-  const handleDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setDate(selectedDate.toISOString().split('T')[0]);
-    }
-  };
-
   return (
     <YStack flex={1} backgroundColor="$background">
       <BackActionHeader label={isEdit ? '경비 수정' : '경비 추가'} onBack={() => router.back()}>
@@ -97,26 +88,13 @@ export default function ExpenseFormScreen() {
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               날짜
             </Text>
-            <Pressable onPress={() => setShowDatePicker(true)}>
-              <XStack {...inputStyle} minHeight={48} alignItems="center">
-                <Text color="$foreground">{date}</Text>
-              </XStack>
-            </Pressable>
+            <DatePickerInput value={date} onChange={setDate} />
             {!isEdit && footprintId && (
               <Text color="$mutedForeground" marginTop="$1" fontSize={14}>
                 발자국 날짜로 자동 설정됨
               </Text>
             )}
           </YStack>
-
-          {showDatePicker && (
-            <DateTimePicker
-              value={date ? new Date(date) : new Date()}
-              mode="date"
-              display="default"
-              onChange={handleDateChange}
-            />
-          )}
 
           {/* Amount and Currency */}
           <YStack marginBottom="$6">
@@ -161,7 +139,7 @@ export default function ExpenseFormScreen() {
                     boxShadow="0 1px 4px rgba(0,0,0,0.08)"
                     opacity={categoryId === cat.id ? 0.8 : 1}
                   >
-                    <Text fontSize={20}>{cat.icon}</Text>
+                    <RNText style={{ fontSize: 20 }}>{cat.icon}</RNText>
                     <Text color="$foreground" fontSize={12} textAlign="center" numberOfLines={1}>
                       {cat.name}
                     </Text>

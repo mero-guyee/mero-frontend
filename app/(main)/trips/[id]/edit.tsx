@@ -1,12 +1,12 @@
+import DatePickerInput from '@/components/ui/DatePickerInput';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { TripStatus } from '@/types';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Image as ImageIcon, X } from '@tamagui/lucide-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Platform, Pressable, ScrollView } from 'react-native';
+import { Alert, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { FilledButton, Input } from '../../../../components/ui';
@@ -27,9 +27,6 @@ export default function EditTripScreen() {
   const [countries, setCountries] = useState<string[]>([]);
   const [newCountry, setNewCountry] = useState('');
   const [status, setStatus] = useState<TripStatus>('ongoing');
-
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
 
   useEffect(() => {
     if (trip) {
@@ -96,24 +93,6 @@ export default function EditTripScreen() {
     setCountries(countries.filter((c) => c !== country));
   };
 
-  const formatDate = (date: Date) => {
-    return date.toISOString().split('T')[0];
-  };
-
-  const handleStartDateChange = (event: any, selectedDate?: Date) => {
-    setShowStartPicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setStartDate(formatDate(selectedDate));
-    }
-  };
-
-  const handleEndDateChange = (event: any, selectedDate?: Date) => {
-    setShowEndPicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setEndDate(formatDate(selectedDate));
-    }
-  };
-
   return (
     <YStack flex={1} backgroundColor="$background">
       {/* Header */}
@@ -147,62 +126,15 @@ export default function EditTripScreen() {
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               출발일
             </Text>
-            <Pressable onPress={() => setShowStartPicker(true)}>
-              <XStack
-                backgroundColor="$muted"
-                borderWidth={2}
-                borderColor="$border"
-                borderRadius="$4"
-                paddingHorizontal="$4"
-                paddingVertical="$3"
-                minHeight={48}
-                alignItems="center"
-              >
-                <Text color={startDate ? '$foreground' : '$mutedForeground'}>
-                  {startDate || 'YYYY-MM-DD'}
-                </Text>
-              </XStack>
-            </Pressable>
+            <DatePickerInput value={startDate} onChange={setStartDate} />
           </YStack>
           <YStack flex={1}>
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               귀환일
             </Text>
-            <Pressable onPress={() => setShowEndPicker(true)}>
-              <XStack
-                backgroundColor="$muted"
-                borderWidth={2}
-                borderColor="$border"
-                borderRadius="$4"
-                paddingHorizontal="$4"
-                paddingVertical="$3"
-                minHeight={48}
-                alignItems="center"
-              >
-                <Text color={endDate ? '$foreground' : '$mutedForeground'}>
-                  {endDate || 'YYYY-MM-DD'}
-                </Text>
-              </XStack>
-            </Pressable>
+            <DatePickerInput value={endDate} onChange={setEndDate} />
           </YStack>
         </XStack>
-
-        {showStartPicker && (
-          <DateTimePicker
-            value={startDate ? new Date(startDate) : new Date()}
-            mode="date"
-            display="default"
-            onChange={handleStartDateChange}
-          />
-        )}
-        {showEndPicker && (
-          <DateTimePicker
-            value={endDate ? new Date(endDate) : new Date()}
-            mode="date"
-            display="default"
-            onChange={handleEndDateChange}
-          />
-        )}
 
         {/* Countries */}
         <YStack marginBottom="$6">

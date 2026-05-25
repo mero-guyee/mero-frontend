@@ -1,25 +1,22 @@
+import DatePickerInput from '@/components/ui/DatePickerInput';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import ImagePickerSheet from '@/components/ui/ImagePickerSheet';
-import { inputStyle } from '@/components/ui/Input';
 import ErrorText from '@/components/ui/form/ErrorText';
 import FormLabel from '@/components/ui/form/FormLabel';
 import PrevNextButtons from '@/components/ui/form/multiStepForm/PrevNextButtons';
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useNewTripForm } from '@/contexts/MultiStepForm/NewTripFormContext';
 import { validateEndDate, validateStartDate } from '@/contexts/MultiStepForm/newTripValidation';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { Image as ImageIcon, X } from '@tamagui/lucide-icons';
 import { Asset } from 'expo-asset';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Platform, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Image, Text, XStack, YStack } from 'tamagui';
 
 export default function NewTripFormDate() {
   const { newTrip, setNewTrip } = useNewTripForm();
-  const [showStartPicker, setShowStartPicker] = useState(false);
-  const [showEndPicker, setShowEndPicker] = useState(false);
   const [showImagePicker, setShowImagePicker] = useState(false);
   const [startDateError, setStartDateError] = useState<string | null>(null);
   const [endDateError, setEndDateError] = useState<string | null>(null);
@@ -41,42 +38,8 @@ export default function NewTripFormDate() {
     router.push('/(main)/trips/new/Title');
   };
 
-  const formatDate = (date: Date) => {
-    return date.toISOString().split('T')[0];
-  };
-
-  const handleStartDateChange = (event: any, selectedDate?: Date) => {
-    setShowStartPicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setNewTrip({ ...newTrip, startDate: formatDate(selectedDate) });
-    }
-  };
-
-  const handleEndDateChange = (event: any, selectedDate?: Date) => {
-    setShowEndPicker(Platform.OS === 'ios');
-    if (selectedDate) {
-      setNewTrip({ ...newTrip, endDate: formatDate(selectedDate) });
-    }
-  };
-
   return (
     <FadeWrapper>
-      {showStartPicker && (
-        <DateTimePicker
-          value={newTrip.startDate ? new Date(newTrip.startDate) : new Date()}
-          mode="date"
-          display="default"
-          onChange={handleStartDateChange}
-        />
-      )}
-      {showEndPicker && (
-        <DateTimePicker
-          value={newTrip.endDate ? new Date(newTrip.endDate) : new Date()}
-          mode="date"
-          display="default"
-          onChange={handleEndDateChange}
-        />
-      )}
       <YStack
         flex={1}
         backgroundColor="$background"
@@ -88,24 +51,18 @@ export default function NewTripFormDate() {
           <XStack gap="$3">
             <YStack flex={1}>
               <FormLabel marginBottom="$2">출발일</FormLabel>
-              <Pressable onPress={() => setShowStartPicker(true)}>
-                <XStack alignItems="center" {...inputStyle}>
-                  <Text color={newTrip.startDate ? '$foreground' : '$mutedForeground'}>
-                    {newTrip.startDate || 'YYYY-MM-DD'}
-                  </Text>
-                </XStack>
-              </Pressable>
+              <DatePickerInput
+                value={newTrip.startDate}
+                onChange={(date) => setNewTrip({ ...newTrip, startDate: date })}
+              />
               <ErrorText error={startDateError} />
             </YStack>
             <YStack flex={1}>
               <FormLabel marginBottom="$2">귀환일</FormLabel>
-              <Pressable onPress={() => setShowEndPicker(true)}>
-                <XStack alignItems="center" {...inputStyle}>
-                  <Text color={newTrip.endDate ? '$foreground' : '$mutedForeground'}>
-                    {newTrip.endDate || 'YYYY-MM-DD'}
-                  </Text>
-                </XStack>
-              </Pressable>
+              <DatePickerInput
+                value={newTrip.endDate}
+                onChange={(date) => setNewTrip({ ...newTrip, endDate: date })}
+              />
               <ErrorText error={endDateError} />
             </YStack>
           </XStack>

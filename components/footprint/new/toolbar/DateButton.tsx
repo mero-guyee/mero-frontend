@@ -1,7 +1,5 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DatePickerInput from '@/components/ui/DatePickerInput';
 import { Calendar } from '@tamagui/lucide-icons';
-import { useState } from 'react';
-import { Platform } from 'react-native';
 import ToolbarButton from './ToolbarButton';
 
 interface DateButtonProps {
@@ -10,29 +8,15 @@ interface DateButtonProps {
 }
 
 export default function DateButton({ value, onChange }: DateButtonProps) {
-  const [open, setOpen] = useState(false);
-
-  const handleChange = (_event: any, selectedDate?: Date) => {
-    setOpen(Platform.OS === 'ios');
-    if (selectedDate) {
-      onChange(selectedDate.toISOString().split('T')[0]);
-    }
-  };
-
   return (
-    <>
-      <ToolbarButton onPress={() => setOpen(true)}>
-        <Calendar size={24} color="$foreground" />
-      </ToolbarButton>
-      {open && (
-        <DateTimePicker
-          value={value ? new Date(value) : new Date()}
-          mode="date"
-          display="default"
-          accentColor="#C8DEE6"
-          onChange={handleChange}
-        />
+    <DatePickerInput
+      value={value}
+      onChange={onChange}
+      renderTrigger={(onPress) => (
+        <ToolbarButton onPress={onPress}>
+          <Calendar size={24} color="$foreground" />
+        </ToolbarButton>
       )}
-    </>
+    />
   );
 }
