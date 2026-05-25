@@ -18,6 +18,12 @@ export default module.exports = {
           apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
         },
       },
+      infoPlist: {
+        NSLocationWhenInUseUsageDescription: '지도에서 현재 위치를 표시하기 위해 위치 정보를 사용합니다.',
+        NSCameraUsageDescription: '사진을 촬영하여 여행 기록에 추가하기 위해 카메라를 사용합니다.',
+        NSPhotoLibraryUsageDescription: '여행 기록에 사진을 추가하기 위해 사진첩에 접근합니다.',
+        NSPhotoLibraryAddUsageDescription: '촬영한 사진을 사진첩에 저장하기 위해 접근합니다.',
+      },
     },
     android: {
       adaptiveIcon: {
@@ -56,6 +62,14 @@ export default module.exports = {
       'expo-secure-store',
       'expo-asset',
       'expo-location',
+      [
+        'expo-image-picker',
+        {
+          cameraPermission: '사진을 촬영하여 여행 기록에 추가하기 위해 카메라를 사용합니다.',
+          microphonePermission: false,
+          photosPermission: '여행 기록에 사진을 추가하기 위해 사진첩에 접근합니다.',
+        },
+      ],
       [
         '@react-native-google-signin/google-signin',
         {
