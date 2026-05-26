@@ -4,7 +4,7 @@ export default module.exports = {
     slug: 'mero',
     version: '1.0.0',
     orientation: 'portrait',
-    icon: './assets/images/icon.jpeg',
+    icon: './assets/typo.png',
     scheme: 'mero',
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
