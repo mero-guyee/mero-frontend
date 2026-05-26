@@ -83,7 +83,20 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
   if (shouldHideTabBar(state)) return null;
 
   return (
-    <View style={{ ...styles.container, paddingBottom: tabBarPadding }}>
+    <View
+      flexDirection="row"
+      backgroundColor="#ffffff"
+      paddingTop={8}
+      paddingHorizontal={paddingHorizontalGeneral}
+      borderTopLeftRadius={16}
+      borderTopRightRadius={16}
+      shadowColor="rgba(0,0,0,0.08)"
+      shadowOffset={{ width: 0, height: 1 }}
+      shadowOpacity={0.08}
+      shadowRadius={4}
+      style={{ elevation: 2 }}
+      paddingBottom={tabBarPadding}
+    >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         if (options.tabBarLabel === '여행') return null;
@@ -125,15 +138,6 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    backgroundColor: '$ffffff',
-    paddingTop: 8,
-    paddingHorizontal: paddingHorizontalGeneral,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
-  },
   tab: {
     flex: 1,
     alignItems: 'center',
