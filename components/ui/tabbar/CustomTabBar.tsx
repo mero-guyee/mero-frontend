@@ -110,7 +110,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
             <Animated.View
               style={{
                 transform: [{ scaleX: animsX[index] }, { scaleY: animsY[index] }],
-                height: 20,
+                height: 24,
               }}
             >
               <Animated.View style={[styles.ripple, { opacity: animsOpacity[index] }]} />
@@ -143,6 +143,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 12,
     fontWeight: '500',
+    lineHeight: 14,
   },
   ripple: {
     position: 'absolute',
