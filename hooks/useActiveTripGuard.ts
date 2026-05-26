@@ -9,6 +9,10 @@ export function useActiveTripGuard() {
 
   useEffect(() => {
     const isOnTrips = segments.some((s) => s === 'trips');
+    const isOnSettings = segments.some((s) => s === 'settings');
+
+    if (isOnSettings) return;
+
     if (!activeTrip && !isOnTrips) {
       router.replace('/(main)/trips');
     }
