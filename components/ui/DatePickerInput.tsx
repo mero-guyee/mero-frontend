@@ -1,7 +1,8 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
+import { isIos } from '@/utils/platform';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState } from 'react';
-import { Platform, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Sheet, Text, XStack } from 'tamagui';
 import { inputStyle } from './Input';
@@ -57,7 +58,7 @@ export default function DatePickerInput({
         </Pressable>
       )}
 
-      {Platform.OS === 'ios' ? (
+      {isIos() ? (
         <Sheet modal open={show} onOpenChange={setShow} snapPointsMode="fit" dismissOnSnapToBottom>
           <Sheet.Overlay
             animation="lazy"
