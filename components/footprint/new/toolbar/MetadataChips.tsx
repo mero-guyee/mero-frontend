@@ -1,4 +1,5 @@
 import Chip from '@/components/ui/Chip';
+import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { Calendar, MapPin } from '@tamagui/lucide-icons';
 import { XStack } from 'tamagui';
 import { FootprintLocation } from '../../../../types';
@@ -27,7 +28,19 @@ export default function MetadataChips({ date, locations, weatherInfo }: Props) {
           icon={<MapPin size={12} color="$mutedForeground" />}
         />
       ))}
-      {weatherInfo ? <Chip label={weatherInfo} /> : null}
+      {weatherInfo
+        ? (() => {
+            const [key, ...rest] = weatherInfo.split(' ');
+            const WeatherIcon = WEATHER_ICON_MAP[key];
+            if (!WeatherIcon) return <Chip label={weatherInfo} />;
+            return (
+              <Chip
+                icon={<WeatherIcon size={12} color="$mutedForeground" />}
+                label={rest.join(' ')}
+              />
+            );
+          })()
+        : null}
     </XStack>
   );
 }

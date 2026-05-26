@@ -1,5 +1,6 @@
 import { YCard } from '@/components/ui/Card';
 import { Footprint } from '@/types';
+import { Globe } from '@tamagui/lucide-icons';
 import { Pressable } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 
@@ -19,9 +20,9 @@ export default function LocationsList({
   if (!hasFootprints) {
     return (
       <YStack alignItems="center" justifyContent="center" paddingVertical={80}>
-        <Text fontSize={48} marginBottom="$4">
-          🌍
-        </Text>
+        <YStack marginBottom="$4">
+          <Globe size={48} color="$foreground" />
+        </YStack>
         <Text color="$foreground" marginBottom="$1">
           아직 여행 기록이 없습니다
         </Text>

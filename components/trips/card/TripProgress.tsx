@@ -2,9 +2,9 @@ import { TripStatus } from '@/types';
 import { Text, XStack, YStack } from 'tamagui';
 
 const tripProgressStatusText: Record<TripStatus, string> = {
-  ongoing: '진행 중 ✨',
-  completed: '여행 완료 🎉',
-  planned: '곧 시작 예정 ⏳',
+  ongoing: '진행 중',
+  completed: '여행 완료',
+  planned: '곧 시작 예정',
 };
 
 export default function TripProgress({

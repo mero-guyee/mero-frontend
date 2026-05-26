@@ -1,18 +1,42 @@
 import { FilledButton, Input } from '@/components/ui';
+import {
+  CloudFog,
+  CloudLightning,
+  CloudRain,
+  CloudSnow,
+  CloudSun,
+  Cloudy,
+  Sun,
+  Wind,
+} from '@tamagui/lucide-icons';
 import { useEffect, useState } from 'react';
 import { Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Sheet, Text, XStack, YStack } from 'tamagui';
 
+export const WEATHER_ICON_MAP: Record<
+  string,
+  React.ComponentType<{ size?: number; color?: string }>
+> = {
+  sunny: Sun,
+  partly_cloudy: CloudSun,
+  cloudy: Cloudy,
+  rain: CloudRain,
+  thunder: CloudLightning,
+  snow: CloudSnow,
+  wind: Wind,
+  fog: CloudFog,
+};
+
 const WEATHER_OPTIONS = [
-  { emoji: '☀️', label: '맑음' },
-  { emoji: '⛅', label: '구름 조금' },
-  { emoji: '☁️', label: '흐림' },
-  { emoji: '🌧', label: '비' },
-  { emoji: '⛈', label: '천둥' },
-  { emoji: '❄️', label: '눈' },
-  { emoji: '🌬', label: '바람' },
-  { emoji: '🌫', label: '안개' },
+  { key: 'sunny', Icon: Sun, label: '맑음' },
+  { key: 'partly_cloudy', Icon: CloudSun, label: '구름 조금' },
+  { key: 'cloudy', Icon: Cloudy, label: '흐림' },
+  { key: 'rain', Icon: CloudRain, label: '비' },
+  { key: 'thunder', Icon: CloudLightning, label: '천둥' },
+  { key: 'snow', Icon: CloudSnow, label: '눈' },
+  { key: 'wind', Icon: Wind, label: '바람' },
+  { key: 'fog', Icon: CloudFog, label: '안개' },
 ];
 
 interface WeatherSheetProps {
@@ -29,22 +53,22 @@ export default function WeatherSheet({
   onConfirm,
 }: WeatherSheetProps) {
   const insets = useSafeAreaInsets();
-  const [iconDraft, setIconDraft] = useState('');
+  const [keyDraft, setKeyDraft] = useState('');
   const [tempDraft, setTempDraft] = useState('');
 
   useEffect(() => {
     if (open) {
       const parts = initialWeatherInfo.split(' ');
-      setIconDraft(parts[0] || '');
+      setKeyDraft(parts[0] || '');
       setTempDraft(parts[1]?.replace('°C', '') || '');
     }
   }, [open]);
 
   const handleConfirm = () => {
-    if (!iconDraft) {
+    if (!keyDraft) {
       onConfirm('');
     } else {
-      onConfirm(tempDraft.trim() ? `${iconDraft} ${tempDraft.trim()}°C` : iconDraft);
+      onConfirm(tempDraft.trim() ? `${keyDraft} ${tempDraft.trim()}°C` : keyDraft);
     }
     onOpenChange(false);
   };
@@ -70,17 +94,16 @@ export default function WeatherSheet({
         </Text>
         <XStack flexWrap="wrap" gap="$2">
           {WEATHER_OPTIONS.map((opt) => (
-            <Pressable key={opt.emoji} onPress={() => setIconDraft(opt.emoji)}>
+            <Pressable key={opt.key} onPress={() => setKeyDraft(opt.key)}>
               <YStack
                 alignItems="center"
                 justifyContent="center"
                 width={42}
                 height={42}
-                borderWidth={0}
                 borderRadius={8}
-                backgroundColor={iconDraft === opt.emoji ? '$accent' : 'transparent'}
+                backgroundColor={keyDraft === opt.key ? '$accent' : 'transparent'}
               >
-                <Text fontSize={22}>{opt.emoji}</Text>
+                <opt.Icon size={22} color="$foreground" />
               </YStack>
             </Pressable>
           ))}

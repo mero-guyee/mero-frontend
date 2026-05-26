@@ -1,3 +1,4 @@
+import { CategoryIcon } from '@/components/expense/CategoryIcon';
 import { YCard } from '@/components/ui/Card';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
@@ -90,7 +91,7 @@ export default function ExpenseDetailScreen() {
                   aspectRatio={1}
                   opacity={0.8}
                 >
-                  <Text fontSize={20}>{category.icon}</Text>
+                  <CategoryIcon name={category.icon} size={20} />
                   <Text color="$foreground" fontSize={12} textAlign="center">
                     {category.name}
                   </Text>

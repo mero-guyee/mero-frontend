@@ -229,7 +229,7 @@ export default function EditTripScreen() {
         {/* Cover Image */}
         <YStack marginBottom="$6">
           <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            📸 대표 풍경
+            대표 풍경
           </Text>
           <Pressable onPress={handleImagePick}>
             <YStack

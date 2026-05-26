@@ -1,3 +1,4 @@
+import { CategoryIcon } from '@/components/expense/CategoryIcon';
 import { IconButton } from '@/components/ui/button/BaseButton';
 import { ArrowLeft, Edit3, GripVertical, Plus, Trash2 } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
@@ -8,13 +9,13 @@ import { Text, XStack, YStack } from 'tamagui';
 import { CircularButton, FilledButton } from '../../../components/ui';
 import { useExpenses } from '../../../contexts';
 
-const CATEGORY_ICONS: Record<string, string> = {
-  restaurant: '🍽️',
-  directions_bus: '🚌',
-  hotel: '🏨',
-  directions_walk: '🎭',
-  shopping_cart: '🛍️',
-  more_horiz: '📦',
+const CATEGORY_ICON_NAMES: Record<string, string> = {
+  restaurant: 'utensils',
+  directions_bus: 'bus',
+  hotel: 'hotel',
+  directions_walk: 'theater',
+  shopping_cart: 'shopping_bag',
+  more_horiz: 'package',
 };
 
 export default function CategoryManagerScreen() {
@@ -85,7 +86,7 @@ export default function CategoryManagerScreen() {
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
         <YStack gap="$2">
           {categories.map((category) => {
-            const icon = CATEGORY_ICONS[category.icon] || category.icon;
+            const iconName = CATEGORY_ICON_NAMES[category.icon] ?? category.icon;
 
             return (
               <XStack
@@ -107,7 +108,7 @@ export default function CategoryManagerScreen() {
                   justifyContent="center"
                   style={{ backgroundColor: category.color + '20' }}
                 >
-                  <Text fontSize={20}>{icon}</Text>
+                  <CategoryIcon name={iconName} size={20} />
                 </YStack>
                 <Text flex={1} color="$foreground">
                   {category.name}

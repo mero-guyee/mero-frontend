@@ -10,14 +10,14 @@ import { FilledButton, Input } from '../../components/ui';
 import { useAuth } from '../../contexts';
 
 const CURRENCIES: { value: Currency; label: string }[] = [
-  { value: 'KRW', label: '🇰🇷 원 (KRW)' },
-  { value: 'USD', label: '🇺🇸 달러 (USD)' },
-  { value: 'EUR', label: '🇪🇺 유로 (EUR)' },
-  { value: 'JPY', label: '🇯🇵 엔 (JPY)' },
-  { value: 'CNY', label: '🇨🇳 위안 (CNY)' },
-  { value: 'GBP', label: '🇬🇧 파운드 (GBP)' },
-  { value: 'AUD', label: '🇦🇺 호주 달러 (AUD)' },
-  { value: 'CAD', label: '🇨🇦 캐나다 달러 (CAD)' },
+  { value: 'KRW', label: '원 (KRW)' },
+  { value: 'USD', label: '달러 (USD)' },
+  { value: 'EUR', label: '유로 (EUR)' },
+  { value: 'JPY', label: '엔 (JPY)' },
+  { value: 'CNY', label: '위안 (CNY)' },
+  { value: 'GBP', label: '파운드 (GBP)' },
+  { value: 'AUD', label: '호주 달러 (AUD)' },
+  { value: 'CAD', label: '캐나다 달러 (CAD)' },
 ];
 
 const TIMEZONES: { value: Timezone; label: string }[] = [

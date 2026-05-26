@@ -1,7 +1,7 @@
 import { YCard } from '@/components/ui/Card';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
-import { Bell, ChevronRight, Globe, HelpCircle, Lock, Tag, User } from '@tamagui/lucide-icons';
+import { Bell, ChevronRight, Globe, HelpCircle, Info, Lock, Tag, User } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { Alert, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -147,7 +147,7 @@ export default function SettingsScreen() {
                 showDivider
               />
               <SettingItem
-                icon={<Text>ℹ️</Text>}
+                icon={<Info size={20} color="$foreground" />}
                 label="앱 정보"
                 onPress={() => handleComingSoon('앱 정보')}
               />

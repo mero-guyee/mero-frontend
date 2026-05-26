@@ -1,6 +1,6 @@
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import { Input } from '@/components/ui';
-import { Plus } from '@tamagui/lucide-icons';
+import { NotebookPen, Plus } from '@tamagui/lucide-icons';
 import { SectionList } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 import { Footprint } from '../../types';
@@ -31,9 +31,9 @@ function EmptyList() {
       paddingVertical={80}
       paddingHorizontal="$4"
     >
-      <Text fontSize={48} marginBottom="$4">
-        📔
-      </Text>
+      <YStack marginBottom="$4">
+        <NotebookPen size={48} color="$foreground" />
+      </YStack>
       <Text color="$foreground" marginBottom="$1">
         아직 일지가 없습니다
       </Text>

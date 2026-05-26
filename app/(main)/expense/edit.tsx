@@ -1,3 +1,4 @@
+import { CategoryIcon } from '@/components/expense/CategoryIcon';
 import CurrencyPicker from '@/components/expense/CurrencyPicker';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import DatePickerInput from '@/components/ui/DatePickerInput';
@@ -6,7 +7,7 @@ import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { inputStyle } from '@/components/ui/Input';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, Text as RNText, ScrollView } from 'react-native';
+import { Alert, Pressable, ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 import { Input } from '../../../components/ui';
 import { useExpenses, useTrips } from '../../../contexts';
@@ -139,7 +140,7 @@ export default function ExpenseFormScreen() {
                     boxShadow="0 1px 4px rgba(0,0,0,0.08)"
                     opacity={categoryId === cat.id ? 0.8 : 1}
                   >
-                    <RNText style={{ fontSize: 20 }}>{cat.icon}</RNText>
+                    <CategoryIcon name={cat.icon} size={20} />
                     <Text color="$foreground" fontSize={12} textAlign="center" numberOfLines={1}>
                       {cat.name}
                     </Text>

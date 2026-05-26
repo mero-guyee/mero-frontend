@@ -1,3 +1,4 @@
+import { Backpack } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { Text, YStack } from 'tamagui';
@@ -35,7 +36,7 @@ export default function LoadingScreen() {
         justifyContent="center"
         marginBottom="$8"
       >
-        <Text fontSize={80}>🎒</Text>
+        <Backpack size={72} color="$foreground" />
       </YStack>
 
       {/* 앱 이름 */}

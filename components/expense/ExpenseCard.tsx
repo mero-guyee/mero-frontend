@@ -1,3 +1,4 @@
+import { CategoryIcon } from '@/components/expense/CategoryIcon';
 import { useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
@@ -34,7 +35,7 @@ export function ExpenseCard({ expense }: ExpenseCardProps) {
             alignItems="center"
             justifyContent="center"
           >
-            <Text fontSize={18}>{expense.categoryIcon || '📦'}</Text>
+            <CategoryIcon name={expense.categoryIcon ?? 'package'} size={18} />
           </YStack>
           <YStack>
             <Text color="$foreground">{expense.description}</Text>

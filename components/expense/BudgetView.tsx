@@ -1,5 +1,5 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
-import { Edit3, Plus, Trash2, X } from '@tamagui/lucide-icons';
+import { Backpack, Edit3, Plus, Trash2, Wallet, X } from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
@@ -88,16 +88,16 @@ export function BudgetView() {
 
           {!activeTrip ? (
             <YCard padding="$10" alignItems="center">
-              <Text fontSize={48} marginBottom="$3">
-                🎒
-              </Text>
+              <YStack marginBottom="$3">
+                <Backpack size={48} color="$mutedForeground" />
+              </YStack>
               <Text color="$mutedForeground">여행을 선택해주세요</Text>
             </YCard>
           ) : filteredBudgets.length === 0 ? (
             <YCard padding="$10" alignItems="center">
-              <Text fontSize={48} marginBottom="$3">
-                💰
-              </Text>
+              <YStack marginBottom="$3">
+                <Wallet size={48} color="$mutedForeground" />
+              </YStack>
               <Text color="$foreground" marginBottom="$1">
                 아직 예산이 없습니다
               </Text>
