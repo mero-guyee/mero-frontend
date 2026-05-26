@@ -18,9 +18,11 @@ export default function LocationSearch({
         placeHolderText="장소 검색"
         style={{
           inputContainer: {
-            backgroundColor: 'F5EFE0',
             borderColor: 'rgba(155, 196, 209, 0.25)',
             borderRadius: 8,
+          },
+          input: {
+            height: 44,
           },
           suggestionsContainer: {
             maxHeight: 200,
