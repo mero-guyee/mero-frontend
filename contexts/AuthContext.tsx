@@ -24,7 +24,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
-  // 앱 시작 시 SecureStore에서 토큰을 읽어 로그인 상태 복원
   useEffect(() => {
     tokenStorage
       .getAccessToken()
@@ -59,8 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = async () => {
-    await authApi.logout();
     setIsAuthenticated(false);
+    await authApi.logout();
   };
 
   const value: AuthContextType = {

@@ -8,10 +8,16 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PortalProvider } from 'tamagui';
 import { AuthProvider, BudgetProvider, ExpenseProvider, TripProvider } from '../contexts';
+import { useAuthGuard } from '../hooks/useAuthGuard';
 import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
 import { QueryProvider } from '../providers/QueryProvider';
 import '../reactotron-config';
 import config from '../tamagui.config';
+
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  useAuthGuard();
+  return <>{children}</>;
+}
 
 function AppContent() {
   const isReady = useDbReady();
@@ -28,21 +34,23 @@ function AppContent() {
   setNavigationColorByPath(currentPath);
   return (
     <AuthProvider>
-      <TripProvider>
-        <ExpenseProvider>
-          <BudgetProvider>
-            <StatusBar style="dark" backgroundColor="transparent" translucent />
-            <PortalProvider>
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="index" />
-                <Stack.Screen name="(auth)" />
-                <Stack.Screen name="(main)" />
-                <Stack.Screen name="auth/naver/callback" />
-              </Stack>
-            </PortalProvider>
-          </BudgetProvider>
-        </ExpenseProvider>
-      </TripProvider>
+      <AuthGuard>
+        <TripProvider>
+          <ExpenseProvider>
+            <BudgetProvider>
+              <StatusBar style="dark" backgroundColor="transparent" translucent />
+              <PortalProvider>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="(auth)" />
+                  <Stack.Screen name="(main)" />
+                  <Stack.Screen name="auth/naver/callback" />
+                </Stack>
+              </PortalProvider>
+            </BudgetProvider>
+          </ExpenseProvider>
+        </TripProvider>
+      </AuthGuard>
     </AuthProvider>
   );
 }
