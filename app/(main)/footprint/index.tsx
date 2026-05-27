@@ -1,8 +1,8 @@
 import FootprintList from '@/components/footprint/FootprintList';
+import FootprintSkeleton from '@/components/footprint/FootprintSkeleton';
 import PathMapView from '@/components/map/PathMapView';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
-import Loading from '@/components/ui/Loading';
 import { List, Map } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -57,7 +57,7 @@ export default function FootprintListScreen() {
   };
 
   if (isFootPrintLoading) {
-    return <Loading />;
+    return <FootprintSkeleton />;
   }
 
   return (

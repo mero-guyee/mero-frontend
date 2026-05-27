@@ -1,9 +1,9 @@
 import BackpackHeader from '@/components/backpack/BackpackHeader';
+import BackpackSkeleton from '@/components/backpack/BackpackSkeleton';
 import TripCoverImage from '@/components/trips/TripCoverImage';
 import { DocumentsTab } from '@/components/trips/documents/DocumentsTab';
 import MemoTab from '@/components/trips/memos/MemoTab';
 import FadeWrapper from '@/components/ui/FadeWrapper';
-import Loading from '@/components/ui/Loading';
 import { SubTabs } from '@/components/ui/tabbar/subTabs/SubTabs';
 import { useTripQuery } from '@/hooks/queries/useTrips';
 import { useState } from 'react';
@@ -26,7 +26,7 @@ export default function TripHomeScreen() {
   const [index, setIndex] = useState(0);
 
   if (isLoading) {
-    return <Loading />;
+    return <BackpackSkeleton />;
   }
 
   if (!trip) {
