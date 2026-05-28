@@ -113,7 +113,7 @@ export default function WeatherSheet({
             flex={1}
             placeholder="온도"
             value={tempDraft}
-            onChangeText={setTempDraft}
+            onChangeText={(val) => setTempDraft(val.replace(/[^0-9.-]/g, ''))}
             keyboardType="numeric"
             onSubmitEditing={handleConfirm}
             inputMode="numeric"
