@@ -10,7 +10,6 @@ export const footprintKeys = {
   detail: (id: string) => ['footprints', id] as const,
 };
 
-
 export function useFootprintsByTripQuery(tripId: string) {
   const db = useDb();
   return useQuery({
