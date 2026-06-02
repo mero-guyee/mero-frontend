@@ -1,10 +1,11 @@
-export const SCHEMA_VERSION = 8;
+export const SCHEMA_VERSION = 9;
 
 export const DROP_TABLES = `
   DROP TABLE IF EXISTS expenses;
   DROP TABLE IF EXISTS budgets;
   DROP TABLE IF EXISTS memos;
   DROP TABLE IF EXISTS documents;
+  DROP TABLE IF EXISTS photos;
   DROP TABLE IF EXISTS footprints;
   DROP TABLE IF EXISTS expense_categories;
   DROP TABLE IF EXISTS notes;
@@ -58,6 +59,25 @@ export const CREATE_TABLES = `
     syncStatus  TEXT NOT NULL DEFAULT 'pending',
     deletedAt   TEXT,
     FOREIGN KEY (tripId) REFERENCES trips(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS photos (
+    id               TEXT PRIMARY KEY NOT NULL,
+    footprintId      TEXT NOT NULL,
+    localUri         TEXT NOT NULL,
+    serverId         TEXT,
+    s3Url            TEXT,
+    originalFilename TEXT,
+    fileSize         REAL,
+    mimeType         TEXT,
+    width            INTEGER,
+    height           INTEGER,
+    orderIndex       INTEGER,
+    createdAt        TEXT NOT NULL,
+    updatedAt        TEXT NOT NULL,
+    syncStatus       TEXT NOT NULL DEFAULT 'pending',
+    deletedAt        TEXT,
+    FOREIGN KEY (footprintId) REFERENCES footprints(id)
   );
 
   CREATE TABLE IF NOT EXISTS memos (
@@ -123,6 +143,7 @@ export const CREATE_TABLES = `
     FOREIGN KEY (tripId) REFERENCES trips(id)
   );
 
+  CREATE INDEX IF NOT EXISTS idx_photos_footprintId   ON photos(footprintId);
   CREATE INDEX IF NOT EXISTS idx_documents_tripId     ON documents(tripId);
   CREATE INDEX IF NOT EXISTS idx_footprints_tripId    ON footprints(tripId);
   CREATE INDEX IF NOT EXISTS idx_footprints_date      ON footprints(date);

@@ -34,6 +34,21 @@ export type TripDocumentFile = {
   fileUri: string;
 };
 
+export type FootprintPhoto = {
+  id: string;
+  footprintId: string;
+  localUri: string;
+  serverId?: string;
+  s3Url?: string;
+  originalFilename?: string;
+  fileSize?: number;
+  mimeType?: string;
+  width?: number;
+  height?: number;
+  orderIndex?: number;
+  syncStatus: 'pending' | 'synced';
+};
+
 export type Footprint = {
   id: string;
   serverId?: string;

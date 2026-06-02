@@ -78,6 +78,13 @@ export class FootprintRepository extends BaseRepository<FootprintRow> {
     return row ? rowToFootprint(row) : null;
   }
 
+  async updatePhotoUrls(id: string, photoUrls: string[]): Promise<void> {
+    await this.db.runAsync(
+      `UPDATE footprints SET photoUrls = ?, updatedAt = datetime('now') WHERE id = ?`,
+      [JSON.stringify(photoUrls), id]
+    );
+  }
+
   async deleteFootprint(id: string): Promise<void> {
     await this.delete(id);
   }
