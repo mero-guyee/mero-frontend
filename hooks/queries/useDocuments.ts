@@ -40,6 +40,7 @@ export function useCreateDocument() {
         if (trip?.serverId) {
           const serverDoc = await documentsApi.upload({
             tripId: parseInt(trip.serverId),
+            clientId: doc.id,
             file: data,
           });
           await docRepo.setServerId(doc.id, String(serverDoc.id));
