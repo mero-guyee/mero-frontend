@@ -1,6 +1,6 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { Trip } from '@/types';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SectionList } from 'react-native';
 
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
@@ -19,6 +19,7 @@ export default function TripListScreen() {
   const insets = useSafeAreaInsets();
   const isFocused = useIsFocused();
 
+  const { created } = useLocalSearchParams<{ created?: string }>();
   const { tripsByProgress, trips, setActiveTrip, isTripsLoading } = useTrips();
 
   const sections: { title: string; data: Trip[] }[] = [
@@ -69,7 +70,14 @@ export default function TripListScreen() {
               )}
               renderItem={({ item }) => (
                 <FadeWrapper>
-                  <TripCard trip={item} onPress={() => handleSelectTrip(item.id)} />
+                  <TripCard
+                    trip={item}
+                    onPress={() => handleSelectTrip(item.id)}
+                    showSyncBadge={
+                      created === 'true' &&
+                      (item.syncStatus === 'pending' || item.syncStatus === 'synced')
+                    }
+                  />
                 </FadeWrapper>
               )}
               showsVerticalScrollIndicator={false}

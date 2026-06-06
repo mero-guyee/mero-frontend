@@ -10,18 +10,17 @@ import TripProgress from './TripProgress';
 interface TripCardProps {
   trip: Trip;
   onPress: () => void;
+  showSyncBadge?: boolean;
 }
 
-export function TripCard({ trip, onPress }: TripCardProps) {
+export function TripCard({ trip, onPress, showSyncBadge = false }: TripCardProps) {
   return (
     <Pressable onPress={onPress}>
       <YCard marginBottom="$4">
         {/* Cover Image */}
         <YStack height={180} overflow="hidden">
           <TripCoverImage uri={trip.imageUrl} />
-          {/* {(trip.syncStatus === 'pending' || trip.syncStatus === 'synced') && ( */}
-          <SyncBadge synced={trip.syncStatus === 'synced'} />
-          {/* )} */}
+          {showSyncBadge && <SyncBadge synced={trip.syncStatus === 'synced'} />}
         </YStack>
 
         {/* Content */}
