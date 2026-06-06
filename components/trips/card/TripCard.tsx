@@ -1,7 +1,7 @@
 import { YCard } from '@/components/ui/Card';
 import { MapPin } from '@tamagui/lucide-icons';
 import { Pressable } from 'react-native';
-import { Text, XStack, YStack } from 'tamagui';
+import { Spinner, Text, XStack, YStack } from 'tamagui';
 import { Trip } from '../../../types';
 import TripCoverImage from '../TripCoverImage';
 import TripProgress from './TripProgress';
@@ -18,6 +18,24 @@ export function TripCard({ trip, onPress }: TripCardProps) {
         {/* Cover Image */}
         <YStack height={180} overflow="hidden">
           <TripCoverImage uri={trip.imageUrl} />
+          {trip.syncStatus === 'pending' && (
+            <XStack
+              position="absolute"
+              top="$2"
+              right="$2"
+              backgroundColor="rgba(0,0,0,0.45)"
+              borderRadius={10}
+              paddingHorizontal="$2"
+              paddingVertical="$1"
+              alignItems="center"
+              gap="$1.5"
+            >
+              <Spinner size="small" color="white" />
+              <Text color="white" fontSize={11}>
+                동기화 중
+              </Text>
+            </XStack>
+          )}
         </YStack>
 
         {/* Content */}

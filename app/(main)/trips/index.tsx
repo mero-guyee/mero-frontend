@@ -68,7 +68,9 @@ export default function TripListScreen() {
                 </Text>
               )}
               renderItem={({ item }) => (
-                <TripCard trip={item} onPress={() => handleSelectTrip(item.id)} />
+                <FadeWrapper>
+                  <TripCard trip={item} onPress={() => handleSelectTrip(item.id)} />
+                </FadeWrapper>
               )}
               showsVerticalScrollIndicator={false}
             />

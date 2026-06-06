@@ -16,6 +16,7 @@ export type Trip = {
   startDate: string;
   endDate: string;
   countries: string[];
+  syncStatus?: 'pending' | 'synced';
 };
 
 export type TripStatus = 'planned' | 'ongoing' | 'completed';

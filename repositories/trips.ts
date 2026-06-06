@@ -28,6 +28,7 @@ function rowToTrip(row: TripRow): Trip {
     startDate: row.startDate,
     endDate: row.endDate,
     countries: typeof row.countries === 'string' ? JSON.parse(row.countries) : row.countries,
+    syncStatus: row.syncStatus as 'pending' | 'synced',
   };
 }
 

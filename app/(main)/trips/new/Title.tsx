@@ -6,6 +6,7 @@ import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useTrips } from '@/contexts';
 import { useNewTripForm } from '@/contexts/MultiStepForm/NewTripFormContext';
 import { validateTitle } from '@/contexts/MultiStepForm/newTripValidation';
+import { useCreateTrip } from '@/hooks/queries/useTrips';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Alert } from 'react-native';
@@ -14,30 +15,32 @@ import { Text, YStack } from 'tamagui';
 
 export default function Title() {
   const insets = useSafeAreaInsets();
-  const { addTrip } = useTrips();
+  const { setActiveTrip, addTrip } = useTrips();
   const { newTrip, setNewTrip, initNewTripForm } = useNewTripForm();
   const [titleError, setTitleError] = useState<string | null>(null);
+  const createTrip = useCreateTrip();
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     const err = validateTitle(newTrip.title);
     setTitleError(err);
     if (err) return;
 
-    try {
-      addTrip(
-        {
-          title: newTrip.title.trim(),
-          startDate: newTrip.startDate,
-          endDate: newTrip.endDate,
-          imageUrl: newTrip.imageUrl,
-          countries: newTrip.countries,
-        },
-        initNewTripForm
-      );
-      router.push('/(main)/trips');
-    } catch {
-      Alert.alert('오류', '여행을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.');
-    }
+    addTrip(
+      {
+        title: newTrip.title.trim(),
+        startDate: newTrip.startDate,
+        endDate: newTrip.endDate,
+        imageUrl: newTrip.imageUrl,
+        countries: newTrip.countries,
+      },
+      () => {
+        initNewTripForm();
+        router.push('/(main)/trips');
+      },
+      () => {
+        Alert.alert('오류', '여행을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    );
   };
 
   return (
@@ -68,7 +71,7 @@ export default function Title() {
             {titleError ?? ''}
           </Text>
         </YStack>
-        <PrevNextButtons isLast onNext={handleSubmit} />
+        <PrevNextButtons isLast onNext={handleSubmit} isNextLoading={createTrip.isPending} />
       </YStack>
     </FadeWrapper>
   );

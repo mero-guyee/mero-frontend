@@ -63,22 +63,25 @@ export function useCreateTrip() {
       const repo = new TripRepository(db);
       const localTrip = await repo.createTrip(data);
 
-      try {
-        const serverTrip = await tripsApi.create({
-          clientId: localTrip.id,
-          title: data.title,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          countries: data.countries,
-          imageUrl: data.imageUrl,
-        });
-
-        await repo.setServerId(localTrip.id, String(serverTrip.id));
-      } catch (e) {
-        if (e instanceof ApiError) {
-          console.error('Failed to create trip on server:', e.status, e.message);
+      (async () => {
+        try {
+          const serverTrip = await tripsApi.create({
+            clientId: localTrip.id,
+            title: data.title,
+            startDate: data.startDate,
+            endDate: data.endDate,
+            countries: data.countries,
+            imageUrl: data.imageUrl,
+          });
+          await repo.setServerId(localTrip.id, String(serverTrip.id));
+          qc.invalidateQueries({ queryKey: tripKeys.all });
+        } catch (e) {
+          if (e instanceof ApiError) {
+            console.error('Failed to create trip on server:', e.status, e.message);
+          }
         }
-      }
+      })();
+
       return localTrip;
     },
     onSuccess: () => {
