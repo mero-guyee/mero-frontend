@@ -17,16 +17,21 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
 
 export function useTripsQuery() {
   const db = useDb();
+  const qc = useQueryClient();
   return useQuery({
     queryKey: tripKeys.all,
     queryFn: async () => {
       const repo = new TripRepository(db);
-      try {
-        const serverTrips = await withTimeout(tripsApi.getAll(), 5000);
-        await Promise.all(serverTrips.map((t) => repo.upsertFromServer(t)));
-      } catch {
-        // offline or timeout — use local cache
-      }
+
+      (async () => {
+        try {
+          const serverTrips = await withTimeout(tripsApi.getAll(), 5000);
+          await Promise.all(serverTrips.map((t) => repo.upsertFromServer(t)));
+          const fresh = await repo.getAllTrips();
+          qc.setQueryData(tripKeys.all, fresh);
+        } catch {}
+      })();
+
       return repo.getAllTrips();
     },
   });
@@ -136,9 +141,11 @@ export function useDeleteTrip() {
         await repo.deleteTrip(tripId);
         await memoRepo.deleteByTripId(tripId);
 
-        if (trip?.serverId) {
-          await tripsApi.delete(parseInt(trip.serverId));
-        }
+        (async () => {
+          if (trip?.serverId) {
+            await tripsApi.delete(parseInt(trip.serverId));
+          }
+        })();
       } catch (e) {
         console.error('Failed to delete trip locally:', e);
       }
