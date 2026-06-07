@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PortalProvider } from 'tamagui';
 import { AuthProvider, BudgetProvider, ExpenseProvider, TripProvider } from '../contexts';
+import { usePendingSync } from '../hooks/sync/usePendingSync';
 import { useAuthGuard } from '../hooks/useAuthGuard';
 import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
 import { QueryProvider } from '../providers/QueryProvider';
@@ -17,6 +18,11 @@ import config from '../tamagui.config';
 function AuthGuard({ children }: { children: React.ReactNode }) {
   useAuthGuard();
   return <>{children}</>;
+}
+
+function SyncManager() {
+  usePendingSync();
+  return null;
 }
 
 function AppContent() {
@@ -38,6 +44,7 @@ function AppContent() {
         <TripProvider>
           <ExpenseProvider>
             <BudgetProvider>
+              <SyncManager />
               <StatusBar style="dark" backgroundColor="transparent" translucent />
               <PortalProvider>
                 <Stack screenOptions={{ headerShown: false }}>
