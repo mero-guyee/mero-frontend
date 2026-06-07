@@ -15,8 +15,8 @@ const NewTripFormContext = createContext<NewTripFormContextProviderType | null>(
 export function NewTripFormProvider({ children }: { children: ReactNode }) {
   const [newTrip, setNewTrip] = useState<Omit<Trip, 'id'>>({
     title: '',
-    startDate: '',
-    endDate: '',
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
     countries: [],
     imageUrl: '',
   });
@@ -37,8 +37,8 @@ export function useNewTripForm(): NewTripFormContextType {
   const initNewTripForm = () => {
     setNewTrip({
       title: '',
-      startDate: '',
-      endDate: '',
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date().toISOString().split('T')[0],
       countries: [],
       imageUrl: '',
     });
