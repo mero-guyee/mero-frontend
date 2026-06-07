@@ -25,6 +25,7 @@ function rowToFootprint(row: FootprintRow): Footprint {
     locations: typeof row.locations === 'string' ? JSON.parse(row.locations) : row.locations,
     photoUrls: typeof row.photoUrls === 'string' ? JSON.parse(row.photoUrls) : row.photoUrls,
     weatherInfo: row.weatherInfo ?? undefined,
+    syncStatus: row.syncStatus,
   };
 }
 
@@ -118,7 +119,7 @@ export class FootprintRepository extends BaseRepository<FootprintRow> {
           serverFootprint.clientId,
           String(serverFootprint.id),
           localTripId,
-          serverFootprint.content ?? '',
+          serverFootprint.title ?? '',
           serverFootprint.content ?? '',
           serverFootprint.date,
           JSON.stringify(serverFootprint.locations ?? []),

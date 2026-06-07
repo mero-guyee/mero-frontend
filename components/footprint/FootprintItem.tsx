@@ -1,4 +1,5 @@
 import { YCard } from '@/components/ui/Card';
+import { SyncBadge } from '@/components/ui/SyncBadge';
 import { Pressable } from 'react-native';
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { Footprint } from '../../types';
@@ -8,11 +9,18 @@ interface Props {
   isLast: boolean;
   expense: { total: number; currency: string };
   onPress: () => void;
+  showSyncBadge?: boolean;
 }
 
-export default function FootprintItem({ footprint, isLast, expense, onPress }: Props) {
+export default function FootprintItem({
+  footprint,
+  isLast,
+  expense,
+  onPress,
+  showSyncBadge = false,
+}: Props) {
   const firstLocation = footprint.locations[0];
-  const badge = firstLocation?.placeName || footprint.serverId;
+  const badge = firstLocation?.placeName;
   const date = new Date(footprint.date);
   const dateLabel = date.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
   const { total, currency } = expense;
@@ -31,7 +39,8 @@ export default function FootprintItem({ footprint, isLast, expense, onPress }: P
       </YStack>
 
       <Pressable style={{ flex: 1 }} onPress={onPress}>
-        <YCard paddingHorizontal="$4" paddingVertical="$4" gap="$2">
+        <YCard paddingHorizontal="$4" paddingVertical="$4" gap="$2" position="relative">
+          {showSyncBadge && <SyncBadge synced={footprint.syncStatus === 'synced'} />}
           <XStack gap="$3">
             <YStack flex={1} gap="$2">
               <XStack alignItems="center" gap="$3">

@@ -57,7 +57,11 @@ export class PhotoRepository extends BaseRepository<PhotoRow> {
     return rows.map(rowToPhoto);
   }
 
-  async createPhoto(footprintId: string, localUri: string, orderIndex?: number): Promise<FootprintPhoto> {
+  async createPhoto(
+    footprintId: string,
+    localUri: string,
+    orderIndex?: number
+  ): Promise<FootprintPhoto> {
     const row = await this.create({
       footprintId,
       localUri,
@@ -73,16 +77,19 @@ export class PhotoRepository extends BaseRepository<PhotoRow> {
     return rowToPhoto(row);
   }
 
-  async markUploaded(id: string, serverData: {
-    serverId: string;
-    s3Url: string;
-    originalFilename?: string;
-    fileSize?: number;
-    mimeType?: string;
-    width?: number;
-    height?: number;
-    orderIndex?: number;
-  }): Promise<void> {
+  async syncUploaded(
+    id: string,
+    serverData: {
+      serverId: string;
+      s3Url: string;
+      originalFilename?: string;
+      fileSize?: number;
+      mimeType?: string;
+      width?: number;
+      height?: number;
+      orderIndex?: number;
+    }
+  ): Promise<void> {
     await this.db.runAsync(
       `UPDATE photos SET
         serverId = ?, s3Url = ?, originalFilename = ?, fileSize = ?,

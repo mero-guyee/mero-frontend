@@ -1,5 +1,7 @@
 // Local domain types (aligned with server API)
 
+import { SyncStatus } from '@/repositories/base';
+
 export type FootprintLocation = {
   placeName?: string;
   country?: string;
@@ -60,6 +62,7 @@ export type Footprint = {
   locations: FootprintLocation[];
   photoUrls: string[];
   weatherInfo?: string;
+  syncStatus?: SyncStatus;
 };
 
 export type Memo = {

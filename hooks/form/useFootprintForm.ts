@@ -40,7 +40,7 @@ export function useFootprintForm() {
     setPhotoUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim() || !tripId) {
       Alert.alert('오류', '제목과 여행을 선택해주세요.');
       return;
@@ -58,11 +58,11 @@ export function useFootprintForm() {
 
     if (existingFootprint) {
       updateFootprint({ ...existingFootprint, ...footprintData });
+      router.push('/(main)/footprint');
     } else {
-      addFootprint(footprintData);
+      const created = await addFootprint(footprintData);
+      router.push(`/(main)/footprint?created=${created.id}`);
     }
-
-    router.back();
   };
 
   return {

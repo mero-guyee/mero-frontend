@@ -1,7 +1,7 @@
 import {
   useCreateFootprint,
   useDeleteFootprint,
-  useFootprintsByTripQuery,
+  useFootprintsQuery,
   useUpdateFootprint,
 } from '../hooks/queries/useFootprints';
 import { Footprint } from '../types';
@@ -9,7 +9,7 @@ import { useTrips } from './TripContext';
 
 interface FootprintContextType {
   footprints: Footprint[];
-  addFootprint: (footprint: Omit<Footprint, 'id' | 'serverId'>) => void;
+  addFootprint: (footprint: Omit<Footprint, 'id' | 'serverId'>) => Promise<Footprint>;
   updateFootprint: (footprint: Footprint) => void;
   deleteFootprint: (footprintId: string) => void;
   getFootprintsByTripId: (tripId: string) => Footprint[];
@@ -18,7 +18,7 @@ interface FootprintContextType {
 
 export function useFootprints(): FootprintContextType {
   const { activeTrip } = useTrips();
-  const { data: footprints = [], isLoading: isFootPrintLoading } = useFootprintsByTripQuery(
+  const { data: footprints = [], isLoading: isFootPrintLoading } = useFootprintsQuery(
     activeTrip ?? ''
   );
 
@@ -28,7 +28,7 @@ export function useFootprints(): FootprintContextType {
 
   return {
     footprints,
-    addFootprint: (footprint) => createFootprint.mutate(footprint),
+    addFootprint: (footprint) => createFootprint.mutateAsync(footprint),
     updateFootprint: (footprint) => updateFootprintMut.mutate(footprint),
     deleteFootprint: (footprintId) => {
       const footprint = footprints.find((f) => f.id === footprintId);

@@ -1,5 +1,5 @@
-import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import { Input } from '@/components/ui';
+import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import { NotebookPen, Plus } from '@tamagui/lucide-icons';
 import { SectionList } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
@@ -20,6 +20,7 @@ interface Props {
   onSelectFootprint: (id: string) => void;
   getFootprintExpense: (footprintId: string) => { total: number; currency: string };
   isEmpty: boolean;
+  createdId?: string;
 }
 
 function EmptyList() {
@@ -51,6 +52,7 @@ export default function FootprintList({
   onSelectFootprint,
   getFootprintExpense,
   isEmpty,
+  createdId,
 }: Props) {
   return (
     <>
@@ -81,6 +83,10 @@ export default function FootprintList({
             isLast={index === section.data.length - 1}
             expense={getFootprintExpense(item.id)}
             onPress={() => onSelectFootprint(item.id)}
+            showSyncBadge={
+              item.id === createdId &&
+              (item.syncStatus === 'pending' || item.syncStatus === 'synced')
+            }
           />
         )}
         ListEmptyComponent={EmptyList}

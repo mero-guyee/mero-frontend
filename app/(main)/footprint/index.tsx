@@ -4,7 +4,7 @@ import PathMapView from '@/components/map/PathMapView';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { List, Map } from '@tamagui/lucide-icons';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable } from 'react-native';
 import { YStack } from 'tamagui';
@@ -12,6 +12,7 @@ import { useExpenses, useFootprints, useTrips } from '../../../contexts';
 
 export default function FootprintListScreen() {
   const router = useRouter();
+  const { created } = useLocalSearchParams<{ created?: string }>();
 
   const { activeTrip } = useTrips();
   const { footprints, isFootPrintLoading } = useFootprints();
@@ -87,6 +88,7 @@ export default function FootprintListScreen() {
             onSelectFootprint={(id) => router.push(`/(main)/footprint/${id}`)}
             getFootprintExpense={getFootprintExpense}
             isEmpty={filteredFootprints.length === 0}
+            createdId={created}
           />
         )}
       </FadeWrapper>
