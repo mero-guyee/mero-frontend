@@ -5,7 +5,7 @@ import {
   useCreateExpense,
   useDeleteCategory,
   useDeleteExpense,
-  useExpensesByTripQuery,
+  useExpensesQuery,
   useUpdateCategory,
   useUpdateExpense,
 } from '../hooks/queries/useExpenses';
@@ -17,7 +17,7 @@ import { useTrips } from './TripContext';
 interface ExpenseContextType {
   expenses: Expense[];
   categories: ExpenseCategory[];
-  addExpense: (expense: Omit<Expense, 'id' | 'createdAt'>) => void;
+  addExpense: (expense: Omit<Expense, 'id' | 'createdAt'>) => Promise<Expense>;
   updateExpense: (expense: Expense) => void;
   deleteExpense: (expenseId: string) => void;
   deleteExpensesByFootprintId: (footprintId: string) => void;
@@ -36,7 +36,7 @@ export function ExpenseProvider({ children }: { children: ReactNode }) {
 export function useExpenses(): ExpenseContextType {
   const db = useDb();
   const { activeTrip } = useTrips();
-  const { data: expenses = [] } = useExpensesByTripQuery(activeTrip ?? '');
+  const { data: expenses = [] } = useExpensesQuery(activeTrip ?? '');
   const { data: categories = [] } = useCategoriesQuery();
 
   const createExpense = useCreateExpense();
@@ -49,7 +49,7 @@ export function useExpenses(): ExpenseContextType {
   return {
     expenses,
     categories,
-    addExpense: (expense) => createExpense.mutate(expense),
+    addExpense: (expense) => createExpense.mutateAsync(expense),
     updateExpense: (expense) => updateExpenseMut.mutate(expense),
     deleteExpense: (expenseId) => {
       const expense = expenses.find((e) => e.id === expenseId);

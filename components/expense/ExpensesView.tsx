@@ -12,7 +12,7 @@ import { ExpenseCard } from './ExpenseCard';
 import ExpenseDayTotal from './ExpenseDayTotal';
 import ExpenseTotalByCurrency from './ExpenseTotalByCurrency';
 
-export function ExpensesView() {
+export function ExpensesView({ createdId }: { createdId?: string }) {
   const router = useRouter();
   const { activeTrip } = useTrips();
   const { expenses } = useExpenses();
@@ -88,7 +88,14 @@ export function ExpensesView() {
                       <ExpenseDayTotal date={date} dayExpenses={dayExpenses} />
                       <YStack gap="$2">
                         {dayExpenses.map((expense) => (
-                          <ExpenseCard key={expense.id} expense={expense} />
+                          <ExpenseCard
+                            key={expense.id}
+                            expense={expense}
+                            showSyncBadge={
+                              expense.id === createdId &&
+                              (expense.syncStatus === 'pending' || expense.syncStatus === 'synced')
+                            }
+                          />
                         ))}
                       </YStack>
                     </YStack>

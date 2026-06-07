@@ -90,6 +90,7 @@ export type Expense = {
   date: string;
   location?: string;
   createdAt: string;
+  syncStatus?: SyncStatus;
 };
 
 export type ExpenseCategory = {
@@ -108,6 +109,7 @@ export type Budget = {
   currency: string;
   amount: number;
   exchangeRate?: number;
+  syncStatus?: SyncStatus;
 };
 
 export type Screen =

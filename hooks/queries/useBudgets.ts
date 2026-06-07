@@ -11,30 +11,29 @@ export const budgetKeys = {
   byTrip: (tripId: string) => ['budgets', 'trip', tripId] as const,
 };
 
-export function useBudgetsQuery() {
+export function useBudgetsQuery(tripId: string) {
   const db = useDb();
-  return useQuery({
-    queryKey: budgetKeys.all,
-    queryFn: () => new BudgetRepository(db).getAllBudgets(),
-  });
-}
-
-export function useBudgetsByTripQuery(tripId: string) {
-  const db = useDb();
+  const qc = useQueryClient();
   return useQuery({
     queryKey: budgetKeys.byTrip(tripId),
     queryFn: async () => {
       const tripRepo = new TripRepository(db);
       const repo = new BudgetRepository(db);
-      try {
-        const trip = await tripRepo.getTripById(tripId);
-        if (trip?.serverId) {
-          const serverBudgets = await budgetsApi.getByTrip(parseInt(trip.serverId));
-          await Promise.all(serverBudgets.map((b) => repo.upsertFromServer(b, tripId)));
+
+      (async () => {
+        try {
+          const trip = await tripRepo.getTripById(tripId);
+          if (trip?.serverId) {
+            const serverBudgets = await budgetsApi.getByTrip(parseInt(trip.serverId));
+            await Promise.all(serverBudgets.map((b) => repo.upsertFromServer(b, tripId)));
+            const fresh = await repo.getBudgetsByTripId(tripId);
+            qc.setQueryData(budgetKeys.byTrip(tripId), fresh);
+          }
+        } catch {
+          // offline — use local cache
         }
-      } catch {
-        // offline — use local cache
-      }
+      })();
+
       return repo.getBudgetsByTripId(tripId);
     },
     enabled: !!tripId,
@@ -49,20 +48,26 @@ export function useCreateBudget() {
       const tripRepo = new TripRepository(db);
       const repo = new BudgetRepository(db);
       const localBudget = await repo.createBudget(data);
-      try {
-        const trip = await tripRepo.getTripById(data.tripId);
-        if (trip?.serverId) {
-          const serverBudget = await budgetsApi.create(parseInt(trip.serverId), {
-            clientId: localBudget.id,
-            amount: data.amount,
-            currency: data.currency as any,
-            exchangeRate: data.exchangeRate || DEFAULT_EXCHANGE_RATE,
-          });
-          await repo.setServerId(localBudget.id, String(serverBudget.id));
+
+      (async () => {
+        try {
+          const trip = await tripRepo.getTripById(data.tripId);
+          if (trip?.serverId) {
+            const serverBudget = await budgetsApi.create(parseInt(trip.serverId), {
+              clientId: localBudget.id,
+              amount: data.amount,
+              currency: data.currency as any,
+              exchangeRate: data.exchangeRate || DEFAULT_EXCHANGE_RATE,
+            });
+            await repo.setServerId(localBudget.id, String(serverBudget.id));
+            qc.invalidateQueries({ queryKey: budgetKeys.all });
+            qc.invalidateQueries({ queryKey: budgetKeys.byTrip(data.tripId) });
+          }
+        } catch {
+          // stays pending
         }
-      } catch {
-        // stays pending
-      }
+      })();
+
       return localBudget;
     },
     onSuccess: (budget) => {
@@ -80,21 +85,27 @@ export function useUpdateBudget() {
       const tripRepo = new TripRepository(db);
       const repo = new BudgetRepository(db);
       const updated = await repo.updateBudget(budget);
-      try {
-        if (budget.serverId) {
-          const trip = await tripRepo.getTripById(budget.tripId);
-          if (trip?.serverId) {
-            await budgetsApi.update(parseInt(trip.serverId), parseInt(budget.serverId), {
-              amount: budget.amount,
-              currency: budget.currency as any,
-              exchangeRate: budget.exchangeRate,
-            });
-            await repo.markSynced(budget.id);
+
+      (async () => {
+        try {
+          if (budget.serverId) {
+            const trip = await tripRepo.getTripById(budget.tripId);
+            if (trip?.serverId) {
+              await budgetsApi.update(parseInt(trip.serverId), parseInt(budget.serverId), {
+                amount: budget.amount,
+                currency: budget.currency as any,
+                exchangeRate: budget.exchangeRate,
+              });
+              await repo.markSynced(budget.id);
+              qc.invalidateQueries({ queryKey: budgetKeys.all });
+              qc.invalidateQueries({ queryKey: budgetKeys.byTrip(budget.tripId) });
+            }
           }
+        } catch {
+          // stays pending
         }
-      } catch {
-        // stays pending
-      }
+      })();
+
       return updated;
     },
     onSuccess: (_, budget) => {
@@ -113,16 +124,20 @@ export function useDeleteBudget() {
       const repo = new BudgetRepository(db);
       const budgetRow = await repo.findById(id);
       await repo.deleteBudget(id);
-      try {
-        if (budgetRow?.serverId) {
-          const trip = await tripRepo.getTripById(tripId);
-          if (trip?.serverId) {
-            await budgetsApi.delete(parseInt(trip.serverId), parseInt(budgetRow.serverId));
+
+      (async () => {
+        try {
+          if (budgetRow?.serverId) {
+            const trip = await tripRepo.getTripById(tripId);
+            if (trip?.serverId) {
+              await budgetsApi.delete(parseInt(trip.serverId), parseInt(budgetRow.serverId));
+            }
           }
+        } catch {
+          // stays soft-deleted with pending status
         }
-      } catch {
-        // stays soft-deleted with pending status
-      }
+      })();
+
       return tripId;
     },
     onSuccess: (tripId) => {

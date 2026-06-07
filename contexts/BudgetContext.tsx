@@ -8,10 +8,11 @@ import {
 import { useDb } from '../providers/DatabaseProvider';
 import { BudgetRepository } from '../repositories';
 import { Budget } from '../types';
+import { useTrips } from './TripContext';
 
 interface BudgetContextType {
   budgets: Budget[];
-  addBudget: (budget: Omit<Budget, 'id'>) => void;
+  addBudget: (budget: Omit<Budget, 'id'>) => Promise<Budget>;
   updateBudget: (budget: Budget) => void;
   deleteBudget: (budgetId: string) => void;
   deleteBudgetsByTripId: (tripId: string) => void;
@@ -25,14 +26,16 @@ export function BudgetProvider({ children }: { children: ReactNode }) {
 
 export function useBudgets(): BudgetContextType {
   const db = useDb();
-  const { data: budgets = [] } = useBudgetsQuery();
+
+  const { activeTrip } = useTrips();
+  const { data: budgets = [] } = useBudgetsQuery(activeTrip ?? '');
   const createBudget = useCreateBudget();
   const updateBudgetMut = useUpdateBudget();
   const deleteBudgetMut = useDeleteBudget();
 
   return {
     budgets,
-    addBudget: (budget) => createBudget.mutate(budget),
+    addBudget: (budget) => createBudget.mutateAsync(budget),
     updateBudget: (budget) => updateBudgetMut.mutate(budget),
     deleteBudget: (budgetId) => {
       const budget = budgets.find((b) => b.id === budgetId);

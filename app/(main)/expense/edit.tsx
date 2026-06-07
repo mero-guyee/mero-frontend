@@ -40,7 +40,7 @@ export default function ExpenseFormScreen() {
     );
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!amount || parseFloat(amount) <= 0) {
       Alert.alert('오류', '금액을 입력해주세요.');
       return;
@@ -60,8 +60,9 @@ export default function ExpenseFormScreen() {
         description: description.trim() || undefined,
         location: location.trim() || undefined,
       });
+      router.back();
     } else {
-      addExpense({
+      const created = await addExpense({
         tripId: effectiveTripId,
         footprintId,
         date,
@@ -71,9 +72,8 @@ export default function ExpenseFormScreen() {
         description: description.trim() || undefined,
         location: location.trim() || undefined,
       });
+      router.push(`/(main)/expense?created=${created.id}`);
     }
-
-    router.back();
   };
 
   return (

@@ -9,6 +9,7 @@ import { Budget } from '../../types';
 import { CircularButton, FilledButton, Input } from '../ui';
 import { YCard } from '../ui/Card';
 import FloatingActionButton from '../ui/button/FloatingActionButton';
+import { SyncBadge } from '../ui/SyncBadge';
 
 export function BudgetView() {
   const { activeTrip } = useTrips();
@@ -18,6 +19,7 @@ export function BudgetView() {
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [budgetForm, setBudgetForm] = useState({ currency: 'KRW', amount: '' });
+  const [createdId, setCreatedId] = useState<string | null>(null);
 
   const filteredBudgets = budgets.filter((b) => !activeTrip || b.tripId === activeTrip);
   const filteredExpenses = expenses.filter((e) => !activeTrip || e.tripId === activeTrip);
@@ -50,7 +52,7 @@ export function BudgetView() {
     setBudgetForm({ currency: 'USD', amount: '' });
   };
 
-  const handleSaveBudget = () => {
+  const handleSaveBudget = async () => {
     if (!activeTrip || !budgetForm.amount) return;
     const amount = parseFloat(budgetForm.amount);
     if (isNaN(amount) || amount <= 0) return;
@@ -58,7 +60,8 @@ export function BudgetView() {
     if (editingBudget) {
       updateBudget({ ...editingBudget, currency: budgetForm.currency, amount });
     } else {
-      addBudget({ tripId: activeTrip, currency: budgetForm.currency, amount });
+      const created = await addBudget({ tripId: activeTrip, currency: budgetForm.currency, amount });
+      setCreatedId(created.id);
     }
     handleCloseBudgetModal();
   };
@@ -124,7 +127,11 @@ export function BudgetView() {
                 const isOverBudget = percentage > 100;
 
                 return (
-                  <YCard key={budget.id} padding="$5">
+                  <YCard key={budget.id} padding="$5" position="relative">
+                    {budget.id === createdId &&
+                      (budget.syncStatus === 'pending' || budget.syncStatus === 'synced') && (
+                        <SyncBadge synced={budget.syncStatus === 'synced'} />
+                      )}
                     <XStack
                       alignItems="flex-start"
                       justifyContent="space-between"

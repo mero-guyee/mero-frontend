@@ -19,6 +19,7 @@ function rowToBudget(row: BudgetRow): Budget {
     currency: row.currency,
     amount: row.amount,
     exchangeRate: row.exchangeRate ?? undefined,
+    syncStatus: row.syncStatus,
   };
 }
 

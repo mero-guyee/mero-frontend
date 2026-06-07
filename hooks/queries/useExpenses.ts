@@ -5,35 +5,35 @@ import { ExpenseCategoryRepository, ExpenseRepository, TripRepository } from '..
 import { Expense, ExpenseCategory } from '../../types';
 
 export const expenseKeys = {
-  all: ['expenses'] as const,
   byTrip: (tripId: string) => ['expenses', 'trip', tripId] as const,
   categories: ['categories'] as const,
 };
 
-export function useExpensesQuery() {
+export function useExpensesQuery(tripId: string) {
   const db = useDb();
-  return useQuery({
-    queryKey: expenseKeys.all,
-    queryFn: () => new ExpenseRepository(db).getAllExpenses(),
-  });
-}
-
-export function useExpensesByTripQuery(tripId: string) {
-  const db = useDb();
+  const qc = useQueryClient();
   return useQuery({
     queryKey: expenseKeys.byTrip(tripId),
     queryFn: async () => {
       const tripRepo = new TripRepository(db);
       const repo = new ExpenseRepository(db);
-      try {
-        const trip = await tripRepo.getTripById(tripId);
-        if (trip?.serverId) {
-          const { expenses: serverExpenses } = await expensesApi.getByTrip(parseInt(trip.serverId));
-          await Promise.all(serverExpenses.map((e) => repo.upsertFromServer(e, tripId)));
+
+      (async () => {
+        try {
+          const trip = await tripRepo.getTripById(tripId);
+          if (trip?.serverId) {
+            const { expenses: serverExpenses } = await expensesApi.getByTrip(
+              parseInt(trip.serverId)
+            );
+            await Promise.all(serverExpenses.map((e) => repo.upsertFromServer(e, tripId)));
+            const fresh = await repo.getExpensesByTripId(tripId);
+            qc.setQueryData(expenseKeys.byTrip(tripId), fresh);
+          }
+        } catch {
+          // offline — use local cache
         }
-      } catch {
-        // offline — use local cache
-      }
+      })();
+
       return repo.getExpensesByTripId(tripId);
     },
     enabled: !!tripId,
@@ -42,16 +42,23 @@ export function useExpensesByTripQuery(tripId: string) {
 
 export function useCategoriesQuery() {
   const db = useDb();
+  const qc = useQueryClient();
   return useQuery({
     queryKey: expenseKeys.categories,
     queryFn: async () => {
       const repo = new ExpenseCategoryRepository(db);
-      try {
-        const serverCategories = await expenseCategoriesApi.getAll();
-        await Promise.all(serverCategories.map((c) => repo.upsertFromServer(c)));
-      } catch {
-        // offline — use local cache
-      }
+
+      (async () => {
+        try {
+          const serverCategories = await expenseCategoriesApi.getAll();
+          await Promise.all(serverCategories.map((c) => repo.upsertFromServer(c)));
+          const fresh = await repo.getAllCategories();
+          qc.setQueryData(expenseKeys.categories, fresh);
+        } catch {
+          // offline — use local cache
+        }
+      })();
+
       return repo.getAllCategories();
     },
   });
@@ -65,30 +72,35 @@ export function useCreateExpense() {
       const tripRepo = new TripRepository(db);
       const repo = new ExpenseRepository(db);
       const localExpense = await repo.createExpense(data);
-      try {
-        const trip = await tripRepo.getTripById(data.tripId);
-        const categoryServerId = (await new ExpenseCategoryRepository(db).findById(data.categoryId))
-          ?.serverId;
-        if (trip?.serverId && categoryServerId) {
-          const serverExpense = await expensesApi.create(parseInt(trip.serverId), {
-            clientId: localExpense.id,
-            tripId: parseInt(trip.serverId),
-            amount: data.amount,
-            currency: data.currency as any,
-            categoryId: parseInt(categoryServerId),
-            description: data.description,
-            date: data.date,
-            location: data.location,
-          });
-          await repo.setServerId(localExpense.id, String(serverExpense.id));
+
+      (async () => {
+        try {
+          const trip = await tripRepo.getTripById(data.tripId);
+          const categoryServerId = (
+            await new ExpenseCategoryRepository(db).findById(data.categoryId)
+          )?.serverId;
+          if (trip?.serverId && categoryServerId) {
+            const serverExpense = await expensesApi.create(parseInt(trip.serverId), {
+              clientId: localExpense.id,
+              tripId: parseInt(trip.serverId),
+              amount: data.amount,
+              currency: data.currency as any,
+              categoryId: parseInt(categoryServerId),
+              description: data.description,
+              date: data.date,
+              location: data.location,
+            });
+            await repo.setServerId(localExpense.id, String(serverExpense.id));
+            qc.invalidateQueries({ queryKey: expenseKeys.byTrip(data.tripId) });
+          }
+        } catch {
+          // stays pending
         }
-      } catch {
-        // stays pending
-      }
+      })();
+
       return localExpense;
     },
     onSuccess: (expense) => {
-      qc.invalidateQueries({ queryKey: expenseKeys.all });
       qc.invalidateQueries({ queryKey: expenseKeys.byTrip(expense.tripId) });
     },
   });
@@ -102,31 +114,35 @@ export function useUpdateExpense() {
       const tripRepo = new TripRepository(db);
       const repo = new ExpenseRepository(db);
       const updated = await repo.updateExpense(expense);
-      try {
-        if (expense.serverId) {
-          const trip = await tripRepo.getTripById(expense.tripId);
-          const categoryServerId = (
-            await new ExpenseCategoryRepository(db).findById(expense.categoryId)
-          )?.serverId;
-          if (trip?.serverId && categoryServerId) {
-            await expensesApi.update(parseInt(trip.serverId), parseInt(expense.serverId), {
-              amount: expense.amount,
-              currency: expense.currency as any,
-              categoryId: parseInt(categoryServerId),
-              description: expense.description,
-              date: expense.date,
-              location: expense.location,
-            });
-            await repo.markSynced(expense.id);
+
+      (async () => {
+        try {
+          if (expense.serverId) {
+            const trip = await tripRepo.getTripById(expense.tripId);
+            const categoryServerId = (
+              await new ExpenseCategoryRepository(db).findById(expense.categoryId)
+            )?.serverId;
+            if (trip?.serverId && categoryServerId) {
+              await expensesApi.update(parseInt(trip.serverId), parseInt(expense.serverId), {
+                amount: expense.amount,
+                currency: expense.currency as any,
+                categoryId: parseInt(categoryServerId),
+                description: expense.description,
+                date: expense.date,
+                location: expense.location,
+              });
+              await repo.markSynced(expense.id);
+              qc.invalidateQueries({ queryKey: expenseKeys.byTrip(expense.tripId) });
+            }
           }
+        } catch {
+          // stays pending
         }
-      } catch {
-        // stays pending
-      }
+      })();
+
       return updated;
     },
     onSuccess: (_, expense) => {
-      qc.invalidateQueries({ queryKey: expenseKeys.all });
       qc.invalidateQueries({ queryKey: expenseKeys.byTrip(expense.tripId) });
     },
   });
@@ -141,20 +157,23 @@ export function useDeleteExpense() {
       const repo = new ExpenseRepository(db);
       const expenseRow = await repo.findById(id);
       await repo.deleteExpense(id);
-      try {
-        if (expenseRow?.serverId) {
-          const trip = await tripRepo.getTripById(tripId);
-          if (trip?.serverId) {
-            await expensesApi.delete(parseInt(trip.serverId), parseInt(expenseRow.serverId));
+
+      (async () => {
+        try {
+          if (expenseRow?.serverId) {
+            const trip = await tripRepo.getTripById(tripId);
+            if (trip?.serverId) {
+              await expensesApi.delete(parseInt(trip.serverId), parseInt(expenseRow.serverId));
+            }
           }
+        } catch {
+          // stays soft-deleted with pending status
         }
-      } catch {
-        // stays soft-deleted with pending status
-      }
+      })();
+
       return tripId;
     },
     onSuccess: (tripId) => {
-      qc.invalidateQueries({ queryKey: expenseKeys.all });
       qc.invalidateQueries({ queryKey: expenseKeys.byTrip(tripId) });
     },
   });
@@ -167,16 +186,21 @@ export function useCreateCategory() {
     mutationFn: async (data: Omit<ExpenseCategory, 'id'>) => {
       const repo = new ExpenseCategoryRepository(db);
       const localCategory = await repo.createCategory(data);
-      try {
-        const serverCategory = await expenseCategoriesApi.create({
-          name: data.name,
-          icon: data.icon,
-          color: data.color,
-        });
-        await repo.setServerId(localCategory.id, String(serverCategory.id));
-      } catch {
-        // stays pending
-      }
+
+      (async () => {
+        try {
+          const serverCategory = await expenseCategoriesApi.create({
+            name: data.name,
+            icon: data.icon,
+            color: data.color,
+          });
+          await repo.setServerId(localCategory.id, String(serverCategory.id));
+          qc.invalidateQueries({ queryKey: expenseKeys.categories });
+        } catch {
+          // stays pending
+        }
+      })();
+
       return localCategory;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: expenseKeys.categories }),
@@ -201,13 +225,16 @@ export function useDeleteCategory() {
       const repo = new ExpenseCategoryRepository(db);
       const categoryRow = await repo.findById(id);
       await repo.deleteCategory(id);
-      try {
-        if (categoryRow?.serverId) {
-          await expenseCategoriesApi.delete(parseInt(categoryRow.serverId));
+
+      (async () => {
+        try {
+          if (categoryRow?.serverId) {
+            await expenseCategoriesApi.delete(parseInt(categoryRow.serverId));
+          }
+        } catch {
+          // stays soft-deleted with pending status
         }
-      } catch {
-        // stays soft-deleted with pending status
-      }
+      })();
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: expenseKeys.categories }),
   });

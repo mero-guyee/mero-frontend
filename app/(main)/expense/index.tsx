@@ -2,6 +2,7 @@ import { BudgetView } from '@/components/expense/BudgetView';
 import { ExpensesView } from '@/components/expense/ExpensesView';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { SubTabs } from '@/components/ui/tabbar/subTabs/SubTabs';
+import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { TabView } from 'react-native-tab-view';
@@ -13,6 +14,7 @@ const routes = [
 ];
 
 export default function ExpenseScreen() {
+  const { created } = useLocalSearchParams<{ created?: string }>();
   const [index, setIndex] = useState(0);
   const layout = useWindowDimensions();
 
@@ -25,7 +27,7 @@ export default function ExpenseScreen() {
         renderScene={({ route }) => {
           switch (route.key) {
             case 'expenses':
-              return <ExpensesView />;
+              return <ExpensesView createdId={created} />;
             case 'budget':
               return <BudgetView />;
             default:

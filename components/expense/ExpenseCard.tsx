@@ -1,4 +1,5 @@
 import { CategoryIcon } from '@/components/expense/CategoryIcon';
+import { SyncBadge } from '@/components/ui/SyncBadge';
 import { useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
@@ -7,9 +8,10 @@ import { Expense } from '../../types';
 
 interface ExpenseCardProps {
   expense: Expense;
+  showSyncBadge?: boolean;
 }
 
-export function ExpenseCard({ expense }: ExpenseCardProps) {
+export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps) {
   const router = useRouter();
   const getCurrencySymbol = (currency: string) => CURRENCY_SYMBOLS[currency] || currency;
 
@@ -25,7 +27,9 @@ export function ExpenseCard({ expense }: ExpenseCardProps) {
         padding="$4"
         alignItems="center"
         justifyContent="space-between"
+        position="relative"
       >
+        {showSyncBadge && <SyncBadge synced={expense.syncStatus === 'synced'} />}
         <XStack alignItems="center" gap="$3">
           <YStack
             width={44}

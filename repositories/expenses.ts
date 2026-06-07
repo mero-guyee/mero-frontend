@@ -42,6 +42,7 @@ function rowToExpense(row: ExpenseRow): Expense {
     date: row.date,
     location: row.location ?? undefined,
     createdAt: row.createdAt,
+    syncStatus: row.syncStatus,
   };
 }
 
