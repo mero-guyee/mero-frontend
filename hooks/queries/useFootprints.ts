@@ -113,30 +113,37 @@ export function useUpdateFootprint() {
           .map((uri, i) => photoRepo.createPhoto(footprint.id, uri, existingPhotos.length + i))
       );
 
-      try {
-        if (footprint.serverId) {
-          const trip = await tripRepo.getTripById(footprint.tripId);
-          if (trip?.serverId) {
-            await footprintsApi.update(parseInt(trip.serverId), parseInt(footprint.serverId), {
-              title: footprint.title,
-              content: footprint.content,
-              date: footprint.date,
-              locations: footprint.locations,
-            });
-            await repo.markSynced(footprint.id);
+      (async () => {
+        try {
+          if (footprint.serverId) {
+            const trip = await tripRepo.getTripById(footprint.tripId);
+            if (trip?.serverId) {
+              await footprintsApi.update(parseInt(trip.serverId), parseInt(footprint.serverId), {
+                title: footprint.title,
+                content: footprint.content,
+                date: footprint.date,
+                locations: footprint.locations,
+              });
+              await repo.markSynced(footprint.id);
 
-            const newUrls = await uploadPhotosAndSync(
-              photoRepo,
-              newLocalPhotos,
-              parseInt(trip.serverId),
-              parseInt(footprint.serverId)
-            );
-            await repo.updatePhotoUrls(footprint.id, [...serverUrls, ...newUrls]);
+              const newUrls = await uploadPhotosAndSync(
+                photoRepo,
+                newLocalPhotos,
+                parseInt(trip.serverId),
+                parseInt(footprint.serverId)
+              );
+              await repo.updatePhotoUrls(footprint.id, [...serverUrls, ...newUrls]);
+
+              qc.invalidateQueries({ queryKey: footprintKeys.byTrip(footprint.tripId) });
+              qc.invalidateQueries({ queryKey: footprintKeys.detail(footprint.id) });
+              qc.invalidateQueries({ queryKey: footprintKeys.photos(footprint.id) });
+            }
           }
+        } catch {
+          // stays pending
         }
-      } catch {
-        // stays pending
-      }
+      })();
+
       return updated;
     },
     onSuccess: (_, footprint) => {
@@ -158,16 +165,20 @@ export function useDeleteFootprint() {
       const footprintRow = await repo.findById(id);
       await repo.deleteFootprint(id);
       await photoRepo.deleteByFootprintId(id);
-      try {
-        if (footprintRow?.serverId) {
-          const trip = await tripRepo.getTripById(tripId);
-          if (trip?.serverId) {
-            await footprintsApi.delete(parseInt(trip.serverId), parseInt(footprintRow.serverId));
+
+      (async () => {
+        try {
+          if (footprintRow?.serverId) {
+            const trip = await tripRepo.getTripById(tripId);
+            if (trip?.serverId) {
+              await footprintsApi.delete(parseInt(trip.serverId), parseInt(footprintRow.serverId));
+            }
           }
+        } catch {
+          // stays soft-deleted with pending status
         }
-      } catch {
-        // stays soft-deleted with pending status
-      }
+      })();
+
       return tripId;
     },
     onSuccess: (tripId) => {

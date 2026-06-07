@@ -102,24 +102,30 @@ export function useUpdateTrip() {
     mutationFn: async (trip: Trip) => {
       const repo = new TripRepository(db);
       const updated = await repo.updateTrip(trip);
-      try {
-        if (trip.serverId) {
-          await tripsApi.update(parseInt(trip.serverId), {
-            title: trip.title,
-            startDate: trip.startDate,
-            endDate: trip.endDate,
-            countries: trip.countries,
-          });
 
-          if (trip.imageUrl) {
-            await tripsApi.uploadImage(parseInt(trip.serverId), trip.imageUrl);
+      (async () => {
+        try {
+          if (trip.serverId) {
+            await tripsApi.update(parseInt(trip.serverId), {
+              title: trip.title,
+              startDate: trip.startDate,
+              endDate: trip.endDate,
+              countries: trip.countries,
+            });
+
+            if (trip.imageUrl) {
+              await tripsApi.uploadImage(parseInt(trip.serverId), trip.imageUrl);
+            }
+
+            await repo.markSynced(trip.id);
+            qc.invalidateQueries({ queryKey: tripKeys.all });
+            qc.invalidateQueries({ queryKey: tripKeys.detail(trip.id) });
           }
-
-          await repo.markSynced(trip.id);
+        } catch {
+          // stays pending
         }
-      } catch {
-        // stays pending
-      }
+      })();
+
       return updated;
     },
     onSuccess: (_, trip) => {
@@ -134,21 +140,21 @@ export function useDeleteTrip() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (tripId: string) => {
-      try {
-        const repo = new TripRepository(db);
-        const memoRepo = new MemoRepository(db);
-        const trip = await repo.getTripById(tripId);
-        await repo.deleteTrip(tripId);
-        await memoRepo.deleteByTripId(tripId);
+      const repo = new TripRepository(db);
+      const memoRepo = new MemoRepository(db);
+      const trip = await repo.getTripById(tripId);
+      await repo.deleteTrip(tripId);
+      await memoRepo.deleteByTripId(tripId);
 
-        (async () => {
+      (async () => {
+        try {
           if (trip?.serverId) {
             await tripsApi.delete(parseInt(trip.serverId));
           }
-        })();
-      } catch (e) {
-        console.error('Failed to delete trip locally:', e);
-      }
+        } catch (e) {
+          console.error('Failed to delete trip on server:', e);
+        }
+      })();
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: tripKeys.all }),
   });
