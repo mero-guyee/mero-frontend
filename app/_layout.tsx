@@ -7,7 +7,13 @@ import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PortalProvider } from 'tamagui';
-import { AuthProvider, BudgetProvider, ExpenseProvider, TripProvider } from '../contexts';
+import {
+  AuthProvider,
+  BudgetProvider,
+  ExpenseProvider,
+  SyncProvider,
+  TripProvider,
+} from '../contexts';
 import { usePendingSync } from '../hooks/sync/usePendingSync';
 import { useAuthGuard } from '../hooks/useAuthGuard';
 import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
@@ -41,22 +47,24 @@ function AppContent() {
   return (
     <AuthProvider>
       <AuthGuard>
-        <TripProvider>
-          <ExpenseProvider>
-            <BudgetProvider>
-              <SyncManager />
-              <StatusBar style="dark" backgroundColor="transparent" translucent />
-              <PortalProvider>
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="index" />
-                  <Stack.Screen name="(auth)" />
-                  <Stack.Screen name="(main)" />
-                  <Stack.Screen name="auth/naver/callback" />
-                </Stack>
-              </PortalProvider>
-            </BudgetProvider>
-          </ExpenseProvider>
-        </TripProvider>
+        <SyncProvider>
+          <TripProvider>
+            <ExpenseProvider>
+              <BudgetProvider>
+                <SyncManager />
+                <StatusBar style="dark" backgroundColor="transparent" translucent />
+                <PortalProvider>
+                  <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="index" />
+                    <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="(main)" />
+                    <Stack.Screen name="auth/naver/callback" />
+                  </Stack>
+                </PortalProvider>
+              </BudgetProvider>
+            </ExpenseProvider>
+          </TripProvider>
+        </SyncProvider>
       </AuthGuard>
     </AuthProvider>
   );
