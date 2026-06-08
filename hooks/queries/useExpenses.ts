@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { expenseCategoriesApi, expensesApi } from '../../api/expenses';
+import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { ExpenseCategoryRepository, ExpenseRepository, TripRepository } from '../../repositories';
 import { Expense, ExpenseCategory } from '../../types';
@@ -67,6 +68,7 @@ export function useCategoriesQuery() {
 export function useCreateExpense() {
   const db = useDb();
   const qc = useQueryClient();
+  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
   return useMutation({
     mutationFn: async (data: Omit<Expense, 'id' | 'serverId' | 'createdAt'>) => {
       const tripRepo = new TripRepository(db);
@@ -74,6 +76,7 @@ export function useCreateExpense() {
       const localExpense = await repo.createExpense(data);
 
       (async () => {
+        markSyncing(localExpense.id);
         try {
           const trip = await tripRepo.getTripById(data.tripId);
           const categoryServerId = (
@@ -91,10 +94,13 @@ export function useCreateExpense() {
               location: data.location,
             });
             await repo.setServerId(localExpense.id, String(serverExpense.id));
+            markJustSynced(localExpense.id);
             qc.invalidateQueries({ queryKey: expenseKeys.byTrip(data.tripId) });
           }
         } catch {
           // stays pending
+        } finally {
+          unmarkSyncing(localExpense.id);
         }
       })();
 
@@ -109,6 +115,7 @@ export function useCreateExpense() {
 export function useUpdateExpense() {
   const db = useDb();
   const qc = useQueryClient();
+  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
   return useMutation({
     mutationFn: async (expense: Expense) => {
       const tripRepo = new TripRepository(db);
@@ -116,6 +123,7 @@ export function useUpdateExpense() {
       const updated = await repo.updateExpense(expense);
 
       (async () => {
+        markSyncing(expense.id);
         try {
           if (expense.serverId) {
             const trip = await tripRepo.getTripById(expense.tripId);
@@ -132,11 +140,14 @@ export function useUpdateExpense() {
                 location: expense.location,
               });
               await repo.markSynced(expense.id);
+              markJustSynced(expense.id);
               qc.invalidateQueries({ queryKey: expenseKeys.byTrip(expense.tripId) });
             }
           }
         } catch {
           // stays pending
+        } finally {
+          unmarkSyncing(expense.id);
         }
       })();
 

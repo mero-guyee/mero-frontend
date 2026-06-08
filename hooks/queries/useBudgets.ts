@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { budgetsApi } from '../../api/budgets';
+import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { BudgetRepository, TripRepository } from '../../repositories';
 import { Budget } from '../../types';
@@ -43,6 +44,7 @@ export function useBudgetsQuery(tripId: string) {
 export function useCreateBudget() {
   const db = useDb();
   const qc = useQueryClient();
+  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
   return useMutation({
     mutationFn: async (data: Omit<Budget, 'id'>) => {
       const tripRepo = new TripRepository(db);
@@ -50,6 +52,7 @@ export function useCreateBudget() {
       const localBudget = await repo.createBudget(data);
 
       (async () => {
+        markSyncing(localBudget.id);
         try {
           const trip = await tripRepo.getTripById(data.tripId);
           if (trip?.serverId) {
@@ -60,11 +63,14 @@ export function useCreateBudget() {
               exchangeRate: data.exchangeRate || DEFAULT_EXCHANGE_RATE,
             });
             await repo.setServerId(localBudget.id, String(serverBudget.id));
+            markJustSynced(localBudget.id);
             qc.invalidateQueries({ queryKey: budgetKeys.all });
             qc.invalidateQueries({ queryKey: budgetKeys.byTrip(data.tripId) });
           }
         } catch {
           // stays pending
+        } finally {
+          unmarkSyncing(localBudget.id);
         }
       })();
 
@@ -80,6 +86,7 @@ export function useCreateBudget() {
 export function useUpdateBudget() {
   const db = useDb();
   const qc = useQueryClient();
+  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
   return useMutation({
     mutationFn: async (budget: Budget) => {
       const tripRepo = new TripRepository(db);
@@ -87,6 +94,7 @@ export function useUpdateBudget() {
       const updated = await repo.updateBudget(budget);
 
       (async () => {
+        markSyncing(budget.id);
         try {
           if (budget.serverId) {
             const trip = await tripRepo.getTripById(budget.tripId);
@@ -97,12 +105,15 @@ export function useUpdateBudget() {
                 exchangeRate: budget.exchangeRate,
               });
               await repo.markSynced(budget.id);
+              markJustSynced(budget.id);
               qc.invalidateQueries({ queryKey: budgetKeys.all });
               qc.invalidateQueries({ queryKey: budgetKeys.byTrip(budget.tripId) });
             }
           }
         } catch {
           // stays pending
+        } finally {
+          unmarkSyncing(budget.id);
         }
       })();
 

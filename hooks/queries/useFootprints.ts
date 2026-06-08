@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { PhotoResponse, footprintsApi } from '../../api/footprints';
+import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { FootprintRepository, PhotoRepository, TripRepository } from '../../repositories';
 import { Footprint, FootprintPhoto } from '../../types';
@@ -40,6 +41,7 @@ export function useFootprintsQuery(tripId: string) {
 export function useCreateFootprint() {
   const db = useDb();
   const qc = useQueryClient();
+  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
   return useMutation({
     mutationFn: async (data: Omit<Footprint, 'id' | 'serverId'>) => {
       const tripRepo = new TripRepository(db);
@@ -52,6 +54,7 @@ export function useCreateFootprint() {
       );
 
       (async () => {
+        markSyncing(localFootprint.id);
         try {
           const trip = await tripRepo.getTripById(data.tripId);
           if (trip?.serverId) {
@@ -75,11 +78,14 @@ export function useCreateFootprint() {
               await repo.updatePhotoUrls(localFootprint.id, [...newUrls]);
             }
 
+            markJustSynced(localFootprint.id);
             qc.invalidateQueries({ queryKey: footprintKeys.byTrip(data.tripId) });
             qc.invalidateQueries({ queryKey: footprintKeys.photos(localFootprint.id) });
           }
         } catch {
           // stays pending
+        } finally {
+          unmarkSyncing(localFootprint.id);
         }
       })();
 
@@ -94,6 +100,7 @@ export function useCreateFootprint() {
 export function useUpdateFootprint() {
   const db = useDb();
   const qc = useQueryClient();
+  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
   return useMutation({
     mutationFn: async (footprint: Footprint) => {
       const tripRepo = new TripRepository(db);
@@ -114,6 +121,7 @@ export function useUpdateFootprint() {
       );
 
       (async () => {
+        markSyncing(footprint.id);
         try {
           if (footprint.serverId) {
             const trip = await tripRepo.getTripById(footprint.tripId);
@@ -125,6 +133,7 @@ export function useUpdateFootprint() {
                 locations: footprint.locations,
               });
               await repo.markSynced(footprint.id);
+              markJustSynced(footprint.id);
 
               const newUrls = await uploadPhotosAndSync(
                 photoRepo,
@@ -141,6 +150,8 @@ export function useUpdateFootprint() {
           }
         } catch {
           // stays pending
+        } finally {
+          unmarkSyncing(footprint.id);
         }
       })();
 

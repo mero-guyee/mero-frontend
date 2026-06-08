@@ -73,10 +73,7 @@ export default function TripListScreen() {
                   <TripCard
                     trip={item}
                     onPress={() => handleSelectTrip(item.id)}
-                    showSyncBadge={
-                      created === 'true' &&
-                      (item.syncStatus === 'pending' || item.syncStatus === 'synced')
-                    }
+                    showSyncBadge={created === item.id}
                   />
                 </FadeWrapper>
               )}

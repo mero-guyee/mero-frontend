@@ -9,7 +9,8 @@ import { Budget } from '../../types';
 import { CircularButton, FilledButton, Input } from '../ui';
 import { YCard } from '../ui/Card';
 import FloatingActionButton from '../ui/button/FloatingActionButton';
-import { SyncBadge } from '../ui/SyncBadge';
+import { SyncIndicator } from '../ui/SyncIndicator';
+import { SyncingResultBadge } from '../ui/SyncingResultBadge';
 
 export function BudgetView() {
   const { activeTrip } = useTrips();
@@ -130,7 +131,7 @@ export function BudgetView() {
                   <YCard key={budget.id} padding="$5" position="relative">
                     {budget.id === createdId &&
                       (budget.syncStatus === 'pending' || budget.syncStatus === 'synced') && (
-                        <SyncBadge synced={budget.syncStatus === 'synced'} />
+                        <SyncingResultBadge id={budget.id} status={budget.syncStatus} />
                       )}
                     <XStack
                       alignItems="flex-start"
@@ -149,9 +150,12 @@ export function BudgetView() {
                           <Text fontSize={20}>{getCurrencySymbol(budget.currency)}</Text>
                         </YStack>
                         <YStack>
-                          <Text color="$foreground" fontWeight="500">
-                            {CURRENCY_NAMES[budget.currency] || budget.currency}
-                          </Text>
+                          <XStack alignItems="center" gap="$2">
+                            <Text color="$foreground" fontWeight="500">
+                              {CURRENCY_NAMES[budget.currency] || budget.currency}
+                            </Text>
+                            <SyncIndicator status={budget.syncStatus} />
+                          </XStack>
                           <Text color="$mutedForeground">
                             예산 {getCurrencySymbol(budget.currency)}{' '}
                             {budget.amount.toLocaleString()}

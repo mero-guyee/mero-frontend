@@ -4,3 +4,4 @@ export { useMemos } from './MemoContext';
 export { useFootprints } from './FootprintContext';
 export { ExpenseProvider, useExpenses } from './ExpenseContext';
 export { BudgetProvider, useBudgets } from './BudgetContext';
+export { SyncProvider, useSyncContext } from './SyncContext';

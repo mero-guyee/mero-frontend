@@ -1,5 +1,6 @@
 import { YCard } from '@/components/ui/Card';
-import { SyncBadge } from '@/components/ui/SyncBadge';
+import { SyncIndicator } from '@/components/ui/SyncIndicator';
+import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { Pressable } from 'react-native';
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { Footprint } from '../../types';
@@ -40,7 +41,7 @@ export default function FootprintItem({
 
       <Pressable style={{ flex: 1 }} onPress={onPress}>
         <YCard paddingHorizontal="$4" paddingVertical="$4" gap="$2" position="relative">
-          {showSyncBadge && <SyncBadge synced={footprint.syncStatus === 'synced'} />}
+          {showSyncBadge && <SyncingResultBadge id={footprint.id} status={footprint.syncStatus ?? 'pending'} />}
           <XStack gap="$3">
             <YStack flex={1} gap="$2">
               <XStack alignItems="center" gap="$3">
@@ -52,6 +53,7 @@ export default function FootprintItem({
                     {badge}
                   </Text>
                 )}
+                <SyncIndicator status={footprint.syncStatus ?? 'pending'} />
               </XStack>
               <Text color="$foreground" fontSize={20} fontWeight="700" numberOfLines={1}>
                 {footprint.title}

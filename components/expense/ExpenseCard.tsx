@@ -1,5 +1,6 @@
 import { CategoryIcon } from '@/components/expense/CategoryIcon';
-import { SyncBadge } from '@/components/ui/SyncBadge';
+import { SyncIndicator } from '@/components/ui/SyncIndicator';
+import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { useRouter } from 'expo-router';
 import { Pressable } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
@@ -29,7 +30,7 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
         justifyContent="space-between"
         position="relative"
       >
-        {showSyncBadge && <SyncBadge synced={expense.syncStatus === 'synced'} />}
+        {showSyncBadge && <SyncingResultBadge id={expense.id} status={expense.syncStatus} />}
         <XStack alignItems="center" gap="$3">
           <YStack
             width={44}
@@ -46,9 +47,12 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
             <Text color="$mutedForeground">{expense.categoryName}</Text>
           </YStack>
         </XStack>
-        <Text color="$foreground">
-          {getCurrencySymbol(expense.currency)} {expense.amount.toLocaleString()}
-        </Text>
+        <XStack alignItems="center" gap="$2">
+          <SyncIndicator status={expense.syncStatus} />
+          <Text color="$foreground">
+            {getCurrencySymbol(expense.currency)} {expense.amount.toLocaleString()}
+          </Text>
+        </XStack>
       </XStack>
     </Pressable>
   );

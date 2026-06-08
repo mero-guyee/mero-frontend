@@ -1,5 +1,6 @@
 import { YCard } from '@/components/ui/Card';
-import { SyncBadge } from '@/components/ui/SyncBadge';
+import { SyncIndicator } from '@/components/ui/SyncIndicator';
+import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { MapPin } from '@tamagui/lucide-icons';
 import { Pressable } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
@@ -20,14 +21,17 @@ export function TripCard({ trip, onPress, showSyncBadge = false }: TripCardProps
         {/* Cover Image */}
         <YStack height={180} overflow="hidden">
           <TripCoverImage uri={trip.imageUrl} />
-          {showSyncBadge && <SyncBadge synced={trip.syncStatus === 'synced'} />}
+          {showSyncBadge && <SyncingResultBadge id={trip.id} status={trip.syncStatus ?? 'pending'} />}
         </YStack>
 
         {/* Content */}
         <YStack padding="$5" gap="$3">
-          <Text fontSize={18} fontWeight="600" color="$foreground">
-            {trip.title}
-          </Text>
+          <XStack justifyContent="space-between" alignItems="center" gap="$2">
+            <Text flex={1} numberOfLines={1} fontSize={18} fontWeight="600" color="$foreground">
+              {trip.title}
+            </Text>
+            <SyncIndicator status={trip.syncStatus ?? 'pending'} />
+          </XStack>
 
           <TripProgress tripStartDate={trip.startDate} tripEndDate={trip.endDate} />
 
