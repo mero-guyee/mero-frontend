@@ -1,28 +1,67 @@
 import { footprintsApi } from '@/api/footprints';
-import { FootprintRepository, TripRepository } from '@/repositories';
+import { FootprintRepository, OutboxRepository, TripRepository } from '@/repositories';
 import * as SQLite from 'expo-sqlite';
 
 export async function syncFootprints(db: SQLite.SQLiteDatabase): Promise<void> {
   const repo = new FootprintRepository(db);
   const tripRepo = new TripRepository(db);
-  const pending = await repo.getPending();
-  const unsynced = pending.filter((f) => !f.serverId && !f.deletedAt);
+  const outbox = new OutboxRepository(db);
+  const ready = await outbox.getReady('footprints');
 
   await Promise.all(
-    unsynced.map(async ({ id, tripId, title, content, date, locations }) => {
+    ready.map(async ({ dataId, operation }) => {
       try {
-        const trip = await tripRepo.findById(tripId);
-        if (!trip?.serverId) return;
-
-        const serverFootprint = await footprintsApi.create(parseInt(trip.serverId), {
-          clientId: id,
-          title,
-          content,
-          date,
-          locations: typeof locations === 'string' ? JSON.parse(locations) : locations,
-        });
-        await repo.setServerId(id, String(serverFootprint.id));
-      } catch {}
+        if (operation === 'create') {
+          const footprint = await repo.findById(dataId);
+          if (!footprint || footprint.serverId || footprint.deletedAt) {
+            await outbox.remove('footprints', dataId);
+            return;
+          }
+          const trip = await tripRepo.findById(footprint.tripId);
+          if (!trip?.serverId) return;
+          const serverFootprint = await footprintsApi.create(parseInt(trip.serverId), {
+            clientId: footprint.id,
+            title: footprint.title,
+            content: footprint.content,
+            date: footprint.date,
+            locations:
+              typeof footprint.locations === 'string'
+                ? JSON.parse(footprint.locations)
+                : footprint.locations,
+          });
+          await repo.setServerId(footprint.id, String(serverFootprint.id));
+        } else if (operation === 'update') {
+          const footprint = await repo.findById(dataId);
+          if (!footprint?.serverId) {
+            await outbox.remove('footprints', dataId);
+            return;
+          }
+          const trip = await tripRepo.findById(footprint.tripId);
+          if (!trip?.serverId) return;
+          await footprintsApi.update(parseInt(trip.serverId), parseInt(footprint.serverId), {
+            title: footprint.title,
+            content: footprint.content,
+            date: footprint.date,
+            locations:
+              typeof footprint.locations === 'string'
+                ? JSON.parse(footprint.locations)
+                : footprint.locations,
+          });
+          await repo.markSynced(dataId);
+        } else if (operation === 'delete') {
+          const footprint = await repo.findByIdIncludeDeleted(dataId);
+          if (!footprint?.serverId) {
+            await outbox.remove('footprints', dataId);
+            return;
+          }
+          const trip = await tripRepo.findById(footprint.tripId);
+          if (!trip?.serverId) return;
+          await footprintsApi.delete(parseInt(trip.serverId), parseInt(footprint.serverId));
+          await outbox.remove('footprints', dataId);
+        }
+      } catch {
+        await outbox.incrementRetry('footprints', dataId);
+      }
     })
   );
 }

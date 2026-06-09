@@ -96,6 +96,7 @@ export function useDeleteMemo() {
           const trip = await tripRepo.getTripById(tripId);
           if (trip?.serverId) {
             await memosApi.delete(parseInt(trip.serverId), parseInt(memoRow.serverId));
+            await memoRepo.removeFromOutbox(id);
           }
         }
       } catch {

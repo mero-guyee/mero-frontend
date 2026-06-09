@@ -175,6 +175,7 @@ export function useDeleteExpense() {
             const trip = await tripRepo.getTripById(tripId);
             if (trip?.serverId) {
               await expensesApi.delete(parseInt(trip.serverId), parseInt(expenseRow.serverId));
+              await repo.removeFromOutbox(id);
             }
           }
         } catch {

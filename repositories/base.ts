@@ -5,6 +5,7 @@ export type SyncStatus = 'pending' | 'synced' | 'conflict';
 
 export interface BaseEntity {
   id: string;
+  serverId?: string | null;
   createdAt: string;
   updatedAt: string;
   syncStatus: SyncStatus;
@@ -50,6 +51,14 @@ export class BaseRepository<T extends BaseEntity> {
     return row ? this.fromRow(row) : null;
   }
 
+  async findByIdIncludeDeleted(id: string): Promise<T | null> {
+    const row = await this.db.getFirstAsync<Record<string, any>>(
+      `SELECT * FROM ${this.table} WHERE id = ?`,
+      [id]
+    );
+    return row ? this.fromRow(row) : null;
+  }
+
   async create(data: Omit<T, keyof BaseEntity>): Promise<T> {
     const entity = {
       ...data,
@@ -64,10 +73,16 @@ export class BaseRepository<T extends BaseEntity> {
     const placeholders = keys.map(() => '?').join(', ');
     const values = keys.map((k) => this.toRow(entity[k as keyof T]));
 
-    await this.db.runAsync(
-      `INSERT INTO ${this.table} (${keys.join(', ')}) VALUES (${placeholders})`,
-      values as SQLite.SQLiteBindValue[]
-    );
+    await this.db.withTransactionAsync(async () => {
+      await this.db.runAsync(
+        `INSERT INTO ${this.table} (${keys.join(', ')}) VALUES (${placeholders})`,
+        values as SQLite.SQLiteBindValue[]
+      );
+      await this.db.runAsync(
+        `INSERT INTO outbox (id, domain, dataId, operation, retryCount, nextRetryAt, createdAt) VALUES (?,?,?,'create',0,datetime('now'),datetime('now'))`,
+        [uuid(), this.table, entity.id]
+      );
+    });
 
     return entity;
   }
@@ -81,19 +96,45 @@ export class BaseRepository<T extends BaseEntity> {
     const setClause = keys.map((k) => `${k} = ?`).join(', ');
     const values = keys.map((k) => this.toRow(updates[k as keyof typeof updates]));
 
-    await this.db.runAsync(`UPDATE ${this.table} SET ${setClause} WHERE id = ?`, [
-      ...(values as SQLite.SQLiteBindValue[]),
-      id,
-    ]);
+    await this.db.withTransactionAsync(async () => {
+      await this.db.runAsync(`UPDATE ${this.table} SET ${setClause} WHERE id = ?`, [
+        ...(values as SQLite.SQLiteBindValue[]),
+        id,
+      ]);
+      if (existing.serverId) {
+        await this.db.runAsync(
+          `INSERT OR REPLACE INTO outbox (id, domain, dataId, operation, retryCount, nextRetryAt, createdAt) VALUES (?,?,?,'update',0,datetime('now'),datetime('now'))`,
+          [uuid(), this.table, id]
+        );
+      }
+    });
 
     return { ...existing, ...updates };
   }
 
   async delete(id: string): Promise<void> {
-    await this.db.runAsync(
-      `UPDATE ${this.table} SET deletedAt = ?, updatedAt = ?, syncStatus = 'pending' WHERE id = ?`,
-      [now(), now(), id]
-    );
+    const existing = await this.findById(id);
+    await this.db.withTransactionAsync(async () => {
+      await this.db.runAsync(
+        `UPDATE ${this.table} SET deletedAt = ?, updatedAt = ?, syncStatus = 'pending' WHERE id = ?`,
+        [now(), now(), id]
+      );
+      if (existing?.serverId) {
+        await this.db.runAsync(
+          `INSERT OR REPLACE INTO outbox (id, domain, dataId, operation, retryCount, nextRetryAt, createdAt) VALUES (?,?,?,'delete',0,datetime('now'),datetime('now'))`,
+          [uuid(), this.table, id]
+        );
+      } else {
+        await this.db.runAsync(`DELETE FROM outbox WHERE domain = ? AND dataId = ?`, [
+          this.table,
+          id,
+        ]);
+      }
+    });
+  }
+
+  async removeFromOutbox(id: string): Promise<void> {
+    await this.db.runAsync(`DELETE FROM outbox WHERE domain = ? AND dataId = ?`, [this.table, id]);
   }
 
   // for test. do not use in production.
@@ -110,13 +151,25 @@ export class BaseRepository<T extends BaseEntity> {
   }
 
   async markSynced(id: string): Promise<void> {
-    await this.db.runAsync(`UPDATE ${this.table} SET syncStatus = 'synced' WHERE id = ?`, [id]);
+    await this.db.withTransactionAsync(async () => {
+      await this.db.runAsync(`UPDATE ${this.table} SET syncStatus = 'synced' WHERE id = ?`, [id]);
+      await this.db.runAsync(`DELETE FROM outbox WHERE domain = ? AND dataId = ?`, [
+        this.table,
+        id,
+      ]);
+    });
   }
 
   async setServerId(id: string, serverId: string): Promise<void> {
-    await this.db.runAsync(
-      `UPDATE ${this.table} SET serverId = ?, syncStatus = 'synced' WHERE id = ?`,
-      [serverId, id]
-    );
+    await this.db.withTransactionAsync(async () => {
+      await this.db.runAsync(
+        `UPDATE ${this.table} SET serverId = ?, syncStatus = 'synced' WHERE id = ?`,
+        [serverId, id]
+      );
+      await this.db.runAsync(`DELETE FROM outbox WHERE domain = ? AND dataId = ?`, [
+        this.table,
+        id,
+      ]);
+    });
   }
 }

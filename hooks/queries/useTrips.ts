@@ -161,6 +161,7 @@ export function useDeleteTrip() {
         try {
           if (trip?.serverId) {
             await tripsApi.delete(parseInt(trip.serverId));
+            await repo.removeFromOutbox(tripId);
           }
         } catch (e) {
           console.error('Failed to delete trip on server:', e);

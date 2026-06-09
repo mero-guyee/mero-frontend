@@ -183,6 +183,7 @@ export function useDeleteFootprint() {
             const trip = await tripRepo.getTripById(tripId);
             if (trip?.serverId) {
               await footprintsApi.delete(parseInt(trip.serverId), parseInt(footprintRow.serverId));
+              await repo.removeFromOutbox(id);
             }
           }
         } catch {

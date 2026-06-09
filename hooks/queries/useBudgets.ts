@@ -142,6 +142,7 @@ export function useDeleteBudget() {
             const trip = await tripRepo.getTripById(tripId);
             if (trip?.serverId) {
               await budgetsApi.delete(parseInt(trip.serverId), parseInt(budgetRow.serverId));
+              await repo.removeFromOutbox(id);
             }
           }
         } catch {
