@@ -22,6 +22,7 @@ function rowToMemo(row: MemoRow): Memo {
     content: row.content,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
+    syncStatus: row.syncStatus,
   };
 }
 

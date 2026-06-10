@@ -73,6 +73,7 @@ export type Memo = {
   content: string;
   createdAt: string;
   updatedAt: string;
+  syncStatus: SyncStatus;
 };
 
 export type Expense = {
