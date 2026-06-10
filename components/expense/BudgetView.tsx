@@ -7,8 +7,8 @@ import { useBudgets, useExpenses, useTrips } from '../../contexts';
 import { CURRENCY_NAMES, CURRENCY_SYMBOLS } from '../../data/constants';
 import { Budget } from '../../types';
 import { CircularButton, FilledButton, Input } from '../ui';
-import { YCard } from '../ui/Card';
 import FloatingActionButton from '../ui/button/FloatingActionButton';
+import { YCard } from '../ui/Card';
 import { SyncIndicator } from '../ui/SyncIndicator';
 import { SyncingResultBadge } from '../ui/SyncingResultBadge';
 
@@ -61,7 +61,11 @@ export function BudgetView() {
     if (editingBudget) {
       updateBudget({ ...editingBudget, currency: budgetForm.currency, amount });
     } else {
-      const created = await addBudget({ tripId: activeTrip, currency: budgetForm.currency, amount });
+      const created = await addBudget({
+        tripId: activeTrip,
+        currency: budgetForm.currency,
+        amount,
+      });
       setCreatedId(created.id);
     }
     handleCloseBudgetModal();

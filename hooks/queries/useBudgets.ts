@@ -46,7 +46,7 @@ export function useCreateBudget() {
   const qc = useQueryClient();
   const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
   return useMutation({
-    mutationFn: async (data: Omit<Budget, 'id'>) => {
+    mutationFn: async (data: Omit<Budget, 'id' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
       const repo = new BudgetRepository(db);
       const localBudget = await repo.createBudget(data);

@@ -12,7 +12,7 @@ import { useTrips } from './TripContext';
 
 interface BudgetContextType {
   budgets: Budget[];
-  addBudget: (budget: Omit<Budget, 'id'>) => Promise<Budget>;
+  addBudget: (budget: Omit<Budget, 'id' | 'syncStatus'>) => Promise<Budget>;
   updateBudget: (budget: Budget) => void;
   deleteBudget: (budgetId: string) => void;
   deleteBudgetsByTripId: (tripId: string) => void;

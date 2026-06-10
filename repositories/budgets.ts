@@ -45,7 +45,7 @@ export class BudgetRepository extends BaseRepository<BudgetRow> {
     return rows.map(rowToBudget);
   }
 
-  async createBudget(data: Omit<Budget, 'id' | 'serverId'>): Promise<Budget> {
+  async createBudget(data: Omit<Budget, 'id' | 'serverId' | 'syncStatus'>): Promise<Budget> {
     const row = await this.create({
       ...data,
       serverId: null,
