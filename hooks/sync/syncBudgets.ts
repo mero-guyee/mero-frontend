@@ -51,9 +51,7 @@ export async function syncBudgets(db: SQLite.SQLiteDatabase): Promise<void> {
           await budgetsApi.delete(parseInt(trip.serverId), parseInt(budget.serverId));
           await outbox.remove('budgets', dataId);
         }
-      } catch {
-        await outbox.incrementRetry('budgets', dataId);
-      }
+      } catch {}
     })
   );
 }

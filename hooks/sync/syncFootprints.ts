@@ -59,9 +59,7 @@ export async function syncFootprints(db: SQLite.SQLiteDatabase): Promise<void> {
           await footprintsApi.delete(parseInt(trip.serverId), parseInt(footprint.serverId));
           await outbox.remove('footprints', dataId);
         }
-      } catch {
-        await outbox.incrementRetry('footprints', dataId);
-      }
+      } catch {}
     })
   );
 }

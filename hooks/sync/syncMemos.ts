@@ -49,9 +49,7 @@ export async function syncMemos(db: SQLite.SQLiteDatabase): Promise<void> {
           await memosApi.delete(parseInt(trip.serverId), parseInt(memo.serverId));
           await outbox.remove('memos', dataId);
         }
-      } catch {
-        await outbox.incrementRetry('memos', dataId);
-      }
+      } catch {}
     })
   );
 }

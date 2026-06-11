@@ -82,9 +82,7 @@ export async function syncExpenses(db: SQLite.SQLiteDatabase): Promise<void> {
           await expensesApi.delete(parseInt(trip.serverId), parseInt(expense.serverId));
           await outbox.remove('expenses', dataId);
         }
-      } catch {
-        await outbox.incrementRetry('expenses', dataId);
-      }
+      } catch {}
     })
   );
 }

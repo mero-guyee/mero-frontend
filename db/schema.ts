@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 12;
+export const SCHEMA_VERSION = 13;
 
 export const DROP_TABLES = `
   DROP TABLE IF EXISTS outbox;
@@ -145,17 +145,13 @@ export const CREATE_TABLES = `
   );
 
   CREATE TABLE IF NOT EXISTS outbox (
-    id          TEXT PRIMARY KEY NOT NULL,
-    domain      TEXT NOT NULL,
-    dataId      TEXT NOT NULL,
-    operation   TEXT NOT NULL DEFAULT 'create',
-    retryCount  INTEGER NOT NULL DEFAULT 0,
-    nextRetryAt TEXT NOT NULL DEFAULT (datetime('now')),
-    createdAt   TEXT NOT NULL DEFAULT (datetime('now')),
+    id        TEXT PRIMARY KEY NOT NULL,
+    domain    TEXT NOT NULL,
+    dataId    TEXT NOT NULL,
+    operation TEXT NOT NULL DEFAULT 'create',
+    createdAt TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(domain, dataId)
   );
-
-  CREATE INDEX IF NOT EXISTS idx_outbox_nextRetryAt ON outbox(nextRetryAt);
 
   CREATE INDEX IF NOT EXISTS idx_photos_footprintId   ON photos(footprintId);
   CREATE INDEX IF NOT EXISTS idx_documents_tripId     ON documents(tripId);
