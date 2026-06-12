@@ -9,7 +9,9 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "offline": "adb shell svc wifi disable && adb shell svc data disable",
-    "online": "adb shell svc wifi enable && adb shell svc data enable"
+    "online": "adb shell svc wifi enable && adb shell svc data enable",
+    "airplane-on": "adb shell cmd connectivity airplane-mode enable",
+    "airplane-off": "adb shell cmd connectivity airplane-mode disable"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
