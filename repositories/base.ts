@@ -79,7 +79,7 @@ export class BaseRepository<T extends BaseEntity> {
         values as SQLite.SQLiteBindValue[]
       );
       await this.db.runAsync(
-        `INSERT INTO outbox (id, domain, dataId, operation, retryCount, nextRetryAt, createdAt) VALUES (?,?,?,'create',0,datetime('now'),datetime('now'))`,
+        `INSERT INTO outbox (id, domain, dataId, operation) VALUES (?,?,?,'create')`,
         [uuid(), this.table, entity.id]
       );
     });
@@ -103,7 +103,7 @@ export class BaseRepository<T extends BaseEntity> {
       ]);
       if (existing.serverId) {
         await this.db.runAsync(
-          `INSERT OR REPLACE INTO outbox (id, domain, dataId, operation, retryCount, nextRetryAt, createdAt) VALUES (?,?,?,'update',0,datetime('now'),datetime('now'))`,
+          `INSERT OR REPLACE INTO outbox (id, domain, dataId, operation) VALUES (?,?,?,'update')`,
           [uuid(), this.table, id]
         );
       }
@@ -121,7 +121,7 @@ export class BaseRepository<T extends BaseEntity> {
       );
       if (existing?.serverId) {
         await this.db.runAsync(
-          `INSERT OR REPLACE INTO outbox (id, domain, dataId, operation, retryCount, nextRetryAt, createdAt) VALUES (?,?,?,'delete',0,datetime('now'),datetime('now'))`,
+          `INSERT OR REPLACE INTO outbox (id, domain, dataId, operation) VALUES (?,?,?,'delete')`,
           [uuid(), this.table, id]
         );
       } else {

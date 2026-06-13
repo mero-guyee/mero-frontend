@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 13;
+export const SCHEMA_VERSION = 14;
 
 export const DROP_TABLES = `
   DROP TABLE IF EXISTS outbox;
@@ -149,6 +149,7 @@ export const CREATE_TABLES = `
     domain    TEXT NOT NULL,
     dataId    TEXT NOT NULL,
     operation TEXT NOT NULL DEFAULT 'create',
+    status    TEXT NOT NULL DEFAULT 'pending',
     createdAt TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(domain, dataId)
   );

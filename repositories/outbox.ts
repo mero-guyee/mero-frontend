@@ -5,6 +5,7 @@ export interface OutboxEntry {
   domain: string;
   dataId: string;
   operation: string;
+  status: 'pending' | 'failed';
   createdAt: string;
 }
 
@@ -13,8 +14,28 @@ export class OutboxRepository {
 
   async getReady(domain: string): Promise<OutboxEntry[]> {
     return this.db.getAllAsync<OutboxEntry>(
-      `SELECT * FROM outbox WHERE domain = ? ORDER BY createdAt ASC`,
+      `SELECT * FROM outbox WHERE domain = ? AND status = 'pending' ORDER BY createdAt ASC`,
       [domain]
+    );
+  }
+
+  async getAll(): Promise<OutboxEntry[]> {
+    return this.db.getAllAsync<OutboxEntry>(
+      `SELECT * FROM outbox ORDER BY domain, createdAt ASC`
+    );
+  }
+
+  async markFailed(domain: string, dataId: string): Promise<void> {
+    await this.db.runAsync(
+      `UPDATE outbox SET status = 'failed' WHERE domain = ? AND dataId = ?`,
+      [domain, dataId]
+    );
+  }
+
+  async resetToReady(domain: string, dataId: string): Promise<void> {
+    await this.db.runAsync(
+      `UPDATE outbox SET status = 'pending' WHERE domain = ? AND dataId = ?`,
+      [domain, dataId]
     );
   }
 
