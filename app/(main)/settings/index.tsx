@@ -1,7 +1,17 @@
 import { YCard } from '@/components/ui/Card';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
-import { Bell, ChevronRight, Globe, HelpCircle, Info, Lock, Tag, User } from '@tamagui/lucide-icons';
+import {
+  Bell,
+  ChevronRight,
+  Cloud,
+  Globe,
+  HelpCircle,
+  Info,
+  Lock,
+  Tag,
+  User,
+} from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { Alert, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -82,6 +92,20 @@ export default function SettingsScreen() {
                 icon={<User size={20} color="$foreground" />}
                 label="프로필 설정"
                 onPress={() => handleComingSoon('프로필 설정')}
+              />
+            </YCard>
+          </YStack>
+
+          {/* Data Section */}
+          <YStack marginBottom="$6">
+            <Text color="$mutedForeground" marginBottom="$3">
+              데이터
+            </Text>
+            <YCard borderRadius="$4">
+              <SettingItem
+                icon={<Cloud size={20} color="$foreground" />}
+                label="동기화"
+                onPress={() => router.push('/settings/sync')}
               />
             </YCard>
           </YStack>
