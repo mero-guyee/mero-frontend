@@ -32,7 +32,7 @@ export function TripHeader({ onSettings }: TripHeaderProps) {
           </YStack>
         </XStack>
 
-        <CircularButton mr="$1" pressStyle={{ backgroundColor: '$muted' }} onPress={onSettings}>
+        <CircularButton mr="$1" pressStyle={{ backgroundColor: '$muted' }} onPress={onSettings} testID="settings-button">
           <Settings size="$7" color="$foreground" />
         </CircularButton>
       </XStack>

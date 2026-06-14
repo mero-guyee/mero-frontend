@@ -81,6 +81,7 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
               ))}
               <TextInput
                 ref={textInputRef}
+                testID="country-search-input"
                 value={query}
                 onChangeText={handleQueryChange}
                 placeholder={selectedCountries.length === 0 ? '국가명을 입력하세요' : ''}

@@ -8,6 +8,9 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:watchAll": "jest --watchAll",
     "offline": "adb shell svc wifi disable && adb shell svc data disable",
     "online": "adb shell svc wifi enable && adb shell svc data enable",
     "airplane-on": "adb shell cmd connectivity airplane-mode enable",
@@ -77,13 +80,21 @@
     "victory-native": "^41.20.2"
   },
   "devDependencies": {
-    "@types/react": "~19.1.0",
+"@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.1.8",
+    "jest": "^29.7.0",
+    "jest-expo": "^56.0.5",
     "prettier": "^3.8.1",
     "reactotron-react-native": "^5.1.18",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "jest": {
+    "preset": "jest-expo",
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1"
+    }
+  }
 }

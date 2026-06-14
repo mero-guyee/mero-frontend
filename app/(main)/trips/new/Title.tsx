@@ -55,6 +55,7 @@ export default function Title() {
         <YStack>
           <FormLabel marginBottom="$2">모험의 이름</FormLabel>
           <Input
+            testID="title-input"
             borderColor={titleError ? '$destructive' : '$foreground'}
             paddingHorizontal="$4"
             paddingVertical="$3"
