@@ -63,6 +63,7 @@ describe('outbox 기본 동작', () => {
     expect(params[1]).toBe('trips');
     expect(sql).toContain("'create'");
     expect(params[2]).toBeTruthy();
+    expect(params[3]).toBe('테스트 여행');
   });
 
   test('서버에 등록된 데이터 삭제 시 outbox에 delete operation이 추가된다', async () => {
