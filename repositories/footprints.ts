@@ -38,6 +38,10 @@ export class FootprintRepository extends BaseRepository<FootprintRow> {
     return row as FootprintRow;
   }
 
+  protected getDataName(entity: FootprintRow): string {
+    return entity.title;
+  }
+
   async getAllFootprints(): Promise<Footprint[]> {
     const rows = await this.findAll();
     return rows.map(rowToFootprint);

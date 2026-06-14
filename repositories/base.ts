@@ -26,6 +26,10 @@ export class BaseRepository<T extends BaseEntity> {
     protected table: string
   ) {}
 
+  protected getDataName(_entity: T): string {
+    return '';
+  }
+
   protected toRow(value: unknown): unknown {
     if (Array.isArray(value)) return JSON.stringify(value);
     if (typeof value === 'boolean') return value ? 1 : 0;
@@ -79,8 +83,8 @@ export class BaseRepository<T extends BaseEntity> {
         values as SQLite.SQLiteBindValue[]
       );
       await this.db.runAsync(
-        `INSERT INTO outbox (id, domain, dataId, operation) VALUES (?,?,?,'create')`,
-        [uuid(), this.table, entity.id]
+        `INSERT INTO outbox (id, domain, dataId, dataName, operation) VALUES (?,?,?,?,'create')`,
+        [uuid(), this.table, entity.id, this.getDataName(entity)]
       );
     });
 
@@ -96,6 +100,8 @@ export class BaseRepository<T extends BaseEntity> {
     const setClause = keys.map((k) => `${k} = ?`).join(', ');
     const values = keys.map((k) => this.toRow(updates[k as keyof typeof updates]));
 
+    const merged = { ...existing, ...updates } as T;
+
     await this.db.withTransactionAsync(async () => {
       await this.db.runAsync(`UPDATE ${this.table} SET ${setClause} WHERE id = ?`, [
         ...(values as SQLite.SQLiteBindValue[]),
@@ -103,8 +109,8 @@ export class BaseRepository<T extends BaseEntity> {
       ]);
       if (existing.serverId) {
         await this.db.runAsync(
-          `INSERT OR REPLACE INTO outbox (id, domain, dataId, operation) VALUES (?,?,?,'update')`,
-          [uuid(), this.table, id]
+          `INSERT OR REPLACE INTO outbox (id, domain, dataId, dataName, operation) VALUES (?,?,?,?,'update')`,
+          [uuid(), this.table, id, this.getDataName(merged)]
         );
       }
     });
@@ -121,8 +127,8 @@ export class BaseRepository<T extends BaseEntity> {
       );
       if (existing?.serverId) {
         await this.db.runAsync(
-          `INSERT OR REPLACE INTO outbox (id, domain, dataId, operation) VALUES (?,?,?,'delete')`,
-          [uuid(), this.table, id]
+          `INSERT OR REPLACE INTO outbox (id, domain, dataId, dataName, operation) VALUES (?,?,?,?,'delete')`,
+          [uuid(), this.table, id, existing ? this.getDataName(existing) : '']
         );
       } else {
         await this.db.runAsync(`DELETE FROM outbox WHERE domain = ? AND dataId = ?`, [

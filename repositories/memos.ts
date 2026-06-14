@@ -35,6 +35,10 @@ export class MemoRepository extends BaseRepository<MemoRow> {
     return row as MemoRow;
   }
 
+  protected getDataName(entity: MemoRow): string {
+    return entity.title;
+  }
+
   async getAllMemos(): Promise<Memo[]> {
     const rows = await this.findAll();
     return rows.map(rowToMemo);

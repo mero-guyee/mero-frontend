@@ -32,6 +32,10 @@ export class BudgetRepository extends BaseRepository<BudgetRow> {
     return row as BudgetRow;
   }
 
+  protected getDataName(entity: BudgetRow): string {
+    return `${entity.currency} ${entity.amount}`;
+  }
+
   async getAllBudgets(): Promise<Budget[]> {
     const rows = await this.findAll();
     return rows.map(rowToBudget);

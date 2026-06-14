@@ -4,6 +4,7 @@ export interface OutboxEntry {
   id: string;
   domain: string;
   dataId: string;
+  dataName: string;
   operation: string;
   status: 'pending' | 'failed';
   createdAt: string;

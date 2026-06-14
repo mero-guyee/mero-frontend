@@ -41,6 +41,10 @@ export class TripRepository extends BaseRepository<TripRow> {
     return row as TripRow;
   }
 
+  protected getDataName(entity: TripRow): string {
+    return entity.title;
+  }
+
   async getAllTrips(): Promise<Trip[]> {
     const rows = await this.findAll();
     return rows.map(rowToTrip);

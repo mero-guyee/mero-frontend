@@ -32,6 +32,10 @@ export class DocumentRepository extends BaseRepository<DocumentRow> {
     return row as DocumentRow;
   }
 
+  protected getDataName(entity: DocumentRow): string {
+    return entity.fileName;
+  }
+
   async findByTripId(tripId: string): Promise<TripDocument[]> {
     const rows = await this.db.getAllAsync<DocumentRow>(
       `SELECT * FROM documents WHERE tripId = ? AND deletedAt IS NULL ORDER BY createdAt DESC`,

@@ -66,6 +66,10 @@ export class ExpenseRepository extends BaseRepository<ExpenseRow> {
     return row as ExpenseRow;
   }
 
+  protected getDataName(entity: ExpenseRow): string {
+    return entity.description ?? `${entity.amount} ${entity.currency}`;
+  }
+
   async getAllExpenses(): Promise<Expense[]> {
     const rows = await this.findAll();
     return rows.map(rowToExpense);
@@ -186,6 +190,10 @@ export class ExpenseCategoryRepository extends BaseRepository<ExpenseCategoryRow
 
   protected fromRow(row: Record<string, any>): ExpenseCategoryRow {
     return row as ExpenseCategoryRow;
+  }
+
+  protected getDataName(entity: ExpenseCategoryRow): string {
+    return entity.name;
   }
 
   async getAllCategories(): Promise<ExpenseCategory[]> {
