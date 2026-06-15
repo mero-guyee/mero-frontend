@@ -1,0 +1,52 @@
+appId: com.dhguswo555.mero
+---
+# 전제: 기기에서 사전 로그인 완료 상태
+# 검증: 오프라인에서 10개 생성 후 온라인 복귀 시 전부 동기화됨
+
+- launchApp
+
+- setAirplaneMode:
+    value: enabled
+
+# 오프라인에서 여행 10개 생성
+- repeat:
+    times: 10
+    commands:
+      - tapOn:
+          id: "new-trip-fab"
+
+      # 1단계: 나라 선택
+      - tapOn:
+          id: "country-search-input"
+      - inputText: "한국"
+      - waitForAnimationToEnd
+      - tapOn: "대한민국"
+      - tapOn: "다음"
+
+      # 2단계: 날짜 (기본값 사용)
+      - tapOn: "다음"
+
+      # 3단계: 제목 입력
+      - tapOn:
+          id: "title-input"
+      - inputText: "오프라인 여행"
+      - tapOn: "완료"
+
+# 설정 → 동기화 현황 확인
+- tapOn:
+    id: "settings-button"
+- tapOn: "동기화"
+- assertVisible: "10개 항목이 동기화를 기다리고 있습니다."
+
+# 온라인 복귀 → NetInfo가 syncTrips 자동 트리거
+- setAirplaneMode:
+    value: disabled
+
+# 동기화 현황 화면을 나갔다가 다시 진입해 useEffect 재실행
+- back
+- tapOn: "동기화"
+
+# 새로고침 후 모든 항목 동기화 완료 확인
+- tapOn:
+    id: "sync-refresh-button"
+- assertVisible: "모든 데이터가 동기화되었습니다."

@@ -1,0 +1,40 @@
+appId: com.dhguswo555.mero
+---
+# 전제: 기기에서 사전 로그인 완료 상태
+# 검증: 오프라인에서 여행 생성 시 outbox에 쌓이고 "미동기화" 표시
+
+- launchApp
+
+- setAirplaneMode:
+    value: enabled
+
+- extendedWaitUntil:
+    visible:
+      id: 'new-trip-fab'
+    timeout: 5000
+
+- tapOn:
+    id: 'new-trip-fab'
+
+# 1단계: 나라 선택
+- tapOn:
+    id: 'country-search-input'
+- inputText: '한국'
+- waitForAnimationToEnd
+- tapOn: '대한민국'
+- tapOn: '다음'
+
+# 2단계: 날짜 (기본값 오늘로 세팅되어 있어 그냥 넘김)
+- tapOn: '다음'
+
+# 3단계: 제목 입력
+- tapOn:
+    id: 'title-input'
+- inputText: '오프라인 여행 테스트'
+- tapOn: '완료'
+
+# 여행 목록에 "미동기화" 표시 확인
+- assertVisible: '미동기화'
+
+- setAirplaneMode:
+    value: disabled
