@@ -2,18 +2,18 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
-import { budgetsApi } from '../api/budgets';
-import { SyncProvider } from '../contexts/SyncContext';
-import { useCreateBudget } from '../hooks/queries/useBudgets';
-import { mockDb } from '../test-utils/mockDb';
+import { footprintsApi } from '../../api/footprints';
+import { SyncProvider } from '../../contexts/SyncContext';
+import { useCreateFootprint } from '../../hooks/queries/useFootprints';
+import { mockDb } from '../../test-utils/mockDb';
 
 jest.mock('expo-crypto');
 
-jest.mock('../api/budgets', () => ({
-  budgetsApi: { create: jest.fn() },
+jest.mock('@/api/footprints', () => ({
+  footprintsApi: { create: jest.fn() },
 }));
 
-jest.mock('../providers/DatabaseProvider', () => ({
+jest.mock('@/providers/DatabaseProvider', () => ({
   useDb: () => mockDb,
 }));
 
@@ -30,10 +30,14 @@ function createWrapper() {
   };
 }
 
-const budgetData = {
+const footprintData = {
   tripId: 'trip-1',
-  currency: 'KRW',
-  amount: 100000,
+  title: '테스트 발자국',
+  content: '',
+  date: '2024-01-01',
+  locations: [],
+  photoUrls: [],
+  syncStatus: 'pending' as const,
 };
 
 beforeEach(() => {
@@ -43,14 +47,14 @@ beforeEach(() => {
   mockDb.getFirstAsync.mockResolvedValue({ serverId: '123' });
 });
 
-describe('useCreateBudget - outbox', () => {
+describe('useCreateFootprint - outbox', () => {
   test('서버 전송 성공 시 outbox에서 제거된다', async () => {
-    (budgetsApi.create as jest.Mock).mockResolvedValueOnce({ id: 555 });
+    (footprintsApi.create as jest.Mock).mockResolvedValueOnce({ id: 888 });
 
-    const { result } = await renderHook(() => useCreateBudget(), { wrapper: createWrapper() });
+    const { result } = await renderHook(() => useCreateFootprint(), { wrapper: createWrapper() });
 
     await act(async () => {
-      result.current.mutate(budgetData);
+      result.current.mutate(footprintData);
     });
 
     await waitFor(() => {
@@ -62,12 +66,12 @@ describe('useCreateBudget - outbox', () => {
   });
 
   test('서버 전송 실패 시 outbox에 항목이 남는다', async () => {
-    (budgetsApi.create as jest.Mock).mockRejectedValueOnce(new Error('network error'));
+    (footprintsApi.create as jest.Mock).mockRejectedValueOnce(new Error('network error'));
 
-    const { result } = await renderHook(() => useCreateBudget(), { wrapper: createWrapper() });
+    const { result } = await renderHook(() => useCreateFootprint(), { wrapper: createWrapper() });
 
     await act(async () => {
-      result.current.mutate(budgetData);
+      result.current.mutate(footprintData);
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
