@@ -21,23 +21,21 @@ export class OutboxRepository {
   }
 
   async getAll(): Promise<OutboxEntry[]> {
-    return this.db.getAllAsync<OutboxEntry>(
-      `SELECT * FROM outbox ORDER BY domain, createdAt ASC`
-    );
+    return this.db.getAllAsync<OutboxEntry>(`SELECT * FROM outbox ORDER BY domain, createdAt ASC`);
   }
 
   async markFailed(domain: string, dataId: string): Promise<void> {
-    await this.db.runAsync(
-      `UPDATE outbox SET status = 'failed' WHERE domain = ? AND dataId = ?`,
-      [domain, dataId]
-    );
+    await this.db.runAsync(`UPDATE outbox SET status = 'failed' WHERE domain = ? AND dataId = ?`, [
+      domain,
+      dataId,
+    ]);
   }
 
   async resetToReady(domain: string, dataId: string): Promise<void> {
-    await this.db.runAsync(
-      `UPDATE outbox SET status = 'pending' WHERE domain = ? AND dataId = ?`,
-      [domain, dataId]
-    );
+    await this.db.runAsync(`UPDATE outbox SET status = 'pending' WHERE domain = ? AND dataId = ?`, [
+      domain,
+      dataId,
+    ]);
   }
 
   async remove(domain: string, dataId: string): Promise<void> {
