@@ -39,16 +39,12 @@ export async function syncTrips(db: SQLite.SQLiteDatabase): Promise<void> {
         });
         await repo.markSynced(dataId);
       } else if (operation === 'delete') {
-        try {
-          const trip = await repo.findByIdIncludeDeleted(dataId);
-          if (!trip?.serverId) {
-            continue;
-          }
-          await tripsApi.delete(parseInt(trip.serverId));
-          await outbox.remove('trips', dataId);
-        } catch (e) {
-          await outbox.remove('trips', dataId);
+        const trip = await repo.findByIdIncludeDeleted(dataId);
+        if (!trip?.serverId) {
+          continue;
         }
+        await tripsApi.delete(parseInt(trip.serverId));
+        await outbox.remove('trips', dataId);
       }
     } catch {
       await outbox.markFailed('trips', dataId);
