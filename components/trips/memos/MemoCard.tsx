@@ -1,5 +1,6 @@
 import { YCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
+import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { Memo } from '@/types';
 import { Trash2 } from '@tamagui/lucide-icons';
 import { Pressable } from 'react-native';
@@ -17,7 +18,8 @@ export default function MemoCard({
   const { id, title, content, syncStatus } = memo;
   return (
     <Pressable key={id} onPress={() => onPress(memo.id)}>
-      <YCard padding="$4">
+      <YCard padding="$4" position="relative">
+        <SyncingResultBadge id={id} status={syncStatus} />
         <XStack alignItems="flex-start" justifyContent="space-between" marginBottom="$2">
           <XStack flex={1} paddingRight="$2" gap="$1">
             <Text color="$foreground" fontWeight="500">
@@ -30,7 +32,7 @@ export default function MemoCard({
               e.stopPropagation();
               onDelete(memo.id);
             }}
-            style={{ padding: 8, marginRight: -8, marginTop: -8 }}
+            style={{ padding: 8, marginRight: -8, marginTop: -8, zIndex: 1 }}
           >
             <Trash2 size={16} color="$destructive" />
           </Pressable>

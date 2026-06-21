@@ -9,18 +9,27 @@ import { documentKeys } from './queryKeys';
 
 export function useDocumentsQuery(tripId: string) {
   const db = useDb();
+  const qc = useQueryClient();
   return useQuery({
     queryKey: documentKeys.byTrip(tripId),
     queryFn: async () => {
       const docRepo = new DocumentRepository(db);
       const tripRepo = new TripRepository(db);
-      const trip = await tripRepo.getTripById(tripId);
-      try {
-        if (trip?.serverId) {
-          const serverTrip = await tripsApi.getById(parseInt(trip.serverId));
-          await Promise.all(serverTrip.documents.map((doc) => docRepo.upsertFromServer(tripId, doc)));
+
+      (async () => {
+        try {
+          const trip = await tripRepo.getTripById(tripId);
+          if (trip?.serverId) {
+            const serverTrip = await tripsApi.getById(parseInt(trip.serverId));
+            await Promise.all(serverTrip.documents.map((doc) => docRepo.upsertFromServer(tripId, doc)));
+            const fresh = await docRepo.findByTripId(tripId);
+            qc.setQueryData(documentKeys.byTrip(tripId), fresh);
+          }
+        } catch {
+          // offline — use local cache
         }
-      } catch {}
+      })();
+
       return docRepo.findByTripId(tripId);
     },
     enabled: !!tripId,
@@ -35,21 +44,26 @@ export function useCreateDocument() {
       const docRepo = new DocumentRepository(db);
       const tripRepo = new TripRepository(db);
       const doc = await docRepo.createDocument(tripId, data);
-      try {
-        const trip = await tripRepo.getTripById(tripId);
-        if (trip?.serverId) {
-          const serverDoc = await documentsApi.upload({
-            tripId: parseInt(trip.serverId),
-            clientId: doc.id,
-            file: data,
-          });
-          await docRepo.setServerId(doc.id, String(serverDoc.id));
+
+      (async () => {
+        try {
+          const trip = await tripRepo.getTripById(tripId);
+          if (trip?.serverId) {
+            const serverDoc = await documentsApi.upload({
+              tripId: parseInt(trip.serverId),
+              clientId: doc.id,
+              file: data,
+            });
+            await docRepo.setServerId(doc.id, String(serverDoc.id));
+            qc.invalidateQueries({ queryKey: documentKeys.byTrip(tripId) });
+          }
+        } catch (e) {
+          if (e instanceof ApiError) {
+            console.error('Failed to upload document to server:', e);
+          }
         }
-      } catch (e) {
-        if (e instanceof ApiError) {
-          console.error('Failed to upload document to server:', e);
-        }
-      }
+      })();
+
       return doc;
     },
     onSuccess: (_, { tripId }) => {
@@ -67,16 +81,21 @@ export function useDeleteDocument() {
       const tripRepo = new TripRepository(db);
       const doc = await docRepo.findById(id);
       await docRepo.delete(id);
-      try {
-        if (doc?.serverId) {
-          const trip = await tripRepo.getTripById(tripId);
-          if (trip?.serverId) {
-            await documentsApi.delete(parseInt(trip.serverId), parseInt(doc.serverId));
+
+      (async () => {
+        try {
+          if (doc?.serverId) {
+            const trip = await tripRepo.getTripById(tripId);
+            if (trip?.serverId) {
+              await documentsApi.delete(parseInt(trip.serverId), parseInt(doc.serverId));
+            }
           }
+        } catch (e) {
+          console.error('Failed to delete document from server:', e);
         }
-      } catch (e) {
-        console.error('Failed to delete document from server:', e);
-      }
+      })();
+
+      return tripId;
     },
     onSuccess: (_, { tripId }) => {
       qc.invalidateQueries({ queryKey: documentKeys.byTrip(tripId) });
