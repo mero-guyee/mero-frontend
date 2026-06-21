@@ -28,6 +28,7 @@ export async function syncTrips(db: SQLite.SQLiteDatabase): Promise<void> {
       } else if (operation === 'update') {
         const trip = await repo.findById(dataId);
         if (!trip?.serverId) {
+          await outbox.remove('trips', dataId);
           continue;
         }
         await tripsApi.update(parseInt(trip.serverId), {
@@ -41,6 +42,7 @@ export async function syncTrips(db: SQLite.SQLiteDatabase): Promise<void> {
       } else if (operation === 'delete') {
         const trip = await repo.findByIdIncludeDeleted(dataId);
         if (!trip?.serverId) {
+          await outbox.remove('trips', dataId);
           continue;
         }
         await tripsApi.delete(parseInt(trip.serverId));
