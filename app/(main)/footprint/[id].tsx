@@ -47,7 +47,14 @@ export default function FootprintDetailScreen() {
   const handleDelete = () => {
     Alert.alert('일지 삭제', '이 기록을 삭제하시겠습니까?', [
       { text: '취소', style: 'cancel' },
-      { text: '삭제', style: 'destructive', onPress: () => deleteFootprint(footprint.id) },
+      {
+        text: '삭제',
+        style: 'destructive',
+        onPress: async () => {
+          await deleteFootprint(footprint.id);
+          router.push('/(main)/footprint');
+        },
+      },
     ]);
   };
 

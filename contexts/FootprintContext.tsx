@@ -11,7 +11,7 @@ interface FootprintContextType {
   footprints: Footprint[];
   addFootprint: (footprint: Omit<Footprint, 'id' | 'serverId'>) => Promise<Footprint>;
   updateFootprint: (footprint: Footprint) => void;
-  deleteFootprint: (footprintId: string) => void;
+  deleteFootprint: (footprintId: string) => Promise<void>;
   getFootprintsByTripId: (tripId: string) => Footprint[];
   isFootPrintLoading: boolean;
 }
@@ -30,9 +30,11 @@ export function useFootprints(): FootprintContextType {
     footprints,
     addFootprint: (footprint) => createFootprint.mutateAsync(footprint),
     updateFootprint: (footprint) => updateFootprintMut.mutate(footprint),
-    deleteFootprint: (footprintId) => {
+    deleteFootprint: async (footprintId) => {
       const footprint = footprints.find((f) => f.id === footprintId);
-      if (footprint) deleteFootprintMut.mutate({ id: footprintId, tripId: footprint.tripId });
+      if (footprint) {
+        await deleteFootprintMut.mutateAsync({ id: footprintId, tripId: footprint.tripId });
+      }
     },
     getFootprintsByTripId: (tripId) => footprints.filter((f) => f.tripId === tripId),
     isFootPrintLoading,
