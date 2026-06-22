@@ -1,17 +1,16 @@
-export default module.exports = {
+module.exports = {
   expo: {
     name: 'mero',
     slug: 'mero',
     version: '1.0.0',
     orientation: 'portrait',
-    icon: './assets/typo.png',
+    icon: './assets/icon.png',
     scheme: 'mero',
     userInterfaceStyle: 'automatic',
     newArchEnabled: true,
     ios: {
       bundleIdentifier: 'com.dhguswo555.mero',
       buildNumber: '1',
-      package: 'com.dhguswo555.mero',
       supportsTablet: true,
       config: {
         googleMaps: {
@@ -21,14 +20,12 @@ export default module.exports = {
       infoPlist: {
         NSLocationWhenInUseUsageDescription:
           '지도에서 현재 위치를 표시하기 위해 위치 정보를 사용합니다.',
-        NSCameraUsageDescription: '사진을 촬영하여 여행 기록에 추가하기 위해 카메라를 사용합니다.',
-        NSPhotoLibraryUsageDescription: '여행 기록에 사진을 추가하기 위해 사진첩에 접근합니다.',
-        NSPhotoLibraryAddUsageDescription: '촬영한 사진을 사진첩에 저장하기 위해 접근합니다.',
       },
     },
     android: {
       adaptiveIcon: {
         backgroundColor: '#E6F4FE',
+        foregroundImage: './assets/icon.png',
       },
       edgeToEdgeEnabled: true,
       predictiveBackGestureEnabled: false,
@@ -41,7 +38,7 @@ export default module.exports = {
     },
     web: {
       output: 'static',
-      favicon: './assets/images/icon.jpeg',
+      favicon: './assets/icon.png',
     },
     plugins: [
       'expo-router',
@@ -50,7 +47,7 @@ export default module.exports = {
       [
         'expo-splash-screen',
         {
-          image: './assets/images/icon.jpeg',
+          image: './assets/icon.png',
           imageWidth: 200,
           resizeMode: 'contain',
           backgroundColor: '#ffffff',
@@ -77,6 +74,14 @@ export default module.exports = {
           iosUrlScheme:
             process.env.GOOGLE_IOS_REVERSED_CLIENT_ID ||
             'com.googleusercontent.apps.89104074447-ec63e3sg97ka1r3kes7tsittkg2lbg8a',
+        },
+      ],
+      [
+        'expo-build-properties',
+        {
+          ios: {
+            useModularHeaders: true,
+          },
         },
       ],
     ],
