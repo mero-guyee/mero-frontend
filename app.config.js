@@ -80,7 +80,7 @@ module.exports = {
         'expo-build-properties',
         {
           ios: {
-            useModularHeaders: true,
+            useFrameworks: 'static',
           },
         },
       ],
