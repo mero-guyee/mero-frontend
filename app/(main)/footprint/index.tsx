@@ -64,15 +64,17 @@ export default function FootprintListScreen() {
   return (
     <YStack flex={1} backgroundColor="$background" position="relative">
       <TabScreenHeader label="일지">
-        <Pressable onPress={() => setViewMode(viewMode === 'list' ? 'map' : 'list')}>
-          <YStack alignItems="center" justifyContent="center" flex={1} paddingHorizontal="$2">
-            {viewMode === 'list' ? (
-              <Map size={22} color="$foreground" />
-            ) : (
-              <List size={22} color="$foreground" />
-            )}
-          </YStack>
-        </Pressable>
+        {filteredFootprints.length > 0 && (
+          <Pressable onPress={() => setViewMode(viewMode === 'list' ? 'map' : 'list')}>
+            <YStack alignItems="center" justifyContent="center" flex={1} paddingHorizontal="$2">
+              {viewMode === 'list' ? (
+                <Map size={22} color="$foreground" />
+              ) : (
+                <List size={22} color="$foreground" />
+              )}
+            </YStack>
+          </Pressable>
+        )}
       </TabScreenHeader>
 
       <FadeWrapper>
