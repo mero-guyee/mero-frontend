@@ -7,13 +7,13 @@ import { Dimensions, StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
 import Supercluster from 'supercluster';
 import { Text } from 'tamagui';
-import FadeWrapper from '../../ui/FadeWrapper';
 import ClusterMarker from '../../map/ClusterMarker';
-import FootprintMapModal from './FootprintMapModal';
 import PinMarker from '../../map/PinMarker';
+import FadeWrapper from '../../ui/FadeWrapper';
+import FootprintMapModal from './FootprintMapModal';
 
 const { width, height } = Dimensions.get('window');
-const MAP_PADDING = Math.min(width, height) * 0.1;
+const MAP_PADDING = Math.min(width, height) * 0.45;
 
 interface FootprintMapViewProps {
   isLoading: boolean;
