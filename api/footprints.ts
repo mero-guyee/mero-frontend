@@ -50,7 +50,18 @@ export interface FootprintResponse {
 
 export interface PhotoResponse {
   id: number;
-  serverId: string;
+  s3Url: string;
+  originalFilename?: string;
+  fileSize?: number;
+  mimeType?: string;
+  width?: number;
+  height?: number;
+  orderIndex?: number;
+}
+
+export interface PhotoDetailItem {
+  id: number;
+  clientId: string;
   s3Url: string;
   originalFilename?: string;
   fileSize?: number;
@@ -67,7 +78,7 @@ export interface FootprintDetailResponse {
   date: string;
   locations: LocationResponse[];
   weatherInfo?: string;
-  photoUrls: string[];
+  photos: PhotoDetailItem[];
   expenses: ExpenseResponse[];
 }
 
