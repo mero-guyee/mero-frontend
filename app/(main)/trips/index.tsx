@@ -39,9 +39,12 @@ export default function TripListScreen() {
 
   if (!isFocused) {
     return (
-      <View flex={1} alignItems="center" justifyContent="center" backgroundColor="$background">
-        <Plane size={44} color="$mutedForeground" />
-      </View>
+      <View
+        flex={1}
+        alignItems="center"
+        justifyContent="center"
+        backgroundColor="$background"
+      ></View>
     );
   }
 
