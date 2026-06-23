@@ -1,6 +1,6 @@
 import FootprintList from '@/components/footprint/FootprintList';
 import FootprintSkeleton from '@/components/footprint/FootprintSkeleton';
-import PathMapView from '@/components/map/PathMapView';
+import FootprintMapView from '@/components/footprint/map/FootprintMapView';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { List, Map } from '@tamagui/lucide-icons';
@@ -79,7 +79,7 @@ export default function FootprintListScreen() {
 
       <FadeWrapper>
         {viewMode === 'map' ? (
-          <PathMapView footprints={filteredFootprints} isLoading={isFootPrintLoading} />
+          <FootprintMapView footprints={filteredFootprints} isLoading={isFootPrintLoading} />
         ) : (
           <FootprintList
             sections={footprintsByMonth}

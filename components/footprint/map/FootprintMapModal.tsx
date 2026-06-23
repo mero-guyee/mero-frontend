@@ -1,20 +1,21 @@
+import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { CircularButton } from '@/components/ui';
 import { useExpenses } from '@/contexts';
 import { Footprint } from '@/types';
 import { formattedLocation } from '@/utils/location/location';
-import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { BookOpen, Calendar, Cloud, MapPin, X } from '@tamagui/lucide-icons';
 import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView } from 'react-native';
 import { Image, Text, XStack, YStack } from 'tamagui';
 
-interface MapFootprintModalProps {
+interface FootprintMapModalProps {
   visible: boolean;
   onClose: () => void;
   footprint: Footprint | null;
 }
 
-export default function MapFootprintModal({ visible, onClose, footprint }: MapFootprintModalProps) {
+export default function FootprintMapModal({ visible, onClose, footprint }: FootprintMapModalProps) {
+  console.log(footprint);
   const { getExpensesByFootprintId } = useExpenses();
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
@@ -113,18 +114,17 @@ export default function MapFootprintModal({ visible, onClose, footprint }: MapFo
                           <Text color="$foreground">{formattedLocation(loc)}</Text>
                         </XStack>
                       ))}
-                      {footprint.weatherInfo && (() => {
-                        const [key, ...rest] = footprint.weatherInfo.split(' ');
-                        const WeatherIcon = WEATHER_ICON_MAP[key] ?? Cloud;
-                        return (
-                          <XStack alignItems="center" gap="$2">
-                            <WeatherIcon size={16} color="$foreground" />
-                            {rest.length > 0 && (
-                              <Text color="$foreground">{rest.join(' ')}</Text>
-                            )}
-                          </XStack>
-                        );
-                      })()}
+                      {footprint.weatherInfo &&
+                        (() => {
+                          const [key, ...rest] = footprint.weatherInfo.split(' ');
+                          const WeatherIcon = WEATHER_ICON_MAP[key] ?? Cloud;
+                          return (
+                            <XStack alignItems="center" gap="$2">
+                              <WeatherIcon size={16} color="$foreground" />
+                              {rest.length > 0 && <Text color="$foreground">{rest.join(' ')}</Text>}
+                            </XStack>
+                          );
+                        })()}
                     </YStack>
 
                     <YStack height={1} backgroundColor="$border" opacity={0.3} marginBottom="$6" />
