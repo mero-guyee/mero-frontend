@@ -1,10 +1,12 @@
 import { footprintsApi } from '@/api/footprints';
-import { FootprintRepository, OutboxRepository, TripRepository } from '@/repositories';
+import { FootprintRepository, OutboxRepository, PhotoRepository, TripRepository } from '@/repositories';
+import { uploadPhotosAndSync } from '@/utils/photoSync';
 import * as SQLite from 'expo-sqlite';
 
 export async function syncFootprints(db: SQLite.SQLiteDatabase): Promise<void> {
   const repo = new FootprintRepository(db);
   const tripRepo = new TripRepository(db);
+  const photoRepo = new PhotoRepository(db);
   const outbox = new OutboxRepository(db);
   const ready = await outbox.getReady('footprints');
 
@@ -29,6 +31,16 @@ export async function syncFootprints(db: SQLite.SQLiteDatabase): Promise<void> {
               : footprint.locations,
         });
         await repo.setServerId(footprint.id, String(serverFootprint.id));
+        const pendingPhotos = await photoRepo.getPendingByFootprintId(footprint.id);
+        if (pendingPhotos.length > 0) {
+          const s3Urls = await uploadPhotosAndSync(
+            photoRepo,
+            pendingPhotos,
+            parseInt(trip.serverId),
+            serverFootprint.id
+          );
+          await repo.updatePhotoUrls(footprint.id, s3Urls);
+        }
       } else if (operation === 'update') {
         const footprint = await repo.findById(dataId);
         if (!footprint?.serverId) {
@@ -47,6 +59,16 @@ export async function syncFootprints(db: SQLite.SQLiteDatabase): Promise<void> {
               : footprint.locations,
         });
         await repo.markSynced(dataId);
+        const pendingPhotos = await photoRepo.getPendingByFootprintId(dataId);
+        if (pendingPhotos.length > 0) {
+          const s3Urls = await uploadPhotosAndSync(
+            photoRepo,
+            pendingPhotos,
+            parseInt(trip.serverId),
+            parseInt(footprint.serverId)
+          );
+          await repo.updatePhotoUrls(dataId, s3Urls);
+        }
       } else if (operation === 'delete') {
         const footprint = await repo.findByIdIncludeDeleted(dataId);
         if (!footprint?.serverId) {

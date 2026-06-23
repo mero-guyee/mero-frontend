@@ -1,9 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { PhotoResponse, footprintsApi } from '../../api/footprints';
+import { footprintsApi } from '../../api/footprints';
 import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { FootprintRepository, PhotoRepository, TripRepository } from '../../repositories';
-import { Footprint, FootprintPhoto } from '../../types';
+import { Footprint } from '../../types';
+import { uploadPhotosAndSync } from '../../utils/photoSync';
 
 export const footprintKeys = {
   byTrip: (tripId: string) => ['footprints', 'trip', tripId] as const,
@@ -201,36 +202,4 @@ export function useDeleteFootprint() {
 
 function isLocalUri(uri: string): boolean {
   return uri.startsWith('file://') || uri.startsWith('content://');
-}
-
-async function uploadPhotosAndSync(
-  photoRepo: PhotoRepository,
-  localPhotos: FootprintPhoto[],
-  tripServerId: number,
-  footprintServerId: number
-): Promise<string[]> {
-  if (localPhotos.length === 0) return [];
-
-  const uploadedPhotos = await footprintsApi.uploadPhotos(
-    tripServerId,
-    footprintServerId,
-    localPhotos
-  );
-
-  await Promise.all(
-    uploadedPhotos.map((photo: PhotoResponse, i: number) =>
-      photoRepo.syncUploaded(localPhotos[i].id, {
-        serverId: String(photo.id),
-        s3Url: photo.s3Url,
-        originalFilename: photo.originalFilename,
-        fileSize: photo.fileSize,
-        mimeType: photo.mimeType,
-        width: photo.width,
-        height: photo.height,
-        orderIndex: photo.orderIndex,
-      })
-    )
-  );
-
-  return uploadedPhotos.map((p: PhotoResponse) => p.s3Url);
 }
