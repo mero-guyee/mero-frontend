@@ -34,15 +34,10 @@ export function SyncListItem({ entry, isLast, isRetrying, onRetry }: SyncListIte
       <Text color="$mutedForeground" fontSize={12}>
         {OPERATION_LABELS[entry.operation] ?? entry.operation}
       </Text>
-      {isFailed ? (
-        <IconButton onPress={onRetry} disabled={isRetrying}>
-          <RefreshCw size={16} color={isRetrying ? '$mutedForeground' : '$destructive'} />
-        </IconButton>
-      ) : (
-        <Text color="$mutedForeground" fontSize={12}>
-          대기
-        </Text>
-      )}
+
+      <IconButton onPress={onRetry} disabled={isRetrying}>
+        <RefreshCw size={16} color={isRetrying ? '$mutedForeground' : '$destructive'} />
+      </IconButton>
     </XStack>
   );
 }
