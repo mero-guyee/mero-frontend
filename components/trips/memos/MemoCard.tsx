@@ -1,6 +1,7 @@
 import { YCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
+import { useSyncContext } from '@/contexts';
 import { Memo } from '@/types';
 import { Trash2 } from '@tamagui/lucide-icons';
 import { Pressable } from 'react-native';
@@ -15,6 +16,7 @@ export default function MemoCard({
   onPress: (id: string) => void;
   onDelete: (id: string) => void;
 }) {
+  const { isSyncing } = useSyncContext();
   const { id, title, content, syncStatus } = memo;
   return (
     <Pressable key={id} onPress={() => onPress(memo.id)}>
@@ -25,7 +27,7 @@ export default function MemoCard({
             <Text color="$foreground" fontWeight="500">
               {title}
             </Text>
-            <SyncIndicator status={syncStatus} />
+            <SyncIndicator status={syncStatus} syncing={isSyncing(id)} />
           </XStack>
           <Pressable
             onPress={(e) => {

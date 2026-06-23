@@ -1,6 +1,7 @@
 import { YCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
+import { useSyncContext } from '@/contexts';
 import { Pressable } from 'react-native';
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { Footprint } from '../../types';
@@ -20,6 +21,7 @@ export default function FootprintItem({
   onPress,
   showSyncBadge = false,
 }: Props) {
+  const { isSyncing } = useSyncContext();
   const firstLocation = footprint.locations[0];
   const badge = firstLocation?.placeName;
   const date = new Date(footprint.date);
@@ -53,7 +55,7 @@ export default function FootprintItem({
                     {badge}
                   </Text>
                 )}
-                <SyncIndicator status={footprint.syncStatus ?? 'pending'} />
+                <SyncIndicator status={footprint.syncStatus ?? 'pending'} syncing={isSyncing(footprint.id)} />
               </XStack>
               <Text color="$foreground" fontSize={20} fontWeight="700" numberOfLines={1}>
                 {footprint.title}

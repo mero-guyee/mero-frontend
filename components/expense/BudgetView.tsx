@@ -3,7 +3,7 @@ import { Backpack, Edit3, Plus, Trash2, Wallet, X } from '@tamagui/lucide-icons'
 import { useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
-import { useBudgets, useExpenses, useTrips } from '../../contexts';
+import { useBudgets, useExpenses, useSyncContext, useTrips } from '../../contexts';
 import { CURRENCY_NAMES, CURRENCY_SYMBOLS } from '../../data/constants';
 import { Budget } from '../../types';
 import { CircularButton, FilledButton, Input } from '../ui';
@@ -16,6 +16,7 @@ export function BudgetView() {
   const { activeTrip } = useTrips();
   const { expenses } = useExpenses();
   const { budgets, addBudget, updateBudget, deleteBudget } = useBudgets();
+  const { isSyncing } = useSyncContext();
 
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
@@ -158,7 +159,7 @@ export function BudgetView() {
                             <Text color="$foreground" fontWeight="500">
                               {CURRENCY_NAMES[budget.currency] || budget.currency}
                             </Text>
-                            <SyncIndicator status={budget.syncStatus} />
+                            <SyncIndicator status={budget.syncStatus} syncing={isSyncing(budget.id)} />
                           </XStack>
                           <Text color="$mutedForeground">
                             예산 {getCurrencySymbol(budget.currency)}{' '}

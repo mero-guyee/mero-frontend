@@ -4,10 +4,11 @@ import type { SyncStatus } from '../../repositories/base';
 
 interface SyncIndicatorProps {
   status: SyncStatus;
+  syncing?: boolean;
 }
 
-export function SyncIndicator({ status }: SyncIndicatorProps) {
-  if (status === 'synced') return null;
+export function SyncIndicator({ status, syncing }: SyncIndicatorProps) {
+  if (status === 'synced' || syncing) return null;
 
   return (
     <XStack alignItems="center" gap="$1">
