@@ -106,7 +106,7 @@ export default function ExpenseFormScreen() {
               <Input
                 flex={1}
                 placeholder="0"
-                placeholderTextColor="$mutedForeground"
+                placeholderTextColor="$placeholderForeground"
                 value={amount}
                 onChangeText={setAmount}
                 keyboardType="numeric"
@@ -160,7 +160,7 @@ export default function ExpenseFormScreen() {
             </Text>
             <Input
               placeholder="예: 점심 식사"
-              placeholderTextColor="$mutedForeground"
+              placeholderTextColor="$placeholderForeground"
               value={description}
               onChangeText={setDescription}
             />
@@ -173,7 +173,7 @@ export default function ExpenseFormScreen() {
             </Text>
             <Input
               placeholder="예: 마추픽추"
-              placeholderTextColor="$mutedForeground"
+              placeholderTextColor="$placeholderForeground"
               value={location}
               onChangeText={setLocation}
             />

@@ -278,7 +278,7 @@ export function BudgetView() {
               <Input
                 flex={1}
                 placeholder="0"
-                placeholderTextColor="$mutedForeground"
+                placeholderTextColor="$placeholderForeground"
                 value={budgetForm.amount}
                 onChangeText={(text) => setBudgetForm({ ...budgetForm, amount: text })}
                 keyboardType="numeric"

@@ -108,7 +108,7 @@ export default function SignUpScreen() {
                   backgroundColor="transparent"
                   borderWidth={0}
                   placeholder="your@email.com"
-                  placeholderTextColor="$mutedForeground"
+                  placeholderTextColor="$placeholderForeground"
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -137,7 +137,7 @@ export default function SignUpScreen() {
                   backgroundColor="transparent"
                   borderWidth={0}
                   placeholder="8자 이상 입력"
-                  placeholderTextColor="$mutedForeground"
+                  placeholderTextColor="$placeholderForeground"
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
@@ -165,7 +165,7 @@ export default function SignUpScreen() {
                   backgroundColor="transparent"
                   borderWidth={0}
                   placeholder="비밀번호 재입력"
-                  placeholderTextColor="$mutedForeground"
+                  placeholderTextColor="$placeholderForeground"
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry
@@ -193,7 +193,7 @@ export default function SignUpScreen() {
                   backgroundColor="transparent"
                   borderWidth={0}
                   placeholder="여행자"
-                  placeholderTextColor="$mutedForeground"
+                  placeholderTextColor="$placeholderForeground"
                   value={nickname}
                   onChangeText={setNickname}
                 />

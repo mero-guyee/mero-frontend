@@ -60,7 +60,7 @@ export default function Title() {
             paddingHorizontal="$4"
             paddingVertical="$3"
             placeholder="예: 2026 남미 여행"
-            placeholderTextColor="$mutedForeground"
+            placeholderTextColor="$placeholderForeground"
             value={newTrip.title}
             onChangeText={(text) => {
               setNewTrip({ ...newTrip, title: text });

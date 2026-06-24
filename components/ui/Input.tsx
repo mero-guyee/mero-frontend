@@ -19,7 +19,7 @@ export const Input = styled(TamaguiInput, {
   borderColor: '$foreground',
   borderRadius: '$2',
   height: 48,
-  placeholderTextColor: '$mutedForeground',
+  placeholderTextColor: '$placeholderForeground',
   paddingHorizontal: '$3',
   paddingVertical: '$2.5',
   focusStyle: {

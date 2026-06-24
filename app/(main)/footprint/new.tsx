@@ -57,7 +57,7 @@ export default function FootprintFormScreen() {
           >
             <TextArea
               placeholder="제목을 입력해주세요"
-              placeholderTextColor="$mutedForeground"
+              placeholderTextColor="$placeholderForeground"
               value={title}
               onChangeText={setTitle}
               color="$foreground"
@@ -70,7 +70,7 @@ export default function FootprintFormScreen() {
             <YStack borderBottomWidth={1} borderColor="$secondary" marginBottom="$3" />
             <TextArea
               placeholder="어떤 여행이었나요? 자유롭게 작성해주세요"
-              placeholderTextColor="$mutedForeground"
+              placeholderTextColor="$placeholderForeground"
               value={content}
               onChangeText={setContent}
               color="$foreground"

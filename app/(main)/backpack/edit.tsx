@@ -87,7 +87,7 @@ export default function EditBackPackScreen() {
           </Text>
           <Input
             placeholder="예: 2026 남미 여행"
-            placeholderTextColor="$mutedForeground"
+            placeholderTextColor="$placeholderForeground"
             value={title}
             onChangeText={setTitle}
             color="$foreground"

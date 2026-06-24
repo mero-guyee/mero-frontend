@@ -2,7 +2,7 @@ import { EmptyState, Input } from '@/components/ui';
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import { NotebookPen, Plus } from '@tamagui/lucide-icons';
 import { SectionList } from 'react-native';
-import { Text, XStack, YStack } from 'tamagui';
+import { Text, XStack } from 'tamagui';
 import { Footprint } from '../../types';
 import FootprintItem from './FootprintItem';
 
@@ -57,7 +57,7 @@ export default function FootprintList({
             paddingHorizontal="$4"
             paddingVertical="$2"
             placeholder="일지 검색..."
-            placeholderTextColor="$mutedForeground"
+            placeholderTextColor="$placeholderForeground"
             value={searchQuery}
             onChangeText={onSearchChange}
             color="$foreground"

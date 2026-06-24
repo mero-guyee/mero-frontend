@@ -60,7 +60,7 @@ export default function MemoFormScreen() {
           <YStack flex={1} justifyContent="flex-start" gap="$3">
             <TextArea
               placeholder="제목을 입력해주세요"
-              placeholderTextColor="$mutedForeground"
+              placeholderTextColor="$placeholderForeground"
               value={title}
               onChangeText={setTitle}
               color="$foreground"
@@ -70,7 +70,7 @@ export default function MemoFormScreen() {
             <YStack borderBottomWidth={1} borderColor="$secondary" />
             <TextArea
               placeholder="여행에 도움이 될 만한 간단한 메모를 남겨보세요"
-              placeholderTextColor="$mutedForeground"
+              placeholderTextColor="$placeholderForeground"
               value={content}
               onChangeText={setContent}
               color="$foreground"

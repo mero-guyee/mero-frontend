@@ -113,7 +113,7 @@ export default function EditTripScreen() {
             paddingHorizontal="$4"
             paddingVertical="$3"
             placeholder="예: 2026 남미 여행"
-            placeholderTextColor="$mutedForeground"
+            placeholderTextColor="$placeholderForeground"
             value={title}
             onChangeText={setTitle}
             color="$foreground"
@@ -171,7 +171,7 @@ export default function EditTripScreen() {
               paddingHorizontal="$4"
               paddingVertical="$3"
               placeholder="국가명을 입력하세요"
-              placeholderTextColor="$mutedForeground"
+              placeholderTextColor="$placeholderForeground"
               value={newCountry}
               onChangeText={setNewCountry}
               color="$foreground"

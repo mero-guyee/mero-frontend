@@ -68,7 +68,8 @@ const tokens = createTokens({
     secondary: '#E8D5B7',
     secondaryForeground: '#5C4033',
     muted: '#F5EFE0',
-    mutedForeground: '#8B7355',
+    mutedForeground: '#5C4A36',
+    placeholderForeground: '#8B7355',
     accent: '#C8DEE6',
     accentForeground: '#5C4033',
     destructive: '#E89B8F',
@@ -216,7 +217,7 @@ export const config = createTamagui({
       borderColorHover: tokens.color.primary,
       borderColorFocus: tokens.color.primary,
       borderColorPress: tokens.color.primary,
-      placeholderColor: tokens.color.mutedForeground,
+      placeholderColor: tokens.color.placeholderForeground,
       // 커스텀 테마 값
       card: tokens.color.card,
       cardForeground: tokens.color.cardForeground,
