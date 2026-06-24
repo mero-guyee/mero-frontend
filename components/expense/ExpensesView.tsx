@@ -1,16 +1,16 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
-import { Plus } from '@tamagui/lucide-icons';
+import { getCurrencySymbol } from '@/data/utils';
+import { Plus, Wallet } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
+import { EmptyState } from '../ui';
 import { useExpenses, useTrips } from '../../contexts';
 import { Expense } from '../../types';
 import FloatingActionButton from '../ui/button/FloatingActionButton';
-import { YCard } from '../ui/Card';
 import { ExpenseCard } from './ExpenseCard';
 import ExpenseDayTotal from './ExpenseDayTotal';
-import ExpenseTotalByCurrency from './ExpenseTotalByCurrency';
 
 export function ExpensesView({ createdId }: { createdId?: string }) {
   const router = useRouter();
@@ -18,15 +18,15 @@ export function ExpensesView({ createdId }: { createdId?: string }) {
   const { expenses } = useExpenses();
 
   const expensesByCurrency = useMemo(() => {
-    const initalValue = {} as Record<string, number>;
-    return expenses.reduce((acc, currentExpense) => {
-      const { currency, amount } = currentExpense;
-      if (!acc[currency]) {
-        acc[currency] = 0;
-      }
-      acc[currency] += amount;
-      return acc;
-    }, initalValue);
+    const totals = {} as Record<string, number>;
+    const counts = {} as Record<string, number>;
+    expenses.forEach(({ currency, amount }) => {
+      totals[currency] = (totals[currency] || 0) + amount;
+      counts[currency] = (counts[currency] || 0) + 1;
+    });
+    return Object.entries(totals)
+      .sort(([a], [b]) => (counts[b] || 0) - (counts[a] || 0))
+      .map(([currency, amount]) => ({ currency, amount }));
   }, [expenses]);
 
   const expensesByDate = useMemo(() => {
@@ -52,58 +52,51 @@ export function ExpensesView({ createdId }: { createdId?: string }) {
         style={{ flex: 1 }}
         contentContainerStyle={{ paddingHorizontal: paddingHorizontalGeneral, paddingBottom: 100 }}
       >
-        <YStack gap="$4">
-          {Object.keys(expensesByCurrency).length > 0 && (
-            <YCard padding="$5">
-              <Text color="$foreground" fontSize={16} fontWeight="600" marginBottom="$1">
-                화폐별 총액
-              </Text>
-              <Text color="$mutedForeground" fontSize={14} marginBottom="$4">
-                사용한 화폐별 총 지출
-              </Text>
-              <YStack gap="$3">
-                {Object.entries(expensesByCurrency).map(([currency, amount]) => (
-                  <ExpenseTotalByCurrency key={currency} currency={currency} amount={amount} />
-                ))}
-              </YStack>
-            </YCard>
+        <YStack gap="$6" paddingTop="$4">
+          {expensesByCurrency.length > 0 && (
+            <YStack gap="$1">
+              <XStack alignItems="center" gap="$2">
+                <Text color="$mutedForeground" fontSize={13}>
+                  총 지출
+                </Text>
+              </XStack>
+              {expensesByCurrency.map(({ currency, amount }) => (
+                <Text key={currency} color="$foreground" fontSize={30} fontWeight="700">
+                  {getCurrencySymbol(currency)} {amount.toLocaleString()}
+                </Text>
+              ))}
+            </YStack>
           )}
 
-          <YCard padding="$5">
-            <Text color="$foreground" fontSize={16} fontWeight="600" marginBottom="$1">
-              지출 내역
-            </Text>
-            <Text color="$mutedForeground" fontSize={14} marginBottom="$4">
-              날짜별 지출 목록
-            </Text>
-            {expenses.length === 0 ? (
-              <YStack alignItems="center" paddingVertical={32}>
-                <Text color="$mutedForeground">아직 지출 내역이 없습니다</Text>
-              </YStack>
-            ) : (
-              <YStack gap="$4">
-                {Object.entries(expensesByDate).map(([date, dayExpenses]) => {
-                  return (
-                    <YStack key={date}>
-                      <ExpenseDayTotal date={date} dayExpenses={dayExpenses} />
-                      <YStack gap="$2">
-                        {dayExpenses.map((expense) => (
-                          <ExpenseCard
-                            key={expense.id}
-                            expense={expense}
-                            showSyncBadge={
-                              expense.id === createdId &&
-                              (expense.syncStatus === 'pending' || expense.syncStatus === 'synced')
-                            }
-                          />
-                        ))}
-                      </YStack>
-                    </YStack>
-                  );
-                })}
-              </YStack>
-            )}
-          </YCard>
+          {expenses.length === 0 ? (
+            <EmptyState
+              icon={<Wallet size={32} color="$mutedForeground" />}
+              title="아직 지출 내역이 없어요"
+              description="여행 중 사용한 금액을 기록해보세요"
+              flex={0}
+              paddingVertical="$8"
+            />
+          ) : (
+            <YStack gap="$4">
+              {Object.entries(expensesByDate).map(([date, dayExpenses]) => (
+                <YStack key={date}>
+                  <ExpenseDayTotal date={date} dayExpenses={dayExpenses} />
+                  <YStack gap="$2">
+                    {dayExpenses.map((expense) => (
+                      <ExpenseCard
+                        key={expense.id}
+                        expense={expense}
+                        showSyncBadge={
+                          expense.id === createdId &&
+                          (expense.syncStatus === 'pending' || expense.syncStatus === 'synced')
+                        }
+                      />
+                    ))}
+                  </YStack>
+                </YStack>
+              ))}
+            </YStack>
+          )}
         </YStack>
       </ScrollView>
       <FloatingActionButton onPress={() => handleAddExpense()}>

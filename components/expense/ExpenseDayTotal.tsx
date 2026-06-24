@@ -1,4 +1,3 @@
-import { getCurrencySymbol } from '@/data/utils';
 import { Expense } from '@/types';
 import { Text, XStack, YStack } from 'tamagui';
 
@@ -27,9 +26,6 @@ export default function ExpenseDayTotal({
             day: 'numeric',
             weekday: 'short',
           })}
-        </Text>
-        <Text color="$mutedForeground">
-          {getCurrencySymbol(mainCurrency)} {dayTotal.toLocaleString()}
         </Text>
       </XStack>
     </YStack>
