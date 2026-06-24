@@ -70,7 +70,7 @@ export function useCreateExpense() {
   const qc = useQueryClient();
   const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
   return useMutation({
-    mutationFn: async (data: Omit<Expense, 'id' | 'serverId' | 'createdAt'>) => {
+    mutationFn: async (data: Omit<Expense, 'id' | 'serverId' | 'createdAt' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
       const repo = new ExpenseRepository(db);
       const localExpense = await repo.createExpense(data);

@@ -91,7 +91,9 @@ export class ExpenseRepository extends BaseRepository<ExpenseRow> {
     return rows.map(rowToExpense);
   }
 
-  async createExpense(data: Omit<Expense, 'id' | 'serverId' | 'createdAt'>): Promise<Expense> {
+  async createExpense(
+    data: Omit<Expense, 'id' | 'serverId' | 'createdAt' | 'syncStatus'>
+  ): Promise<Expense> {
     const row = await this.create({
       ...data,
       serverId: null,
@@ -229,12 +231,25 @@ export class ExpenseCategoryRepository extends BaseRepository<ExpenseCategoryRow
     if (existing) {
       await this.db.runAsync(
         `UPDATE expense_categories SET name=?, icon=?, color=?, isDefault=?, syncStatus='synced', updatedAt=datetime('now') WHERE id=?`,
-        [serverCategory.name, serverCategory.icon, serverCategory.color, serverCategory.isDefault ? 1 : 0, existing.id]
+        [
+          serverCategory.name,
+          serverCategory.icon,
+          serverCategory.color,
+          serverCategory.isDefault ? 1 : 0,
+          existing.id,
+        ]
       );
     } else {
       await this.db.runAsync(
         `INSERT OR IGNORE INTO expense_categories (id, serverId, name, icon, color, isDefault, createdAt, updatedAt, syncStatus) VALUES (?,?,?,?,?,?,datetime('now'),datetime('now'),'synced')`,
-        [serverId, serverId, serverCategory.name, serverCategory.icon, serverCategory.color, serverCategory.isDefault ? 1 : 0]
+        [
+          serverId,
+          serverId,
+          serverCategory.name,
+          serverCategory.icon,
+          serverCategory.color,
+          serverCategory.isDefault ? 1 : 0,
+        ]
       );
     }
   }

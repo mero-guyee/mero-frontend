@@ -17,7 +17,7 @@ import { useTrips } from './TripContext';
 interface ExpenseContextType {
   expenses: Expense[];
   categories: ExpenseCategory[];
-  addExpense: (expense: Omit<Expense, 'id' | 'createdAt'>) => Promise<Expense>;
+  addExpense: (expense: Omit<Expense, 'id' | 'createdAt' | 'syncStatus'>) => Promise<Expense>;
   updateExpense: (expense: Expense) => void;
   deleteExpense: (expenseId: string) => void;
   deleteExpensesByFootprintId: (footprintId: string) => void;
