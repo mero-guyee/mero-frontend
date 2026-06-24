@@ -7,13 +7,13 @@ import { Sheet, Text, XStack, YStack } from 'tamagui';
 import { useBudgets, useExpenses, useSyncContext, useTrips } from '../../contexts';
 import { CURRENCY_NAMES, CURRENCY_SYMBOLS } from '../../data/constants';
 import { Budget } from '../../types';
-import CurrencyPicker from './CurrencyPicker';
-import { FilledButton, Input } from '../ui';
-import { inputStyle } from '../ui/Input';
+import { EmptyState, FilledButton, Input } from '../ui';
 import FloatingActionButton from '../ui/button/FloatingActionButton';
 import { YCard } from '../ui/Card';
+import { inputStyle } from '../ui/Input';
 import { SyncIndicator } from '../ui/SyncIndicator';
 import { SyncingResultBadge } from '../ui/SyncingResultBadge';
+import CurrencyPicker from './CurrencyPicker';
 
 export function BudgetView() {
   const { activeTrip } = useTrips();
@@ -100,35 +100,22 @@ export function BudgetView() {
           </YStack>
 
           {!activeTrip ? (
-            <YCard padding="$10" alignItems="center">
-              <YStack marginBottom="$3">
-                <Backpack size={48} color="$mutedForeground" />
-              </YStack>
-              <Text color="$mutedForeground">여행을 선택해주세요</Text>
+            <YCard>
+              <EmptyState
+                icon={<Backpack size={32} color="$mutedForeground" />}
+                title="여행을 선택해주세요"
+                flex={0}
+                paddingVertical="$8"
+              />
             </YCard>
           ) : filteredBudgets.length === 0 ? (
-            <YCard padding="$10" alignItems="center">
-              <YStack marginBottom="$3">
-                <Wallet size={48} color="$mutedForeground" />
-              </YStack>
-              <Text color="$foreground" marginBottom="$1">
-                아직 예산이 없습니다
-              </Text>
-              <Text color="$mutedForeground" marginBottom="$6" textAlign="center">
-                화폐별로 예산을 설정하고 지출을 관리해보세요
-              </Text>
-              <FilledButton
-                backgroundColor="$primary"
-                pressStyle={{ opacity: 0.8 }}
-                paddingHorizontal="$5"
-                paddingVertical="$3"
-                onPress={() => handleOpenBudgetModal()}
-              >
-                <Text color="white" fontWeight="500">
-                  첫 예산 추가하기
-                </Text>
-              </FilledButton>
-            </YCard>
+            <EmptyState
+              icon={<Wallet size={32} color="$mutedForeground" />}
+              title="아직 예산이 없어요"
+              description="화폐별로 예산을 설정하고 지출을 관리해보세요"
+              flex={0}
+              paddingVertical="$8"
+            />
           ) : (
             <YStack gap="$3">
               {filteredBudgets.map((budget) => {
@@ -163,7 +150,10 @@ export function BudgetView() {
                             <Text color="$foreground" fontWeight="500">
                               {CURRENCY_NAMES[budget.currency] || budget.currency}
                             </Text>
-                            <SyncIndicator status={budget.syncStatus} syncing={isSyncing(budget.id)} />
+                            <SyncIndicator
+                              status={budget.syncStatus}
+                              syncing={isSyncing(budget.id)}
+                            />
                           </XStack>
                           <Text color="$mutedForeground">
                             예산 {getCurrencySymbol(budget.currency)}{' '}

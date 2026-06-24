@@ -1,4 +1,4 @@
-import { Input } from '@/components/ui';
+import { EmptyState, Input } from '@/components/ui';
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import { NotebookPen, Plus } from '@tamagui/lucide-icons';
 import { SectionList } from 'react-native';
@@ -25,21 +25,11 @@ interface Props {
 
 function EmptyList() {
   return (
-    <YStack
-      flex={1}
-      alignItems="center"
-      justifyContent="center"
-      paddingVertical={80}
-      paddingHorizontal="$4"
-    >
-      <YStack marginBottom="$4">
-        <NotebookPen size={48} color="$foreground" />
-      </YStack>
-      <Text color="$foreground" marginBottom="$1">
-        아직 일지가 없습니다
-      </Text>
-      <Text color="$mutedForeground">새 일지를 작성해보세요</Text>
-    </YStack>
+    <EmptyState
+      icon={<NotebookPen size={32} color="$mutedForeground" />}
+      title="아직 일지가 없어요"
+      description="여행의 순간순간을 기록해보세요"
+    />
   );
 }
 
