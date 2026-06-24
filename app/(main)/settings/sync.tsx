@@ -1,6 +1,7 @@
 import { SyncListItem } from '@/components/sync/SyncListItem';
 import { YCard } from '@/components/ui/Card';
 import { IconButton } from '@/components/ui/button/BaseButton';
+import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { syncBudgets } from '@/hooks/sync/syncBudgets';
 import { syncExpenses } from '@/hooks/sync/syncExpenses';
 import { syncFootprints } from '@/hooks/sync/syncFootprints';
@@ -8,12 +9,11 @@ import { syncMemos } from '@/hooks/sync/syncMemos';
 import { syncTrips } from '@/hooks/sync/syncTrips';
 import { useDb } from '@/providers/DatabaseProvider';
 import { OutboxRepository, type OutboxEntry } from '@/repositories/outbox';
-import { ArrowLeft, CheckCircle, RefreshCw } from '@tamagui/lucide-icons';
+import { CheckCircle, RefreshCw } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Text, XStack, YStack } from 'tamagui';
+import { Text, YStack } from 'tamagui';
 
 const DOMAIN_LABELS: Record<string, string> = {
   trips: '여행',
@@ -41,7 +41,6 @@ interface DomainGroup {
 
 export default function SyncStatusScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const db = useDb();
   const [groups, setGroups] = useState<DomainGroup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -95,30 +94,11 @@ export default function SyncStatusScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      <YStack
-        backgroundColor="$card"
-        paddingTop={insets.top}
-        borderBottomWidth={2}
-        borderBottomColor="$primary"
-        style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
-      >
-        <XStack
-          paddingHorizontal="$4"
-          paddingVertical="$3"
-          alignItems="center"
-          justifyContent="space-between"
-        >
-          <IconButton onPress={() => router.back()}>
-            <ArrowLeft size={20} color="$foreground" />
-          </IconButton>
-          <Text color="$foreground" fontSize={16} fontWeight="500">
-            동기화 현황
-          </Text>
-          <IconButton onPress={loadOutbox} testID="sync-refresh-button">
-            <RefreshCw size={20} color="$foreground" />
-          </IconButton>
-        </XStack>
-      </YStack>
+      <BackActionHeader onBack={() => router.back()} label="동기화 현황">
+        <IconButton onPress={loadOutbox} testID="sync-refresh-button">
+          <RefreshCw size={20} color="$foreground" />
+        </IconButton>
+      </BackActionHeader>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>
         {!isLoading && totalCount === 0 ? (

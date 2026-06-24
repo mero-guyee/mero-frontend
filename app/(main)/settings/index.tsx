@@ -1,6 +1,6 @@
 import { YCard } from '@/components/ui/Card';
 import FadeWrapper from '@/components/ui/FadeWrapper';
-import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
+import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import {
   Bell,
   ChevronRight,
@@ -77,8 +77,7 @@ export default function SettingsScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$background" pb={insets.bottom}>
-      {/* Header */}
-      <TabScreenHeader label="설정" />
+      <BackActionHeader onBack={() => router.back()} label="설정" />
 
       <FadeWrapper>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>

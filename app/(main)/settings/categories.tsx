@@ -1,10 +1,9 @@
 import { CategoryIcon } from '@/components/expense/CategoryIcon';
-import { IconButton } from '@/components/ui/button/BaseButton';
-import { ArrowLeft, Edit3, GripVertical, Plus, Trash2 } from '@tamagui/lucide-icons';
+import BackActionHeader from '@/components/ui/header/BackActionHeader';
+import { Edit3, GripVertical, Plus, Trash2 } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
 import { CircularButton, FilledButton } from '../../../components/ui';
 import { useExpenses } from '../../../contexts';
@@ -20,7 +19,6 @@ const CATEGORY_ICON_NAMES: Record<string, string> = {
 
 export default function CategoryManagerScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
   const { categories, deleteCategory } = useExpenses();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -46,42 +44,22 @@ export default function CategoryManagerScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      {/* Header */}
-      <YStack
-        backgroundColor="$card"
-        paddingTop={insets.top}
-        borderBottomWidth={2}
-        borderBottomColor="$primary"
-        style={{ borderBottomColor: 'rgba(155, 196, 209, 0.25)' }}
-      >
-        <XStack
+      <BackActionHeader onBack={() => router.back()} label="카테고리 관리">
+        <CircularButton onPress={handleAddCategory}>
+          <Plus size={20} color="$foreground" />
+        </CircularButton>
+      </BackActionHeader>
+      <XStack paddingHorizontal="$4" paddingBottom="$3">
+        <FilledButton
+          backgroundColor={isEditing ? '$primary' : '$muted'}
+          pressStyle={{ opacity: 0.8 }}
           paddingHorizontal="$4"
-          paddingVertical="$3"
-          alignItems="center"
-          justifyContent="space-between"
+          paddingVertical="$2"
+          onPress={() => setIsEditing(!isEditing)}
         >
-          <IconButton onPress={() => router.back()}>
-            <ArrowLeft size={20} color="$foreground" />
-          </IconButton>
-          <Text color="$foreground" fontSize={16} fontWeight="500">
-            카테고리 관리
-          </Text>
-          <CircularButton onPress={handleAddCategory}>
-            <Plus size={20} color="$foreground" />
-          </CircularButton>
-        </XStack>
-        <XStack paddingHorizontal="$4" paddingBottom="$3">
-          <FilledButton
-            backgroundColor={isEditing ? '$primary' : '$muted'}
-            pressStyle={{ opacity: 0.8 }}
-            paddingHorizontal="$4"
-            paddingVertical="$2"
-            onPress={() => setIsEditing(!isEditing)}
-          >
-            <Text color={isEditing ? 'white' : '$foreground'}>{isEditing ? '완료' : '편집'}</Text>
-          </FilledButton>
-        </XStack>
-      </YStack>
+          <Text color={isEditing ? 'white' : '$foreground'}>{isEditing ? '완료' : '편집'}</Text>
+        </FilledButton>
+      </XStack>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
         <YStack gap="$2">
