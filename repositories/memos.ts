@@ -57,7 +57,9 @@ export class MemoRepository extends BaseRepository<MemoRow> {
     return rows.map(rowToMemo);
   }
 
-  async createMemo(data: Omit<Memo, 'id' | 'createdAt' | 'updatedAt'>): Promise<Memo> {
+  async createMemo(
+    data: Omit<Memo, 'id' | 'createdAt' | 'updatedAt' | 'syncStatus'>
+  ): Promise<Memo> {
     const row = await this.create({
       ...data,
       serverId: null,

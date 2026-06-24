@@ -9,7 +9,7 @@ import { useTrips } from './TripContext';
 
 interface MemoContextType {
   memos: Memo[];
-  addMemo: (memo: Omit<Memo, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addMemo: (memo: Omit<Memo, 'id' | 'createdAt' | 'updatedAt' | 'syncStatus'>) => void;
   updateMemo: (memo: Memo) => void;
   deleteMemo: (memoId: string) => void;
 }

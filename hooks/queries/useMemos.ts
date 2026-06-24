@@ -40,7 +40,7 @@ export function useCreateMemo() {
   const qc = useQueryClient();
   const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
   return useMutation({
-    mutationFn: async (data: Omit<Memo, 'id' | 'createdAt' | 'updatedAt'>) => {
+    mutationFn: async (data: Omit<Memo, 'id' | 'createdAt' | 'updatedAt' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
       const memoRepo = new MemoRepository(db);
       const localMemo = await memoRepo.createMemo(data);
