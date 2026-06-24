@@ -137,10 +137,7 @@ export default function ExpenseFormScreen() {
                     backgroundColor={categoryId === cat.id ? '$accent' : '$muted'}
                     alignItems="center"
                     gap="$1"
-                    shadowColor="rgba(0,0,0,0.08)"
-                    shadowOffset={{ width: 0, height: 1 }}
-                    shadowOpacity={1}
-                    shadowRadius={4}
+                    boxShadow="0 1px 4px rgba(0,0,0,0.08)"
                     opacity={categoryId === cat.id ? 0.8 : 1}
                   >
                     <CategoryIcon name={cat.icon} size={20} />
