@@ -43,7 +43,7 @@ export default function FootprintItem({
 
       <Pressable style={{ flex: 1 }} onPress={onPress}>
         <YCard paddingHorizontal="$4" paddingVertical="$4" gap="$2" position="relative">
-          {showSyncBadge && <SyncingResultBadge id={footprint.id} status={footprint.syncStatus ?? 'pending'} />}
+          {showSyncBadge && <SyncingResultBadge id={footprint.id} />}
           <XStack gap="$3">
             <YStack flex={1} gap="$2">
               <XStack alignItems="center" gap="$3">

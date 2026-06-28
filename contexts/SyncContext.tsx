@@ -5,9 +5,13 @@ interface SyncContextType {
   markSyncing: (id: string) => void;
   unmarkSyncing: (id: string) => void;
   clearAllSyncing: () => void;
+  clearTransientState: () => void;
   isJustSynced: (id: string) => boolean;
   markJustSynced: (id: string) => void;
   clearJustSynced: (id: string) => void;
+  isFailed: (id: string) => boolean;
+  markFailed: (id: string) => void;
+  clearFailed: (id: string) => void;
 }
 
 const SyncContext = createContext<SyncContextType | null>(null);
@@ -15,6 +19,7 @@ const SyncContext = createContext<SyncContextType | null>(null);
 export function SyncProvider({ children }: { children: ReactNode }) {
   const [syncingIds, setSyncingIds] = useState<Set<string>>(new Set());
   const [justSyncedIds, setJustSyncedIds] = useState<Set<string>>(new Set());
+  const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
 
   const markSyncing = useCallback((id: string) => {
     setSyncingIds((prev) => new Set(prev).add(id));
@@ -34,6 +39,11 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     setSyncingIds(new Set());
   }, []);
 
+  const clearTransientState = useCallback(() => {
+    setJustSyncedIds(new Set());
+    setFailedIds(new Set());
+  }, []);
+
   const markJustSynced = useCallback((id: string) => {
     setJustSyncedIds((prev) => new Set(prev).add(id));
   }, []);
@@ -48,9 +58,35 @@ export function SyncProvider({ children }: { children: ReactNode }) {
 
   const isJustSynced = useCallback((id: string) => justSyncedIds.has(id), [justSyncedIds]);
 
+  const markFailed = useCallback((id: string) => {
+    setFailedIds((prev) => new Set(prev).add(id));
+  }, []);
+
+  const clearFailed = useCallback((id: string) => {
+    setFailedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }, []);
+
+  const isFailed = useCallback((id: string) => failedIds.has(id), [failedIds]);
+
   return (
     <SyncContext.Provider
-      value={{ isSyncing, markSyncing, unmarkSyncing, clearAllSyncing, isJustSynced, markJustSynced, clearJustSynced }}
+      value={{
+        isSyncing,
+        markSyncing,
+        unmarkSyncing,
+        clearAllSyncing,
+        clearTransientState,
+        isJustSynced,
+        markJustSynced,
+        clearJustSynced,
+        isFailed,
+        markFailed,
+        clearFailed,
+      }}
     >
       {children}
     </SyncContext.Provider>

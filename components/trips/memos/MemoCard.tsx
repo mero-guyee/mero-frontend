@@ -21,7 +21,7 @@ export default function MemoCard({
   return (
     <Pressable key={id} onPress={() => onPress(memo.id)}>
       <YCard padding="$4" position="relative">
-        <SyncingResultBadge id={id} status={syncStatus} />
+        <SyncingResultBadge id={id} />
         <XStack alignItems="flex-start" justifyContent="space-between" marginBottom="$2">
           <XStack flex={1} paddingRight="$2" gap="$1">
             <Text color="$foreground" fontWeight="500">

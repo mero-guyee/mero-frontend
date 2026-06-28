@@ -125,10 +125,7 @@ export function BudgetView() {
 
                 return (
                   <YCard key={budget.id} padding="$5" position="relative">
-                    {budget.id === createdId &&
-                      (budget.syncStatus === 'pending' || budget.syncStatus === 'synced') && (
-                        <SyncingResultBadge id={budget.id} status={budget.syncStatus} />
-                      )}
+                    {budget.id === createdId && <SyncingResultBadge id={budget.id} />}
                     <XStack
                       alignItems="flex-start"
                       justifyContent="space-between"

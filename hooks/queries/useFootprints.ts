@@ -42,7 +42,7 @@ export function useFootprintsQuery(tripId: string) {
 export function useCreateFootprint() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (data: Omit<Footprint, 'id' | 'serverId'>) => {
       const tripRepo = new TripRepository(db);
@@ -84,7 +84,7 @@ export function useCreateFootprint() {
             qc.invalidateQueries({ queryKey: footprintKeys.photos(localFootprint.id) });
           }
         } catch {
-          // stays pending
+          markFailed(localFootprint.id);
         } finally {
           unmarkSyncing(localFootprint.id);
         }
@@ -101,7 +101,7 @@ export function useCreateFootprint() {
 export function useUpdateFootprint() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (footprint: Footprint) => {
       const tripRepo = new TripRepository(db);
@@ -150,7 +150,7 @@ export function useUpdateFootprint() {
             }
           }
         } catch {
-          // stays pending
+          markFailed(footprint.id);
         } finally {
           unmarkSyncing(footprint.id);
         }

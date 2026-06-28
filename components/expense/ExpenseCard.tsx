@@ -32,7 +32,7 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
         justifyContent="space-between"
         position="relative"
       >
-        {showSyncBadge && <SyncingResultBadge id={expense.id} status={expense.syncStatus} />}
+        {showSyncBadge && <SyncingResultBadge id={expense.id} />}
         <XStack alignItems="center" gap="$3">
           <YStack
             width={44}

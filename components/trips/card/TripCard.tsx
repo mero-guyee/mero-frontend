@@ -23,7 +23,7 @@ export function TripCard({ trip, onPress, showSyncBadge = false }: TripCardProps
         {/* Cover Image */}
         <YStack height={180} overflow="hidden">
           <TripCoverImage uri={trip.imageUrl} />
-          {showSyncBadge && <SyncingResultBadge id={trip.id} status={trip.syncStatus ?? 'pending'} />}
+          {showSyncBadge && <SyncingResultBadge id={trip.id} />}
         </YStack>
 
         {/* Content */}

@@ -30,12 +30,12 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 function SyncManager() {
   usePendingSync();
-  const { clearAllSyncing } = useSyncContext();
+  const { clearTransientState } = useSyncContext();
   const currentPath = usePathname();
 
   useEffect(() => {
-    clearAllSyncing();
-  }, [clearAllSyncing, currentPath]);
+    clearTransientState();
+  }, [clearTransientState, currentPath]);
   return null;
 }
 

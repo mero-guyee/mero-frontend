@@ -1,7 +1,7 @@
 import * as Crypto from 'expo-crypto';
 import * as SQLite from 'expo-sqlite';
 
-export type SyncStatus = 'pending' | 'synced' | 'conflict';
+export type SyncStatus = 'pending' | 'synced';
 
 export interface BaseEntity {
   id: string;

@@ -1,10 +1,9 @@
 import { AnimatePresence } from '@tamagui/animate-presence';
-import { AlertCircle, Check, CloudOff } from '@tamagui/lucide-icons';
-import { useEffect } from 'react';
+import { AlertCircle, Check } from '@tamagui/lucide-icons';
+import { useEffect, useState } from 'react';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 import { Spinner, Text, XStack, styled } from 'tamagui';
 import { useSyncContext } from '../../contexts/SyncContext';
-import type { SyncStatus } from '../../repositories/base';
 
 const AnimatedXStack = Animated.createAnimatedComponent(
   styled(XStack, {
@@ -17,33 +16,36 @@ const AnimatedXStack = Animated.createAnimatedComponent(
     paddingVertical: '$1',
     alignItems: 'center',
     gap: '$1.5',
+    zIndex: 2,
     height: 24,
   })
 );
 
-type DisplayState = 'justSynced' | 'syncing' | 'pending' | 'conflict';
+type DisplayState = 'syncing' | 'justSynced' | 'justFailed';
 
 function getDisplayState(
-  status: SyncStatus,
   syncing: boolean,
-  justSynced: boolean
+  justSynced: boolean,
+  justFailed: boolean
 ): DisplayState | null {
-  if (status === 'conflict') return 'conflict';
+  if (syncing) return 'syncing';
   if (justSynced) return 'justSynced';
-  if (status === 'synced') return null;
-  return syncing ? 'syncing' : 'pending';
+  if (justFailed) return 'justFailed';
+  return null;
 }
 
 interface SyncingResultBadgeProps {
   id: string;
-  status: SyncStatus;
 }
 
-export function SyncingResultBadge({ id, status }: SyncingResultBadgeProps) {
-  const { isSyncing, isJustSynced, clearJustSynced } = useSyncContext();
+export function SyncingResultBadge({ id }: SyncingResultBadgeProps) {
+  const { isSyncing, isJustSynced, clearJustSynced, isFailed, clearFailed } = useSyncContext();
   const syncing = isSyncing(id);
+
   const justSynced = isJustSynced(id);
-  const displayState = getDisplayState(status, syncing, justSynced);
+  const justFailed = isFailed(id);
+  const displayState = getDisplayState(syncing, justSynced, justFailed);
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     if (!justSynced) return;
@@ -51,9 +53,25 @@ export function SyncingResultBadge({ id, status }: SyncingResultBadgeProps) {
     return () => clearTimeout(timer);
   }, [justSynced, id, clearJustSynced]);
 
+  useEffect(() => {
+    if (!justFailed) return;
+    const timer = setTimeout(() => clearFailed(id), 1500);
+    return () => clearTimeout(timer);
+  }, [justFailed, id, clearFailed]);
+
+  useEffect(() => {
+    if (!displayState) {
+      setHidden(false);
+      return;
+    }
+    setHidden(false);
+    const timer = setTimeout(() => setHidden(true), 1500);
+    return () => clearTimeout(timer);
+  }, [displayState]);
+
   return (
     <AnimatePresence>
-      {displayState && (
+      {displayState && !hidden && (
         <AnimatedXStack
           key="badge"
           layout={LinearTransition.springify().damping(20).stiffness(200)}
@@ -67,7 +85,7 @@ export function SyncingResultBadge({ id, status }: SyncingResultBadgeProps) {
                 <Check size={14} color="white" />
               </XStack>
             )}
-            {displayState === 'conflict' && (
+            {displayState === 'justFailed' && (
               <XStack key="alert" animation="fast" enterStyle={{ scale: 0 }}>
                 <AlertCircle size={14} color="white" />
               </XStack>
@@ -77,23 +95,13 @@ export function SyncingResultBadge({ id, status }: SyncingResultBadgeProps) {
                 <Spinner size="small" color="white" />
               </XStack>
             )}
-            {displayState === 'pending' && (
-              <XStack key="cloud-off" animation="fast" enterStyle={{ scale: 0 }}>
-                <CloudOff size={14} color="white" />
-              </XStack>
-            )}
           </AnimatePresence>
           {displayState === 'syncing' && (
             <Text color="white" fontSize={11}>
               동기화 중
             </Text>
           )}
-          {displayState === 'pending' && (
-            <Text color="white" fontSize={11}>
-              미동기화
-            </Text>
-          )}
-          {displayState === 'conflict' && (
+          {displayState === 'justFailed' && (
             <Text color="white" fontSize={11}>
               동기화 실패
             </Text>

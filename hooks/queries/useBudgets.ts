@@ -44,7 +44,7 @@ export function useBudgetsQuery(tripId: string) {
 export function useCreateBudget() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (data: Omit<Budget, 'id' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
@@ -68,7 +68,7 @@ export function useCreateBudget() {
             qc.invalidateQueries({ queryKey: budgetKeys.byTrip(data.tripId) });
           }
         } catch {
-          // stays pending
+          markFailed(localBudget.id);
         } finally {
           unmarkSyncing(localBudget.id);
         }
@@ -86,7 +86,7 @@ export function useCreateBudget() {
 export function useUpdateBudget() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (budget: Budget) => {
       const tripRepo = new TripRepository(db);
@@ -111,7 +111,7 @@ export function useUpdateBudget() {
             }
           }
         } catch {
-          // stays pending
+          markFailed(budget.id);
         } finally {
           unmarkSyncing(budget.id);
         }

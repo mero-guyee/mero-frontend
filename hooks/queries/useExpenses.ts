@@ -68,7 +68,7 @@ export function useCategoriesQuery() {
 export function useCreateExpense() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (data: Omit<Expense, 'id' | 'serverId' | 'createdAt' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
@@ -98,7 +98,7 @@ export function useCreateExpense() {
             qc.invalidateQueries({ queryKey: expenseKeys.byTrip(data.tripId) });
           }
         } catch {
-          // stays pending
+          markFailed(localExpense.id);
         } finally {
           unmarkSyncing(localExpense.id);
         }
@@ -115,7 +115,7 @@ export function useCreateExpense() {
 export function useUpdateExpense() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (expense: Expense) => {
       const tripRepo = new TripRepository(db);
@@ -145,7 +145,7 @@ export function useUpdateExpense() {
             }
           }
         } catch {
-          // stays pending
+          markFailed(expense.id);
         } finally {
           unmarkSyncing(expense.id);
         }
