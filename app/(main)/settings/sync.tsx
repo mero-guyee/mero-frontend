@@ -13,6 +13,7 @@ import { CheckCircle, RefreshCw } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Text, YStack } from 'tamagui';
 
 const DOMAIN_LABELS: Record<string, string> = {
@@ -78,6 +79,7 @@ export default function SyncStatusScreen() {
 
   const handleRetry = async (entry: OutboxEntry) => {
     const key = `${entry.domain}-${entry.dataId}`;
+
     setRetrying(key);
     try {
       const outbox = new OutboxRepository(db);
@@ -85,6 +87,13 @@ export default function SyncStatusScreen() {
       const syncFn = DOMAIN_SYNC_FNS[entry.domain];
       if (syncFn) await syncFn(db);
       await loadOutbox();
+    } catch (e) {
+      console.error('Failed to retry sync for entry', entry, e);
+      Toast.show({
+        type: 'error',
+        text1: '동기화 실패',
+        text2: '항목을 다시 동기화하는 데 실패했습니다. 잠시 후 다시 시도해주세요.',
+      });
     } finally {
       setRetrying(null);
     }
