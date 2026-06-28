@@ -3,6 +3,7 @@ import { TamaguiProvider } from '@tamagui/core';
 import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -13,6 +14,7 @@ import {
   ExpenseProvider,
   SyncProvider,
   TripProvider,
+  useSyncContext,
 } from '../contexts';
 import { usePendingSync } from '../hooks/sync/usePendingSync';
 import { useAuthGuard } from '../hooks/useAuthGuard';
@@ -28,6 +30,12 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 function SyncManager() {
   usePendingSync();
+  const { clearAllSyncing } = useSyncContext();
+  const currentPath = usePathname();
+
+  useEffect(() => {
+    clearAllSyncing();
+  }, [clearAllSyncing, currentPath]);
   return null;
 }
 

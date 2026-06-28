@@ -4,6 +4,7 @@ interface SyncContextType {
   isSyncing: (id: string) => boolean;
   markSyncing: (id: string) => void;
   unmarkSyncing: (id: string) => void;
+  clearAllSyncing: () => void;
   isJustSynced: (id: string) => boolean;
   markJustSynced: (id: string) => void;
   clearJustSynced: (id: string) => void;
@@ -29,6 +30,10 @@ export function SyncProvider({ children }: { children: ReactNode }) {
 
   const isSyncing = useCallback((id: string) => syncingIds.has(id), [syncingIds]);
 
+  const clearAllSyncing = useCallback(() => {
+    setSyncingIds(new Set());
+  }, []);
+
   const markJustSynced = useCallback((id: string) => {
     setJustSyncedIds((prev) => new Set(prev).add(id));
   }, []);
@@ -45,7 +50,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
 
   return (
     <SyncContext.Provider
-      value={{ isSyncing, markSyncing, unmarkSyncing, isJustSynced, markJustSynced, clearJustSynced }}
+      value={{ isSyncing, markSyncing, unmarkSyncing, clearAllSyncing, isJustSynced, markJustSynced, clearJustSynced }}
     >
       {children}
     </SyncContext.Provider>
