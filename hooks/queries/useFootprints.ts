@@ -24,8 +24,16 @@ export function useFootprintsQuery(tripId: string) {
         (async () => {
           const trip = await tripRepo.getTripById(tripId);
           if (trip?.serverId) {
+            const photoRepo = new PhotoRepository(db);
             const serverFootprints = await footprintsApi.getAll(parseInt(trip.serverId));
-            await Promise.all(serverFootprints.map((f) => repo.upsertFromServer(f, tripId)));
+            await Promise.all(
+              serverFootprints.map(async (f) => {
+                await repo.upsertFromServer(f, tripId);
+                if (f.clientId && f.photos.length > 0) {
+                  await photoRepo.upsertFromServer(f.clientId, f.photos);
+                }
+              })
+            );
             const fresh = await repo.getFootprintsByTripId(tripId);
             qc.setQueryData(footprintKeys.byTrip(trip?.id), fresh);
           }

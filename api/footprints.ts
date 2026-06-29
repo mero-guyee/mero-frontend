@@ -46,6 +46,7 @@ export interface FootprintResponse {
   date: string;
   locations: LocationResponse[];
   thumbnailUrl?: string;
+  photos: PhotoDetailItem[];
 }
 
 export interface PhotoResponse {

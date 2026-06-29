@@ -1,4 +1,5 @@
 import * as SQLite from 'expo-sqlite';
+import { PhotoDetailItem } from '../api/footprints';
 import { FootprintPhoto } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
@@ -108,6 +109,51 @@ export class PhotoRepository extends BaseRepository<PhotoRow> {
         id,
       ]
     );
+  }
+
+  async upsertFromServer(footprintId: string, photos: PhotoDetailItem[]): Promise<void> {
+    for (const photo of photos) {
+      if (!photo.clientId) continue;
+      const serverId = String(photo.id);
+      const existing = await this.db.getFirstAsync<PhotoRow>(
+        `SELECT * FROM photos WHERE id = ? AND deletedAt IS NULL`,
+        [photo.clientId]
+      );
+      if (existing) {
+        if (existing.syncStatus === 'pending') continue;
+        await this.db.runAsync(
+          `UPDATE photos SET serverId=?, s3Url=?, originalFilename=?, fileSize=?, mimeType=?, width=?, height=?, orderIndex=?, syncStatus='synced', updatedAt=datetime('now') WHERE id=?`,
+          [
+            serverId,
+            photo.s3Url,
+            photo.originalFilename ?? null,
+            photo.fileSize ?? null,
+            photo.mimeType ?? null,
+            photo.width ?? null,
+            photo.height ?? null,
+            photo.orderIndex ?? null,
+            photo.clientId,
+          ]
+        );
+      } else {
+        await this.db.runAsync(
+          `INSERT OR IGNORE INTO photos (id, footprintId, localUri, serverId, s3Url, originalFilename, fileSize, mimeType, width, height, orderIndex, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?,datetime('now'),datetime('now'),'synced',NULL)`,
+          [
+            photo.clientId,
+            footprintId,
+            photo.s3Url,
+            serverId,
+            photo.s3Url,
+            photo.originalFilename ?? null,
+            photo.fileSize ?? null,
+            photo.mimeType ?? null,
+            photo.width ?? null,
+            photo.height ?? null,
+            photo.orderIndex ?? null,
+          ]
+        );
+      }
+    }
   }
 
   async deleteByFootprintId(footprintId: string): Promise<void> {
