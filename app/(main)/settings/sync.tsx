@@ -9,12 +9,12 @@ import { syncMemos } from '@/hooks/sync/syncMemos';
 import { syncTrips } from '@/hooks/sync/syncTrips';
 import { useDb } from '@/providers/DatabaseProvider';
 import { OutboxRepository, type OutboxEntry } from '@/repositories/outbox';
-import { CheckCircle, RefreshCw } from '@tamagui/lucide-icons';
+import { CheckCircle, RefreshCw, Trash2 } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { Text, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 
 const DOMAIN_LABELS: Record<string, string> = {
   trips: '여행',
@@ -99,14 +99,31 @@ export default function SyncStatusScreen() {
     }
   };
 
+  const handleClearAll = async () => {
+    try {
+      const outbox = new OutboxRepository(db);
+      await outbox.clearAll();
+      await loadOutbox();
+    } catch (e) {
+      console.error('Failed to clear outbox', e);
+    }
+  };
+
   const totalCount = groups.reduce((sum, g) => sum + g.entries.length, 0);
 
   return (
     <YStack flex={1} backgroundColor="$background">
       <BackActionHeader onBack={() => router.back()} label="동기화 현황">
-        <IconButton onPress={loadOutbox} testID="sync-refresh-button">
-          <RefreshCw size={20} color="$foreground" />
-        </IconButton>
+        <XStack gap="$3">
+          {__DEV__ && (
+            <IconButton onPress={handleClearAll}>
+              <Trash2 size={20} color="$foreground" />
+            </IconButton>
+          )}
+          <IconButton onPress={loadOutbox} testID="sync-refresh-button">
+            <RefreshCw size={20} color="$foreground" />
+          </IconButton>
+        </XStack>
       </BackActionHeader>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>

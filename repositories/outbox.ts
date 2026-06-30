@@ -41,4 +41,10 @@ export class OutboxRepository {
   async remove(domain: string, dataId: string): Promise<void> {
     await this.db.runAsync(`DELETE FROM outbox WHERE domain = ? AND dataId = ?`, [domain, dataId]);
   }
+
+  // for test. do not use in production.
+
+  async clearAll(): Promise<void> {
+    await this.db.runAsync(`DELETE FROM outbox`);
+  }
 }
