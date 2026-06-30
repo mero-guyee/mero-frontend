@@ -3,7 +3,7 @@ import { footprintsApi } from '../../api/footprints';
 import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { FootprintRepository, PhotoRepository, TripRepository } from '../../repositories';
-import { Footprint } from '../../types';
+import { Footprint, FootprintPhoto } from '../../types';
 import { uploadPhotosAndSync } from '../../utils/photoSync';
 
 export const footprintKeys = {
@@ -11,6 +11,15 @@ export const footprintKeys = {
   detail: (id: string) => ['footprints', id] as const,
   photos: (footprintId: string) => ['footprints', footprintId, 'photos'] as const,
 };
+
+export function useFootprintPhotosQuery(footprintId: string) {
+  const db = useDb();
+  return useQuery({
+    queryKey: footprintKeys.photos(footprintId),
+    queryFn: () => new PhotoRepository(db).getByFootprintId(footprintId),
+    enabled: !!footprintId,
+  });
+}
 
 export function useFootprintsQuery(tripId: string) {
   const db = useDb();
@@ -52,15 +61,20 @@ export function useCreateFootprint() {
   const qc = useQueryClient();
   const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
   return useMutation({
-    mutationFn: async (data: Omit<Footprint, 'id' | 'serverId'>) => {
+    mutationFn: async ({
+      photoUris,
+      ...data
+    }: Omit<Footprint, 'id' | 'serverId'> & { photoUris: string[] }) => {
       const tripRepo = new TripRepository(db);
       const repo = new FootprintRepository(db);
       const photoRepo = new PhotoRepository(db);
 
       const localFootprint = await repo.createFootprint({ ...data });
-      const localPhotos = await Promise.all(
-        data.photoUrls.map((uri, i) => photoRepo.createPhoto(localFootprint.id, uri, i))
-      );
+
+      const localPhotos: FootprintPhoto[] = [];
+      for (const [i, uri] of photoUris.entries()) {
+        localPhotos.push(await photoRepo.createPhoto(localFootprint.id, uri, i));
+      }
 
       (async () => {
         markSyncing(localFootprint.id);
@@ -77,14 +91,17 @@ export function useCreateFootprint() {
             });
             await repo.setServerId(localFootprint.id, String(serverFootprint.id));
 
-            if (localPhotos) {
-              const newUrls = await uploadPhotosAndSync(
-                photoRepo,
-                localPhotos,
-                parseInt(trip.serverId),
-                serverFootprint.id
-              );
-              await repo.updatePhotoUrls(localFootprint.id, [...newUrls]);
+            if (localPhotos.length > 0) {
+              try {
+                await uploadPhotosAndSync(
+                  photoRepo,
+                  localPhotos,
+                  parseInt(trip.serverId),
+                  serverFootprint.id
+                );
+              } catch (error) {
+                console.error('Error uploading photos:', error);
+              }
             }
 
             markJustSynced(localFootprint.id);
@@ -111,23 +128,24 @@ export function useUpdateFootprint() {
   const qc = useQueryClient();
   const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
   return useMutation({
-    mutationFn: async (footprint: Footprint) => {
+    mutationFn: async ({ photoUris, ...footprint }: Footprint & { photoUris: string[] }) => {
       const tripRepo = new TripRepository(db);
       const repo = new FootprintRepository(db);
       const photoRepo = new PhotoRepository(db);
 
-      const localUris = footprint.photoUrls.filter(isLocalUri);
-      const serverUrls = footprint.photoUrls.filter((u) => !isLocalUri(u));
-
-      const updated = await repo.updateFootprint({ ...footprint, photoUrls: serverUrls });
+      const updated = await repo.updateFootprint(footprint);
 
       const existingPhotos = await photoRepo.getByFootprintId(footprint.id);
       const existingLocalUris = new Set(existingPhotos.map((p) => p.localUri));
-      const newLocalPhotos = await Promise.all(
-        localUris
-          .filter((uri) => !existingLocalUris.has(uri))
-          .map((uri, i) => photoRepo.createPhoto(footprint.id, uri, existingPhotos.length + i))
-      );
+      const newLocalUris = photoUris
+        .filter(isLocalUri)
+        .filter((uri) => !existingLocalUris.has(uri));
+      const newLocalPhotos: FootprintPhoto[] = [];
+      for (const [i, uri] of newLocalUris.entries()) {
+        newLocalPhotos.push(
+          await photoRepo.createPhoto(footprint.id, uri, existingPhotos.length + i)
+        );
+      }
 
       (async () => {
         markSyncing(footprint.id);
@@ -144,13 +162,14 @@ export function useUpdateFootprint() {
               await repo.markSynced(footprint.id);
               markJustSynced(footprint.id);
 
-              const newUrls = await uploadPhotosAndSync(
-                photoRepo,
-                newLocalPhotos,
-                parseInt(trip.serverId),
-                parseInt(footprint.serverId)
-              );
-              await repo.updatePhotoUrls(footprint.id, [...serverUrls, ...newUrls]);
+              if (newLocalPhotos.length > 0) {
+                await uploadPhotosAndSync(
+                  photoRepo,
+                  newLocalPhotos,
+                  parseInt(trip.serverId),
+                  parseInt(footprint.serverId)
+                );
+              }
 
               qc.invalidateQueries({ queryKey: footprintKeys.byTrip(footprint.tripId) });
               qc.invalidateQueries({ queryKey: footprintKeys.detail(footprint.id) });
@@ -183,6 +202,7 @@ export function useDeleteFootprint() {
       const repo = new FootprintRepository(db);
       const photoRepo = new PhotoRepository(db);
       const footprintRow = await repo.findById(id);
+      const photos = await photoRepo.getByFootprintId(id);
       await repo.deleteFootprint(id);
       await photoRepo.deleteByFootprintId(id);
 
@@ -191,7 +211,14 @@ export function useDeleteFootprint() {
           if (footprintRow?.serverId) {
             const trip = await tripRepo.getTripById(tripId);
             if (trip?.serverId) {
-              await footprintsApi.delete(parseInt(trip.serverId), parseInt(footprintRow.serverId));
+              const tServerId = parseInt(trip.serverId);
+              const fServerId = parseInt(footprintRow.serverId);
+              for (const photo of photos) {
+                if (photo.serverId) {
+                  await footprintsApi.deletePhoto(tServerId, fServerId, parseInt(photo.serverId));
+                }
+              }
+              await footprintsApi.delete(tServerId, fServerId);
               await repo.removeFromOutbox(id);
             }
           }

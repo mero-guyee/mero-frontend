@@ -36,7 +36,7 @@ const footprintData = {
   content: '',
   date: '2024-01-01',
   locations: [],
-  photoUrls: [],
+  photoUris: [],
   syncStatus: 'pending' as const,
 };
 

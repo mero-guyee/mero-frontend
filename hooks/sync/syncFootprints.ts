@@ -33,13 +33,12 @@ export async function syncFootprints(db: SQLite.SQLiteDatabase): Promise<void> {
         await repo.setServerId(footprint.id, String(serverFootprint.id));
         const pendingPhotos = await photoRepo.getPendingByFootprintId(footprint.id);
         if (pendingPhotos.length > 0) {
-          const s3Urls = await uploadPhotosAndSync(
+          await uploadPhotosAndSync(
             photoRepo,
             pendingPhotos,
             parseInt(trip.serverId),
             serverFootprint.id
           );
-          await repo.updatePhotoUrls(footprint.id, s3Urls);
         }
       } else if (operation === 'update') {
         const footprint = await repo.findById(dataId);
@@ -61,13 +60,12 @@ export async function syncFootprints(db: SQLite.SQLiteDatabase): Promise<void> {
         await repo.markSynced(dataId);
         const pendingPhotos = await photoRepo.getPendingByFootprintId(dataId);
         if (pendingPhotos.length > 0) {
-          const s3Urls = await uploadPhotosAndSync(
+          await uploadPhotosAndSync(
             photoRepo,
             pendingPhotos,
             parseInt(trip.serverId),
             parseInt(footprint.serverId)
           );
-          await repo.updatePhotoUrls(dataId, s3Urls);
         }
       } else if (operation === 'delete') {
         const footprint = await repo.findByIdIncludeDeleted(dataId);

@@ -1,3 +1,4 @@
+import * as Crypto from 'expo-crypto';
 import * as SQLite from 'expo-sqlite';
 import { PhotoDetailItem } from '../api/footprints';
 import { FootprintPhoto } from '../types';
@@ -91,24 +92,30 @@ export class PhotoRepository extends BaseRepository<PhotoRow> {
       orderIndex?: number;
     }
   ): Promise<void> {
-    await this.db.runAsync(
-      `UPDATE photos SET
-        serverId = ?, s3Url = ?, originalFilename = ?, fileSize = ?,
-        mimeType = ?, width = ?, height = ?, orderIndex = ?,
-        syncStatus = 'synced', updatedAt = datetime('now')
-       WHERE id = ?`,
-      [
-        serverData.serverId,
-        serverData.s3Url,
-        serverData.originalFilename ?? null,
-        serverData.fileSize ?? null,
-        serverData.mimeType ?? null,
-        serverData.width ?? null,
-        serverData.height ?? null,
-        serverData.orderIndex ?? null,
-        id,
-      ]
-    );
+    await this.db.withTransactionAsync(async () => {
+      await this.db.runAsync(
+        `UPDATE photos SET
+          serverId = ?, s3Url = ?, originalFilename = ?, fileSize = ?,
+          mimeType = ?, width = ?, height = ?, orderIndex = ?,
+          syncStatus = 'synced', updatedAt = datetime('now')
+         WHERE id = ?`,
+        [
+          serverData.serverId,
+          serverData.s3Url,
+          serverData.originalFilename ?? null,
+          serverData.fileSize ?? null,
+          serverData.mimeType ?? null,
+          serverData.width ?? null,
+          serverData.height ?? null,
+          serverData.orderIndex ?? null,
+          id,
+        ]
+      );
+      await this.db.runAsync(
+        `DELETE FROM outbox WHERE domain = 'photos' AND dataId = ?`,
+        [id]
+      );
+    });
   }
 
   async upsertFromServer(footprintId: string, photos: PhotoDetailItem[]): Promise<void> {
@@ -157,9 +164,20 @@ export class PhotoRepository extends BaseRepository<PhotoRow> {
   }
 
   async deleteByFootprintId(footprintId: string): Promise<void> {
-    await this.db.runAsync(
-      `UPDATE photos SET deletedAt = datetime('now'), updatedAt = datetime('now') WHERE footprintId = ?`,
-      [footprintId]
-    );
+    const photos = await this.getByFootprintId(footprintId);
+    await this.db.withTransactionAsync(async () => {
+      await this.db.runAsync(
+        `UPDATE photos SET deletedAt = datetime('now'), updatedAt = datetime('now') WHERE footprintId = ?`,
+        [footprintId]
+      );
+      for (const photo of photos) {
+        if (photo.serverId) {
+          await this.db.runAsync(
+            `INSERT OR REPLACE INTO outbox (id, domain, dataId, dataName, operation) VALUES (?, 'photos', ?, '', 'delete')`,
+            [Crypto.randomUUID(), photo.id]
+          );
+        }
+      }
+    });
   }
 }
