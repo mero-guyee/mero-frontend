@@ -35,6 +35,9 @@ export type {
   LocationResponse,
 } from './footprints';
 
+export { photosApi } from './photos';
+export type { PhotoDetailItem, PhotoResponse } from './photos';
+
 export { memosApi } from './memos';
 export type { MemoCreateRequest, MemoResponse, MemoUpdateRequest } from './memos';
 

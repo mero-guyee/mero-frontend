@@ -1,4 +1,4 @@
-import { PhotoResponse, footprintsApi } from '@/api/footprints';
+import { PhotoResponse, photosApi } from '@/api/photos';
 import { PhotoRepository } from '@/repositories';
 import { FootprintPhoto } from '@/types';
 
@@ -10,7 +10,7 @@ export async function uploadPhotosAndSync(
 ): Promise<string[]> {
   if (localPhotos.length === 0) return [];
 
-  const uploadedPhotos = await footprintsApi.uploadPhotos(
+  const uploadedPhotos = await photosApi.upload(
     tripServerId,
     footprintServerId,
     localPhotos

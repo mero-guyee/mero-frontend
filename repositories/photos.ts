@@ -1,6 +1,6 @@
 import * as Crypto from 'expo-crypto';
 import * as SQLite from 'expo-sqlite';
-import { PhotoDetailItem } from '../api/footprints';
+import { PhotoDetailItem } from '../api/photos';
 import { FootprintPhoto } from '../types';
 import { BaseEntity, BaseRepository } from './base';
 
@@ -55,6 +55,13 @@ export class PhotoRepository extends BaseRepository<PhotoRow> {
     const rows = await this.db.getAllAsync<PhotoRow>(
       `SELECT * FROM photos WHERE footprintId = ? AND syncStatus = 'pending' AND deletedAt IS NULL`,
       [footprintId]
+    );
+    return rows.map(rowToPhoto);
+  }
+
+  async getAllPendingUploads(): Promise<FootprintPhoto[]> {
+    const rows = await this.db.getAllAsync<PhotoRow>(
+      `SELECT * FROM photos WHERE syncStatus = 'pending' AND serverId IS NULL AND deletedAt IS NULL ORDER BY footprintId, orderIndex ASC, createdAt ASC`
     );
     return rows.map(rowToPhoto);
   }

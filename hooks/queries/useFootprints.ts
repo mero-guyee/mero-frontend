@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { footprintsApi } from '../../api/footprints';
+import { photosApi } from '../../api/photos';
 import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
-import { FootprintRepository, PhotoRepository, TripRepository } from '../../repositories';
+import { FootprintRepository, OutboxRepository, PhotoRepository, TripRepository } from '../../repositories';
 import { Footprint, FootprintPhoto } from '../../types';
 import { uploadPhotosAndSync } from '../../utils/photoSync';
 
@@ -201,6 +202,7 @@ export function useDeleteFootprint() {
       const tripRepo = new TripRepository(db);
       const repo = new FootprintRepository(db);
       const photoRepo = new PhotoRepository(db);
+      const outbox = new OutboxRepository(db);
       const footprintRow = await repo.findById(id);
       const photos = await photoRepo.getByFootprintId(id);
       await repo.deleteFootprint(id);
@@ -215,7 +217,8 @@ export function useDeleteFootprint() {
               const fServerId = parseInt(footprintRow.serverId);
               for (const photo of photos) {
                 if (photo.serverId) {
-                  await footprintsApi.deletePhoto(tServerId, fServerId, parseInt(photo.serverId));
+                  await photosApi.delete(tServerId, fServerId, parseInt(photo.serverId));
+                  await outbox.remove('photos', photo.id);
                 }
               }
               await footprintsApi.delete(tServerId, fServerId);

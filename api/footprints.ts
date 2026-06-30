@@ -1,6 +1,6 @@
-import { FootprintPhoto } from '@/types';
-import { apiFormRequest, apiRequest } from './client';
+import { apiRequest } from './client';
 import { ExpenseResponse } from './expenses';
+import { PhotoDetailItem } from './photos';
 
 // Footprint = server-side equivalent of local Diary
 
@@ -21,13 +21,12 @@ export interface LocationResponse {
 }
 
 export interface FootprintCreateRequest {
-  clientId: string; // local UUID (footprintId)
+  clientId: string;
   title?: string;
   content?: string;
-  date: string; // YYYY-MM-DD
+  date: string;
   wheaterInfo?: string;
   locations?: LocationRequest[];
-  photoUrls?: string[]; // local URIs for photos to be uploaded
 }
 
 export interface FootprintUpdateRequest {
@@ -49,28 +48,6 @@ export interface FootprintResponse {
   photos: PhotoDetailItem[];
 }
 
-export interface PhotoResponse {
-  id: number;
-  s3Url: string;
-  originalFilename?: string;
-  fileSize?: number;
-  mimeType?: string;
-  width?: number;
-  height?: number;
-  orderIndex?: number;
-}
-
-export interface PhotoDetailItem {
-  id: number;
-  clientId: string;
-  s3Url: string;
-  originalFilename?: string;
-  fileSize?: number;
-  mimeType?: string;
-  width?: number;
-  height?: number;
-  orderIndex?: number;
-}
 
 export interface FootprintDetailResponse {
   id: number;
@@ -108,31 +85,4 @@ export const footprintsApi = {
 
   delete: (tripId: number, footprintId: number): Promise<void> =>
     apiRequest(`/api/trips/${tripId}/footprints/${footprintId}`, { method: 'DELETE' }),
-
-  uploadPhotos: async (
-    tripId: number,
-    footprintId: number,
-    imageUris: FootprintPhoto[]
-  ): Promise<PhotoResponse[]> => {
-    const results: PhotoResponse[] = [];
-    for (let i = 0; i < imageUris.length; i++) {
-      const form = new FormData();
-      form.append('photo', {
-        uri: imageUris[i].localUri,
-        name: `photo_${i}.jpg`,
-        type: 'image/jpeg',
-      } as any);
-      const response = await apiFormRequest<PhotoResponse>(
-        `/api/trips/${tripId}/footprints/${footprintId}/photos/${imageUris[i].id}`,
-        form
-      );
-      results.push(response);
-    }
-    return results;
-  },
-
-  deletePhoto: (tripId: number, footprintId: number, photoId: number): Promise<void> =>
-    apiRequest(`/api/trips/${tripId}/footprints/${footprintId}/photos/${photoId}`, {
-      method: 'DELETE',
-    }),
 };

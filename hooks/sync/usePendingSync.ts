@@ -7,6 +7,7 @@ import { syncBudgets } from './syncBudgets';
 import { syncExpenses } from './syncExpenses';
 import { syncFootprints } from './syncFootprints';
 import { syncMemos } from './syncMemos';
+import { syncPhotos } from './syncPhotos';
 import { syncTrips } from './syncTrips';
 
 export function usePendingSync() {
@@ -17,6 +18,7 @@ export function usePendingSync() {
   async function runSync() {
     await syncTrips(db);
     await Promise.all([syncMemos(db), syncFootprints(db), syncBudgets(db)]);
+    await syncPhotos(db);
     await syncExpenses(db);
   }
 
