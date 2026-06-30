@@ -2,6 +2,7 @@ import { YCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { useSyncContext } from '@/contexts';
+import { useFootprintPhotosQuery } from '@/hooks/queries/useFootprints';
 import { Pressable } from 'react-native';
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { Footprint } from '../../types';
@@ -22,6 +23,8 @@ export default function FootprintItem({
   showSyncBadge = false,
 }: Props) {
   const { isSyncing } = useSyncContext();
+  const { data: photos = [] } = useFootprintPhotosQuery(footprint.id);
+  const thumbnailUri = photos[0] ? (photos[0].s3Url || photos[0].localUri) : undefined;
   const firstLocation = footprint.locations[0];
   const badge = firstLocation?.placeName;
   const date = new Date(footprint.date);
@@ -79,9 +82,9 @@ export default function FootprintItem({
                 )}
               </XStack>
             </YStack>
-            {footprint.photoUrls[0] && (
+            {thumbnailUri && (
               <Image
-                source={{ uri: footprint.photoUrls[0] }}
+                source={{ uri: thumbnailUri }}
                 width={72}
                 height={72}
                 borderRadius="$3"

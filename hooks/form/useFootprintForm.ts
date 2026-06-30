@@ -2,11 +2,14 @@ import { useFootprints, useTrips } from '@/contexts';
 import { FootprintLocation } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { PhotoRepository } from '../../repositories';
+import { useDb } from '../../providers/DatabaseProvider';
 import { Alert } from 'react-native';
 
 export function useFootprintForm() {
   const { footprintId } = useLocalSearchParams<{ footprintId?: string }>();
   const router = useRouter();
+  const db = useDb();
   const { trips, activeTrip } = useTrips();
   const { footprints, addFootprint, updateFootprint } = useFootprints();
 
@@ -28,9 +31,11 @@ export function useFootprintForm() {
       setTripId(existingFootprint.tripId);
       setWeatherInfo(existingFootprint.weatherInfo || '');
       setLocations(existingFootprint.locations);
-      setPhotoUrls(existingFootprint.photoUrls ?? []);
+      new PhotoRepository(db).getByFootprintId(existingFootprint.id).then((photos) => {
+        setPhotoUrls(photos.map((p) => p.s3Url || p.localUri));
+      });
     }
-  }, [existingFootprint]);
+  }, [existingFootprint, db]);
 
   const handleAddPhotos = (uris: string[]) => {
     setPhotoUrls((prev) => [...prev, ...uris]);
@@ -52,15 +57,14 @@ export function useFootprintForm() {
       date,
       content: content.trim(),
       locations,
-      photoUrls,
       weatherInfo: weatherInfo.trim() || undefined,
     };
 
     if (existingFootprint) {
-      updateFootprint({ ...existingFootprint, ...footprintData });
+      updateFootprint({ ...existingFootprint, ...footprintData, photoUris: photoUrls });
       router.push('/(main)/footprint');
     } else {
-      const created = await addFootprint(footprintData);
+      const created = await addFootprint({ ...footprintData, photoUris: photoUrls });
       router.push(`/(main)/footprint?created=${created.id}`);
     }
   };

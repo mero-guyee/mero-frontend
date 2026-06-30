@@ -60,7 +60,6 @@ export type Footprint = {
   content: string;
   date: string;
   locations: FootprintLocation[];
-  photoUrls: string[];
   weatherInfo?: string;
   syncStatus?: SyncStatus;
 };

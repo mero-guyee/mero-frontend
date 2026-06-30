@@ -11,6 +11,7 @@ import { Alert, Modal, Pressable, ScrollView, useWindowDimensions } from 'react-
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { FilledButton } from '../../../components/ui';
 import { useExpenses, useFootprints } from '../../../contexts';
+import { useFootprintPhotosQuery } from '../../../hooks/queries/useFootprints';
 
 export default function FootprintDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string; from?: string }>();
@@ -21,6 +22,7 @@ export default function FootprintDetailScreen() {
   const { getExpensesByFootprintId, deleteExpense } = useExpenses();
 
   const footprint = footprints.find((f) => f.id === (id || ''));
+  const { data: photos = [] } = useFootprintPhotosQuery(id || '');
   const expenses = getExpensesByFootprintId(id || '');
 
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
@@ -116,7 +118,7 @@ export default function FootprintDetailScreen() {
             )}
 
             {/* Photo Slider */}
-            {footprint.photoUrls.length > 0 && (
+            {photos.length > 0 && (
               <YCard
                 height={SCREEN_WIDTH * 0.75}
                 borderRadius="$4"
@@ -135,18 +137,21 @@ export default function FootprintDetailScreen() {
                     setCurrentPhotoIndex(index);
                   }}
                 >
-                  {footprint.photoUrls.map((url, i) => (
-                    <Pressable
-                      key={i}
-                      style={{ width: SCREEN_WIDTH - 48, height: SCREEN_WIDTH * 0.75 }}
-                      onPress={() => setSelectedPhoto(url)}
-                    >
-                      <Image source={{ uri: url }} width="100%" height="100%" resizeMode="cover" />
-                    </Pressable>
-                  ))}
+                  {photos.map((photo) => {
+                    const uri = photo.s3Url || photo.localUri;
+                    return (
+                      <Pressable
+                        key={photo.id}
+                        style={{ width: SCREEN_WIDTH - 48, height: SCREEN_WIDTH * 0.75 }}
+                        onPress={() => setSelectedPhoto(uri)}
+                      >
+                        <Image source={{ uri }} width="100%" height="100%" resizeMode="cover" />
+                      </Pressable>
+                    );
+                  })}
                 </ScrollView>
 
-                {footprint.photoUrls.length > 1 && (
+                {photos.length > 1 && (
                   <XStack
                     position="absolute"
                     bottom="$3"
@@ -155,7 +160,7 @@ export default function FootprintDetailScreen() {
                     justifyContent="center"
                     gap="$1.5"
                   >
-                    {footprint.photoUrls.map((_, i) => (
+                    {photos.map((_, i) => (
                       <YStack
                         key={i}
                         width={i === currentPhotoIndex ? 8 : 6}

@@ -10,7 +10,6 @@ export interface FootprintRow extends BaseEntity {
   content: string;
   date: string;
   locations: string; // JSON string
-  photoUrls: string; // JSON string
   weatherInfo?: string | null;
 }
 
@@ -23,7 +22,6 @@ function rowToFootprint(row: FootprintRow): Footprint {
     content: row.content,
     date: row.date,
     locations: typeof row.locations === 'string' ? JSON.parse(row.locations) : row.locations,
-    photoUrls: typeof row.photoUrls === 'string' ? JSON.parse(row.photoUrls) : row.photoUrls,
     weatherInfo: row.weatherInfo ?? undefined,
     syncStatus: row.syncStatus,
   };
@@ -65,7 +63,6 @@ export class FootprintRepository extends BaseRepository<FootprintRow> {
       ...data,
       serverId: null,
       locations: JSON.stringify(data.locations ?? []),
-      photoUrls: JSON.stringify(data.photoUrls ?? []),
       weatherInfo: data.weatherInfo ?? null,
     } as Omit<FootprintRow, keyof BaseEntity>);
     return rowToFootprint(row);
@@ -77,17 +74,9 @@ export class FootprintRepository extends BaseRepository<FootprintRow> {
       content: footprint.content,
       date: footprint.date,
       locations: JSON.stringify(footprint.locations),
-      photoUrls: JSON.stringify(footprint.photoUrls),
       weatherInfo: footprint.weatherInfo ?? null,
     });
     return row ? rowToFootprint(row) : null;
-  }
-
-  async updatePhotoUrls(id: string, photoUrls: string[]): Promise<void> {
-    await this.db.runAsync(
-      `UPDATE footprints SET photoUrls = ?, updatedAt = datetime('now') WHERE id = ?`,
-      [JSON.stringify(photoUrls), id]
-    );
   }
 
   async deleteFootprint(id: string): Promise<void> {
@@ -118,7 +107,7 @@ export class FootprintRepository extends BaseRepository<FootprintRow> {
       );
     } else {
       await this.db.runAsync(
-        `INSERT OR IGNORE INTO footprints (id, serverId, tripId, title, content, date, locations, photoUrls, weatherInfo, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,?,NULL,?,?,'synced',NULL)`,
+        `INSERT OR IGNORE INTO footprints (id, serverId, tripId, title, content, date, locations, weatherInfo, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,NULL,?,?,'synced',NULL)`,
         [
           serverFootprint.clientId,
           String(serverFootprint.id),
@@ -127,7 +116,6 @@ export class FootprintRepository extends BaseRepository<FootprintRow> {
           serverFootprint.content ?? '',
           serverFootprint.date,
           JSON.stringify(serverFootprint.locations ?? []),
-          JSON.stringify([]),
           new Date().toISOString(),
           new Date().toISOString(),
         ]

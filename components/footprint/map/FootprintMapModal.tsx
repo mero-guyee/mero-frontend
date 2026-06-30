@@ -1,7 +1,8 @@
 import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { CircularButton } from '@/components/ui';
 import { useExpenses } from '@/contexts';
-import { Footprint } from '@/types';
+import { useFootprintPhotosQuery } from '@/hooks/queries/useFootprints';
+import { Footprint, FootprintPhoto } from '@/types';
 import { formattedLocation } from '@/utils/location/location';
 import { BookOpen, Calendar, Cloud, MapPin, X } from '@tamagui/lucide-icons';
 import { useMemo, useState } from 'react';
@@ -18,6 +19,7 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
   console.log(footprint);
   const { getExpensesByFootprintId } = useExpenses();
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const { data: photos = [] } = useFootprintPhotosQuery(footprint?.id ?? '');
 
   const expenses = footprint ? getExpensesByFootprintId(footprint.id) : [];
   const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
@@ -27,28 +29,29 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
     if (!footprint) return [];
     const paragraphs = footprint.content.split('\n\n').filter((p) => p.trim());
     const result: { type: 'text' | 'photo'; content: string }[] = [];
+    const photoUris = photos.map((p: FootprintPhoto) => p.s3Url || p.localUri);
 
     const photoInterval = Math.max(
       1,
-      Math.floor(paragraphs.length / (footprint.photoUrls.length + 1))
+      Math.floor(paragraphs.length / (photoUris.length + 1))
     );
     let photoIndex = 0;
 
     paragraphs.forEach((paragraph, idx) => {
       result.push({ type: 'text', content: paragraph });
-      if (photoIndex < footprint.photoUrls.length && (idx + 1) % photoInterval === 0) {
-        result.push({ type: 'photo', content: footprint.photoUrls[photoIndex] });
+      if (photoIndex < photoUris.length && (idx + 1) % photoInterval === 0) {
+        result.push({ type: 'photo', content: photoUris[photoIndex] });
         photoIndex++;
       }
     });
 
-    while (photoIndex < footprint.photoUrls.length) {
-      result.push({ type: 'photo', content: footprint.photoUrls[photoIndex] });
+    while (photoIndex < photoUris.length) {
+      result.push({ type: 'photo', content: photoUris[photoIndex] });
       photoIndex++;
     }
 
     return result;
-  }, [footprint]);
+  }, [footprint, photos]);
 
   return (
     <>

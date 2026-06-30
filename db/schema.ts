@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 15;
+export const SCHEMA_VERSION = 16;
 
 export const DROP_TABLES = `
   DROP TABLE IF EXISTS outbox;
@@ -53,7 +53,6 @@ export const CREATE_TABLES = `
     content     TEXT NOT NULL DEFAULT '',
     date        TEXT NOT NULL,
     locations   TEXT NOT NULL DEFAULT '[]',
-    photoUrls   TEXT NOT NULL DEFAULT '[]',
     weatherInfo TEXT,
     createdAt   TEXT NOT NULL,
     updatedAt   TEXT NOT NULL,

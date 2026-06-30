@@ -9,8 +9,8 @@ import { useTrips } from './TripContext';
 
 interface FootprintContextType {
   footprints: Footprint[];
-  addFootprint: (footprint: Omit<Footprint, 'id' | 'serverId'>) => Promise<Footprint>;
-  updateFootprint: (footprint: Footprint) => void;
+  addFootprint: (footprint: Omit<Footprint, 'id' | 'serverId'> & { photoUris: string[] }) => Promise<Footprint>;
+  updateFootprint: (footprint: Footprint & { photoUris: string[] }) => void;
   deleteFootprint: (footprintId: string) => Promise<void>;
   getFootprintsByTripId: (tripId: string) => Footprint[];
   isFootPrintLoading: boolean;
