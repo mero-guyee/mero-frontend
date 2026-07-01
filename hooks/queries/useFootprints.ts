@@ -3,9 +3,14 @@ import { footprintsApi } from '../../api/footprints';
 import { photosApi } from '../../api/photos';
 import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
-import { FootprintRepository, OutboxRepository, PhotoRepository, TripRepository } from '../../repositories';
-import { Footprint, FootprintPhoto } from '../../types';
-import { uploadPhotosAndSync } from '../../utils/photoSync';
+import {
+  FootprintRepository,
+  OutboxRepository,
+  PhotoRepository,
+  TripRepository,
+} from '../../repositories';
+import { Footprint } from '../../types';
+import { createLocalPhotos, filterNewPhotoUris, uploadPhotosAndSync } from '../../utils/photoSync';
 
 export const footprintKeys = {
   byTrip: (tripId: string) => ['footprints', 'trip', tripId] as const,
@@ -72,10 +77,7 @@ export function useCreateFootprint() {
 
       const localFootprint = await repo.createFootprint({ ...data });
 
-      const localPhotos: FootprintPhoto[] = [];
-      for (const [i, uri] of photoUris.entries()) {
-        localPhotos.push(await photoRepo.createPhoto(localFootprint.id, uri, i));
-      }
+      const localPhotos = await createLocalPhotos(photoRepo, localFootprint.id, photoUris);
 
       (async () => {
         markSyncing(localFootprint.id);
@@ -137,16 +139,12 @@ export function useUpdateFootprint() {
       const updated = await repo.updateFootprint(footprint);
 
       const existingPhotos = await photoRepo.getByFootprintId(footprint.id);
-      const existingLocalUris = new Set(existingPhotos.map((p) => p.localUri));
-      const newLocalUris = photoUris
-        .filter(isLocalUri)
-        .filter((uri) => !existingLocalUris.has(uri));
-      const newLocalPhotos: FootprintPhoto[] = [];
-      for (const [i, uri] of newLocalUris.entries()) {
-        newLocalPhotos.push(
-          await photoRepo.createPhoto(footprint.id, uri, existingPhotos.length + i)
-        );
-      }
+      const newLocalPhotos = await createLocalPhotos(
+        photoRepo,
+        footprint.id,
+        filterNewPhotoUris(existingPhotos, photoUris),
+        existingPhotos.length
+      );
 
       (async () => {
         markSyncing(footprint.id);
@@ -236,8 +234,4 @@ export function useDeleteFootprint() {
       qc.invalidateQueries({ queryKey: footprintKeys.byTrip(tripId) });
     },
   });
-}
-
-function isLocalUri(uri: string): boolean {
-  return uri.startsWith('file://') || uri.startsWith('content://');
 }
