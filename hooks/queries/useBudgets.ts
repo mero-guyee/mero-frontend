@@ -44,7 +44,7 @@ export function useBudgetsQuery(tripId: string) {
 export function useCreateBudget() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (data: Omit<Budget, 'id' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
@@ -63,12 +63,12 @@ export function useCreateBudget() {
               exchangeRate: data.exchangeRate || DEFAULT_EXCHANGE_RATE,
             });
             await repo.setServerId(localBudget.id, String(serverBudget.id));
-            markJustSynced(localBudget.id);
+            markSyncSucceeded(localBudget.id);
             qc.invalidateQueries({ queryKey: budgetKeys.all });
             qc.invalidateQueries({ queryKey: budgetKeys.byTrip(data.tripId) });
           }
         } catch {
-          markFailed(localBudget.id);
+          markSyncFailed(localBudget.id);
         } finally {
           unmarkSyncing(localBudget.id);
         }
@@ -86,7 +86,7 @@ export function useCreateBudget() {
 export function useUpdateBudget() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (budget: Budget) => {
       const tripRepo = new TripRepository(db);
@@ -105,13 +105,13 @@ export function useUpdateBudget() {
                 exchangeRate: budget.exchangeRate,
               });
               await repo.markSynced(budget.id);
-              markJustSynced(budget.id);
+              markSyncSucceeded(budget.id);
               qc.invalidateQueries({ queryKey: budgetKeys.all });
               qc.invalidateQueries({ queryKey: budgetKeys.byTrip(budget.tripId) });
             }
           }
         } catch {
-          markFailed(budget.id);
+          markSyncFailed(budget.id);
         } finally {
           unmarkSyncing(budget.id);
         }

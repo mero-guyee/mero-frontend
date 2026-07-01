@@ -68,7 +68,7 @@ export function useCategoriesQuery() {
 export function useCreateExpense() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (data: Omit<Expense, 'id' | 'serverId' | 'createdAt' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
@@ -94,11 +94,11 @@ export function useCreateExpense() {
               location: data.location,
             });
             await repo.setServerId(localExpense.id, String(serverExpense.id));
-            markJustSynced(localExpense.id);
+            markSyncSucceeded(localExpense.id);
             qc.invalidateQueries({ queryKey: expenseKeys.byTrip(data.tripId) });
           }
         } catch {
-          markFailed(localExpense.id);
+          markSyncFailed(localExpense.id);
         } finally {
           unmarkSyncing(localExpense.id);
         }
@@ -115,7 +115,7 @@ export function useCreateExpense() {
 export function useUpdateExpense() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (expense: Expense) => {
       const tripRepo = new TripRepository(db);
@@ -140,12 +140,12 @@ export function useUpdateExpense() {
                 location: expense.location,
               });
               await repo.markSynced(expense.id);
-              markJustSynced(expense.id);
+              markSyncSucceeded(expense.id);
               qc.invalidateQueries({ queryKey: expenseKeys.byTrip(expense.tripId) });
             }
           }
         } catch {
-          markFailed(expense.id);
+          markSyncFailed(expense.id);
         } finally {
           unmarkSyncing(expense.id);
         }

@@ -64,7 +64,7 @@ export function useTripQuery(id: string) {
 export function useCreateTrip() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (data: Omit<Trip, 'id'>) => {
       const repo = new TripRepository(db);
@@ -82,13 +82,13 @@ export function useCreateTrip() {
             imageUrl: data.imageUrl,
           });
           await repo.setServerId(localTrip.id, String(serverTrip.id));
-          markJustSynced(localTrip.id);
+          markSyncSucceeded(localTrip.id);
           qc.invalidateQueries({ queryKey: tripKeys.all });
         } catch (e) {
           if (e instanceof ApiError) {
             console.error('Failed to create trip on server:', e.status, e.message);
           }
-          markFailed(localTrip.id);
+          markSyncFailed(localTrip.id);
         } finally {
           unmarkSyncing(localTrip.id);
         }
@@ -105,7 +105,7 @@ export function useCreateTrip() {
 export function useUpdateTrip() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (trip: Trip) => {
       const repo = new TripRepository(db);
@@ -127,12 +127,12 @@ export function useUpdateTrip() {
             }
 
             await repo.markSynced(trip.id);
-            markJustSynced(trip.id);
+            markSyncSucceeded(trip.id);
             qc.invalidateQueries({ queryKey: tripKeys.all });
             qc.invalidateQueries({ queryKey: tripKeys.detail(trip.id) });
           }
         } catch {
-          markFailed(trip.id);
+          markSyncFailed(trip.id);
         } finally {
           unmarkSyncing(trip.id);
         }

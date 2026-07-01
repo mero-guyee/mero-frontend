@@ -65,7 +65,7 @@ export function useFootprintsQuery(tripId: string) {
 export function useCreateFootprint() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
   return useMutation({
     mutationFn: async ({
       photoUris,
@@ -107,12 +107,12 @@ export function useCreateFootprint() {
               }
             }
 
-            markJustSynced(localFootprint.id);
+            markSyncSucceeded(localFootprint.id);
             qc.invalidateQueries({ queryKey: footprintKeys.byTrip(data.tripId) });
             qc.invalidateQueries({ queryKey: footprintKeys.photos(localFootprint.id) });
           }
         } catch {
-          markFailed(localFootprint.id);
+          markSyncFailed(localFootprint.id);
         } finally {
           unmarkSyncing(localFootprint.id);
         }
@@ -129,7 +129,7 @@ export function useCreateFootprint() {
 export function useUpdateFootprint() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
   return useMutation({
     mutationFn: async ({ photoUris, ...footprint }: Footprint & { photoUris: string[] }) => {
       const tripRepo = new TripRepository(db);
@@ -159,7 +159,7 @@ export function useUpdateFootprint() {
                 locations: footprint.locations,
               });
               await repo.markSynced(footprint.id);
-              markJustSynced(footprint.id);
+              markSyncSucceeded(footprint.id);
 
               if (newLocalPhotos.length > 0) {
                 await uploadPhotosAndSync(
@@ -176,7 +176,7 @@ export function useUpdateFootprint() {
             }
           }
         } catch {
-          markFailed(footprint.id);
+          markSyncFailed(footprint.id);
         } finally {
           unmarkSyncing(footprint.id);
         }

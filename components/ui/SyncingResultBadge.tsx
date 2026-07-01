@@ -21,16 +21,16 @@ const AnimatedXStack = Animated.createAnimatedComponent(
   })
 );
 
-type DisplayState = 'syncing' | 'justSynced' | 'justFailed';
+type DisplayState = 'syncing' | 'syncSucceeded' | 'syncFailed';
 
 function getDisplayState(
   syncing: boolean,
-  justSynced: boolean,
-  justFailed: boolean
+  syncSucceeded: boolean,
+  syncFailed: boolean
 ): DisplayState | null {
   if (syncing) return 'syncing';
-  if (justSynced) return 'justSynced';
-  if (justFailed) return 'justFailed';
+  if (syncSucceeded) return 'syncSucceeded';
+  if (syncFailed) return 'syncFailed';
   return null;
 }
 
@@ -39,25 +39,26 @@ interface SyncingResultBadgeProps {
 }
 
 export function SyncingResultBadge({ id }: SyncingResultBadgeProps) {
-  const { isSyncing, isJustSynced, clearJustSynced, isFailed, clearFailed } = useSyncContext();
+  const { isSyncing, isSyncSucceeded, clearSyncSucceeded, isSyncFailed, clearSyncFailed } =
+    useSyncContext();
   const syncing = isSyncing(id);
 
-  const justSynced = isJustSynced(id);
-  const justFailed = isFailed(id);
-  const displayState = getDisplayState(syncing, justSynced, justFailed);
+  const syncSucceeded = isSyncSucceeded(id);
+  const syncFailed = isSyncFailed(id);
+  const displayState = getDisplayState(syncing, syncSucceeded, syncFailed);
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
-    if (!justSynced) return;
-    const timer = setTimeout(() => clearJustSynced(id), 1500);
+    if (!syncSucceeded) return;
+    const timer = setTimeout(() => clearSyncSucceeded(id), 1500);
     return () => clearTimeout(timer);
-  }, [justSynced, id, clearJustSynced]);
+  }, [syncSucceeded, id, clearSyncSucceeded]);
 
   useEffect(() => {
-    if (!justFailed) return;
-    const timer = setTimeout(() => clearFailed(id), 1500);
+    if (!syncFailed) return;
+    const timer = setTimeout(() => clearSyncFailed(id), 1500);
     return () => clearTimeout(timer);
-  }, [justFailed, id, clearFailed]);
+  }, [syncFailed, id, clearSyncFailed]);
 
   useEffect(() => {
     if (!displayState) {
@@ -80,12 +81,12 @@ export function SyncingResultBadge({ id }: SyncingResultBadgeProps) {
           exitStyle={{ opacity: 0 }}
         >
           <AnimatePresence>
-            {displayState === 'justSynced' && (
+            {displayState === 'syncSucceeded' && (
               <XStack key="check" animation="fast" enterStyle={{ scale: 0 }}>
                 <Check size={14} color="white" />
               </XStack>
             )}
-            {displayState === 'justFailed' && (
+            {displayState === 'syncFailed' && (
               <XStack key="alert" animation="fast" enterStyle={{ scale: 0 }}>
                 <AlertCircle size={14} color="white" />
               </XStack>
@@ -101,7 +102,7 @@ export function SyncingResultBadge({ id }: SyncingResultBadgeProps) {
               동기화 중
             </Text>
           )}
-          {displayState === 'justFailed' && (
+          {displayState === 'syncFailed' && (
             <Text color="white" fontSize={11}>
               동기화 실패
             </Text>

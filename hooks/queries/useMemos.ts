@@ -38,7 +38,7 @@ export function useMemosQuery(tripId: string) {
 export function useCreateMemo() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (data: Omit<Memo, 'id' | 'createdAt' | 'updatedAt' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
@@ -56,11 +56,11 @@ export function useCreateMemo() {
               content: data.content,
             });
             await memoRepo.setServerId(localMemo.id, String(serverMemo.id));
-            markJustSynced(localMemo.id);
+            markSyncSucceeded(localMemo.id);
             qc.invalidateQueries({ queryKey: memoKeys.all });
           }
         } catch {
-          markFailed(localMemo.id);
+          markSyncFailed(localMemo.id);
         } finally {
           unmarkSyncing(localMemo.id);
         }
@@ -75,7 +75,7 @@ export function useCreateMemo() {
 export function useUpdateMemo() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markJustSynced, markFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
   return useMutation({
     mutationFn: async (memo: Memo) => {
       const tripRepo = new TripRepository(db);
@@ -93,12 +93,12 @@ export function useUpdateMemo() {
                 content: memo.content,
               });
               await memoRepo.markSynced(memo.id);
-              markJustSynced(memo.id);
+              markSyncSucceeded(memo.id);
               qc.invalidateQueries({ queryKey: memoKeys.all });
             }
           }
         } catch {
-          markFailed(memo.id);
+          markSyncFailed(memo.id);
         } finally {
           unmarkSyncing(memo.id);
         }

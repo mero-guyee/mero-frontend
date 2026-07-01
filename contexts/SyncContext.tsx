@@ -6,12 +6,12 @@ interface SyncContextType {
   unmarkSyncing: (id: string) => void;
   clearAllSyncing: () => void;
   clearTransientState: () => void;
-  isJustSynced: (id: string) => boolean;
-  markJustSynced: (id: string) => void;
-  clearJustSynced: (id: string) => void;
-  isFailed: (id: string) => boolean;
-  markFailed: (id: string) => void;
-  clearFailed: (id: string) => void;
+  isSyncSucceeded: (id: string) => boolean;
+  markSyncSucceeded: (id: string) => void;
+  clearSyncSucceeded: (id: string) => void;
+  isSyncFailed: (id: string) => boolean;
+  markSyncFailed: (id: string) => void;
+  clearSyncFailed: (id: string) => void;
 }
 
 const SyncContext = createContext<SyncContextType | null>(null);
@@ -44,11 +44,11 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     setFailedIds(new Set());
   }, []);
 
-  const markJustSynced = useCallback((id: string) => {
+  const markSyncSucceeded = useCallback((id: string) => {
     setJustSyncedIds((prev) => new Set(prev).add(id));
   }, []);
 
-  const clearJustSynced = useCallback((id: string) => {
+  const clearSyncSucceeded = useCallback((id: string) => {
     setJustSyncedIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -56,13 +56,13 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const isJustSynced = useCallback((id: string) => justSyncedIds.has(id), [justSyncedIds]);
+  const isSyncSucceeded = useCallback((id: string) => justSyncedIds.has(id), [justSyncedIds]);
 
-  const markFailed = useCallback((id: string) => {
+  const markSyncFailed = useCallback((id: string) => {
     setFailedIds((prev) => new Set(prev).add(id));
   }, []);
 
-  const clearFailed = useCallback((id: string) => {
+  const clearSyncFailed = useCallback((id: string) => {
     setFailedIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -70,7 +70,7 @@ export function SyncProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const isFailed = useCallback((id: string) => failedIds.has(id), [failedIds]);
+  const isSyncFailed = useCallback((id: string) => failedIds.has(id), [failedIds]);
 
   return (
     <SyncContext.Provider
@@ -80,12 +80,12 @@ export function SyncProvider({ children }: { children: ReactNode }) {
         unmarkSyncing,
         clearAllSyncing,
         clearTransientState,
-        isJustSynced,
-        markJustSynced,
-        clearJustSynced,
-        isFailed,
-        markFailed,
-        clearFailed,
+        isSyncSucceeded,
+        markSyncSucceeded,
+        clearSyncSucceeded,
+        isSyncFailed,
+        markSyncFailed,
+        clearSyncFailed,
       }}
     >
       {children}
