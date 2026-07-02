@@ -1,14 +1,12 @@
-import { Bus, Car, Hotel, Package, ShoppingBag, Theater, Utensils, Wallet } from '@tamagui/lucide-icons';
+import { Car, Hotel, Package, ShoppingBag, Theater, Utensils, Wallet } from '@tamagui/lucide-icons';
 
 const ICON_MAP: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
-  car: Car,
-  bus: Bus,
-  utensils: Utensils,
-  hotel: Hotel,
-  theater: Theater,
-  shopping_bag: ShoppingBag,
-  wallet: Wallet,
-  package: Package,
+  교통: Car,
+  식비: Utensils,
+  숙박: Hotel,
+  액티비티: Theater,
+  쇼핑: ShoppingBag,
+  기타: Wallet,
 };
 
 export function CategoryIcon({

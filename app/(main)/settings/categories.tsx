@@ -8,15 +8,6 @@ import { Text, XStack, YStack } from 'tamagui';
 import { CircularButton, FilledButton } from '../../../components/ui';
 import { useExpenses } from '../../../contexts';
 
-const CATEGORY_ICON_NAMES: Record<string, string> = {
-  restaurant: 'utensils',
-  directions_bus: 'bus',
-  hotel: 'hotel',
-  directions_walk: 'theater',
-  shopping_cart: 'shopping_bag',
-  more_horiz: 'package',
-};
-
 export default function CategoryManagerScreen() {
   const router = useRouter();
   const { categories, deleteCategory } = useExpenses();
@@ -64,8 +55,6 @@ export default function CategoryManagerScreen() {
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 100 }}>
         <YStack gap="$2">
           {categories.map((category) => {
-            const iconName = CATEGORY_ICON_NAMES[category.icon] ?? category.icon;
-
             return (
               <XStack
                 key={category.id}
@@ -86,7 +75,7 @@ export default function CategoryManagerScreen() {
                   justifyContent="center"
                   style={{ backgroundColor: category.color + '20' }}
                 >
-                  <CategoryIcon name={iconName} size={20} />
+                  <CategoryIcon name={category.name} size={20} />
                 </YStack>
                 <Text flex={1} color="$foreground">
                   {category.name}

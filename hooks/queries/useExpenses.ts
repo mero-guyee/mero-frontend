@@ -41,30 +41,6 @@ export function useExpensesQuery(tripId: string) {
   });
 }
 
-export function useCategoriesQuery() {
-  const db = useDb();
-  const qc = useQueryClient();
-  return useQuery({
-    queryKey: expenseKeys.categories,
-    queryFn: async () => {
-      const repo = new ExpenseCategoryRepository(db);
-
-      (async () => {
-        try {
-          const serverCategories = await expenseCategoriesApi.getAll();
-          await Promise.all(serverCategories.map((c) => repo.upsertFromServer(c)));
-          const fresh = await repo.getAllCategories();
-          qc.setQueryData(expenseKeys.categories, fresh);
-        } catch {
-          // offline — use local cache
-        }
-      })();
-
-      return repo.getAllCategories();
-    },
-  });
-}
-
 export function useCreateExpense() {
   const db = useDb();
   const qc = useQueryClient();
@@ -187,6 +163,30 @@ export function useDeleteExpense() {
     },
     onSuccess: (tripId) => {
       qc.invalidateQueries({ queryKey: expenseKeys.byTrip(tripId) });
+    },
+  });
+}
+
+export function useCategoriesQuery() {
+  const db = useDb();
+  const qc = useQueryClient();
+  return useQuery({
+    queryKey: expenseKeys.categories,
+    queryFn: async () => {
+      const repo = new ExpenseCategoryRepository(db);
+
+      (async () => {
+        try {
+          const serverCategories = await expenseCategoriesApi.getAll();
+          await Promise.all(serverCategories.map((c) => repo.upsertFromServer(c)));
+          const fresh = await repo.getAllCategories();
+          qc.setQueryData(expenseKeys.categories, fresh);
+        } catch {
+          // offline — use local cache
+        }
+      })();
+
+      return repo.getAllCategories();
     },
   });
 }

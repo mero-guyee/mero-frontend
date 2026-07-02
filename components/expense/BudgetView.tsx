@@ -1,5 +1,5 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
-import { Backpack, Edit3, Plus, Trash2, Wallet } from '@tamagui/lucide-icons';
+import { Backpack, Pencil, Plus, Trash2, Wallet } from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -90,15 +90,6 @@ export function BudgetView() {
         contentContainerStyle={{ paddingHorizontal: paddingHorizontalGeneral, paddingBottom: 100 }}
       >
         <YStack gap="$4">
-          <YStack>
-            <Text color="$foreground" fontSize={16} fontWeight="600">
-              예산 설정
-            </Text>
-            <Text color="$mutedForeground" fontSize={14} marginTop="$0.5">
-              화폐별 예산을 관리하세요
-            </Text>
-          </YStack>
-
           {!activeTrip ? (
             <YCard>
               <EmptyState
@@ -158,7 +149,7 @@ export function BudgetView() {
                           </Text>
                         </YStack>
                       </XStack>
-                      <XStack gap="$2">
+                      <XStack gap="$1">
                         <Pressable onPress={() => handleOpenBudgetModal(budget)}>
                           <YStack
                             width={36}
@@ -167,7 +158,7 @@ export function BudgetView() {
                             justifyContent="center"
                             borderRadius="$3"
                           >
-                            <Edit3 size={16} color="$mutedForeground" />
+                            <Pencil size={16} color="$foreground" />
                           </YStack>
                         </Pressable>
                         <Pressable onPress={() => handleDeleteBudget(budget.id)}>
@@ -178,7 +169,7 @@ export function BudgetView() {
                             justifyContent="center"
                             borderRadius="$3"
                           >
-                            <Trash2 size={16} color="$mutedForeground" />
+                            <Trash2 size={16} color="$destructive" />
                           </YStack>
                         </Pressable>
                       </XStack>
@@ -218,8 +209,9 @@ export function BudgetView() {
                         paddingHorizontal="$3"
                         paddingVertical="$1.5"
                         borderRadius={20}
-                        backgroundColor={isOverBudget ? '$destructive' : '$accent'}
-                        opacity={isOverBudget ? 0.2 : 0.4}
+                        backgroundColor={
+                          isOverBudget ? 'rgba(232,155,143,0.2)' : 'rgba(200,222,230,0.4)'
+                        }
                       >
                         <Text color={isOverBudget ? '$destructive' : '$mutedForeground'}>
                           {percentage.toFixed(1)}%

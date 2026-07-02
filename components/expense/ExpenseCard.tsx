@@ -42,11 +42,11 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
             alignItems="center"
             justifyContent="center"
           >
-            <CategoryIcon name={expense.categoryIcon ?? 'package'} size={18} />
+            <CategoryIcon name={expense.categoryName!} size={18} />
           </YStack>
           <YStack>
-            <Text color="$foreground">{expense.description}</Text>
             <Text color="$mutedForeground">{expense.categoryName}</Text>
+            <Text color="$foreground">{expense.description || '-'}</Text>
           </YStack>
         </XStack>
         <XStack alignItems="center" gap="$2">

@@ -1,10 +1,13 @@
-import { CategoryIcon } from '@/components/expense/CategoryIcon';
+import CategoryPicker from '@/components/expense/CategoryPicker';
 import CurrencyPicker from '@/components/expense/CurrencyPicker';
+import LocationPicker from '@/components/location/LocationPicker';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import DatePickerInput from '@/components/ui/DatePickerInput';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { inputStyle } from '@/components/ui/Input';
+import { formatGeocode } from '@/utils/location/location';
+import { MapPin } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
@@ -32,6 +35,7 @@ export default function ExpenseFormScreen() {
   const [date, setDate] = useState(expense?.date ?? new Date().toISOString().split('T')[0]);
   const [description, setDescription] = useState(expense?.description ?? '');
   const [location, setLocation] = useState(expense?.location ?? '');
+  const [locationPickerOpen, setLocationPickerOpen] = useState(false);
   if (isEdit && !expense) {
     return (
       <YStack flex={1} backgroundColor="$background" alignItems="center" justifyContent="center">
@@ -39,6 +43,20 @@ export default function ExpenseFormScreen() {
       </YStack>
     );
   }
+
+  const handleLocationConfirm = ({
+    latitude,
+    longitude,
+    placeName: searchedPlaceName,
+  }: {
+    latitude: number;
+    longitude: number;
+    placeName?: string;
+  }) => {
+    formatGeocode(latitude, longitude).then(({ placeName: geocodedPlaceName }) => {
+      setLocation(searchedPlaceName || geocodedPlaceName);
+    });
+  };
 
   const handleSubmit = async () => {
     if (!amount || parseFloat(amount) <= 0) {
@@ -84,6 +102,35 @@ export default function ExpenseFormScreen() {
 
       <FadeWrapper>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
+          {/* Amount and Currency */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$2" fontWeight="500">
+              금액
+            </Text>
+            <XStack {...inputStyle} alignItems="center" paddingHorizontal="$0">
+              <Input
+                flex={1}
+                placeholder="0"
+                placeholderTextColor="$placeholderForeground"
+                value={amount}
+                onChangeText={setAmount}
+                keyboardType="number-pad"
+                color="$foreground"
+                borderWidth={0}
+                height={44}
+                focusStyle={{ borderWidth: 0 }}
+                autoFocus
+              />
+              <CurrencyPicker value={currency} onChange={setCurrency} />
+            </XStack>
+          </YStack>
+          {/* Category */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$3" fontWeight="500">
+              카테고리
+            </Text>
+            <CategoryPicker categories={categories} value={categoryId} onChange={setCategoryId} />
+          </YStack>
           {/* Date */}
           <YStack marginBottom="$6">
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
@@ -97,66 +144,13 @@ export default function ExpenseFormScreen() {
             )}
           </YStack>
 
-          {/* Amount and Currency */}
-          <YStack marginBottom="$6">
-            <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              금액
-            </Text>
-            <XStack {...inputStyle} alignItems="center" paddingHorizontal="$0">
-              <Input
-                flex={1}
-                placeholder="0"
-                placeholderTextColor="$placeholderForeground"
-                value={amount}
-                onChangeText={setAmount}
-                keyboardType="numeric"
-                color="$foreground"
-                borderWidth={0}
-                height={44}
-                focusStyle={{ borderWidth: 0 }}
-              />
-              <CurrencyPicker value={currency} onChange={setCurrency} />
-            </XStack>
-          </YStack>
-
-          {/* Category */}
-          <YStack marginBottom="$6">
-            <Text color="$foreground" marginBottom="$3" fontWeight="500">
-              카테고리
-            </Text>
-            <XStack flexWrap="wrap" gap="$3">
-              {categories.map((cat) => (
-                <Pressable
-                  key={cat.id}
-                  onPress={() => setCategoryId(cat.id)}
-                  style={{ width: '22%' }}
-                >
-                  <YStack
-                    padding="$3"
-                    borderRadius="$4"
-                    backgroundColor={categoryId === cat.id ? '$accent' : '$muted'}
-                    alignItems="center"
-                    gap="$1"
-                    boxShadow="0 1px 4px rgba(0,0,0,0.08)"
-                    opacity={categoryId === cat.id ? 0.8 : 1}
-                  >
-                    <CategoryIcon name={cat.icon} size={20} />
-                    <Text color="$foreground" fontSize={12} textAlign="center" numberOfLines={1}>
-                      {cat.name}
-                    </Text>
-                  </YStack>
-                </Pressable>
-              ))}
-            </XStack>
-          </YStack>
-
           {/* Description */}
           <YStack marginBottom="$6">
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               설명
             </Text>
             <Input
-              placeholder="예: 점심 식사"
+              placeholder="맛있게 먹었으니 0원"
               placeholderTextColor="$placeholderForeground"
               value={description}
               onChangeText={setDescription}
@@ -168,11 +162,18 @@ export default function ExpenseFormScreen() {
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               장소
             </Text>
-            <Input
-              placeholder="예: 마추픽추"
-              placeholderTextColor="$placeholderForeground"
-              value={location}
-              onChangeText={setLocation}
+            <Pressable onPress={() => setLocationPickerOpen(true)}>
+              <XStack {...inputStyle} alignItems="center" justifyContent="space-between">
+                <Text color={location ? '$foreground' : '$placeholderForeground'}>
+                  {location || '예: 마추픽추'}
+                </Text>
+                <MapPin size={18} color="$mutedForeground" />
+              </XStack>
+            </Pressable>
+            <LocationPicker
+              visible={locationPickerOpen}
+              onClose={() => setLocationPickerOpen(false)}
+              onConfirm={handleLocationConfirm}
             />
           </YStack>
         </ScrollView>

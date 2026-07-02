@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 16;
+export const SCHEMA_VERSION = 17;
 
 export const DROP_TABLES = `
   DROP TABLE IF EXISTS outbox;
@@ -162,15 +162,4 @@ export const CREATE_TABLES = `
   CREATE INDEX IF NOT EXISTS idx_expenses_tripId      ON expenses(tripId);
   CREATE INDEX IF NOT EXISTS idx_expenses_footprintId ON expenses(footprintId);
   CREATE INDEX IF NOT EXISTS idx_budgets_tripId       ON budgets(tripId);
-`;
-
-export const SEED_CATEGORIES = `
-  INSERT OR REPLACE INTO expense_categories (id, name, icon, color, isDefault, createdAt, updatedAt, syncStatus)
-  VALUES
-    ('1', '교통',     'car',          '#4CAF50', 1, datetime('now'), datetime('now'), 'synced'),
-    ('2', '식비',     'utensils',     '#FF9800', 1, datetime('now'), datetime('now'), 'synced'),
-    ('3', '숙박',     'hotel',        '#2196F3', 1, datetime('now'), datetime('now'), 'synced'),
-    ('4', '액티비티', 'theater',      '#9C27B0', 1, datetime('now'), datetime('now'), 'synced'),
-    ('5', '쇼핑',     'shopping_bag', '#E91E63', 1, datetime('now'), datetime('now'), 'synced'),
-    ('6', '기타',     'wallet',       '#607D8B', 1, datetime('now'), datetime('now'), 'synced');
 `;
