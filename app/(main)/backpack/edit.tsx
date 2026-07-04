@@ -1,6 +1,7 @@
 import TripCountrySearch from '@/components/trips/TripCountrySearch';
 import TripCountrySearchChip from '@/components/trips/TripCountrySearchChip';
 import { FilledButton, Input } from '@/components/ui';
+import AppBottomSheet from '@/components/ui/AppBottomSheet';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import { YCard } from '@/components/ui/Card';
 import DatePickerInput from '@/components/ui/DatePickerInput';
@@ -13,13 +14,11 @@ import { Asset } from 'expo-asset';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Image, Sheet, Text, XStack, YStack } from 'tamagui';
+import { Image, Text, XStack, YStack } from 'tamagui';
 
 const DEFAULT_IMAGE = Asset.fromModule(require('@/assets/images/mountain.jpg')).uri;
 export default function EditBackPackScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
 
   const { activeTrip, updateTrip } = useTrips();
   const { data: trip } = useTripQuery(activeTrip || '');
@@ -221,46 +220,36 @@ export default function EditBackPackScreen() {
         onOpenChange={setShowImagePicker}
         onSelect={setImageUrl}
       />
-      <Sheet
-        modal
+      <AppBottomSheet
         open={showCountrySheet}
         onOpenChange={setShowCountrySheet}
         snapPoints={[85]}
-        dismissOnSnapToBottom
+        frameProps={{ padding: '$4' }}
       >
-        <Sheet.Overlay
-          animation="lazy"
-          bg="rgba(0,0,0,0.6)"
-          enterStyle={{ opacity: 0 }}
-          exitStyle={{ opacity: 0 }}
-        />
-        <Sheet.Handle />
-        <Sheet.Frame padding="$4" paddingBottom={insets.bottom || 8}>
-          <XStack justifyContent="space-between" alignItems="center" marginBottom="$3">
-            <Text color="$foreground" fontWeight="600" fontSize={16}>
-              국가 선택
+        <XStack justifyContent="space-between" alignItems="center" marginBottom="$3">
+          <Text color="$foreground" fontWeight="600" fontSize={16}>
+            국가 선택
+          </Text>
+          <FilledButton
+            paddingHorizontal="$4"
+            paddingVertical="$2"
+            onPress={() => {
+              setCountries(draftCountries);
+              setShowCountrySheet(false);
+            }}
+          >
+            <Text color="$foreground" fontWeight="500">
+              확인
             </Text>
-            <FilledButton
-              paddingHorizontal="$4"
-              paddingVertical="$2"
-              onPress={() => {
-                setCountries(draftCountries);
-                setShowCountrySheet(false);
-              }}
-            >
-              <Text color="$foreground" fontWeight="500">
-                확인
-              </Text>
-            </FilledButton>
-          </XStack>
-          <TripCountrySearch
-            selectedCountries={draftCountries}
-            onAdd={(c) => setDraftCountries((prev) => [...prev, c])}
-            onRemove={(c) => setDraftCountries((prev) => prev.filter((x) => x !== c))}
-            error={null}
-          />
-        </Sheet.Frame>
-      </Sheet>
+          </FilledButton>
+        </XStack>
+        <TripCountrySearch
+          selectedCountries={draftCountries}
+          onAdd={(c) => setDraftCountries((prev) => [...prev, c])}
+          onRemove={(c) => setDraftCountries((prev) => prev.filter((x) => x !== c))}
+          error={null}
+        />
+      </AppBottomSheet>
     </YStack>
   );
 }

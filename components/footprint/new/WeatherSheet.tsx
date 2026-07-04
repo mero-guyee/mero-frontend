@@ -1,4 +1,5 @@
 import { FilledButton, Input } from '@/components/ui';
+import AppBottomSheet from '@/components/ui/AppBottomSheet';
 import {
   CloudFog,
   CloudLightning,
@@ -11,8 +12,7 @@ import {
 } from '@tamagui/lucide-icons';
 import { useEffect, useState } from 'react';
 import { Pressable } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Sheet, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 
 export const WEATHER_ICON_MAP: Record<
   string,
@@ -52,7 +52,6 @@ export default function WeatherSheet({
   initialWeatherInfo,
   onConfirm,
 }: WeatherSheetProps) {
-  const insets = useSafeAreaInsets();
   const [keyDraft, setKeyDraft] = useState('');
   const [tempDraft, setTempDraft] = useState('');
 
@@ -74,56 +73,45 @@ export default function WeatherSheet({
   };
 
   return (
-    <Sheet
-      modal
+    <AppBottomSheet
       open={open}
       onOpenChange={onOpenChange}
-      snapPoints={[insets.bottom]}
-      dismissOnSnapToBottom
+      frameProps={{ padding: '$5', gap: '$4' }}
     >
-      <Sheet.Overlay
-        animation="lazy"
-        bg="rgba(0,0,0,0.6)"
-        enterStyle={{ opacity: 0 }}
-        exitStyle={{ opacity: 0 }}
-      />
-      <Sheet.Handle />
-      <Sheet.Frame padding="$5" gap="$4" h="$16">
-        <Text fontSize={16} fontWeight="600" color="$foreground">
-          날씨
+      <Text fontSize={16} fontWeight="600" color="$foreground">
+        날씨
+      </Text>
+      <XStack flexWrap="wrap" gap="$2">
+        {WEATHER_OPTIONS.map((opt) => (
+          <Pressable key={opt.key} onPress={() => setKeyDraft(opt.key)}>
+            <YStack
+              alignItems="center"
+              justifyContent="center"
+              width={42}
+              height={42}
+              borderRadius={8}
+              backgroundColor={keyDraft === opt.key ? '$accent' : 'transparent'}
+            >
+              <opt.Icon size={22} color="$foreground" />
+            </YStack>
+          </Pressable>
+        ))}
+      </XStack>
+      <XStack alignItems="center" gap="$2">
+        <Input
+          flex={1}
+          placeholder="온도"
+          value={tempDraft}
+          onChangeText={(val) => setTempDraft(val.replace(/[^0-9.-]/g, ''))}
+          keyboardType="numeric"
+          onSubmitEditing={handleConfirm}
+          inputMode="numeric"
+        />
+        <Text fontSize={15} color="$foreground">
+          °C
         </Text>
-        <XStack flexWrap="wrap" gap="$2">
-          {WEATHER_OPTIONS.map((opt) => (
-            <Pressable key={opt.key} onPress={() => setKeyDraft(opt.key)}>
-              <YStack
-                alignItems="center"
-                justifyContent="center"
-                width={42}
-                height={42}
-                borderRadius={8}
-                backgroundColor={keyDraft === opt.key ? '$accent' : 'transparent'}
-              >
-                <opt.Icon size={22} color="$foreground" />
-              </YStack>
-            </Pressable>
-          ))}
-        </XStack>
-        <XStack alignItems="center" gap="$2">
-          <Input
-            flex={1}
-            placeholder="온도"
-            value={tempDraft}
-            onChangeText={(val) => setTempDraft(val.replace(/[^0-9.-]/g, ''))}
-            keyboardType="numeric"
-            onSubmitEditing={handleConfirm}
-            inputMode="numeric"
-          />
-          <Text fontSize={15} color="$foreground">
-            °C
-          </Text>
-        </XStack>
-        <FilledButton onPress={handleConfirm}>확인</FilledButton>
-      </Sheet.Frame>
-    </Sheet>
+      </XStack>
+      <FilledButton onPress={handleConfirm}>확인</FilledButton>
+    </AppBottomSheet>
   );
 }

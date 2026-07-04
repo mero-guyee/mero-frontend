@@ -2,12 +2,12 @@ import { paddingHorizontalGeneral } from '@/constants/theme';
 import { Backpack, Pencil, Plus, Trash2, Wallet } from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Sheet, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { useBudgets, useExpenses, useSyncContext, useTrips } from '../../contexts';
 import { CURRENCY_NAMES, CURRENCY_SYMBOLS } from '../../data/constants';
 import { Budget } from '../../types';
 import { EmptyState, FilledButton, Input } from '../ui';
+import AppBottomSheet from '../ui/AppBottomSheet';
 import FloatingActionButton from '../ui/button/FloatingActionButton';
 import { YCard } from '../ui/Card';
 import { inputStyle } from '../ui/Input';
@@ -25,7 +25,6 @@ export function BudgetView() {
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [budgetForm, setBudgetForm] = useState({ currency: 'KRW', amount: '' });
   const [createdId, setCreatedId] = useState<string | null>(null);
-  const insets = useSafeAreaInsets();
 
   const filteredBudgets = budgets.filter((b) => !activeTrip || b.tripId === activeTrip);
   const filteredExpenses = expenses.filter((e) => !activeTrip || e.tripId === activeTrip);
@@ -240,64 +239,53 @@ export function BudgetView() {
         </FloatingActionButton>
       )}
 
-      <Sheet
-        modal
+      <AppBottomSheet
         open={showBudgetModal}
         onOpenChange={(open: boolean) => !open && handleCloseBudgetModal()}
-        snapPointsMode="fit"
-        dismissOnSnapToBottom
+        frameProps={{ padding: '$5', gap: '$4' }}
       >
-        <Sheet.Overlay
-          animation="lazy"
-          bg="rgba(0,0,0,0.6)"
-          enterStyle={{ opacity: 0 }}
-          exitStyle={{ opacity: 0 }}
-        />
-        <Sheet.Handle />
-        <Sheet.Frame padding="$5" gap="$4" paddingBottom={insets.bottom || 8}>
-          <Text color="$foreground" fontSize={18} fontWeight="600">
-            {editingBudget ? '예산 수정' : '예산 추가'}
+        <Text color="$foreground" fontSize={18} fontWeight="600">
+          {editingBudget ? '예산 수정' : '예산 추가'}
+        </Text>
+
+        <YStack>
+          <Text color="$mutedForeground" marginBottom="$2">
+            예산 금액
           </Text>
-
-          <YStack>
-            <Text color="$mutedForeground" marginBottom="$2">
-              예산 금액
-            </Text>
-            <XStack {...inputStyle} alignItems="center" paddingHorizontal="$0">
-              <Input
-                flex={1}
-                placeholder="0"
-                placeholderTextColor="$placeholderForeground"
-                value={budgetForm.amount}
-                onChangeText={(text) => setBudgetForm({ ...budgetForm, amount: text })}
-                keyboardType="numeric"
-                color="$foreground"
-                borderWidth={0}
-                height={44}
-                focusStyle={{ borderWidth: 0 }}
-              />
-              <CurrencyPicker
-                value={budgetForm.currency}
-                onChange={(currency) => setBudgetForm({ ...budgetForm, currency })}
-              />
-            </XStack>
-          </YStack>
-
-          <XStack gap="$3">
-            <FilledButton
+          <XStack {...inputStyle} alignItems="center" paddingHorizontal="$0">
+            <Input
               flex={1}
-              backgroundColor="$muted"
-              pressStyle={{ backgroundColor: '$secondary' }}
-              onPress={handleCloseBudgetModal}
-            >
-              <Text color="$foreground">취소</Text>
-            </FilledButton>
-            <FilledButton flex={1} onPress={handleSaveBudget}>
-              <Text color="$foreground">{editingBudget ? '수정' : '추가'}</Text>
-            </FilledButton>
+              placeholder="0"
+              placeholderTextColor="$placeholderForeground"
+              value={budgetForm.amount}
+              onChangeText={(text) => setBudgetForm({ ...budgetForm, amount: text })}
+              keyboardType="numeric"
+              color="$foreground"
+              borderWidth={0}
+              height={44}
+              focusStyle={{ borderWidth: 0 }}
+            />
+            <CurrencyPicker
+              value={budgetForm.currency}
+              onChange={(currency) => setBudgetForm({ ...budgetForm, currency })}
+            />
           </XStack>
-        </Sheet.Frame>
-      </Sheet>
+        </YStack>
+
+        <XStack gap="$3">
+          <FilledButton
+            flex={1}
+            backgroundColor="$muted"
+            pressStyle={{ backgroundColor: '$secondary' }}
+            onPress={handleCloseBudgetModal}
+          >
+            <Text color="$foreground">취소</Text>
+          </FilledButton>
+          <FilledButton flex={1} onPress={handleSaveBudget}>
+            <Text color="$foreground">{editingBudget ? '수정' : '추가'}</Text>
+          </FilledButton>
+        </XStack>
+      </AppBottomSheet>
     </YStack>
   );
 }

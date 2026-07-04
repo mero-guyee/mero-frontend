@@ -1,9 +1,10 @@
+import AppBottomSheet from '@/components/ui/AppBottomSheet';
 import { inputStyle } from '@/components/ui/Input';
 import { ExpenseCategory } from '@/types';
 import { ChevronRight } from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { Pressable, ScrollView } from 'react-native';
-import { Sheet, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { CategoryIcon } from './CategoryIcon';
 
 interface Props {
@@ -33,53 +34,49 @@ export default function CategoryPicker({ categories, value, onChange, renderTrig
         </Pressable>
       )}
 
-      <Sheet open={open} onOpenChange={setOpen} snapPoints={[50]} dismissOnSnapToBottom modal>
-        <Sheet.Overlay />
-        <Sheet.Frame padding="$4">
-          <Sheet.Handle />
-          <Text color="$foreground" fontWeight="600" fontSize={16} marginBottom="$4" marginTop="$2">
-            카테고리 선택
-          </Text>
-          <ScrollView>
-            <YStack gap="$1">
-              {categories.map((cat) => (
-                <Pressable
-                  key={cat.id}
-                  onPress={() => {
-                    onChange(cat.id);
-                    setOpen(false);
-                  }}
+      <AppBottomSheet open={open} onOpenChange={setOpen} frameProps={{ padding: '$4' }}>
+        <Text color="$foreground" fontWeight="600" fontSize={16} marginBottom="$4" marginTop="$2">
+          카테고리 선택
+        </Text>
+        <ScrollView>
+          <YStack gap="$1">
+            {categories.map((cat) => (
+              <Pressable
+                key={cat.id}
+                onPress={() => {
+                  onChange(cat.id);
+                  setOpen(false);
+                }}
+              >
+                <XStack
+                  paddingHorizontal="$3"
+                  paddingVertical="$3"
+                  borderRadius="$3"
+                  backgroundColor={value === cat.id ? '$accent' : 'transparent'}
+                  alignItems="center"
+                  justifyContent="space-between"
                 >
-                  <XStack
-                    paddingHorizontal="$3"
-                    paddingVertical="$3"
-                    borderRadius="$3"
-                    backgroundColor={value === cat.id ? '$accent' : 'transparent'}
-                    alignItems="center"
-                    justifyContent="space-between"
-                  >
-                    <XStack alignItems="center" gap="$2">
-                      <CategoryIcon name={cat.name} size={18} />
-                      <Text
-                        color="$foreground"
-                        fontSize={15}
-                        fontWeight={value === cat.id ? '600' : '400'}
-                      >
-                        {cat.name}
-                      </Text>
-                    </XStack>
-                    {value === cat.id && (
-                      <Text color="$foreground" fontSize={14}>
-                        ✓
-                      </Text>
-                    )}
+                  <XStack alignItems="center" gap="$2">
+                    <CategoryIcon name={cat.name} size={18} />
+                    <Text
+                      color="$foreground"
+                      fontSize={15}
+                      fontWeight={value === cat.id ? '600' : '400'}
+                    >
+                      {cat.name}
+                    </Text>
                   </XStack>
-                </Pressable>
-              ))}
-            </YStack>
-          </ScrollView>
-        </Sheet.Frame>
-      </Sheet>
+                  {value === cat.id && (
+                    <Text color="$foreground" fontSize={14}>
+                      ✓
+                    </Text>
+                  )}
+                </XStack>
+              </Pressable>
+            ))}
+          </YStack>
+        </ScrollView>
+      </AppBottomSheet>
     </>
   );
 }

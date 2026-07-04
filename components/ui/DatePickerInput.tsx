@@ -3,8 +3,8 @@ import { isIos } from '@/utils/platform';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import { Pressable } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Sheet, Text, XStack } from 'tamagui';
+import { Text, XStack } from 'tamagui';
+import AppBottomSheet from './AppBottomSheet';
 import { inputStyle } from './Input';
 import { FilledButton } from './button/BaseButton';
 
@@ -23,7 +23,6 @@ export default function DatePickerInput({
 }: DatePickerInputProps) {
   const [show, setShow] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(value ? new Date(value) : new Date());
-  const insets = useSafeAreaInsets();
 
   const handleOpen = () => {
     setTempDate(value ? new Date(value) : new Date());
@@ -59,31 +58,23 @@ export default function DatePickerInput({
       )}
 
       {isIos() ? (
-        <Sheet modal open={show} onOpenChange={setShow} snapPointsMode="fit" dismissOnSnapToBottom>
-          <Sheet.Overlay
-            animation="lazy"
-            bg="rgba(0,0,0,0.5)"
-            enterStyle={{ opacity: 0 }}
-            exitStyle={{ opacity: 0 }}
+        <AppBottomSheet
+          open={show}
+          onOpenChange={setShow}
+          frameProps={{ paddingHorizontal: paddingHorizontalGeneral * 2 }}
+        >
+          <DateTimePicker
+            value={tempDate}
+            mode="date"
+            display="spinner"
+            onChange={handleSpinnerChange}
+            style={{ height: 200 }}
           />
-          <Sheet.Handle />
-          <Sheet.Frame
-            paddingBottom={insets.bottom || 8}
-            paddingHorizontal={paddingHorizontalGeneral * 2}
-          >
-            <DateTimePicker
-              value={tempDate}
-              mode="date"
-              display="spinner"
-              onChange={handleSpinnerChange}
-              style={{ height: 200 }}
-            />
 
-            <FilledButton color="$accent" fontWeight="600" fontSize={16} onPress={handleConfirm}>
-              <Text>완료</Text>
-            </FilledButton>
-          </Sheet.Frame>
-        </Sheet>
+          <FilledButton color="$accent" fontWeight="600" fontSize={16} onPress={handleConfirm}>
+            <Text>완료</Text>
+          </FilledButton>
+        </AppBottomSheet>
       ) : (
         show && (
           <DateTimePicker
