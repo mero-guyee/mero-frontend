@@ -16,7 +16,6 @@ interface FootprintMapModalProps {
 }
 
 export default function FootprintMapModal({ visible, onClose, footprint }: FootprintMapModalProps) {
-  console.log(footprint);
   const { getExpensesByFootprintId } = useExpenses();
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const { data: photos = [] } = useFootprintPhotosQuery(footprint?.id ?? '');
@@ -31,10 +30,7 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
     const result: { type: 'text' | 'photo'; content: string }[] = [];
     const photoUris = photos.map((p: FootprintPhoto) => p.s3Url || p.localUri);
 
-    const photoInterval = Math.max(
-      1,
-      Math.floor(paragraphs.length / (photoUris.length + 1))
-    );
+    const photoInterval = Math.max(1, Math.floor(paragraphs.length / (photoUris.length + 1)));
     let photoIndex = 0;
 
     paragraphs.forEach((paragraph, idx) => {
