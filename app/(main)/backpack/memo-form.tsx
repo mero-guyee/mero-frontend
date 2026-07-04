@@ -63,6 +63,8 @@ export default function MemoFormScreen() {
               placeholderTextColor="$placeholderForeground"
               value={title}
               onChangeText={setTitle}
+              fontSize={20}
+              fontWeight="600"
               color="$foreground"
               borderWidth={0}
               padding={0}
