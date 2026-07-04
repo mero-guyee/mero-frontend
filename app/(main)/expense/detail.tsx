@@ -8,9 +8,9 @@ import DatePickerInput from '@/components/ui/DatePickerInput';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { formatGeocode } from '@/utils/location/location';
-import { ChevronRight, Trash2 } from '@tamagui/lucide-icons';
+import { ChevronRight, Pencil, Trash2 } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { ComponentRef, useRef, useState } from 'react';
 import { Alert, Pressable } from 'react-native';
 import { ScrollView, Text, XStack, YStack } from 'tamagui';
 import { useExpenses } from '../../../contexts';
@@ -64,6 +64,8 @@ export default function ExpenseDetailScreen() {
   const [tempCurrency] = useState(expense?.currency ?? 'KRW');
   const [tempDescription, setTempDescription] = useState(expense?.description ?? '');
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
+  const amountInputRef = useRef<ComponentRef<typeof Input>>(null);
+  const descriptionInputRef = useRef<ComponentRef<typeof Input>>(null);
 
   const getCurrencySymbol = (currency: string) => CURRENCY_SYMBOLS[currency] || currency;
 
@@ -142,6 +144,7 @@ export default function ExpenseDetailScreen() {
                   {getCurrencySymbol(tempCurrency)}
                 </Text>
                 <Input
+                  ref={amountInputRef}
                   {...plainInputStyle}
                   color="$foreground"
                   fontSize={16}
@@ -153,6 +156,9 @@ export default function ExpenseDetailScreen() {
                   placeholder="0"
                   placeholderTextColor="$placeholderForeground"
                 />
+                <Pressable onPress={() => amountInputRef.current?.focus()} hitSlop={8}>
+                  <Pencil size={14} color="$mutedForeground" />
+                </Pressable>
               </XStack>
             </XStack>
             {/* Category */}
@@ -196,6 +202,7 @@ export default function ExpenseDetailScreen() {
                 설명
               </Text>
               <Input
+                ref={descriptionInputRef}
                 {...plainInputStyle}
                 flex={1}
                 color="$foreground"
@@ -207,6 +214,9 @@ export default function ExpenseDetailScreen() {
                 placeholder="맛있게 먹었으니 0원"
                 placeholderTextColor="$placeholderForeground"
               />
+              <Pressable onPress={() => descriptionInputRef.current?.focus()} hitSlop={8}>
+                <Pencil size={14} color="$mutedForeground" />
+              </Pressable>
             </XStack>
 
             {/* Location */}

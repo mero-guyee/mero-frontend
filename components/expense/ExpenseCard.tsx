@@ -28,12 +28,12 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
         backgroundColor="$muted"
         borderRadius="$4"
         padding="$4"
-        alignItems="center"
+        alignItems="flex-start"
         justifyContent="space-between"
         position="relative"
       >
         {showSyncBadge && <SyncingResultBadge id={expense.id} />}
-        <XStack alignItems="center" gap="$3">
+        <XStack alignItems="flex-start" gap="$3">
           <YStack
             width={44}
             height={44}
@@ -44,7 +44,7 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
           >
             <CategoryIcon name={expense.categoryName!} size={18} />
           </YStack>
-          <YStack>
+          <YStack gap="$1">
             <Text color="$mutedForeground">{expense.categoryName}</Text>
             <Text color="$foreground">{expense.description || '-'}</Text>
           </YStack>
