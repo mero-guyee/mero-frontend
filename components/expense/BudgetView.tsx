@@ -1,4 +1,5 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
+import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
 import { Backpack, Pencil, Plus, Trash2, Wallet } from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
@@ -13,21 +14,31 @@ import { YCard } from '../ui/Card';
 import { inputStyle } from '../ui/Input';
 import { SyncIndicator } from '../ui/SyncIndicator';
 import { SyncingResultBadge } from '../ui/SyncingResultBadge';
-import CurrencyPicker from './CurrencyPicker';
+import CurrencyPicker, { CURRENCIES } from './CurrencyPicker';
 
 export function BudgetView() {
   const { activeTrip } = useTrips();
   const { expenses } = useExpenses();
   const { budgets, addBudget, updateBudget, deleteBudget } = useBudgets();
   const { isSyncing } = useSyncContext();
-
-  const [showBudgetModal, setShowBudgetModal] = useState(false);
-  const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
-  const [budgetForm, setBudgetForm] = useState({ currency: 'KRW', amount: '' });
-  const [createdId, setCreatedId] = useState<string | null>(null);
+  const isKeyboardVisible = useKeyboardVisible();
 
   const filteredBudgets = budgets.filter((b) => !activeTrip || b.tripId === activeTrip);
   const filteredExpenses = expenses.filter((e) => !activeTrip || e.tripId === activeTrip);
+
+  const getDefaultCurrency = () => {
+    const usedCurrencies = filteredBudgets.map((b) => b.currency);
+    return CURRENCIES.find((c) => !usedCurrencies.includes(c)) || CURRENCIES[0];
+  };
+
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
+  const [budgetForm, setBudgetForm] = useState({ currency: getDefaultCurrency(), amount: '' });
+  const [createdId, setCreatedId] = useState<string | null>(null);
+
+  const usedCurrencies = filteredBudgets
+    .filter((b) => b.id !== editingBudget?.id)
+    .map((b) => b.currency);
 
   const expensesByCurrency = filteredExpenses.reduce(
     (acc, expense) => {
@@ -46,7 +57,7 @@ export function BudgetView() {
       setBudgetForm({ currency: budget.currency, amount: budget.amount.toString() });
     } else {
       setEditingBudget(null);
-      setBudgetForm({ currency: 'KRW', amount: '' });
+      setBudgetForm({ currency: getDefaultCurrency(), amount: '' });
     }
     setShowBudgetModal(true);
   };
@@ -54,7 +65,7 @@ export function BudgetView() {
   const handleCloseBudgetModal = () => {
     setShowBudgetModal(false);
     setEditingBudget(null);
-    setBudgetForm({ currency: 'USD', amount: '' });
+    setBudgetForm({ currency: getDefaultCurrency(), amount: '' });
   };
 
   const handleSaveBudget = async () => {
@@ -242,6 +253,7 @@ export function BudgetView() {
       <AppBottomSheet
         open={showBudgetModal}
         onOpenChange={(open: boolean) => !open && handleCloseBudgetModal()}
+        dismissOnOverlayPress={!isKeyboardVisible}
         frameProps={{ padding: '$5', gap: '$4' }}
       >
         <Text color="$foreground" fontSize={18} fontWeight="600">
@@ -268,6 +280,7 @@ export function BudgetView() {
             <CurrencyPicker
               value={budgetForm.currency}
               onChange={(currency) => setBudgetForm({ ...budgetForm, currency })}
+              disabledCurrencies={usedCurrencies}
             />
           </XStack>
         </YStack>
