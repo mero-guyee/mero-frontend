@@ -1,5 +1,6 @@
 import { CategoryIcon } from '@/components/expense/CategoryIcon';
 import CategoryPicker from '@/components/expense/CategoryPicker';
+import CurrencyPicker from '@/components/expense/CurrencyPicker';
 import LocationPicker from '@/components/location/LocationPicker';
 import { Input } from '@/components/ui';
 import { IconButton } from '@/components/ui/button/BaseButton';
@@ -12,9 +13,8 @@ import { ChevronRight, Pencil, Trash2 } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { ComponentRef, useRef, useState } from 'react';
 import { Alert, Pressable } from 'react-native';
-import { ScrollView, Text, XStack, YStack } from 'tamagui';
+import { ScrollView, Stack, Text, XStack, YStack } from 'tamagui';
 import { useExpenses } from '../../../contexts';
-import { CURRENCY_SYMBOLS } from '../../../data/constants';
 
 const plainInputStyle = {
   borderWidth: 0,
@@ -61,13 +61,9 @@ export default function ExpenseDetailScreen() {
   const expense = expenses.find((e) => e.id === expenseId);
 
   const [tempAmount, setTempAmount] = useState(expense?.amount?.toString() ?? '');
-  const [tempCurrency] = useState(expense?.currency ?? 'KRW');
   const [tempDescription, setTempDescription] = useState(expense?.description ?? '');
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
-  const amountInputRef = useRef<ComponentRef<typeof Input>>(null);
   const descriptionInputRef = useRef<ComponentRef<typeof Input>>(null);
-
-  const getCurrencySymbol = (currency: string) => CURRENCY_SYMBOLS[currency] || currency;
 
   if (!expense) {
     return (
@@ -139,12 +135,8 @@ export default function ExpenseDetailScreen() {
               <Text color="$mutedForeground" fontSize={13} fontWeight="500">
                 금액
               </Text>
-              <XStack alignItems="center" gap="$1" flex={1} justifyContent="flex-end">
-                <Text color="$foreground" fontSize={16}>
-                  {getCurrencySymbol(tempCurrency)}
-                </Text>
+              <XStack alignItems="center" gap="$0.5" flex={1} justifyContent="flex-end">
                 <Input
-                  ref={amountInputRef}
                   {...plainInputStyle}
                   color="$foreground"
                   fontSize={16}
@@ -156,9 +148,12 @@ export default function ExpenseDetailScreen() {
                   placeholder="0"
                   placeholderTextColor="$placeholderForeground"
                 />
-                <Pressable onPress={() => amountInputRef.current?.focus()} hitSlop={8}>
-                  <Pencil size={14} color="$mutedForeground" />
-                </Pressable>
+                <Stack style={{ marginRight: -9 }}>
+                  <CurrencyPicker
+                    value={expense.currency}
+                    onChange={(currency) => updateExpense({ ...expense, currency })}
+                  />
+                </Stack>
               </XStack>
             </XStack>
             {/* Category */}
