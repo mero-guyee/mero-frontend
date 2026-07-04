@@ -11,7 +11,7 @@ import {
   Wind,
 } from '@tamagui/lucide-icons';
 import { useEffect, useState } from 'react';
-import { Pressable } from 'react-native';
+import { Keyboard, Pressable } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 
 export const WEATHER_ICON_MAP: Record<
@@ -54,6 +54,7 @@ export default function WeatherSheet({
 }: WeatherSheetProps) {
   const [keyDraft, setKeyDraft] = useState('');
   const [tempDraft, setTempDraft] = useState('');
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -62,6 +63,15 @@ export default function WeatherSheet({
       setTempDraft(parts[1]?.replace('°C', '') || '');
     }
   }, [open]);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener('keyboardDidShow', () => setIsKeyboardVisible(true));
+    const hideSub = Keyboard.addListener('keyboardDidHide', () => setIsKeyboardVisible(false));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const handleConfirm = () => {
     if (!keyDraft) {
@@ -76,6 +86,7 @@ export default function WeatherSheet({
     <AppBottomSheet
       open={open}
       onOpenChange={onOpenChange}
+      dismissOnOverlayPress={!isKeyboardVisible}
       frameProps={{ padding: '$5', gap: '$4' }}
     >
       <Text fontSize={16} fontWeight="600" color="$foreground">

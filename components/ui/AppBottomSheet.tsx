@@ -1,4 +1,5 @@
 import { ComponentProps, ReactNode } from 'react';
+import { Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Sheet } from 'tamagui';
 
@@ -10,6 +11,7 @@ interface AppBottomSheetProps {
   children: ReactNode;
   snapPoints?: number[];
   dismissOnSnapToBottom?: boolean;
+  dismissOnOverlayPress?: boolean;
   frameProps?: FrameProps;
 }
 
@@ -19,6 +21,7 @@ export default function AppBottomSheet({
   children,
   snapPoints,
   dismissOnSnapToBottom = true,
+  dismissOnOverlayPress,
   frameProps,
 }: AppBottomSheetProps) {
   const insets = useSafeAreaInsets();
@@ -31,12 +34,14 @@ export default function AppBottomSheet({
       snapPointsMode={snapPoints ? undefined : 'fit'}
       snapPoints={snapPoints}
       dismissOnSnapToBottom={dismissOnSnapToBottom}
+      dismissOnOverlayPress={dismissOnOverlayPress}
     >
       <Sheet.Overlay
         animation="lazy"
         bg="rgba(0,0,0,0.6)"
         enterStyle={{ opacity: 0 }}
         exitStyle={{ opacity: 0 }}
+        onPress={() => Keyboard.dismiss()}
       />
       <Sheet.Handle />
       <Sheet.Frame paddingBottom={insets.bottom || 8} {...frameProps}>
