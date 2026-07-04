@@ -1,4 +1,5 @@
 import { CategoryIcon } from '@/components/expense/CategoryIcon';
+import { XCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { useSyncContext } from '@/contexts';
@@ -24,7 +25,7 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
         router.push({ pathname: '/expense/detail', params: { expenseId: expense.id } })
       }
     >
-      <XStack
+      <XCard
         backgroundColor="$muted"
         borderRadius="$4"
         padding="$4"
@@ -55,7 +56,7 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
             {getCurrencySymbol(expense.currency)} {expense.amount.toLocaleString()}
           </Text>
         </XStack>
-      </XStack>
+      </XCard>
     </Pressable>
   );
 }
