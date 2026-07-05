@@ -94,6 +94,7 @@ const tokens = createTokens({
     primaryHover: '#88B3C3',
     secondaryHover: '#D5C5A8',
     destructiveHover: '#D88B7F',
+    backgroundPressLight: 'rgba(245, 239, 224, 0.25)',
   },
   space: {
     0: 0,
@@ -244,6 +245,7 @@ export const config = createTamagui({
       // 호버/프레스 색상
       accentHover: tokens.color.accentHover,
       primaryHover: tokens.color.primaryHover,
+      backgroundPressLight: tokens.color.backgroundPressLight,
     },
   },
   animations,

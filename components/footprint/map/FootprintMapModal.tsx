@@ -1,5 +1,6 @@
 import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { CircularButton } from '@/components/ui';
+import { YCard } from '@/components/ui/Card';
 import { useExpenses } from '@/contexts';
 import { useFootprintPhotosQuery } from '@/hooks/queries/useFootprints';
 import { Footprint, FootprintPhoto } from '@/types';
@@ -167,13 +168,7 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
                         사용한 돈
                       </Text>
                       {expenses.length > 0 ? (
-                        <YStack
-                          backgroundColor="$card"
-                          borderRadius="$4"
-                          borderWidth={1}
-                          borderColor="$border"
-                          overflow="hidden"
-                        >
+                        <YCard borderWidth={1} borderColor="$border">
                           {expenses.map((expense, index) => (
                             <YStack
                               key={expense.id}
@@ -197,18 +192,16 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
                               </Text>
                             </XStack>
                           </YStack>
-                        </YStack>
+                        </YCard>
                       ) : (
-                        <YStack
-                          backgroundColor="$card"
-                          borderRadius="$4"
+                        <YCard
                           padding="$4"
                           alignItems="center"
                           borderWidth={1}
                           borderColor="$border"
                         >
                           <Text color="$mutedForeground">지출 기록이 없습니다</Text>
-                        </YStack>
+                        </YCard>
                       )}
                     </YStack>
                   </>

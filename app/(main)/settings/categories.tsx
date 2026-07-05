@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 import { CircularButton, FilledButton } from '../../../components/ui';
+import { XCard } from '../../../components/ui/Card';
 import { useExpenses } from '../../../contexts';
 
 export default function CategoryManagerScreen() {
@@ -56,10 +57,8 @@ export default function CategoryManagerScreen() {
         <YStack gap="$2">
           {categories.map((category) => {
             return (
-              <XStack
+              <XCard
                 key={category.id}
-                backgroundColor="$card"
-                borderRadius="$4"
                 padding="$4"
                 alignItems="center"
                 gap="$3"
@@ -108,7 +107,7 @@ export default function CategoryManagerScreen() {
                     )}
                   </XStack>
                 )}
-              </XStack>
+              </XCard>
             );
           })}
         </YStack>
