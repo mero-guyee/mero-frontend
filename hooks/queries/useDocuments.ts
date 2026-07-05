@@ -1,11 +1,24 @@
 import { ApiError } from '@/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import * as Crypto from 'expo-crypto';
+import { Directory, File, Paths } from 'expo-file-system';
 import { documentsApi } from '../../api/documents';
 import { tripsApi } from '../../api/trips';
 import { useDb } from '../../providers/DatabaseProvider';
 import { DocumentRepository, TripRepository } from '../../repositories';
 import { TripDocumentFile } from '../../types';
 import { documentKeys } from './queryKeys';
+
+function persistToDocumentDirectory(data: TripDocumentFile): TripDocumentFile {
+  const documentsDir = new Directory(Paths.document, 'documents');
+  if (!documentsDir.exists) {
+    documentsDir.create({ intermediates: true });
+  }
+  const ext = data.fileName.split('.').pop();
+  const newFile = new File(documentsDir, `${Crypto.randomUUID()}.${ext}`);
+  new File(data.fileUri).copy(newFile);
+  return { fileName: data.fileName, fileUri: newFile.uri };
+}
 
 export function useDocumentsQuery(tripId: string) {
   const db = useDb();
@@ -21,7 +34,9 @@ export function useDocumentsQuery(tripId: string) {
           const trip = await tripRepo.getTripById(tripId);
           if (trip?.serverId) {
             const serverTrip = await tripsApi.getById(parseInt(trip.serverId));
-            await Promise.all(serverTrip.documents.map((doc) => docRepo.upsertFromServer(tripId, doc)));
+            await Promise.all(
+              serverTrip.documents.map((doc) => docRepo.upsertFromServer(tripId, doc))
+            );
             const fresh = await docRepo.findByTripId(tripId);
             qc.setQueryData(documentKeys.byTrip(tripId), fresh);
           }
@@ -43,7 +58,8 @@ export function useCreateDocument() {
     mutationFn: async ({ tripId, data }: { tripId: string; data: TripDocumentFile }) => {
       const docRepo = new DocumentRepository(db);
       const tripRepo = new TripRepository(db);
-      const doc = await docRepo.createDocument(tripId, data);
+      const persisted = persistToDocumentDirectory(data);
+      const doc = await docRepo.createDocument(tripId, persisted);
 
       (async () => {
         try {
@@ -81,6 +97,10 @@ export function useDeleteDocument() {
       const tripRepo = new TripRepository(db);
       const doc = await docRepo.findById(id);
       await docRepo.delete(id);
+      if (doc?.fileUri) {
+        const file = new File(doc.fileUri);
+        if (file.exists) file.delete();
+      }
 
       (async () => {
         try {

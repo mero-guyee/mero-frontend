@@ -63,8 +63,8 @@ export class DocumentRepository extends BaseRepository<DocumentRow> {
     );
     if (existing) {
       await this.db.runAsync(
-        `UPDATE documents SET fileName=?, fileUri=?, fileSize=?, updatedAt=datetime('now'), syncStatus='synced' WHERE id=?`,
-        [serverDoc.fileName, serverDoc.fileUri, serverDoc.fileSize ?? null, existing.id]
+        `UPDATE documents SET fileName=?, fileSize=?, updatedAt=datetime('now'), syncStatus='synced' WHERE id=?`,
+        [serverDoc.fileName, serverDoc.fileSize ?? null, existing.id]
       );
     } else {
       const id = Crypto.randomUUID();
