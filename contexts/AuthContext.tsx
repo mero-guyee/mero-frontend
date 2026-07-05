@@ -1,7 +1,7 @@
 import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
 import { useRouter } from 'expo-router';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { authApi, tokenStorage } from '../api';
+import { authApi, setAuthExpiredHandler, tokenStorage } from '../api';
 
 GoogleSignin.configure({
   webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
@@ -31,6 +31,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (token) setIsAuthenticated(true);
       })
       .finally(() => setIsLoading(false));
+  }, []);
+
+  useEffect(() => {
+    setAuthExpiredHandler(() => setIsAuthenticated(false));
+    return () => setAuthExpiredHandler(null);
   }, []);
 
   const login = async ({ email, password }: { email: string; password: string }) => {

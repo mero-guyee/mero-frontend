@@ -12,6 +12,13 @@ export class ApiError extends Error {
   }
 }
 
+type AuthExpiredHandler = () => void;
+let authExpiredHandler: AuthExpiredHandler | null = null;
+
+export function setAuthExpiredHandler(handler: AuthExpiredHandler | null) {
+  authExpiredHandler = handler;
+}
+
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
 
@@ -36,6 +43,7 @@ async function refreshAccessToken(): Promise<string | null> {
     });
     if (!res.ok) {
       await tokenStorage.clearTokens();
+      authExpiredHandler?.();
       return null;
     }
     const data = await res.json();
@@ -45,6 +53,7 @@ async function refreshAccessToken(): Promise<string | null> {
     return newAccessToken;
   } catch {
     await tokenStorage.clearTokens();
+    authExpiredHandler?.();
     return null;
   }
 }

@@ -11,7 +11,7 @@ export type {
 export { budgetsApi } from './budgets';
 export type { BudgetCreateRequest, BudgetResponse, BudgetUpdateRequest } from './budgets';
 
-export { ApiError, apiRequest, BASE_URL } from './client';
+export { ApiError, apiRequest, BASE_URL, setAuthExpiredHandler } from './client';
 export { tokenStorage } from './tokenStorage';
 
 export { expenseCategoriesApi, expensesApi } from './expenses';
