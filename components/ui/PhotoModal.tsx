@@ -1,5 +1,6 @@
-import { Modal, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import { Image } from 'tamagui';
+import { MediaModal } from './MediaModal';
 
 interface PhotoModalProps {
   uri: string | null;
@@ -8,7 +9,7 @@ interface PhotoModalProps {
 
 export function PhotoModal({ uri, onClose }: PhotoModalProps) {
   return (
-    <Modal visible={!!uri} transparent animationType="fade" onRequestClose={onClose}>
+    <MediaModal visible={!!uri} onClose={onClose}>
       <Pressable
         style={{
           flex: 1,
@@ -26,6 +27,6 @@ export function PhotoModal({ uri, onClose }: PhotoModalProps) {
           />
         )}
       </Pressable>
-    </Modal>
+    </MediaModal>
   );
 }
