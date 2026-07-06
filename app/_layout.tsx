@@ -26,11 +26,11 @@ import config from '../tamagui.config';
 
 Sentry.init({
   dsn: 'https://d3584d51d314d552ed61e55ddd8405a3@o4511688550449152.ingest.us.sentry.io/4511688553136128',
-  sendDefaultPii: true,
   enableLogs: true,
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1,
-  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+  tracesSampleRate: __DEV__ ? 1.0 : 0.2,
+  replaysSessionSampleRate: 0,
+  replaysOnErrorSampleRate: __DEV__ ? 1.0 : 0.5,
+  integrations: [Sentry.mobileReplayIntegration()],
 });
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
