@@ -8,28 +8,39 @@ import {
   Image,
   Trash2,
 } from '@tamagui/lucide-icons';
+import * as Sharing from 'expo-sharing';
 import { Pressable } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 
-const IMAGE_EXTENSIONS = new Set(['jpg', 'jpeg', 'png']);
+interface FileTypeConfig {
+  icon: React.ComponentType<{ size?: number; color?: string }>;
+  mime?: string;
+  ctg?: 'image' | 'pdf';
+}
 
-const EXTENSION_ICONS: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
-  pdf: FileText,
-  doc: FileText,
-  docx: FileText,
-  txt: FileText,
-  jpg: Image,
-  jpeg: Image,
-  png: Image,
-  xlsx: FileSpreadsheet,
-  csv: FileSpreadsheet,
-  md: FileCode,
-  zip: Archive,
+const FILE_TYPES: Record<string, FileTypeConfig> = {
+  pdf: { icon: FileText, mime: 'application/pdf', ctg: 'pdf' },
+  doc: { icon: FileText, mime: 'application/msword' },
+  docx: {
+    icon: FileText,
+    mime: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  },
+  txt: { icon: FileText, mime: 'text/plain' },
+  jpg: { icon: Image, ctg: 'image' },
+  jpeg: { icon: Image, ctg: 'image' },
+  png: { icon: Image, ctg: 'image' },
+  xlsx: {
+    icon: FileSpreadsheet,
+    mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  },
+  csv: { icon: FileSpreadsheet, mime: 'text/csv' },
+  md: { icon: FileCode, mime: 'text/markdown' },
+  zip: { icon: Archive, mime: 'application/zip' },
 };
 
-function getIconByFileName(fileName: string) {
+function getFileType(fileName: string): FileTypeConfig | undefined {
   const ext = fileName.split('.').pop()?.toLowerCase() ?? '';
-  return EXTENSION_ICONS[ext] ?? File;
+  return FILE_TYPES[ext];
 }
 
 interface DocumentCardProps {
@@ -37,15 +48,36 @@ interface DocumentCardProps {
   fileUri: string;
   onRemove: () => void;
   onImagePress?: (uri: string) => void;
+  onPdfPress?: (uri: string) => void;
 }
 
-export function DocumentCard({ name, fileUri, onRemove, onImagePress }: DocumentCardProps) {
-  const IconComponent = getIconByFileName(name);
-  const ext = name.split('.').pop()?.toLowerCase() ?? '';
-  const isImage = IMAGE_EXTENSIONS.has(ext);
+export function DocumentCard({
+  name,
+  fileUri,
+  onRemove,
+  onImagePress,
+  onPdfPress,
+}: DocumentCardProps) {
+  const { icon: IconComponent = File, mime, ctg } = getFileType(name) ?? {};
+
+  const handlePress = async () => {
+    if (ctg === 'image') {
+      onImagePress?.(fileUri);
+      return;
+    }
+    if (ctg === 'pdf') {
+      onPdfPress?.(fileUri);
+      return;
+    }
+    if (!(await Sharing.isAvailableAsync())) return;
+    await Sharing.shareAsync(fileUri, {
+      mimeType: mime ?? 'application/octet-stream',
+      dialogTitle: name,
+    });
+  };
 
   return (
-    <Pressable onPress={isImage ? () => onImagePress?.(fileUri) : undefined}>
+    <Pressable onPress={handlePress}>
       <XCard
         backgroundColor="$card"
         borderRadius="$4"

@@ -1,4 +1,5 @@
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
+import { PdfModal } from '@/components/ui/PdfModal';
 import { PhotoModal } from '@/components/ui/PhotoModal';
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useTrips } from '@/contexts';
@@ -12,6 +13,7 @@ import EmptyDocuments from './EmptyDocuments';
 export function DocumentsTab({ tripId }: { tripId: string }) {
   const { createDocument, documents, deleteDocument } = useTrips();
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedPdf, setSelectedPdf] = useState<string | null>(null);
   const [isSourceSheetOpen, setIsSourceSheetOpen] = useState(false);
 
   return (
@@ -21,13 +23,14 @@ export function DocumentsTab({ tripId }: { tripId: string }) {
           <YStack>
             {documents.length > 0 ? (
               <YStack gap="$2">
-                {documents.map((doc, index) => (
+                {documents.map((doc) => (
                   <DocumentCard
-                    key={index}
+                    key={doc.id}
                     name={doc.fileName}
                     fileUri={doc.fileUri}
                     onRemove={() => deleteDocument(doc.id)}
                     onImagePress={setSelectedImage}
+                    onPdfPress={setSelectedPdf}
                   />
                 ))}
               </YStack>
@@ -44,6 +47,7 @@ export function DocumentsTab({ tripId }: { tripId: string }) {
         </XStack>
       </FloatingActionButton>
       <PhotoModal uri={selectedImage} onClose={() => setSelectedImage(null)} />
+      <PdfModal uri={selectedPdf} onClose={() => setSelectedPdf(null)} />
       <DocumentSourceSheet
         open={isSourceSheetOpen}
         onOpenChange={setIsSourceSheetOpen}
