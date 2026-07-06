@@ -1,4 +1,5 @@
 import { setNavigationColorByPath } from '@/utils/setNavigationColorByPath';
+import * as Sentry from '@sentry/react-native';
 import { TamaguiProvider } from '@tamagui/core';
 import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
@@ -22,6 +23,15 @@ import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
 import { QueryProvider } from '../providers/QueryProvider';
 import '../reactotron-config';
 import config from '../tamagui.config';
+
+Sentry.init({
+  dsn: 'https://d3584d51d314d552ed61e55ddd8405a3@o4511688550449152.ingest.us.sentry.io/4511688553136128',
+  sendDefaultPii: true,
+  enableLogs: true,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+});
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   useAuthGuard();
@@ -78,7 +88,7 @@ function AppContent() {
   );
 }
 
-export default function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
   const [fontsLoaded] = useFonts({
     'Pretendard-Regular': require('../assets/fonts/Pretendard-Regular.ttf'),
     'Pretendard-Medium': require('../assets/fonts/Pretendard-Medium.ttf'),
@@ -107,4 +117,4 @@ export default function RootLayout() {
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
-}
+});
