@@ -6,8 +6,8 @@ import { useTrips } from '@/contexts';
 import { Plus } from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { ScrollView, Text, XStack, YStack } from 'tamagui';
+import DocumentAddSheet from './DocumentAddSheet';
 import { DocumentCard } from './DocumentCard';
-import DocumentSourceSheet from './DocumentSourceSheet';
 import EmptyDocuments from './EmptyDocuments';
 
 export function DocumentsTab({ tripId }: { tripId: string }) {
@@ -48,7 +48,7 @@ export function DocumentsTab({ tripId }: { tripId: string }) {
       </FloatingActionButton>
       <PhotoModal uri={selectedImage} onClose={() => setSelectedImage(null)} />
       <PdfModal uri={selectedPdf} onClose={() => setSelectedPdf(null)} />
-      <DocumentSourceSheet
+      <DocumentAddSheet
         open={isSourceSheetOpen}
         onOpenChange={setIsSourceSheetOpen}
         onSelect={(file) => createDocument(tripId, file)}
