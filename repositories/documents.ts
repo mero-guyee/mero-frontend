@@ -1,4 +1,5 @@
 import * as Crypto from 'expo-crypto';
+import { Directory, File, Paths } from 'expo-file-system';
 import * as SQLite from 'expo-sqlite';
 import type { ServerTripDocument } from '../api/trips';
 import { TripDocument, TripDocumentFile } from '../types';
@@ -12,13 +13,18 @@ export interface DocumentRow extends BaseEntity {
   fileSize?: number | null;
 }
 
+function resolveAbsoluteFileUri(storedUri: string): string {
+  if (/^https?:\/\//.test(storedUri)) return storedUri;
+  return new File(new Directory(Paths.document, 'documents'), storedUri).uri;
+}
+
 function rowToDocument(row: DocumentRow): TripDocument {
   return {
     id: row.id,
     serverId: row.serverId ?? undefined,
     tripId: row.tripId,
     fileName: row.fileName,
-    fileUri: row.fileUri,
+    fileUri: resolveAbsoluteFileUri(row.fileUri),
     fileSize: row.fileSize ?? undefined,
   };
 }

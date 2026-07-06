@@ -9,15 +9,15 @@ import { DocumentRepository, TripRepository } from '../../repositories';
 import { TripDocumentFile } from '../../types';
 import { documentKeys } from './queryKeys';
 
-function persistToDocumentDirectory(data: TripDocumentFile): TripDocumentFile {
+function persistToDocumentDirectory(ogFile: TripDocumentFile): TripDocumentFile {
   const documentsDir = new Directory(Paths.document, 'documents');
   if (!documentsDir.exists) {
     documentsDir.create({ intermediates: true });
   }
-  const ext = data.fileName.split('.').pop();
+  const ext = ogFile.fileName.split('.').pop();
   const newFile = new File(documentsDir, `${Crypto.randomUUID()}.${ext}`);
-  new File(data.fileUri).copy(newFile);
-  return { fileName: data.fileName, fileUri: newFile.uri };
+  new File(ogFile.fileUri).copy(newFile);
+  return { fileName: ogFile.fileName, fileUri: newFile.name };
 }
 
 export function useDocumentsQuery(tripId: string) {
@@ -97,8 +97,9 @@ export function useDeleteDocument() {
       const tripRepo = new TripRepository(db);
       const doc = await docRepo.findById(id);
       await docRepo.delete(id);
-      if (doc?.fileUri) {
-        const file = new File(doc.fileUri);
+      const isLocalOnlyFile = doc?.fileUri && !/^https?:\/\//.test(doc.fileUri);
+      if (isLocalOnlyFile) {
+        const file = new File(new Directory(Paths.document, 'documents'), doc.fileUri);
         if (file.exists) file.delete();
       }
 
