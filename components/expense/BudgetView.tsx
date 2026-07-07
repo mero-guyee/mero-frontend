@@ -1,6 +1,14 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useKeyboardVisible } from '@/hooks/useKeyboardVisible';
-import { Backpack, Pencil, Plus, Trash2, Wallet } from '@tamagui/lucide-icons';
+import {
+  Backpack,
+  ChevronDown,
+  ChevronUp,
+  Pencil,
+  Plus,
+  Trash2,
+  Wallet,
+} from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
@@ -16,8 +24,11 @@ import { SyncIndicator } from '../ui/SyncIndicator';
 import { SyncingResultBadge } from '../ui/SyncingResultBadge';
 import CurrencyPicker from './CurrencyPicker';
 
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+const startOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+
 export function BudgetView() {
-  const { activeTrip } = useTrips();
+  const { activeTrip, getTripById } = useTrips();
   const { expenses } = useExpenses();
   const { budgets, addBudget, updateBudget, deleteBudget } = useBudgets();
   const { isSyncing } = useSyncContext();
@@ -25,6 +36,7 @@ export function BudgetView() {
 
   const filteredBudgets = budgets.filter((b) => !activeTrip || b.tripId === activeTrip);
   const filteredExpenses = expenses.filter((e) => !activeTrip || e.tripId === activeTrip);
+  const trip = activeTrip ? getTripById(activeTrip) : undefined;
 
   const getDefaultCurrency = (): string => {
     const usedCurrencies = filteredBudgets.map((b) => b.currency);
@@ -35,6 +47,16 @@ export function BudgetView() {
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [budgetForm, setBudgetForm] = useState({ currency: getDefaultCurrency(), amount: '' });
   const [createdId, setCreatedId] = useState<string | null>(null);
+  const [expandedBudgetIds, setExpandedBudgetIds] = useState<Set<string>>(new Set());
+
+  const toggleBudgetExpanded = (budgetId: string) => {
+    setExpandedBudgetIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(budgetId)) next.delete(budgetId);
+      else next.add(budgetId);
+      return next;
+    });
+  };
 
   const usedCurrencies = filteredBudgets
     .filter((b) => b.id !== editingBudget?.id)
@@ -48,6 +70,47 @@ export function BudgetView() {
     },
     {} as Record<string, number>
   );
+
+  const getCategoryBreakdown = (currency: string) => {
+    const byCategory = new Map<
+      string,
+      { id: string; name: string; color?: string; amount: number }
+    >();
+    filteredExpenses
+      .filter((e) => e.currency === currency)
+      .forEach((e) => {
+        const existing = byCategory.get(e.categoryId);
+        if (existing) {
+          existing.amount += e.amount;
+        } else {
+          byCategory.set(e.categoryId, {
+            id: e.categoryId,
+            name: e.categoryName || '기타',
+            color: e.categoryColor,
+            amount: e.amount,
+          });
+        }
+      });
+    return Array.from(byCategory.values()).sort((a, b) => b.amount - a.amount);
+  };
+
+  const getDailyRecommended = (remaining: number): number | null => {
+    if (!trip || remaining <= 0) return null;
+    const today = startOfDay(new Date());
+    const end = startOfDay(new Date(trip.endDate));
+    const remainingDays = Math.floor((end.getTime() - today.getTime()) / MS_PER_DAY) + 1;
+    if (remainingDays <= 0) return null;
+    return Math.round(remaining / remainingDays);
+  };
+
+  const getTodayMarkerPercent = (): number | null => {
+    if (!trip) return null;
+    const start = startOfDay(new Date(trip.startDate)).getTime();
+    const end = startOfDay(new Date(trip.endDate)).getTime();
+    const today = startOfDay(new Date()).getTime();
+    if (end <= start || today < start || today > end) return null;
+    return ((today - start) / (end - start)) * 100;
+  };
 
   const handleOpenBudgetModal = (budget?: Budget) => {
     if (budget) {
@@ -121,46 +184,30 @@ export function BudgetView() {
                 const spent = expensesByCurrency[budget.currency] || 0;
                 const percentage = (spent / budget.amount) * 100;
                 const isOverBudget = percentage > 100;
+                const remaining = budget.amount - spent;
+                const dailyRecommended = getDailyRecommended(remaining);
+                const todayMarkerPercent = getTodayMarkerPercent();
+                const categoryBreakdown = getCategoryBreakdown(budget.currency);
+                const isExpanded = expandedBudgetIds.has(budget.id);
 
                 return (
                   <YCard key={budget.id} padding="$5" position="relative">
                     {budget.id === createdId && <SyncingResultBadge id={budget.id} />}
-                    <XStack
-                      alignItems="flex-start"
-                      justifyContent="space-between"
-                      marginBottom="$4"
-                    >
-                      <XStack alignItems="center" gap="$3" flex={1}>
-                        <YStack
-                          width={48}
-                          height={48}
-                          backgroundColor="$accent"
-                          borderRadius="$4"
-                          alignItems="center"
-                          justifyContent="center"
-                        >
-                          <Text fontSize={20}>{getCurrencyCode(budget.currency)}</Text>
-                        </YStack>
-                        <YStack>
-                          <XStack alignItems="center" gap="$2">
-                            <Text color="$foreground" fontWeight="500">
-                              {getCurrencyCode(budget.currency)}
-                            </Text>
-                            <SyncIndicator
-                              status={budget.syncStatus}
-                              syncing={isSyncing(budget.id)}
-                            />
-                          </XStack>
-                          <Text color="$mutedForeground">
-                            예산 {getCurrencyCode(budget.currency)} {budget.amount.toLocaleString()}
-                          </Text>
-                        </YStack>
+
+                    <XStack alignItems="center" justifyContent="space-between" marginBottom="$4">
+                      <XStack alignItems="center" gap="$2" flex={1}>
+                        <Text color="$foreground" fontSize={20} fontWeight="700">
+                          {isOverBudget
+                            ? `${getCurrencyCode(budget.currency)} ${(spent - budget.amount).toLocaleString()} 초과했어요`
+                            : `${getCurrencyCode(budget.currency)} ${remaining.toLocaleString()} 남았어요`}
+                        </Text>
+                        <SyncIndicator status={budget.syncStatus} syncing={isSyncing(budget.id)} />
                       </XStack>
-                      <XStack gap="$1">
+                      <XStack gap="$3">
                         <Pressable onPress={() => handleOpenBudgetModal(budget)}>
                           <YStack
-                            width={36}
-                            height={36}
+                            width={32}
+                            height={32}
                             alignItems="center"
                             justifyContent="center"
                             borderRadius="$3"
@@ -170,8 +217,8 @@ export function BudgetView() {
                         </Pressable>
                         <Pressable onPress={() => handleDeleteBudget(budget.id)}>
                           <YStack
-                            width={36}
-                            height={36}
+                            width={32}
+                            height={32}
                             alignItems="center"
                             justifyContent="center"
                             borderRadius="$3"
@@ -182,54 +229,111 @@ export function BudgetView() {
                       </XStack>
                     </XStack>
 
-                    <YStack gap="$2">
-                      <XStack alignItems="center" justifyContent="space-between">
-                        <Text color="$mutedForeground">사용 현황</Text>
-                        <Text color="$mutedForeground">
-                          {getCurrencyCode(budget.currency)} {spent.toLocaleString()}
-                        </Text>
-                      </XStack>
-                      <YStack
-                        height={10}
-                        backgroundColor="$muted"
-                        borderRadius={5}
-                        overflow="hidden"
-                      >
-                        <YStack
-                          height="100%"
-                          borderRadius={5}
-                          backgroundColor={isOverBudget ? '$destructive' : '$primary'}
-                          width={`${Math.min(percentage, 100)}%`}
-                        />
-                      </YStack>
-                    </YStack>
-
-                    <XStack
-                      alignItems="center"
-                      justifyContent="space-between"
-                      marginTop="$4"
-                      paddingTop="$4"
-                      borderTopWidth={1}
-                      borderTopColor="$border"
+                    <YStack
+                      height={14}
+                      backgroundColor="$muted"
+                      borderRadius={7}
+                      overflow="hidden"
+                      position="relative"
+                      marginBottom="$2"
                     >
                       <YStack
-                        paddingHorizontal="$3"
-                        paddingVertical="$1.5"
-                        borderRadius={20}
-                        backgroundColor={
-                          isOverBudget ? 'rgba(232,155,143,0.2)' : 'rgba(200,222,230,0.4)'
-                        }
-                      >
-                        <Text color={isOverBudget ? '$destructive' : '$mutedForeground'}>
-                          {percentage.toFixed(1)}%
-                        </Text>
-                      </YStack>
-                      <Text color={isOverBudget ? '$destructive' : '$mutedForeground'}>
-                        {isOverBudget
-                          ? `${getCurrencyCode(budget.currency)} ${(spent - budget.amount).toLocaleString()} 초과`
-                          : `${getCurrencyCode(budget.currency)} ${(budget.amount - spent).toLocaleString()} 남음`}
+                        height="100%"
+                        borderRadius={7}
+                        backgroundColor={isOverBudget ? '$destructive' : '$primary'}
+                        width={`${Math.min(percentage, 100)}%`}
+                      />
+                      {todayMarkerPercent !== null && (
+                        <YStack
+                          position="absolute"
+                          top={0}
+                          bottom={0}
+                          left={`${todayMarkerPercent}%`}
+                          width={2}
+                          backgroundColor="$foreground"
+                          opacity={0.4}
+                        />
+                      )}
+                    </YStack>
+                    <XStack alignItems="center" justifyContent="space-between" marginBottom="$4">
+                      <Text color="$mutedForeground" fontSize={13}>
+                        사용 {getCurrencyCode(budget.currency)} {spent.toLocaleString()}
+                      </Text>
+                      <Text color="$mutedForeground" fontSize={13}>
+                        총 예산 {getCurrencyCode(budget.currency)} {budget.amount.toLocaleString()}
                       </Text>
                     </XStack>
+
+                    {dailyRecommended !== null && (
+                      <XStack
+                        alignItems="center"
+                        justifyContent="space-between"
+                        paddingVertical="$3"
+                        borderTopWidth={1}
+                        borderTopColor="$border"
+                        marginBottom="$3"
+                      >
+                        <Text color="$mutedForeground">하루 권장 예산</Text>
+                        <Text color="$foreground" fontWeight="600">
+                          {getCurrencyCode(budget.currency)} {dailyRecommended.toLocaleString()}
+                        </Text>
+                      </XStack>
+                    )}
+
+                    <Pressable
+                      onPress={() =>
+                        categoryBreakdown.length > 0 && toggleBudgetExpanded(budget.id)
+                      }
+                    >
+                      <YStack backgroundColor="$muted" borderRadius="$4" padding="$4" gap="$3">
+                        <XStack alignItems="center" justifyContent="space-between">
+                          <Text color="$foreground" fontWeight="600">
+                            사용한 예산
+                          </Text>
+                          <XStack alignItems="center" gap="$1">
+                            <Text color="$foreground" fontWeight="600">
+                              {getCurrencyCode(budget.currency)} {spent.toLocaleString()}
+                            </Text>
+                            {categoryBreakdown.length > 0 &&
+                              (isExpanded ? (
+                                <ChevronUp size={16} color="$mutedForeground" />
+                              ) : (
+                                <ChevronDown size={16} color="$mutedForeground" />
+                              ))}
+                          </XStack>
+                        </XStack>
+                        {isExpanded && categoryBreakdown.length > 0 && (
+                          <YStack
+                            gap="$2"
+                            paddingTop="$2"
+                            borderTopWidth={1}
+                            borderTopColor="$border"
+                          >
+                            {categoryBreakdown.map((category) => (
+                              <XStack
+                                key={category.id}
+                                alignItems="center"
+                                justifyContent="space-between"
+                              >
+                                <XStack alignItems="center" gap="$2">
+                                  <YStack
+                                    width={8}
+                                    height={8}
+                                    borderRadius={4}
+                                    backgroundColor={category.color || '$mutedForeground'}
+                                  />
+                                  <Text color="$mutedForeground">{category.name}</Text>
+                                </XStack>
+                                <Text color="$foreground">
+                                  {getCurrencyCode(budget.currency)}{' '}
+                                  {category.amount.toLocaleString()}
+                                </Text>
+                              </XStack>
+                            ))}
+                          </YStack>
+                        )}
+                      </YStack>
+                    </Pressable>
                   </YCard>
                 );
               })}
