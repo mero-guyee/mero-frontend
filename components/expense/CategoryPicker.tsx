@@ -3,8 +3,8 @@ import { inputStyle } from '@/components/ui/Input';
 import { ExpenseCategory } from '@/types';
 import { ChevronRight } from '@tamagui/lucide-icons';
 import { useState } from 'react';
-import { Pressable, ScrollView } from 'react-native';
-import { Text, XStack, YStack } from 'tamagui';
+import { Pressable } from 'react-native';
+import { Sheet, Text, XStack, YStack } from 'tamagui';
 import { CategoryIcon } from './CategoryIcon';
 
 interface Props {
@@ -38,7 +38,7 @@ export default function CategoryPicker({ categories, value, onChange, renderTrig
         <Text color="$foreground" fontWeight="600" fontSize={16} marginBottom="$4" marginTop="$2">
           카테고리 선택
         </Text>
-        <ScrollView>
+        <Sheet.ScrollView>
           <YStack gap="$1">
             {categories.map((cat) => (
               <Pressable
@@ -75,7 +75,7 @@ export default function CategoryPicker({ categories, value, onChange, renderTrig
               </Pressable>
             ))}
           </YStack>
-        </ScrollView>
+        </Sheet.ScrollView>
       </AppBottomSheet>
     </>
   );

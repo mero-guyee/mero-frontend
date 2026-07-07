@@ -2,8 +2,8 @@ import AppBottomSheet from '@/components/ui/AppBottomSheet';
 import { CURRENCIES } from '@/data/constants';
 import { ChevronDown } from '@tamagui/lucide-icons';
 import { useState } from 'react';
-import { Pressable, ScrollView } from 'react-native';
-import { Text, XStack, YStack } from 'tamagui';
+import { Pressable } from 'react-native';
+import { Sheet, Text, XStack, YStack } from 'tamagui';
 
 interface Props {
   value: string;
@@ -27,9 +27,9 @@ export default function CurrencyPicker({ value, onChange, disabledCurrencies = [
         <Text color="$foreground" fontWeight="600" fontSize={16} marginBottom="$4" marginTop="$2">
           통화 선택
         </Text>
-        <ScrollView>
+        <Sheet.ScrollView style={{ height: 400 }}>
           <YStack gap="$1">
-            {CURRENCIES.map(({ code }) => {
+            {CURRENCIES.map(({ code, name }) => {
               const isDisabled = disabledCurrencies.includes(code);
               return (
                 <Pressable
@@ -49,13 +49,18 @@ export default function CurrencyPicker({ value, onChange, disabledCurrencies = [
                     justifyContent="space-between"
                     opacity={isDisabled ? 0.4 : 1}
                   >
-                    <Text
-                      color="$foreground"
-                      fontSize={15}
-                      fontWeight={value === code ? '600' : '400'}
-                    >
-                      {code}
-                    </Text>
+                    <XStack alignItems="baseline" gap="$2">
+                      <Text
+                        color="$foreground"
+                        fontSize={15}
+                        fontWeight={value === code ? '600' : '400'}
+                      >
+                        {code}
+                      </Text>
+                      <Text color="$mutedForeground" fontSize={12}>
+                        {name}
+                      </Text>
+                    </XStack>
                     {isDisabled ? (
                       <Text color="$mutedForeground" fontSize={12}>
                         등록됨
@@ -72,7 +77,7 @@ export default function CurrencyPicker({ value, onChange, disabledCurrencies = [
               );
             })}
           </YStack>
-        </ScrollView>
+        </Sheet.ScrollView>
       </AppBottomSheet>
     </>
   );
