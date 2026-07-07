@@ -1,11 +1,12 @@
 import { CategoryIcon } from '@/components/expense/CategoryIcon';
+import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { YCard } from '@/components/ui/Card';
 import Chip from '@/components/ui/Chip';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import MoreEditDelete from '@/components/ui/MoreEditDelete';
 import { formattedLocation } from '@/utils/location/location';
-import { ChevronDown, Cloud, MapPin } from '@tamagui/lucide-icons';
+import { ChevronDown, ChevronUp, Cloud, MapPin } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView, useWindowDimensions } from 'react-native';
@@ -28,7 +29,7 @@ export default function FootprintDetailScreen() {
 
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [expenseOpen, setExpenseOpen] = useState(false);
+  const [expenseOpen, setExpenseOpen] = useState(expenses.length > 0);
 
   const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
   const currency = expenses[0]?.currency || 'KRW';
@@ -98,12 +99,17 @@ export default function FootprintDetailScreen() {
                     icon={<MapPin size={12} color="$mutedForeground" />}
                   />
                 ))}
-                {footprint.weatherInfo && (
-                  <Chip
-                    label={footprint.weatherInfo}
-                    icon={<Cloud size={12} color="$mutedForeground" />}
-                  />
-                )}
+                {footprint.weatherInfo &&
+                  (() => {
+                    const [key, ...rest] = footprint.weatherInfo.split(' ');
+                    const WeatherIcon = WEATHER_ICON_MAP[key] ?? Cloud;
+                    return (
+                      <Chip
+                        icon={<WeatherIcon size={12} color="$mutedForeground" />}
+                        label={rest.join(' ')}
+                      />
+                    );
+                  })()}
               </ScrollView>
             )}
 
@@ -189,13 +195,11 @@ export default function FootprintDetailScreen() {
                         {currency} {totalExpense.toLocaleString()}
                       </Text>
                     )}
-                    <ChevronDown
-                      size={18}
-                      color="$mutedForeground"
-                      style={{
-                        transform: [{ rotate: expenseOpen ? '180deg' : '0deg' }],
-                      }}
-                    />
+                    {expenseOpen ? (
+                      <ChevronUp size={18} color="$mutedForeground" />
+                    ) : (
+                      <ChevronDown size={18} color="$mutedForeground" />
+                    )}
                   </XStack>
                 </XStack>
               </Pressable>

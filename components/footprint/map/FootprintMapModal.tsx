@@ -143,7 +143,7 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
                                 aspectRatio={4 / 3}
                                 overflow="hidden"
                                 borderRadius="$4"
-                                borderWidth={2}
+                                borderWidth={1}
                                 borderColor="$border"
                                 marginVertical="$4"
                               >
