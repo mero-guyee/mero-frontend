@@ -14,6 +14,7 @@ export default function MainLayout() {
     <>
       <Tabs
         tabBar={(props) => <CustomTabBar {...props} />}
+        backBehavior="history"
         screenOptions={{
           headerShown: false,
           animation: 'shift',
