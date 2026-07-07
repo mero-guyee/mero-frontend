@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 import { useBudgets, useExpenses, useSyncContext, useTrips } from '../../contexts';
-import { CURRENCIES, getCurrencyName, getCurrencySymbol } from '../../data/constants';
+import { CURRENCIES, getCurrencyCode } from '../../data/constants';
 import { Budget } from '../../types';
 import { EmptyState, FilledButton, Input } from '../ui';
 import AppBottomSheet from '../ui/AppBottomSheet';
@@ -139,12 +139,12 @@ export function BudgetView() {
                           alignItems="center"
                           justifyContent="center"
                         >
-                          <Text fontSize={20}>{getCurrencySymbol(budget.currency)}</Text>
+                          <Text fontSize={20}>{getCurrencyCode(budget.currency)}</Text>
                         </YStack>
                         <YStack>
                           <XStack alignItems="center" gap="$2">
                             <Text color="$foreground" fontWeight="500">
-                              {getCurrencyName(budget.currency)}
+                              {getCurrencyCode(budget.currency)}
                             </Text>
                             <SyncIndicator
                               status={budget.syncStatus}
@@ -152,8 +152,7 @@ export function BudgetView() {
                             />
                           </XStack>
                           <Text color="$mutedForeground">
-                            예산 {getCurrencySymbol(budget.currency)}{' '}
-                            {budget.amount.toLocaleString()}
+                            예산 {getCurrencyCode(budget.currency)} {budget.amount.toLocaleString()}
                           </Text>
                         </YStack>
                       </XStack>
@@ -187,7 +186,7 @@ export function BudgetView() {
                       <XStack alignItems="center" justifyContent="space-between">
                         <Text color="$mutedForeground">사용 현황</Text>
                         <Text color="$mutedForeground">
-                          {getCurrencySymbol(budget.currency)} {spent.toLocaleString()}
+                          {getCurrencyCode(budget.currency)} {spent.toLocaleString()}
                         </Text>
                       </XStack>
                       <YStack
@@ -227,8 +226,8 @@ export function BudgetView() {
                       </YStack>
                       <Text color={isOverBudget ? '$destructive' : '$mutedForeground'}>
                         {isOverBudget
-                          ? `${getCurrencySymbol(budget.currency)} ${(spent - budget.amount).toLocaleString()} 초과`
-                          : `${getCurrencySymbol(budget.currency)} ${(budget.amount - spent).toLocaleString()} 남음`}
+                          ? `${getCurrencyCode(budget.currency)} ${(spent - budget.amount).toLocaleString()} 초과`
+                          : `${getCurrencyCode(budget.currency)} ${(budget.amount - spent).toLocaleString()} 남음`}
                       </Text>
                     </XStack>
                   </YCard>

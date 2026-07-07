@@ -16,3 +16,6 @@ export const getCurrencySymbol = (code: string) =>
 
 export const getCurrencyName = (code: string) =>
   CURRENCIES.find((c) => c.code === code)?.name || code;
+
+export const getCurrencyCode = (code: string) =>
+  CURRENCIES.find((c) => c.code === code)?.code || code;

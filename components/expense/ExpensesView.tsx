@@ -1,13 +1,13 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
-import { getCurrencySymbol } from '@/data/utils';
+import { getCurrencyCode } from '@/data/constants';
 import { Plus, Wallet } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
-import { EmptyState } from '../ui';
 import { useExpenses, useTrips } from '../../contexts';
 import { Expense } from '../../types';
+import { EmptyState } from '../ui';
 import FloatingActionButton from '../ui/button/FloatingActionButton';
 import { ExpenseCard } from './ExpenseCard';
 import ExpenseDayTotal from './ExpenseDayTotal';
@@ -62,7 +62,7 @@ export function ExpensesView({ createdId }: { createdId?: string }) {
               </XStack>
               {expensesByCurrency.map(({ currency, amount }) => (
                 <Text key={currency} color="$foreground" fontSize={30} fontWeight="700">
-                  {getCurrencySymbol(currency)} {amount.toLocaleString()}
+                  {getCurrencyCode(currency)} {amount.toLocaleString()}
                 </Text>
               ))}
             </YStack>

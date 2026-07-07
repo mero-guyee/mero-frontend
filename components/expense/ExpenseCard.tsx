@@ -5,7 +5,7 @@ import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { useSyncContext } from '@/contexts';
 import { useRouter } from 'expo-router';
 import { Text, XStack, YStack } from 'tamagui';
-import { getCurrencySymbol } from '../../data/constants';
+import { getCurrencyCode } from '../../data/constants';
 import { Expense } from '../../types';
 
 interface ExpenseCardProps {
@@ -47,7 +47,7 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
       <XStack alignItems="center" gap="$2">
         <SyncIndicator status={expense.syncStatus} syncing={isSyncing(expense.id)} />
         <Text color="$foreground">
-          {getCurrencySymbol(expense.currency)} {expense.amount.toLocaleString()}
+          {getCurrencyCode(expense.currency)} {expense.amount.toLocaleString()}
         </Text>
       </XStack>
     </PressableXCard>
