@@ -90,7 +90,11 @@ export default function ExpenseFormScreen() {
         description: description.trim() || undefined,
         location: location.trim() || undefined,
       });
-      router.push(`/(main)/expense?created=${created.id}`);
+      if (footprintId) {
+        router.push(`/(main)/footprint/${footprintId}`);
+      } else {
+        router.push(`/(main)/expense?created=${created.id}`);
+      }
     }
   };
 
