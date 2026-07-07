@@ -1,3 +1,4 @@
+import { CategoryIcon } from '@/components/expense/CategoryIcon';
 import { YCard } from '@/components/ui/Card';
 import Chip from '@/components/ui/Chip';
 import FadeWrapper from '@/components/ui/FadeWrapper';
@@ -214,16 +215,7 @@ export default function FootprintDetailScreen() {
                           borderBottomColor="$border"
                         >
                           <XStack alignItems="center" gap="$3" flex={1}>
-                            {expense.categoryIcon ? (
-                              <Text fontSize={20}>{expense.categoryIcon}</Text>
-                            ) : (
-                              <YStack
-                                width={8}
-                                height={8}
-                                borderRadius={4}
-                                backgroundColor={expense.categoryColor ?? '$muted'}
-                              />
-                            )}
+                            <CategoryIcon name={expense.categoryName!} size={18} />
                             <YStack flex={1}>
                               <Text color="$foreground" fontSize={14}>
                                 {expense.description || expense.categoryName || '지출'}
