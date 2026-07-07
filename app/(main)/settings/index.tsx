@@ -86,7 +86,7 @@ export default function SettingsScreen() {
             <Text color="$mutedForeground" marginBottom="$3">
               계정
             </Text>
-            <YCard borderRadius="$4">
+            <YCard>
               <SettingItem
                 icon={<User size={20} color="$foreground" />}
                 label="프로필 설정"
@@ -100,7 +100,7 @@ export default function SettingsScreen() {
             <Text color="$mutedForeground" marginBottom="$3">
               데이터
             </Text>
-            <YCard borderRadius="$4">
+            <YCard>
               <SettingItem
                 icon={<Cloud size={20} color="$foreground" />}
                 label="동기화"
@@ -114,7 +114,7 @@ export default function SettingsScreen() {
             <Text color="$mutedForeground" marginBottom="$3">
               경비
             </Text>
-            <YCard borderRadius="$4">
+            <YCard>
               <SettingItem
                 icon={<Tag size={20} color="$foreground" />}
                 label="카테고리 관리"
@@ -128,7 +128,7 @@ export default function SettingsScreen() {
             <Text color="$mutedForeground" marginBottom="$3">
               일반
             </Text>
-            <YCard borderRadius="$4">
+            <YCard>
               <SettingItem
                 icon={<Globe size={20} color="$foreground" />}
                 label="언어 설정"
@@ -148,7 +148,7 @@ export default function SettingsScreen() {
             <Text color="$mutedForeground" marginBottom="$3">
               보안
             </Text>
-            <YCard borderRadius="$4">
+            <YCard>
               <SettingItem
                 icon={<Lock size={20} color="$foreground" />}
                 label="개인정보 보호"
@@ -162,7 +162,7 @@ export default function SettingsScreen() {
             <Text color="$mutedForeground" marginBottom="$3">
               지원
             </Text>
-            <YCard borderRadius="$4">
+            <YCard>
               <SettingItem
                 icon={<HelpCircle size={20} color="$foreground" />}
                 label="도움말"

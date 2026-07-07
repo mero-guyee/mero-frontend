@@ -146,7 +146,7 @@ export default function SyncStatusScreen() {
                 <Text color="$mutedForeground" fontSize={13}>
                   {DOMAIN_LABELS[domain] ?? domain}
                 </Text>
-                <YCard borderRadius="$4">
+                <YCard>
                   {entries.map((entry, idx) => (
                     <SyncListItem
                       key={entry.id}

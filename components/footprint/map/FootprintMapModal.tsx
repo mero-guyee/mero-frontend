@@ -168,7 +168,7 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
                         사용한 돈
                       </Text>
                       {expenses.length > 0 ? (
-                        <YCard borderWidth={1} borderColor="$border">
+                        <YCard>
                           {expenses.map((expense, index) => (
                             <YStack
                               key={expense.id}
@@ -194,12 +194,7 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
                           </YStack>
                         </YCard>
                       ) : (
-                        <YCard
-                          padding="$4"
-                          alignItems="center"
-                          borderWidth={1}
-                          borderColor="$border"
-                        >
+                        <YCard padding="$4" bg="$white" alignItems="center">
                           <Text color="$mutedForeground">지출 기록이 없습니다</Text>
                         </YCard>
                       )}

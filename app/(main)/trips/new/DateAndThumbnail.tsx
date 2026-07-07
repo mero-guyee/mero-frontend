@@ -71,7 +71,6 @@ export default function NewTripFormDate() {
             <Pressable onPress={() => setShowImagePicker(true)}>
               <YStack
                 backgroundColor="$muted"
-                borderWidth={2}
                 borderColor="$border"
                 borderRadius="$4"
                 overflow="hidden"

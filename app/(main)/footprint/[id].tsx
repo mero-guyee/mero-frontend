@@ -122,7 +122,6 @@ export default function FootprintDetailScreen() {
             {photos.length > 0 && (
               <YCard
                 height={SCREEN_WIDTH * 0.75}
-                borderRadius="$4"
                 borderWidth={1}
                 borderColor="$border"
                 overflow="hidden"
@@ -256,10 +255,8 @@ export default function FootprintDetailScreen() {
                   ) : (
                     <YCard
                       backgroundColor="$card"
-                      borderRadius="$4"
                       padding="$4"
                       alignItems="center"
-                      borderWidth={1}
                       borderColor="$border"
                     >
                       <Text color="$mutedForeground">지출 기록이 없습니다</Text>

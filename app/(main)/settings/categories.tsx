@@ -62,7 +62,6 @@ export default function CategoryManagerScreen() {
                 padding="$4"
                 alignItems="center"
                 gap="$3"
-                borderWidth={1}
                 borderColor="$border"
               >
                 {isEditing && <GripVertical size={20} color="$mutedForeground" />}

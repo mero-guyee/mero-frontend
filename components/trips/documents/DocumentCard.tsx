@@ -80,7 +80,6 @@ export function DocumentCard({
     <Pressable onPress={handlePress}>
       <XCard
         backgroundColor="$card"
-        borderRadius="$4"
         padding="$3"
         alignItems="center"
         justifyContent="space-between"
