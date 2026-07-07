@@ -26,10 +26,10 @@ import config from '../tamagui.config';
 
 Sentry.init({
   dsn: 'https://d3584d51d314d552ed61e55ddd8405a3@o4511688550449152.ingest.us.sentry.io/4511688553136128',
-  enableLogs: true,
-  tracesSampleRate: __DEV__ ? 1.0 : 0.2,
+  enabled: process.env.NODE_ENV === 'production',
+  tracesSampleRate: __DEV__ ? 0 : 0.2,
   replaysSessionSampleRate: 0,
-  replaysOnErrorSampleRate: __DEV__ ? 1.0 : 0.5,
+  replaysOnErrorSampleRate: __DEV__ ? 0 : 0.5,
   integrations: [Sentry.mobileReplayIntegration()],
 });
 
