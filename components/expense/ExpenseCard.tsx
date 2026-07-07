@@ -5,7 +5,7 @@ import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { useSyncContext } from '@/contexts';
 import { useRouter } from 'expo-router';
 import { Text, XStack, YStack } from 'tamagui';
-import { CURRENCY_SYMBOLS } from '../../data/constants';
+import { getCurrencySymbol } from '../../data/constants';
 import { Expense } from '../../types';
 
 interface ExpenseCardProps {
@@ -16,7 +16,6 @@ interface ExpenseCardProps {
 export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps) {
   const router = useRouter();
   const { isSyncing } = useSyncContext();
-  const getCurrencySymbol = (currency: string) => CURRENCY_SYMBOLS[currency] || currency;
 
   return (
     <PressableXCard

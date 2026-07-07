@@ -1,10 +1,9 @@
 import AppBottomSheet from '@/components/ui/AppBottomSheet';
+import { CURRENCIES } from '@/data/constants';
 import { ChevronDown } from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { Pressable, ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
-
-export const CURRENCIES = ['KRW', 'USD', 'EUR', 'JPY', 'GBP', 'CNY', 'THB', 'VND', 'PEN', 'BRL'];
 
 interface Props {
   value: string;
@@ -30,14 +29,14 @@ export default function CurrencyPicker({ value, onChange, disabledCurrencies = [
         </Text>
         <ScrollView>
           <YStack gap="$1">
-            {CURRENCIES.map((curr) => {
-              const isDisabled = disabledCurrencies.includes(curr);
+            {CURRENCIES.map(({ code }) => {
+              const isDisabled = disabledCurrencies.includes(code);
               return (
                 <Pressable
-                  key={curr}
+                  key={code}
                   disabled={isDisabled}
                   onPress={() => {
-                    onChange(curr);
+                    onChange(code);
                     setOpen(false);
                   }}
                 >
@@ -45,7 +44,7 @@ export default function CurrencyPicker({ value, onChange, disabledCurrencies = [
                     paddingHorizontal="$3"
                     paddingVertical="$3"
                     borderRadius="$3"
-                    backgroundColor={value === curr ? '$accent' : 'transparent'}
+                    backgroundColor={value === code ? '$accent' : 'transparent'}
                     alignItems="center"
                     justifyContent="space-between"
                     opacity={isDisabled ? 0.4 : 1}
@@ -53,16 +52,16 @@ export default function CurrencyPicker({ value, onChange, disabledCurrencies = [
                     <Text
                       color="$foreground"
                       fontSize={15}
-                      fontWeight={value === curr ? '600' : '400'}
+                      fontWeight={value === code ? '600' : '400'}
                     >
-                      {curr}
+                      {code}
                     </Text>
                     {isDisabled ? (
                       <Text color="$mutedForeground" fontSize={12}>
                         등록됨
                       </Text>
                     ) : (
-                      value === curr && (
+                      value === code && (
                         <Text color="$foreground" fontSize={14}>
                           ✓
                         </Text>

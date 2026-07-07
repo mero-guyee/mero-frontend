@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 import { useBudgets, useExpenses, useSyncContext, useTrips } from '../../contexts';
-import { CURRENCY_NAMES, CURRENCY_SYMBOLS } from '../../data/constants';
+import { CURRENCIES, getCurrencyName, getCurrencySymbol } from '../../data/constants';
 import { Budget } from '../../types';
 import { EmptyState, FilledButton, Input } from '../ui';
 import AppBottomSheet from '../ui/AppBottomSheet';
@@ -14,7 +14,7 @@ import { YCard } from '../ui/Card';
 import { inputStyle } from '../ui/Input';
 import { SyncIndicator } from '../ui/SyncIndicator';
 import { SyncingResultBadge } from '../ui/SyncingResultBadge';
-import CurrencyPicker, { CURRENCIES } from './CurrencyPicker';
+import CurrencyPicker from './CurrencyPicker';
 
 export function BudgetView() {
   const { activeTrip } = useTrips();
@@ -26,9 +26,9 @@ export function BudgetView() {
   const filteredBudgets = budgets.filter((b) => !activeTrip || b.tripId === activeTrip);
   const filteredExpenses = expenses.filter((e) => !activeTrip || e.tripId === activeTrip);
 
-  const getDefaultCurrency = () => {
+  const getDefaultCurrency = (): string => {
     const usedCurrencies = filteredBudgets.map((b) => b.currency);
-    return CURRENCIES.find((c) => !usedCurrencies.includes(c)) || CURRENCIES[0];
+    return CURRENCIES.find((c) => !usedCurrencies.includes(c.code))?.code || CURRENCIES[0].code;
   };
 
   const [showBudgetModal, setShowBudgetModal] = useState(false);
@@ -48,8 +48,6 @@ export function BudgetView() {
     },
     {} as Record<string, number>
   );
-
-  const getCurrencySymbol = (currency: string) => CURRENCY_SYMBOLS[currency] || currency;
 
   const handleOpenBudgetModal = (budget?: Budget) => {
     if (budget) {
@@ -146,7 +144,7 @@ export function BudgetView() {
                         <YStack>
                           <XStack alignItems="center" gap="$2">
                             <Text color="$foreground" fontWeight="500">
-                              {CURRENCY_NAMES[budget.currency] || budget.currency}
+                              {getCurrencyName(budget.currency)}
                             </Text>
                             <SyncIndicator
                               status={budget.syncStatus}
