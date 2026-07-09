@@ -42,7 +42,7 @@ export function TripCard({ trip, onPress, showSyncBadge = false }: TripCardProps
 
         <XStack alignItems="center" gap="$1.5">
           <MapPin size={16} color="$mutedForeground" />
-          <Text color="$mutedForeground" fontSize={14}>
+          <Text flex={1} color="$mutedForeground" fontSize={14}>
             {trip.countries.length > 0 ? trip.countries.join(', ') : '아직 정해지지 않았어요.'}
           </Text>
         </XStack>

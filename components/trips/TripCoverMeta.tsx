@@ -36,23 +36,23 @@ export default function TripCoverMeta({ trip }: Props) {
           {trip.title}
         </Text>
 
-        <XStack gap="$4" alignItems="center">
-          <XStack alignItems="center" gap="$1">
-            <Calendar size={11} color="rgba(255,255,255,0.7)" />
-            <Text color="rgba(255,255,255,0.8)" fontSize={12}>
-              {dateLabel}
+        <XStack alignItems="center" gap="$1">
+          <Calendar size={11} color="rgba(255,255,255,0.7)" />
+          <Text color="rgba(255,255,255,0.8)" fontSize={12}>
+            {dateLabel}
+          </Text>
+        </XStack>
+
+        {countriesLabel.length > 0 && (
+          <XStack alignItems="flex-start" gap="$1">
+            <YStack width={11} height={16} alignItems="center" justifyContent="center">
+              <Globe size={11} color="rgba(255,255,255,0.7)" />
+            </YStack>
+            <Text flex={1} color="rgba(255,255,255,0.8)" fontSize={12}>
+              {countriesLabel}
             </Text>
           </XStack>
-
-          {countriesLabel.length > 0 && (
-            <XStack alignItems="center" gap="$1">
-              <Globe size={11} color="rgba(255,255,255,0.7)" />
-              <Text color="rgba(255,255,255,0.8)" fontSize={12} numberOfLines={1}>
-                {countriesLabel}
-              </Text>
-            </XStack>
-          )}
-        </XStack>
+        )}
       </YStack>
     </LinearGradient>
   );
