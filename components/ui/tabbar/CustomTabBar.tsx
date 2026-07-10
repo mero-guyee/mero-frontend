@@ -13,6 +13,13 @@ function shouldHideTabBar(state: BottomTabBarProps['state']): boolean {
   if (currentRoute.name === 'trips') return true;
   if (currentRoute.name === 'settings') return true;
   if (currentRoute.name === 'footprint' && nestedRoute?.name === 'new') return true;
+  if (currentRoute.name === 'expense' && (nestedRoute?.name === 'new' || nestedRoute?.name === 'edit'))
+    return true;
+  if (
+    currentRoute.name === 'backpack' &&
+    (nestedRoute?.name === 'edit' || nestedRoute?.name === 'memo-form')
+  )
+    return true;
 
   return false;
 }
