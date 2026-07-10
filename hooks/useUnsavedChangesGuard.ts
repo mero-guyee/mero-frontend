@@ -1,5 +1,5 @@
 import { usePreventRemove } from '@react-navigation/native';
-import { useNavigation, useRouter } from 'expo-router';
+import { useFocusEffect, useNavigation, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef } from 'react';
 import { Alert, BackHandler } from 'react-native';
 
@@ -7,6 +7,12 @@ export function useUnsavedChangesGuard(isDirty: boolean) {
   const navigation = useNavigation();
   const router = useRouter();
   const bypassRef = useRef(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      bypassRef.current = false;
+    }, [])
+  );
 
   const confirmLeave = useCallback(
     (leave: () => void) => {
