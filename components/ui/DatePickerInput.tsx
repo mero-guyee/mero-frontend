@@ -69,6 +69,7 @@ export default function DatePickerInput({
             display="spinner"
             onChange={handleSpinnerChange}
             style={{ height: 200 }}
+            themeVariant="light"
           />
 
           <FilledButton color="$accent" fontWeight="600" fontSize={16} onPress={handleConfirm}>
