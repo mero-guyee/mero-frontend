@@ -12,3 +12,7 @@ export const memoKeys = {
   byTrip: (tripId: string) => ['memos', tripId] as const,
   detail: (memoId: number) => ['memos', memoId] as const,
 };
+
+export const userKeys = {
+  me: ['user', 'me'] as const,
+};

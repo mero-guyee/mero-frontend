@@ -6,3 +6,5 @@ export { OutboxRepository } from './outbox';
 export { PhotoRepository } from './photos';
 export { MemoRepository } from './memos';
 export { TripRepository } from './trips';
+export { UserRepository } from './user';
+export type { UserRow } from './user';

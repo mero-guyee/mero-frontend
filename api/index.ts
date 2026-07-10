@@ -44,3 +44,5 @@ export type {
 
 export { naverApi } from './naver';
 export type { NaverConnectRequest, NaverConnectResponse, NaverStatusResponse } from './naver';
+
+export { userApi } from './user';

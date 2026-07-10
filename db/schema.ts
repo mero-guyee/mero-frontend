@@ -1,7 +1,8 @@
-export const SCHEMA_VERSION = 17;
+export const SCHEMA_VERSION = 18;
 
 export const DROP_TABLES = `
   DROP TABLE IF EXISTS outbox;
+  DROP TABLE IF EXISTS users;
   DROP TABLE IF EXISTS expenses;
   DROP TABLE IF EXISTS budgets;
   DROP TABLE IF EXISTS memos;
@@ -17,6 +18,16 @@ export const DROP_TABLES = `
 `;
 
 export const CREATE_TABLES = `
+  CREATE TABLE IF NOT EXISTS users (
+    id           TEXT PRIMARY KEY NOT NULL,
+    serverId     TEXT NOT NULL,
+    email        TEXT NOT NULL,
+    nickname     TEXT NOT NULL,
+    profileImage TEXT,
+    createdAt    TEXT NOT NULL,
+    updatedAt    TEXT NOT NULL
+  );
+
   CREATE TABLE IF NOT EXISTS trips (
     id          TEXT PRIMARY KEY NOT NULL,
     serverId    TEXT,

@@ -1,7 +1,9 @@
 import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
 import { useRouter } from 'expo-router';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { authApi, setAuthExpiredHandler, tokenStorage } from '../api';
+import { authApi, setAuthExpiredHandler, tokenStorage, userApi } from '../api';
+import { useDb } from '../providers/DatabaseProvider';
+import { UserRepository } from '../repositories';
 
 GoogleSignin.configure({
   webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
@@ -23,6 +25,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const db = useDb();
+
+  const cacheCurrentUser = async () => {
+    try {
+      const user = await userApi.getMe();
+      await new UserRepository(db).upsertFromServer(user);
+    } catch (e) {
+      console.error('Failed to cache user:', e);
+    }
+  };
 
   useEffect(() => {
     tokenStorage
@@ -41,6 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async ({ email, password }: { email: string; password: string }) => {
     await authApi.login({ email, password });
     setIsAuthenticated(true);
+    await cacheCurrentUser();
     router.push('/(main)/trips');
   };
 
@@ -55,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!idToken) throw new Error('Google idToken을 가져올 수 없습니다.');
       await authApi.googleLogin(idToken);
       setIsAuthenticated(true);
+      await cacheCurrentUser();
       router.push('/(main)/trips');
     } catch (e: any) {
       console.error('Google 로그인 실패:', e);
@@ -65,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     setIsAuthenticated(false);
     await authApi.logout();
+    await new UserRepository(db).clear();
   };
 
   const value: AuthContextType = {
