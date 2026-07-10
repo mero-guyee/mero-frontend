@@ -18,7 +18,7 @@ interface Props {
   onSearchChange: (query: string) => void;
   onCreateFootprint: () => void;
   onSelectFootprint: (id: string) => void;
-  getFootprintExpense: (footprintId: string) => { total: number; currency: string };
+  getFootprintExpense: (footprintId: string) => { currency: string; amount: number }[];
   isEmpty: boolean;
   createdId?: string;
 }

@@ -1,5 +1,6 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { getCurrencyCode } from '@/data/constants';
+import { groupExpensesByCurrency } from '@/data/utils';
 import { Plus, Wallet } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useMemo } from 'react';
@@ -17,17 +18,7 @@ export function ExpensesView({ createdId }: { createdId?: string }) {
   const { activeTrip } = useTrips();
   const { expenses } = useExpenses();
 
-  const expensesByCurrency = useMemo(() => {
-    const totals = {} as Record<string, number>;
-    const counts = {} as Record<string, number>;
-    expenses.forEach(({ currency, amount }) => {
-      totals[currency] = (totals[currency] || 0) + amount;
-      counts[currency] = (counts[currency] || 0) + 1;
-    });
-    return Object.entries(totals)
-      .sort(([a], [b]) => (counts[b] || 0) - (counts[a] || 0))
-      .map(([currency, amount]) => ({ currency, amount }));
-  }, [expenses]);
+  const expensesByCurrency = useMemo(() => groupExpensesByCurrency(expenses), [expenses]);
 
   const expensesByDate = useMemo(() => {
     return expenses
@@ -43,7 +34,7 @@ export function ExpensesView({ createdId }: { createdId?: string }) {
   }, [expenses]);
 
   const handleAddExpense = () => {
-    router.push({ pathname: '/expense/edit', params: { tripId: activeTrip } });
+    router.push({ pathname: '/expense/new', params: { tripId: activeTrip } });
   };
 
   return (

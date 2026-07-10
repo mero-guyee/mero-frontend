@@ -3,6 +3,7 @@ import FootprintSkeleton from '@/components/footprint/FootprintSkeleton';
 import FootprintMapView from '@/components/footprint/map/FootprintMapView';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
+import { groupExpensesByCurrency } from '@/data/utils';
 import { List, Map } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -52,9 +53,7 @@ export default function FootprintListScreen() {
 
   const getFootprintExpense = (footprintId: string) => {
     const footprintExpenses = expenses.filter((e) => e.footprintId === footprintId);
-    const total = footprintExpenses.reduce((sum, e) => sum + e.amount, 0);
-    const currency = footprintExpenses[0]?.currency || 'USD';
-    return { total, currency };
+    return groupExpensesByCurrency(footprintExpenses);
   };
 
   if (isFootPrintLoading) {

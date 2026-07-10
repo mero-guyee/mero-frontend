@@ -2,6 +2,8 @@ import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { CircularButton } from '@/components/ui';
 import { YCard } from '@/components/ui/Card';
 import { useExpenses } from '@/contexts';
+import { getCurrencyCode } from '@/data/constants';
+import { groupExpensesByCurrency } from '@/data/utils';
 import { useFootprintPhotosQuery } from '@/hooks/queries/useFootprints';
 import { Footprint, FootprintPhoto } from '@/types';
 import { formattedLocation } from '@/utils/location/location';
@@ -22,8 +24,7 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
   const { data: photos = [] } = useFootprintPhotosQuery(footprint?.id ?? '');
 
   const expenses = footprint ? getExpensesByFootprintId(footprint.id) : [];
-  const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const currency = expenses[0]?.currency || 'KRW';
+  const expensesByCurrency = groupExpensesByCurrency(expenses);
 
   const contentWithPhotos = useMemo(() => {
     if (!footprint) return [];
@@ -183,13 +184,25 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
                             </YStack>
                           ))}
                           <YStack padding="$4" borderTopWidth={1} borderTopColor="$border">
-                            <XStack justifyContent="space-between">
+                            <XStack alignItems="center" justifyContent="space-between">
                               <Text color="$foreground" fontWeight="500">
                                 합계
                               </Text>
-                              <Text color="$foreground" fontWeight="500">
-                                {currency} {totalExpense.toLocaleString()}
-                              </Text>
+                              <XStack gap="$2">
+                                {expensesByCurrency.map(({ currency, amount }) => (
+                                  <YStack
+                                    key={currency}
+                                    backgroundColor="$muted"
+                                    borderRadius="$2"
+                                    paddingHorizontal="$2"
+                                    paddingVertical="$1"
+                                  >
+                                    <Text color="$foreground" fontSize={13} fontWeight="500">
+                                      {getCurrencyCode(currency)} {amount.toLocaleString()}
+                                    </Text>
+                                  </YStack>
+                                ))}
+                              </XStack>
                             </XStack>
                           </YStack>
                         </YCard>

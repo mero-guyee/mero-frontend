@@ -5,6 +5,8 @@ import Chip from '@/components/ui/Chip';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import MoreEditDelete from '@/components/ui/MoreEditDelete';
+import { getCurrencyCode } from '@/data/constants';
+import { groupExpensesByCurrency } from '@/data/utils';
 import { formattedLocation } from '@/utils/location/location';
 import { ChevronDown, ChevronUp, Cloud, MapPin } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -31,8 +33,7 @@ export default function FootprintDetailScreen() {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [expenseOpen, setExpenseOpen] = useState(expenses.length > 0);
 
-  const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
-  const currency = expenses[0]?.currency || 'KRW';
+  const expensesByCurrency = groupExpensesByCurrency(expenses);
 
   const paragraphs = footprint?.content.split('\n\n').filter((p) => p.trim()) ?? [];
 
@@ -64,7 +65,7 @@ export default function FootprintDetailScreen() {
 
   const handleAddExpense = () => {
     router.push({
-      pathname: '/(main)/expense/edit',
+      pathname: '/(main)/expense/new',
       params: { footprintId: footprint.id, tripId: footprint.tripId },
     });
   };
@@ -190,10 +191,22 @@ export default function FootprintDetailScreen() {
                     사용한 돈
                   </Text>
                   <XStack alignItems="center" gap="$2">
-                    {!expenseOpen && expenses.length > 0 && (
-                      <Text color="$mutedForeground" fontSize={13}>
-                        {currency} {totalExpense.toLocaleString()}
-                      </Text>
+                    {!expenseOpen && expensesByCurrency.length > 0 && (
+                      <XStack gap="$2">
+                        {expensesByCurrency.map(({ currency, amount }) => (
+                          <YStack
+                            key={currency}
+                            backgroundColor="$muted"
+                            borderRadius="$2"
+                            paddingHorizontal="$2"
+                            paddingVertical="$1"
+                          >
+                            <Text color="$mutedForeground" fontSize={12}>
+                              {getCurrencyCode(currency)} {amount.toLocaleString()}
+                            </Text>
+                          </YStack>
+                        ))}
+                      </XStack>
                     )}
                     {expenseOpen ? (
                       <ChevronUp size={18} color="$mutedForeground" />
@@ -244,6 +257,7 @@ export default function FootprintDetailScreen() {
                       ))}
                       <XStack
                         padding="$4"
+                        alignItems="center"
                         justifyContent="space-between"
                         borderTopWidth={1}
                         borderTopColor="$border"
@@ -251,9 +265,21 @@ export default function FootprintDetailScreen() {
                         <Text color="$foreground" fontWeight="500">
                           합계
                         </Text>
-                        <Text color="$foreground" fontWeight="500">
-                          {currency} {totalExpense.toLocaleString()}
-                        </Text>
+                        <XStack gap="$2">
+                          {expensesByCurrency.map(({ currency, amount }) => (
+                            <YStack
+                              key={currency}
+                              backgroundColor="$muted"
+                              borderRadius="$2"
+                              paddingHorizontal="$2"
+                              paddingVertical="$1"
+                            >
+                              <Text color="$foreground" fontSize={13} fontWeight="500">
+                                {getCurrencyCode(currency)} {amount.toLocaleString()}
+                              </Text>
+                            </YStack>
+                          ))}
+                        </XStack>
                       </XStack>
                     </YCard>
                   ) : (

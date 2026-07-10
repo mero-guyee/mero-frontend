@@ -2,6 +2,7 @@ import { PressableYCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { useSyncContext } from '@/contexts';
+import { getCurrencyCode } from '@/data/constants';
 import { useFootprintPhotosQuery } from '@/hooks/queries/useFootprints';
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { Footprint } from '../../types';
@@ -9,7 +10,7 @@ import { Footprint } from '../../types';
 interface Props {
   footprint: Footprint;
   isLast: boolean;
-  expense: { total: number; currency: string };
+  expense: { currency: string; amount: number }[];
   onPress: () => void;
   showSyncBadge?: boolean;
 }
@@ -28,7 +29,6 @@ export default function FootprintItem({
   const badge = firstLocation?.placeName;
   const date = new Date(footprint.date);
   const dateLabel = date.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
-  const { total, currency } = expense;
 
   return (
     <XStack marginBottom="$3">
@@ -75,19 +75,19 @@ export default function FootprintItem({
               {footprint.content}
             </Text>
             <XStack gap="$2" marginTop="$1">
-              {total > 0 && (
+              {expense.map(({ currency, amount }) => (
                 <YStack
+                  key={currency}
                   backgroundColor="$muted"
                   borderRadius="$2"
                   paddingHorizontal="$2"
                   paddingVertical="$1"
                 >
                   <Text color="$mutedForeground" fontSize={12}>
-                    {currency === 'KRW' ? '₩' : currency}
-                    {total.toLocaleString()}
+                    {getCurrencyCode(currency)} {amount.toLocaleString()}
                   </Text>
                 </YStack>
-              )}
+              ))}
             </XStack>
           </YStack>
           {thumbnailUri && (
