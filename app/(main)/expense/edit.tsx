@@ -143,7 +143,7 @@ export default function ExpenseFormScreen() {
             <DatePickerInput value={date} onChange={setDate} />
             {!isEdit && footprintId && (
               <Text color="$mutedForeground" marginTop="$1" fontSize={14}>
-                발자국 날짜로 자동 설정됨
+                일지 날짜로 자동 설정됨
               </Text>
             )}
           </YStack>

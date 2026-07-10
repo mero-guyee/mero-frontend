@@ -19,7 +19,7 @@ import { Text, XStack, YStack } from 'tamagui';
 const DOMAIN_LABELS: Record<string, string> = {
   trips: '여행',
   memos: '메모',
-  footprints: '발자국',
+  footprints: '일지',
   expenses: '경비',
   budgets: '예산',
   documents: '문서',
