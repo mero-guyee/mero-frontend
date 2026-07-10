@@ -6,6 +6,7 @@ import DatePickerInput from '@/components/ui/DatePickerInput';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { inputStyle } from '@/components/ui/Input';
+import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { formatGeocode } from '@/utils/location/location';
 import { MapPin } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
@@ -35,6 +36,16 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
   const [location, setLocation] = useState(expense?.location ?? '');
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
 
+  const isDirty =
+    amount !== (expense?.amount?.toString() ?? '') ||
+    currency !== (expense?.currency ?? 'KRW') ||
+    categoryId !== (expense?.categoryId ?? categories[0]?.id ?? '') ||
+    date !== (expense?.date ?? new Date().toISOString().split('T')[0]) ||
+    description !== (expense?.description ?? '') ||
+    location !== (expense?.location ?? '');
+
+  const { confirmLeave, markSaved } = useUnsavedChangesGuard(isDirty);
+
   const handleLocationConfirm = ({
     latitude,
     longitude,
@@ -58,6 +69,8 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
       Alert.alert('오류', '카테고리를 선택해주세요.');
       return;
     }
+
+    markSaved();
 
     if (isEdit) {
       updateExpense({
@@ -91,7 +104,10 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      <BackActionHeader label={isEdit ? '경비 수정' : '경비 추가'} onBack={() => router.back()}>
+      <BackActionHeader
+        label={isEdit ? '경비 수정' : '경비 추가'}
+        onBack={() => confirmLeave(() => router.back())}
+      >
         <SubmitButton onPress={handleSubmit} />
       </BackActionHeader>
 
