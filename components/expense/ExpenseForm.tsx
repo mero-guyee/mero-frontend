@@ -82,9 +82,9 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
         location: location.trim() || undefined,
       });
       if (footprintId) {
-        router.push(`/(main)/footprint/${footprintId}`);
+        router.back();
       } else {
-        router.push(`/(main)/expense?created=${created.id}`);
+        router.dismissTo({ pathname: '/(main)/expense', params: { created: created.id } });
       }
     }
   };
