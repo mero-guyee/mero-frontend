@@ -34,7 +34,7 @@ export function ExpensesView({ createdId }: { createdId?: string }) {
   }, [expenses]);
 
   const handleAddExpense = () => {
-    router.push({ pathname: '/expense/new', params: { tripId: activeTrip } });
+    router.push({ pathname: '/expense-new', params: { tripId: activeTrip } });
   };
 
   return (

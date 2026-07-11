@@ -10,7 +10,6 @@ export default function ExpenseLayout() {
       <Stack.Screen name="index" />
       <Stack.Screen name="detail" />
       <Stack.Screen name="edit" />
-      <Stack.Screen name="new" />
     </Stack>
   );
 }

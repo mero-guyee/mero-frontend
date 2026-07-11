@@ -77,6 +77,7 @@ function AppContent() {
                     <Stack.Screen name="(auth)" />
                     <Stack.Screen name="(main)" />
                     <Stack.Screen name="auth/naver/callback" />
+                    <Stack.Screen name="expense-new" />
                   </Stack>
                 </PortalProvider>
               </BudgetProvider>
