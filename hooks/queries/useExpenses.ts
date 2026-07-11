@@ -49,7 +49,13 @@ export function useCreateExpense() {
     mutationFn: async (data: Omit<Expense, 'id' | 'serverId' | 'createdAt' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
       const repo = new ExpenseRepository(db);
-      const localExpense = await repo.createExpense(data);
+      const category = await new ExpenseCategoryRepository(db).findById(data.categoryId);
+      const localExpense = await repo.createExpense({
+        ...data,
+        categoryName: category?.name,
+        categoryIcon: category?.icon,
+        categoryColor: category?.color,
+      });
 
       (async () => {
         markSyncing(localExpense.id);
@@ -96,7 +102,13 @@ export function useUpdateExpense() {
     mutationFn: async (expense: Expense) => {
       const tripRepo = new TripRepository(db);
       const repo = new ExpenseRepository(db);
-      const updated = await repo.updateExpense(expense);
+      const category = await new ExpenseCategoryRepository(db).findById(expense.categoryId);
+      const updated = await repo.updateExpense({
+        ...expense,
+        categoryName: category?.name,
+        categoryIcon: category?.icon,
+        categoryColor: category?.color,
+      });
 
       (async () => {
         markSyncing(expense.id);
