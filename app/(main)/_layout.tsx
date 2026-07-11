@@ -1,5 +1,5 @@
 import { toastConfig } from '@/components/ui/CustomToast';
-import CustomTabBar from '@/components/ui/tabbar/CustomTabBar';
+import MainTabBar from '@/components/ui/tabbar/mainTabbar/MainTabBar';
 import useBackHandler from '@/hooks/useBackHandler';
 import { Backpack, BookOpen, Wallet } from '@tamagui/lucide-icons';
 import { Tabs } from 'expo-router';
@@ -13,7 +13,7 @@ export default function MainLayout() {
   return (
     <>
       <Tabs
-        tabBar={(props) => <CustomTabBar {...props} />}
+        tabBar={(props) => <MainTabBar {...props} />}
         backBehavior="history"
         screenOptions={{
           headerShown: false,
