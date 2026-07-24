@@ -53,6 +53,10 @@ function AppContent() {
   const isReady = useDbReady();
   const currentPath = usePathname();
 
+  useEffect(() => {
+    console.log('[route]', currentPath);
+  }, [currentPath]);
+
   if (!isReady) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -78,6 +82,7 @@ function AppContent() {
                     <Stack.Screen name="(main)" />
                     <Stack.Screen name="auth/naver/callback" />
                     <Stack.Screen name="expense-new" />
+                    <Stack.Screen name="expense-detail" />
                   </Stack>
                 </PortalProvider>
               </BudgetProvider>
