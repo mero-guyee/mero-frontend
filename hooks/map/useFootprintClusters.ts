@@ -7,8 +7,7 @@ type FootprintPoint = Supercluster.PointFeature<{ footprintId: string }>;
 
 export function useFootprintClusters(
   mapRef: React.RefObject<MapView | null>,
-  validFootprints: Footprint[],
-  footprintCentroids: Record<string, { latitude: number; longitude: number }>
+  validFootprints: Footprint[]
 ) {
   const scRef = useRef(new Supercluster<{ footprintId: string }>({ radius: 60, maxZoom: 16 }));
   const currentRegionRef = useRef<Region | null>(null);
@@ -26,17 +25,19 @@ export function useFootprintClusters(
   };
 
   useEffect(() => {
-    const points: FootprintPoint[] = validFootprints.map((f) => ({
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [footprintCentroids[f.id].longitude, footprintCentroids[f.id].latitude],
-      },
-      properties: { footprintId: f.id },
-    }));
+    const points: FootprintPoint[] = validFootprints.flatMap((f) =>
+      f.locations.map((loc) => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: [loc.longitude!, loc.latitude!],
+        },
+        properties: { footprintId: f.id },
+      }))
+    );
     scRef.current.load(points);
     if (currentRegionRef.current) updateClusters(currentRegionRef.current);
-  }, [validFootprints, footprintCentroids]);
+  }, [validFootprints]);
 
   const handleRegionChangeComplete = (region: Region) => {
     currentRegionRef.current = region;

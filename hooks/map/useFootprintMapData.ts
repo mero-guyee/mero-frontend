@@ -29,19 +29,6 @@ export function useFootprintMapData(footprints: Footprint[]) {
     return colorMap;
   }, [validFootprints]);
 
-  const footprintCentroids = useMemo(() => {
-    const centroidMap: Record<string, { latitude: number; longitude: number }> = {};
-    validFootprints.forEach((f) => {
-      const lats = f.locations.map((loc) => loc.latitude!);
-      const lngs = f.locations.map((loc) => loc.longitude!);
-      centroidMap[f.id] = {
-        latitude: lats.reduce((sum, v) => sum + v, 0) / lats.length,
-        longitude: lngs.reduce((sum, v) => sum + v, 0) / lngs.length,
-      };
-    });
-    return centroidMap;
-  }, [validFootprints]);
-
   const allCoords = useMemo(
     () =>
       validFootprints.flatMap((f) =>
@@ -50,5 +37,5 @@ export function useFootprintMapData(footprints: Footprint[]) {
     [validFootprints]
   );
 
-  return { validFootprints, footprintColors, footprintCentroids, allCoords };
+  return { validFootprints, footprintColors, allCoords };
 }

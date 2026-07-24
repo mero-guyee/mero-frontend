@@ -1,9 +1,10 @@
 import { useFootprintClusters } from '@/hooks/map/useFootprintClusters';
 import { useFootprintMapData } from '@/hooks/map/useFootprintMapData';
 import { Footprint } from '@/types';
+import { unwrapLongitudesForFit } from '@/utils/map/region';
 import { Plane } from '@tamagui/lucide-icons';
 import React, { useEffect, useRef, useState } from 'react';
-import { Dimensions, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
 import Supercluster from 'supercluster';
 import { Text } from 'tamagui';
@@ -11,9 +12,6 @@ import ClusterMarker from '../../map/ClusterMarker';
 import PinMarker from '../../map/PinMarker';
 import FadeWrapper from '../../ui/FadeWrapper';
 import FootprintMapModal from './FootprintMapModal';
-
-const { width, height } = Dimensions.get('window');
-const MAP_PADDING = Math.min(width, height) * 0.45;
 
 interface FootprintMapViewProps {
   isLoading: boolean;
@@ -26,39 +24,26 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
   const [selectedFootprint, setSelectedFootprint] = useState<Footprint | null>(null);
   const [showModal, setShowModal] = useState(false);
 
-  const { validFootprints, footprintColors, footprintCentroids, allCoords } =
-    useFootprintMapData(footprints);
+  const { validFootprints, footprintColors, allCoords } = useFootprintMapData(footprints);
 
   const { clusters, handleRegionChangeComplete, handleClusterPress } = useFootprintClusters(
     mapRef,
-    validFootprints,
-    footprintCentroids
+    validFootprints
   );
 
   useEffect(() => {
     if (allCoords.length === 0) return;
     setTimeout(() => {
-      if (allCoords.length === 1) {
-        mapRef.current?.animateToRegion(
-          {
-            latitude: allCoords[0].latitude,
-            longitude: allCoords[0].longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          },
-          300
-        );
-      } else {
-        mapRef.current?.fitToCoordinates(allCoords, {
-          edgePadding: {
-            top: MAP_PADDING,
-            right: MAP_PADDING,
-            bottom: MAP_PADDING,
-            left: MAP_PADDING,
-          },
-          animated: false,
-        });
-      }
+      const target = allCoords[allCoords.length - 1];
+      mapRef.current?.animateToRegion(
+        {
+          latitude: target.latitude,
+          longitude: target.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        },
+        300
+      );
     }, 300);
   }, [allCoords]);
 
@@ -82,7 +67,7 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
         300
       );
     } else {
-      mapRef.current?.fitToCoordinates(coords, {
+      mapRef.current?.fitToCoordinates(unwrapLongitudesForFit(coords), {
         edgePadding: { top: 40, right: 40, bottom: 40, left: 40 },
         animated: true,
       });
