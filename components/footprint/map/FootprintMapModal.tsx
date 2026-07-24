@@ -1,15 +1,17 @@
+import { CategoryIcon } from '@/components/expense/CategoryIcon';
 import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { CircularButton } from '@/components/ui';
 import { YCard } from '@/components/ui/Card';
+import Chip from '@/components/ui/Chip';
 import { useExpenses } from '@/contexts';
 import { getCurrencyCode } from '@/data/constants';
 import { groupExpensesByCurrency } from '@/data/utils';
 import { useFootprintPhotosQuery } from '@/hooks/queries/useFootprints';
-import { Footprint, FootprintPhoto } from '@/types';
+import { Footprint } from '@/types';
 import { formattedLocation } from '@/utils/location/location';
-import { BookOpen, Calendar, Cloud, MapPin, X } from '@tamagui/lucide-icons';
-import { useMemo, useState } from 'react';
-import { Modal, Pressable, ScrollView } from 'react-native';
+import { Calendar, ChevronDown, ChevronUp, Cloud, MapPin, X } from '@tamagui/lucide-icons';
+import { useState } from 'react';
+import { Modal, Pressable, ScrollView, useWindowDimensions } from 'react-native';
 import { Image, Text, XStack, YStack } from 'tamagui';
 
 interface FootprintMapModalProps {
@@ -19,43 +21,23 @@ interface FootprintMapModalProps {
 }
 
 export default function FootprintMapModal({ visible, onClose, footprint }: FootprintMapModalProps) {
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
   const { getExpensesByFootprintId } = useExpenses();
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const { data: photos = [] } = useFootprintPhotosQuery(footprint?.id ?? '');
 
   const expenses = footprint ? getExpensesByFootprintId(footprint.id) : [];
   const expensesByCurrency = groupExpensesByCurrency(expenses);
+  const [expenseOpen, setExpenseOpen] = useState(expenses.length > 0);
 
-  const contentWithPhotos = useMemo(() => {
-    if (!footprint) return [];
-    const paragraphs = footprint.content.split('\n\n').filter((p) => p.trim());
-    const result: { type: 'text' | 'photo'; content: string }[] = [];
-    const photoUris = photos.map((p: FootprintPhoto) => p.s3Url || p.localUri);
-
-    const photoInterval = Math.max(1, Math.floor(paragraphs.length / (photoUris.length + 1)));
-    let photoIndex = 0;
-
-    paragraphs.forEach((paragraph, idx) => {
-      result.push({ type: 'text', content: paragraph });
-      if (photoIndex < photoUris.length && (idx + 1) % photoInterval === 0) {
-        result.push({ type: 'photo', content: photoUris[photoIndex] });
-        photoIndex++;
-      }
-    });
-
-    while (photoIndex < photoUris.length) {
-      result.push({ type: 'photo', content: photoUris[photoIndex] });
-      photoIndex++;
-    }
-
-    return result;
-  }, [footprint, photos]);
+  const paragraphs = footprint?.content.split('\n\n').filter((p) => p.trim()) ?? [];
 
   return (
     <>
       <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
         <Pressable style={{ flex: 1, justifyContent: 'flex-end' }} onPress={onClose}>
-          <Pressable onPress={(e) => e.stopPropagation()} style={{ height: '85%' }}>
+          <Pressable onPress={(e) => e.stopPropagation()} style={{ height: '50%' }}>
             <YStack
               style={{
                 shadowColor: '#000',
@@ -64,7 +46,7 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
                 shadowRadius: 20,
                 elevation: 24,
               }}
-              backgroundColor="$card"
+              backgroundColor="$background"
               borderTopLeftRadius="$6"
               borderTopRightRadius="$6"
               flex={1}
@@ -80,7 +62,6 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
               >
                 <YStack alignItems="flex-start">
                   <XStack alignItems="center" gap="$2">
-                    <BookOpen size={20} color="$foreground" />
                     <Text color="$foreground" fontSize={18} fontWeight="600">
                       {footprint?.title}
                     </Text>
@@ -106,88 +87,124 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
               {/* Content */}
               <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
                 {footprint && (
-                  <>
-                    {/* Location & Weather */}
-                    <YStack gap="$2" marginBottom="$6">
-                      {footprint.locations.map((loc, i) => (
-                        <XStack key={i} alignItems="center" gap="$2">
-                          <MapPin size={16} color="$foreground" />
-                          <Text color="$foreground">{formattedLocation(loc)}</Text>
-                        </XStack>
-                      ))}
-                      {footprint.weatherInfo &&
-                        (() => {
-                          const [key, ...rest] = footprint.weatherInfo.split(' ');
-                          const WeatherIcon = WEATHER_ICON_MAP[key] ?? Cloud;
-                          return (
-                            <XStack alignItems="center" gap="$2">
-                              <WeatherIcon size={16} color="$foreground" />
-                              {rest.length > 0 && <Text color="$foreground">{rest.join(' ')}</Text>}
-                            </XStack>
-                          );
-                        })()}
-                    </YStack>
+                  <YStack gap="$6">
+                    {/* Location & Weather chips */}
+                    {(footprint.locations.length > 0 || footprint.weatherInfo) && (
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ gap: 8 }}
+                      >
+                        {footprint.locations.map((loc, i) => (
+                          <Chip
+                            key={i}
+                            label={formattedLocation(loc)}
+                            icon={<MapPin size={12} color="$mutedForeground" />}
+                          />
+                        ))}
+                        {footprint.weatherInfo &&
+                          (() => {
+                            const [key, ...rest] = footprint.weatherInfo.split(' ');
+                            const WeatherIcon = WEATHER_ICON_MAP[key] ?? Cloud;
+                            return (
+                              <Chip
+                                icon={<WeatherIcon size={12} color="$mutedForeground" />}
+                                label={rest.join(' ')}
+                              />
+                            );
+                          })()}
+                      </ScrollView>
+                    )}
 
-                    <YStack height={1} backgroundColor="$border" opacity={0.3} marginBottom="$6" />
+                    {/* Text Content */}
+                    {paragraphs.length > 0 && (
+                      <YCard gap="$4" padding="$3">
+                        {paragraphs.map((p, i) => (
+                          <Text key={i} color="$foreground" lineHeight={26} fontSize={15}>
+                            {p}
+                          </Text>
+                        ))}
+                      </YCard>
+                    )}
 
-                    {/* Content with Photos */}
-                    <YStack gap="$4" marginBottom="$6">
-                      {contentWithPhotos.map((item, idx) => (
-                        <YStack key={idx}>
-                          {item.type === 'text' ? (
-                            <Text color="$foreground" lineHeight={24}>
-                              {item.content}
-                            </Text>
-                          ) : (
-                            <Pressable onPress={() => setSelectedPhoto(item.content)}>
-                              <YStack
-                                aspectRatio={4 / 3}
-                                overflow="hidden"
-                                borderRadius="$4"
-                                borderWidth={1}
-                                borderColor="$border"
-                                marginVertical="$4"
+                    {/* Photo Slider */}
+                    {photos.length > 0 && (
+                      <YCard
+                        height={SCREEN_WIDTH * 0.75}
+                        borderWidth={1}
+                        borderColor="$border"
+                        overflow="hidden"
+                        style={{ position: 'relative' }}
+                      >
+                        <ScrollView
+                          horizontal
+                          pagingEnabled
+                          showsHorizontalScrollIndicator={false}
+                          style={{ width: SCREEN_WIDTH - 48 }}
+                          onMomentumScrollEnd={(e) => {
+                            const index = Math.round(
+                              e.nativeEvent.contentOffset.x / (SCREEN_WIDTH - 48)
+                            );
+                            setCurrentPhotoIndex(index);
+                          }}
+                        >
+                          {photos.map((photo) => {
+                            const uri = photo.s3Url || photo.localUri;
+                            return (
+                              <Pressable
+                                key={photo.id}
+                                style={{ width: SCREEN_WIDTH - 48, height: SCREEN_WIDTH * 0.75 }}
+                                onPress={() => setSelectedPhoto(uri)}
                               >
                                 <Image
-                                  source={{ uri: item.content }}
+                                  source={{ uri }}
                                   width="100%"
                                   height="100%"
                                   resizeMode="cover"
                                 />
-                              </YStack>
-                            </Pressable>
-                          )}
-                        </YStack>
-                      ))}
-                    </YStack>
+                              </Pressable>
+                            );
+                          })}
+                        </ScrollView>
 
-                    <YStack height={1} backgroundColor="$border" opacity={0.3} marginBottom="$6" />
+                        {photos.length > 1 && (
+                          <XStack
+                            position="absolute"
+                            bottom="$3"
+                            left={0}
+                            right={0}
+                            justifyContent="center"
+                            gap="$1.5"
+                          >
+                            {photos.map((_, i) => (
+                              <YStack
+                                key={i}
+                                width={i === currentPhotoIndex ? 8 : 6}
+                                height={i === currentPhotoIndex ? 8 : 6}
+                                borderRadius={4}
+                                backgroundColor={
+                                  i === currentPhotoIndex ? 'white' : 'rgba(255,255,255,0.5)'
+                                }
+                              />
+                            ))}
+                          </XStack>
+                        )}
+                      </YCard>
+                    )}
 
-                    {/* Expenses */}
-                    <YStack marginBottom="$6">
-                      <Text color="$foreground" fontSize={16} fontWeight="600" marginBottom="$3">
-                        사용한 돈
-                      </Text>
-                      {expenses.length > 0 ? (
-                        <YCard>
-                          {expenses.map((expense, index) => (
-                            <YStack
-                              key={expense.id}
-                              padding="$4"
-                              borderBottomWidth={index < expenses.length - 1 ? 1 : 0}
-                              borderBottomColor="$border"
-                            >
-                              <Text color="$foreground">{expense.description || '지출'}</Text>
-                              <Text color="$foreground">
-                                {expense.currency} {expense.amount.toLocaleString()}
-                              </Text>
-                            </YStack>
-                          ))}
-                          <YStack padding="$4" borderTopWidth={1} borderTopColor="$border">
-                            <XStack alignItems="center" justifyContent="space-between">
-                              <Text color="$foreground" fontWeight="500">
-                                합계
-                              </Text>
+                    {/* Expenses Accordion */}
+                    <YStack>
+                      <Pressable onPress={() => setExpenseOpen((v) => !v)}>
+                        <XStack
+                          justifyContent="space-between"
+                          alignItems="center"
+                          paddingVertical="$1"
+                        >
+                          <Text color="$foreground" fontSize={16} fontWeight="600">
+                            사용한 돈
+                          </Text>
+                          <XStack alignItems="center" gap="$2">
+                            {!expenseOpen && expensesByCurrency.length > 0 && (
                               <XStack gap="$2">
                                 {expensesByCurrency.map(({ currency, amount }) => (
                                   <YStack
@@ -197,22 +214,94 @@ export default function FootprintMapModal({ visible, onClose, footprint }: Footp
                                     paddingHorizontal="$2"
                                     paddingVertical="$1"
                                   >
-                                    <Text color="$foreground" fontSize={13} fontWeight="500">
+                                    <Text color="$mutedForeground" fontSize={12}>
                                       {getCurrencyCode(currency)} {amount.toLocaleString()}
                                     </Text>
                                   </YStack>
                                 ))}
                               </XStack>
-                            </XStack>
-                          </YStack>
-                        </YCard>
-                      ) : (
-                        <YCard padding="$4" bg="$white" alignItems="center">
-                          <Text color="$mutedForeground">지출 기록이 없습니다</Text>
-                        </YCard>
+                            )}
+                            {expenseOpen ? (
+                              <ChevronUp size={18} color="$mutedForeground" />
+                            ) : (
+                              <ChevronDown size={18} color="$mutedForeground" />
+                            )}
+                          </XStack>
+                        </XStack>
+                      </Pressable>
+
+                      {expenseOpen && (
+                        <YStack gap="$3" marginTop="$3">
+                          {expenses.length > 0 ? (
+                            <YCard backgroundColor="$card" overflow="hidden">
+                              {expenses.map((expense, index) => (
+                                <XStack
+                                  key={expense.id}
+                                  padding="$4"
+                                  alignItems="center"
+                                  justifyContent="space-between"
+                                  borderBottomWidth={index < expenses.length - 1 ? 1 : 0}
+                                  borderBottomColor="$border"
+                                >
+                                  <XStack alignItems="center" gap="$3" flex={1}>
+                                    <CategoryIcon name={expense.categoryName!} size={18} />
+                                    <YStack flex={1}>
+                                      <Text color="$foreground" fontSize={14}>
+                                        {expense.description || expense.categoryName || '지출'}
+                                      </Text>
+                                      {expense.description && expense.categoryName && (
+                                        <Text color="$mutedForeground" fontSize={12}>
+                                          {expense.categoryName}
+                                        </Text>
+                                      )}
+                                    </YStack>
+                                  </XStack>
+                                  <Text color="$foreground" fontWeight="500">
+                                    {expense.currency} {expense.amount.toLocaleString()}
+                                  </Text>
+                                </XStack>
+                              ))}
+                              <XStack
+                                padding="$4"
+                                alignItems="center"
+                                justifyContent="space-between"
+                                borderTopWidth={1}
+                                borderTopColor="$border"
+                              >
+                                <Text color="$foreground" fontWeight="500">
+                                  합계
+                                </Text>
+                                <XStack gap="$2">
+                                  {expensesByCurrency.map(({ currency, amount }) => (
+                                    <YStack
+                                      key={currency}
+                                      backgroundColor="$muted"
+                                      borderRadius="$2"
+                                      paddingHorizontal="$2"
+                                      paddingVertical="$1"
+                                    >
+                                      <Text color="$foreground" fontSize={13} fontWeight="500">
+                                        {getCurrencyCode(currency)} {amount.toLocaleString()}
+                                      </Text>
+                                    </YStack>
+                                  ))}
+                                </XStack>
+                              </XStack>
+                            </YCard>
+                          ) : (
+                            <YCard
+                              backgroundColor="$card"
+                              padding="$4"
+                              alignItems="center"
+                              borderColor="$border"
+                            >
+                              <Text color="$mutedForeground">지출 기록이 없습니다</Text>
+                            </YCard>
+                          )}
+                        </YStack>
                       )}
                     </YStack>
-                  </>
+                  </YStack>
                 )}
               </ScrollView>
             </YStack>

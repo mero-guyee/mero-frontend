@@ -222,38 +222,47 @@ export default function FootprintDetailScreen() {
                   {expenses.length > 0 ? (
                     <YCard backgroundColor="$card" overflow="hidden">
                       {expenses.map((expense, index) => (
-                        <XStack
+                        <Pressable
                           key={expense.id}
-                          padding="$4"
-                          alignItems="center"
-                          justifyContent="space-between"
-                          borderBottomWidth={index < expenses.length - 1 ? 1 : 0}
-                          borderBottomColor="$border"
+                          onPress={() =>
+                            router.push({
+                              pathname: '/expense-detail',
+                              params: { expenseId: expense.id },
+                            })
+                          }
                         >
-                          <XStack alignItems="center" gap="$3" flex={1}>
-                            <CategoryIcon name={expense.categoryName!} size={18} />
-                            <YStack flex={1}>
-                              <Text color="$foreground" fontSize={14}>
-                                {expense.description || expense.categoryName || '지출'}
-                              </Text>
-                              {expense.description && expense.categoryName && (
-                                <Text color="$mutedForeground" fontSize={12}>
-                                  {expense.categoryName}
+                          <XStack
+                            padding="$4"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            borderBottomWidth={index < expenses.length - 1 ? 1 : 0}
+                            borderBottomColor="$border"
+                          >
+                            <XStack alignItems="center" gap="$3" flex={1}>
+                              <CategoryIcon name={expense.categoryName!} size={18} />
+                              <YStack flex={1}>
+                                <Text color="$foreground" fontSize={14}>
+                                  {expense.description || expense.categoryName || '지출'}
                                 </Text>
-                              )}
-                            </YStack>
-                          </XStack>
-                          <XStack alignItems="center" gap="$3">
-                            <Text color="$foreground" fontWeight="500">
-                              {expense.currency} {expense.amount.toLocaleString()}
-                            </Text>
-                            <Pressable onPress={() => handleDeleteExpense(expense.id)}>
-                              <Text color="$destructive" fontSize={13}>
-                                삭제
+                                {expense.description && expense.categoryName && (
+                                  <Text color="$mutedForeground" fontSize={12}>
+                                    {expense.categoryName}
+                                  </Text>
+                                )}
+                              </YStack>
+                            </XStack>
+                            <XStack alignItems="center" gap="$3">
+                              <Text color="$foreground" fontWeight="500">
+                                {expense.currency} {expense.amount.toLocaleString()}
                               </Text>
-                            </Pressable>
+                              <Pressable onPress={() => handleDeleteExpense(expense.id)}>
+                                <Text color="$destructive" fontSize={13}>
+                                  삭제
+                                </Text>
+                              </Pressable>
+                            </XStack>
                           </XStack>
-                        </XStack>
+                        </Pressable>
                       ))}
                       <XStack
                         padding="$4"
