@@ -1,5 +1,6 @@
 import { useFootprintClusters } from '@/hooks/map/useFootprintClusters';
 import { useFootprintMapData } from '@/hooks/map/useFootprintMapData';
+import { useIsOffline } from '@/hooks/network/useIsOffline';
 import { Footprint } from '@/types';
 import { Plane } from '@tamagui/lucide-icons';
 import React, { useEffect, useRef, useState } from 'react';
@@ -8,6 +9,7 @@ import MapView from 'react-native-maps';
 import Supercluster from 'supercluster';
 import { Text } from 'tamagui';
 import ClusterMarker from '../../map/ClusterMarker';
+import MapOfflineFallback from '../../map/MapOfflineFallback';
 import PinMarker from '../../map/PinMarker';
 import FadeWrapper from '../../ui/FadeWrapper';
 import FootprintMapModal from './FootprintMapModal';
@@ -26,6 +28,7 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
     longitude: number;
   } | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const isOffline = useIsOffline();
 
   const { validFootprints, footprintColors, allCoords } = useFootprintMapData(footprints);
 
@@ -96,6 +99,10 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
         <Text>일지가 없습니다.</Text>
       </View>
     );
+  }
+
+  if (isOffline) {
+    return <MapOfflineFallback />;
   }
 
   return (

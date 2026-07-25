@@ -1,3 +1,4 @@
+import { useIsOffline } from '@/hooks/network/useIsOffline';
 import useLocation from '@/hooks/useLocation';
 import { ArrowLeft, Clock, MapPin, Plane } from '@tamagui/lucide-icons';
 import * as Location from 'expo-location';
@@ -16,6 +17,7 @@ import MapView, { MapPressEvent } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { Stack, XStack, YStack } from 'tamagui';
+import MapOfflineFallback from '../map/MapOfflineFallback';
 import FadeWrapper from '../ui/FadeWrapper';
 import LocationSearch from './LocationSearch';
 import LocationView from './LocationView';
@@ -45,6 +47,7 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
   );
   const mapRef = useRef<MapView>(null);
   const insets = useSafeAreaInsets();
+  const isOffline = useIsOffline();
 
   const {
     status: locationPermissionStatus,
@@ -145,6 +148,22 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
               <YStack flex={1} justifyContent="center" alignItems="center">
                 <Plane width={24} height={24} color="#A0A0A0" />
               </YStack>
+            ) : isOffline ? (
+              <>
+                <View
+                  style={{
+                    height: 44,
+                    justifyContent: 'center',
+                    paddingHorizontal: 16,
+                    paddingTop: insets.top + 8,
+                  }}
+                >
+                  <Pressable onPress={() => onClose()} hitSlop={16}>
+                    <ArrowLeft />
+                  </Pressable>
+                </View>
+                <MapOfflineFallback message="오프라인 상태에서는 위치를 선택할 수 없어요" />
+              </>
             ) : (
               <>
                 <LocationView
