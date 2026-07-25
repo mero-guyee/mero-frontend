@@ -67,7 +67,7 @@ export default function TripListScreen() {
               keyExtractor={(item) => item.id}
               contentContainerStyle={{ padding: paddingHorizontalGeneral, paddingTop: 0 }}
               renderSectionHeader={({ section }) => (
-                <Text fontSize={20} fontWeight="600" color="$input">
+                <Text fontSize={20} fontWeight="600" color="$foreground" paddingVertical="$2">
                   {section.title}
                 </Text>
               )}
