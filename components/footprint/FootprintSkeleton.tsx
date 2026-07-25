@@ -33,51 +33,29 @@ function FootprintItemSkeleton({
   opacity,
   color,
   showImage,
-  isLast,
 }: {
   opacity: Animated.Value;
   color: string;
   showImage: boolean;
-  isLast: boolean;
 }) {
   return (
-    <XStack marginBottom="$3">
-      {/* Timeline dot + line */}
-      <YStack alignItems="center" width={20} marginRight="$3">
-        <SkeletonBox width={8} height={8} borderRadius={4} opacity={opacity} color={color} />
-        {!isLast && (
-          <Animated.View
-            style={{ flex: 1, width: 1, backgroundColor: color, opacity, marginTop: 4 }}
-          />
+    <YStack
+      backgroundColor="$card"
+      borderRadius="$4"
+      paddingHorizontal="$4"
+      paddingVertical="$4"
+      gap="$3"
+      marginBottom="$3"
+    >
+      <SkeletonBox width={160} height={17} opacity={opacity} color={color} />
+      <SkeletonBox width={140} height={12} opacity={opacity} color={color} />
+      <XStack gap="$3" alignItems="center">
+        <SkeletonBox width="70%" height={13} opacity={opacity} color={color} />
+        {showImage && (
+          <SkeletonBox width={56} height={56} borderRadius={12} opacity={opacity} color={color} />
         )}
-      </YStack>
-
-      {/* Card */}
-      <YStack
-        flex={1}
-        backgroundColor="$card"
-        borderRadius="$4"
-        paddingHorizontal="$4"
-        paddingVertical="$4"
-        gap="$2"
-        marginTop={14}
-      >
-        <XStack gap="$3">
-          <YStack flex={1} gap="$2">
-            <XStack gap="$3">
-              <SkeletonBox width={72} height={13} opacity={opacity} color={color} />
-              <SkeletonBox width={60} height={13} opacity={opacity} color={color} />
-            </XStack>
-            <SkeletonBox width={180} height={20} opacity={opacity} color={color} />
-            <SkeletonBox width={140} height={13} opacity={opacity} color={color} />
-            <SkeletonBox width={60} height={22} borderRadius={4} opacity={opacity} color={color} />
-          </YStack>
-          {showImage && (
-            <SkeletonBox width={72} height={72} borderRadius={12} opacity={opacity} color={color} />
-          )}
-        </XStack>
-      </YStack>
-    </XStack>
+      </XStack>
+    </YStack>
   );
 }
 
@@ -135,7 +113,6 @@ export default function FootprintSkeleton() {
               opacity={opacity}
               color={color}
               showImage={item.showImage}
-              isLast={i === ITEMS.length - 1}
             />
           ))}
         </YStack>

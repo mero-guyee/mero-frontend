@@ -3,7 +3,7 @@ import { pressFeedbackStyle } from '@/components/ui/pressFeedback';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { useSyncContext } from '@/contexts';
-import { MapPin } from '@tamagui/lucide-icons';
+import { Calendar, MapPin } from '@tamagui/lucide-icons';
 import { Text, XStack, YStack } from 'tamagui';
 import { Trip } from '../../../types';
 import TripCoverImage from '../TripCoverImage';
@@ -36,9 +36,12 @@ export function TripCard({ trip, onPress, showSyncBadge = false }: TripCardProps
 
         <TripProgress tripStartDate={trip.startDate} tripEndDate={trip.endDate} />
 
-        <Text color="$mutedForeground" fontSize={14}>
-          {trip.startDate} - {trip.endDate}
-        </Text>
+        <XStack alignItems="center" gap="$1.5">
+          <Calendar size={16} color="$mutedForeground" />
+          <Text color="$mutedForeground" fontSize={14}>
+            {trip.startDate} - {trip.endDate}
+          </Text>
+        </XStack>
 
         <XStack alignItems="center" gap="$1.5">
           <MapPin size={16} color="$mutedForeground" />

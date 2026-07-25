@@ -18,7 +18,6 @@ interface Props {
   onSearchChange: (query: string) => void;
   onCreateFootprint: () => void;
   onSelectFootprint: (id: string) => void;
-  getFootprintExpense: (footprintId: string) => { currency: string; amount: number }[];
   isEmpty: boolean;
   createdId?: string;
 }
@@ -40,7 +39,6 @@ export default function FootprintList({
   onSearchChange,
   onCreateFootprint,
   onSelectFootprint,
-  getFootprintExpense,
   isEmpty,
   createdId,
 }: Props) {
@@ -67,11 +65,9 @@ export default function FootprintList({
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
-        renderItem={({ item, index, section }) => (
+        renderItem={({ item }) => (
           <FootprintItem
             footprint={item}
-            isLast={index === section.data.length - 1}
-            expense={getFootprintExpense(item.id)}
             onPress={() => onSelectFootprint(item.id)}
             showSyncBadge={
               item.id === createdId &&

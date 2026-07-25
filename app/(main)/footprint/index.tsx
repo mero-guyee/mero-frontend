@@ -3,13 +3,12 @@ import FootprintSkeleton from '@/components/footprint/FootprintSkeleton';
 import FootprintMapView from '@/components/footprint/map/FootprintMapView';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
-import { groupExpensesByCurrency } from '@/data/utils';
 import { List, Map } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable } from 'react-native';
 import { YStack } from 'tamagui';
-import { useExpenses, useFootprints, useTrips } from '../../../contexts';
+import { useFootprints, useTrips } from '../../../contexts';
 
 export default function FootprintListScreen() {
   const router = useRouter();
@@ -17,7 +16,6 @@ export default function FootprintListScreen() {
 
   const { activeTrip } = useTrips();
   const { footprints, isFootPrintLoading } = useFootprints();
-  const { expenses } = useExpenses();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -51,11 +49,6 @@ export default function FootprintListScreen() {
     return Object.entries(grouped).map(([title, data]) => ({ title, data }));
   }, [filteredFootprints]);
 
-  const getFootprintExpense = (footprintId: string) => {
-    const footprintExpenses = expenses.filter((e) => e.footprintId === footprintId);
-    return groupExpensesByCurrency(footprintExpenses);
-  };
-
   if (isFootPrintLoading) {
     return <FootprintSkeleton />;
   }
@@ -87,7 +80,6 @@ export default function FootprintListScreen() {
             onSearchChange={setSearchQuery}
             onCreateFootprint={() => router.push('/(main)/footprint/new')}
             onSelectFootprint={(id) => router.push(`/(main)/footprint/${id}`)}
-            getFootprintExpense={getFootprintExpense}
             isEmpty={filteredFootprints.length === 0}
             createdId={created}
           />
