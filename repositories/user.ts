@@ -39,4 +39,12 @@ export class UserRepository {
   async clear(): Promise<void> {
     await this.db.runAsync(`DELETE FROM users WHERE id = ?`, [LOCAL_ID]);
   }
+
+  async updateNickname(nickname: string): Promise<void> {
+    await this.db.runAsync(`UPDATE users SET nickname = ?, updatedAt = ? WHERE id = ?`, [
+      nickname,
+      new Date().toISOString(),
+      LOCAL_ID,
+    ]);
+  }
 }

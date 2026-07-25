@@ -1,7 +1,7 @@
 import { UserResponse } from '@/api/auth';
 import { userApi } from '@/api/user';
 import { UserRepository, UserRow } from '@/repositories';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useDb } from '../../providers/DatabaseProvider';
 import { userKeys } from './queryKeys';
 
@@ -35,6 +35,22 @@ export function useUserQuery() {
 
       const cached = await repo.getUser();
       return cached ? rowToUser(cached) : null;
+    },
+  });
+}
+
+export function useUpdateNickname() {
+  const db = useDb();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (nickname: string) => {
+      await userApi.updateNickname({ nickname });
+      const repo = new UserRepository(db);
+      await repo.updateNickname(nickname);
+      return repo.getUser();
+    },
+    onSuccess: (row) => {
+      if (row) qc.setQueryData(userKeys.me, rowToUser(row));
     },
   });
 }

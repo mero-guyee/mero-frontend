@@ -28,6 +28,10 @@ export default function SettingsScreen() {
     router.push('/settings/categories');
   };
 
+  const handleProfileSettings = () => {
+    router.push('/settings/profile');
+  };
+
   const handleComingSoon = (feature: string) => {
     Alert.alert('알림', `${feature} 기능은 준비 중입니다.`);
   };
@@ -90,7 +94,7 @@ export default function SettingsScreen() {
               <SettingItem
                 icon={<User size={20} color="$foreground" />}
                 label="프로필 설정"
-                onPress={() => handleComingSoon('프로필 설정')}
+                onPress={handleProfileSettings}
               />
             </YCard>
           </YStack>
