@@ -21,12 +21,7 @@ function darkenHex(hex: string, amount: number = 0.4): string {
   return `#${dr.toString(16).padStart(2, '0')}${dg.toString(16).padStart(2, '0')}${db.toString(16).padStart(2, '0')}`;
 }
 
-export default function PinMarker({
-  coordinate,
-  color,
-  isSelected,
-  onPress,
-}: PinMarkerProps) {
+export default function PinMarker({ coordinate, color, isSelected, onPress }: PinMarkerProps) {
   const [tracksViewChanges, setTracksViewChanges] = useState(true);
 
   useEffect(() => {
@@ -47,9 +42,9 @@ export default function PinMarker({
         <View
           style={[
             styles.circle,
-            { backgroundColor: color, borderColor: darkenHex(color, 0.65) },
+            { backgroundColor: color, borderColor: darkenHex(color, 0.35) },
             isSelected && {
-              borderWidth: 3.5,
+              borderWidth: 8,
               shadowColor: color,
               shadowOpacity: 0.9,
               shadowRadius: 12,
@@ -60,7 +55,7 @@ export default function PinMarker({
         >
           <Image source={require('@/assets/icon.png')} style={styles.icon} resizeMode="cover" />
         </View>
-        <View style={[styles.triangle, { borderTopColor: darkenHex(color, 0.65) }]} />
+        <View style={[styles.triangle, { borderTopColor: darkenHex(color, 0.35) }]} />
       </View>
     </Marker>
   );
@@ -71,10 +66,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   circle: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    borderWidth: 2,
+    width: 45,
+    height: 45,
+    borderRadius: 22.5,
+    borderWidth: 6,
     overflow: 'hidden',
     shadowColor: 'black',
     shadowOffset: { width: 0, height: 3 },

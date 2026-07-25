@@ -12,6 +12,7 @@ export function useFootprintClusters(
   const scRef = useRef(new Supercluster<{ footprintId: string }>({ radius: 60, maxZoom: 16 }));
   const currentRegionRef = useRef<Region | null>(null);
   const [clusters, setClusters] = useState<ReturnType<typeof scRef.current.getClusters>>([]);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const updateClusters = (region: Region) => {
     const zoom = Math.min(20, Math.round(Math.log(360 / region.latitudeDelta) / Math.LN2));
@@ -39,9 +40,16 @@ export function useFootprintClusters(
     if (currentRegionRef.current) updateClusters(currentRegionRef.current);
   }, [validFootprints]);
 
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    };
+  }, []);
+
   const handleRegionChangeComplete = (region: Region) => {
     currentRegionRef.current = region;
-    updateClusters(region);
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => updateClusters(region), 150);
   };
 
   const handleClusterPress = (clusterId: number, latitude: number, longitude: number) => {

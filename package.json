@@ -14,7 +14,8 @@
     "offline": "adb shell svc wifi disable && adb shell svc data disable",
     "online": "adb shell svc wifi enable && adb shell svc data enable",
     "airplane-on": "adb shell cmd connectivity airplane-mode enable",
-    "airplane-off": "adb shell cmd connectivity airplane-mode disable"
+    "airplane-off": "adb shell cmd connectivity airplane-mode disable",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -94,6 +95,7 @@
     "eslint-config-prettier": "^10.1.8",
     "jest": "^29.7.0",
     "jest-expo": "^56.0.5",
+    "patch-package": "^8.0.1",
     "prettier": "^3.8.1",
     "reactotron-react-native": "^5.1.18",
     "test-renderer": "^1.2.0",
