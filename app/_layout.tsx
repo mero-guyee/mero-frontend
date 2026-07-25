@@ -1,3 +1,4 @@
+import OfflineBanner from '@/components/network/OfflineBanner';
 import { setNavigationColorByPath } from '@/utils/setNavigationColorByPath';
 import * as Sentry from '@sentry/react-native';
 import { TamaguiProvider } from '@tamagui/core';
@@ -75,10 +76,12 @@ function AppContent() {
               <BudgetProvider>
                 <SyncManager />
                 <StatusBar style="dark" backgroundColor="transparent" translucent />
+                <OfflineBanner />
                 <PortalProvider>
                   <Stack screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="index" />
                     <Stack.Screen name="(auth)" />
+                    <Stack.Screen name="onboarding" />
                     <Stack.Screen name="(main)" />
                     <Stack.Screen name="auth/naver/callback" />
                     <Stack.Screen name="expense-new" />
