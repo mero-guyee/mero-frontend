@@ -3,7 +3,7 @@ import { Trip } from '@/types';
 import { Edit3 } from '@tamagui/lucide-icons';
 import { Asset } from 'expo-asset';
 import { Image } from 'expo-image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { YStack } from 'tamagui';
 
 const DEFAULT_IMAGE = Asset.fromModule(require('@/assets/images/mountain.jpg')).uri;
@@ -19,6 +19,11 @@ export default function TripDetailCoverImage({
   onEdit?: () => void;
 }) {
   const [localUri, setLocalUri] = useState<string>(uri ?? DEFAULT_IMAGE);
+
+  useEffect(() => {
+    setLocalUri(uri ?? DEFAULT_IMAGE);
+  }, [uri]);
+
   return (
     <YStack height={192} position="relative" overflow="hidden">
       <Image

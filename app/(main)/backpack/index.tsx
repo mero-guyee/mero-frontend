@@ -42,7 +42,7 @@ export default function TripHomeScreen() {
       <BackpackHeader trip={trip} />
       <FadeWrapper>
         <YStack flex={1}>
-          <TripCoverImage uri={trip.imageUrl} trip={trip} />
+          <TripCoverImage key={trip.id} uri={trip.imageUrl} trip={trip} />
 
           <TabView
             navigationState={{ index, routes }}
