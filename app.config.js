@@ -12,6 +12,7 @@ module.exports = {
       bundleIdentifier: 'com.dhguswo555.mero',
       buildNumber: '1',
       supportsTablet: true,
+      usesAppleSignIn: true,
       config: {
         googleMaps: {
           apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY,
@@ -84,6 +85,7 @@ module.exports = {
           },
         },
       ],
+      'expo-apple-authentication',
     ],
     experiments: {
       typedRoutes: true,

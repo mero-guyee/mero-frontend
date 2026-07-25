@@ -1,12 +1,14 @@
 import LoadingDots from '@/components/ui/button/Loading';
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Alert } from 'react-native';
-import { Image, Text, XStack, YStack } from 'tamagui';
+import { Alert, Platform } from 'react-native';
+import { Image, Text, XStack, YStack, useTheme } from 'tamagui';
 import { FilledButton } from '../../components/ui';
 import { useAuth } from '../../contexts';
 
 export default function LoginScreen() {
-  const { loginWithGoogle } = useAuth();
+  const { loginWithGoogle, loginWithApple } = useAuth();
+  const theme = useTheme();
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
 
@@ -21,8 +23,15 @@ export default function LoginScreen() {
     }
   };
 
-  const handleAppleLogin = () => {
-    Alert.alert('알림', 'Apple 로그인은 준비 중입니다.');
+  const handleAppleLogin = async () => {
+    setAppleLoading(true);
+    try {
+      await loginWithApple();
+    } catch (e: any) {
+      Alert.alert('Apple 로그인 실패', e?.message ?? '다시 시도해주세요.');
+    } finally {
+      setAppleLoading(false);
+    }
   };
 
   return (
@@ -67,18 +76,20 @@ export default function LoginScreen() {
             )}
           </FilledButton>
           {/* Apple Login */}
-          <FilledButton onPress={handleAppleLogin}>
-            {appleLoading ? (
-              <LoadingDots />
-            ) : (
-              <XStack alignItems="center" gap="$2">
-                <Text fontSize={20}></Text>
-                <Text color="$foreground" fontWeight="600" fontSize={16}>
-                  Apple로 로그인
-                </Text>
-              </XStack>
-            )}
-          </FilledButton>
+          {Platform.OS === 'ios' && (
+            <FilledButton onPress={handleAppleLogin} disabled={appleLoading} opacity={appleLoading ? 0.6 : 1}>
+              {appleLoading ? (
+                <LoadingDots />
+              ) : (
+                <XStack alignItems="center" gap="$2">
+                  <Ionicons name="logo-apple" size={20} color={theme.foreground?.val} />
+                  <Text color="$foreground" fontWeight="600" fontSize={16}>
+                    Apple로 로그인
+                  </Text>
+                </XStack>
+              )}
+            </FilledButton>
+          )}
         </YStack>
       </YStack>
     </YStack>
