@@ -1,7 +1,6 @@
 import { useFootprintClusters } from '@/hooks/map/useFootprintClusters';
 import { useFootprintMapData } from '@/hooks/map/useFootprintMapData';
 import { Footprint } from '@/types';
-import { unwrapLongitudesForFit } from '@/utils/map/region';
 import { Plane } from '@tamagui/lucide-icons';
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -22,6 +21,10 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
   const mapRef = useRef<MapView>(null);
   const isSelectingRef = useRef(false);
   const [selectedFootprint, setSelectedFootprint] = useState<Footprint | null>(null);
+  const [selectedPoint, setSelectedPoint] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
   const [showModal, setShowModal] = useState(false);
 
   const { validFootprints, footprintColors, allCoords } = useFootprintMapData(footprints);
@@ -47,31 +50,21 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
     }, 300);
   }, [allCoords]);
 
-  const handleSelectFootprint = (footprint: Footprint) => {
+  const handleSelectFootprint = (footprint: Footprint, latitude: number, longitude: number) => {
     isSelectingRef.current = true;
     setSelectedFootprint(footprint);
+    setSelectedPoint({ latitude, longitude });
     setShowModal(true);
 
-    const coords = footprint.locations.map((loc) => ({
-      latitude: loc.latitude!,
-      longitude: loc.longitude!,
-    }));
-    if (coords.length === 1) {
-      mapRef.current?.animateToRegion(
-        {
-          latitude: coords[0].latitude,
-          longitude: coords[0].longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        },
-        300
-      );
-    } else {
-      mapRef.current?.fitToCoordinates(unwrapLongitudesForFit(coords), {
-        edgePadding: { top: 40, right: 40, bottom: 40, left: 40 },
-        animated: true,
-      });
-    }
+    mapRef.current?.animateToRegion(
+      {
+        latitude,
+        longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      },
+      300
+    );
   };
 
   const handleDeselect = () => {
@@ -80,10 +73,12 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
       return;
     }
     setSelectedFootprint(null);
+    setSelectedPoint(null);
   };
 
   const handleCloseModal = () => {
     setSelectedFootprint(null);
+    setSelectedPoint(null);
     setShowModal(false);
   };
 
@@ -113,7 +108,7 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
           onRegionChangeComplete={handleRegionChangeComplete}
           onPress={handleDeselect}
         >
-          {clusters.map((point, index) => {
+          {clusters.map((point) => {
             const [longitude, latitude] = point.geometry.coordinates;
 
             if ('cluster' in point.properties && point.properties.cluster) {
@@ -134,11 +129,13 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
 
             return (
               <PinMarker
-                key={`marker-${footprintId}-${index}`}
+                key={`marker-${footprintId}-${longitude}-${latitude}`}
                 coordinate={{ latitude, longitude }}
                 color={footprintColors[footprintId]}
-                isSelected={selectedFootprint?.id === footprintId}
-                onPress={() => handleSelectFootprint(footprint)}
+                isSelected={
+                  selectedPoint?.latitude === latitude && selectedPoint?.longitude === longitude
+                }
+                onPress={() => handleSelectFootprint(footprint, latitude, longitude)}
               />
             );
           })}
