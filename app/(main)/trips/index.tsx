@@ -65,6 +65,7 @@ export default function TripListScreen() {
             <SectionList
               sections={sections}
               keyExtractor={(item) => item.id}
+              stickySectionHeadersEnabled={false}
               contentContainerStyle={{ padding: paddingHorizontalGeneral, paddingTop: 0 }}
               renderSectionHeader={({ section }) => (
                 <Text fontSize={20} fontWeight="600" color="$foreground" paddingVertical="$2">
