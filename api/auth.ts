@@ -18,6 +18,7 @@ export interface LoginResponse {
   nickname: string;
   accessToken: string;
   refreshToken: string;
+  isNewUser: boolean;
 }
 
 export interface UserResponse {
@@ -48,6 +49,15 @@ export const authApi = {
     const res = await apiRequest<LoginResponse>('/api/auth/google', {
       method: 'POST',
       body: JSON.stringify({ idToken }),
+    });
+    await tokenStorage.setTokens(res.accessToken, res.refreshToken);
+    return res;
+  },
+
+  appleLogin: async (identityToken: string): Promise<LoginResponse> => {
+    const res = await apiRequest<LoginResponse>('/api/auth/apple', {
+      method: 'POST',
+      body: JSON.stringify({ identityToken }),
     });
     await tokenStorage.setTokens(res.accessToken, res.refreshToken);
     return res;

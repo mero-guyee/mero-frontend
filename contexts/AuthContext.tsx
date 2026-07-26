@@ -1,4 +1,5 @@
 import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { useRouter } from 'expo-router';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { authApi, setAuthExpiredHandler, tokenStorage, userApi } from '../api';
@@ -16,6 +17,7 @@ interface AuthContextType {
   setIsAuthenticated: (value: boolean) => void;
   login: ({ email, password }: { email: string; password: string }) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
+  loginWithApple: () => Promise<void>;
   logout: () => void;
 }
 
@@ -51,10 +53,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async ({ email, password }: { email: string; password: string }) => {
-    await authApi.login({ email, password });
+    const res = await authApi.login({ email, password });
     setIsAuthenticated(true);
     await cacheCurrentUser();
-    router.push('/(main)/trips');
+    router.push(res.isNewUser ? '/onboarding' : '/(main)/trips');
   };
 
   const loginWithGoogle = async () => {
@@ -66,13 +68,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { idToken } = response.data;
 
       if (!idToken) throw new Error('Google idToken을 가져올 수 없습니다.');
-      await authApi.googleLogin(idToken);
+      const res = await authApi.googleLogin(idToken);
       setIsAuthenticated(true);
       await cacheCurrentUser();
-      router.push('/(main)/trips');
+      router.push(res.isNewUser ? '/onboarding' : '/(main)/trips');
     } catch (e: any) {
       console.error('Google 로그인 실패:', e);
       throw new Error(e?.message ?? 'Google 로그인 과정에서 오류가 발생했습니다.');
+    }
+  };
+
+  const loginWithApple = async () => {
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (!credential.identityToken) throw new Error('Apple identityToken을 가져올 수 없습니다.');
+      const res = await authApi.appleLogin(credential.identityToken);
+      setIsAuthenticated(true);
+      await cacheCurrentUser();
+      router.push(res.isNewUser ? '/onboarding' : '/(main)/trips');
+    } catch (e: any) {
+      if (e?.code === 'ERR_REQUEST_CANCELED') {
+        throw new Error('Apple 로그인이 취소되었습니다.');
+      }
+      console.error('Apple 로그인 실패:', e);
+      throw new Error(e?.message ?? 'Apple 로그인 과정에서 오류가 발생했습니다.');
     }
   };
 
@@ -88,6 +113,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated,
     login,
     loginWithGoogle,
+    loginWithApple,
     logout,
   };
 
