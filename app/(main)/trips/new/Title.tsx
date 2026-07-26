@@ -56,7 +56,7 @@ export default function Title() {
           <FormLabel marginBottom="$2">모험의 이름</FormLabel>
           <Input
             testID="title-input"
-            borderColor={titleError ? '$destructive' : '$foreground'}
+            borderColor={titleError ? '$destructiveText' : '$foreground'}
             paddingHorizontal="$4"
             paddingVertical="$3"
             placeholder="예: 2026 남미 여행"
@@ -68,7 +68,7 @@ export default function Title() {
             }}
             color="$foreground"
           />
-          <Text color="$destructive" fontSize={13} marginTop="$1" minHeight={14}>
+          <Text color="$destructiveText" fontSize={13} marginTop="$1" minHeight={14}>
             {titleError ?? ''}
           </Text>
         </YStack>

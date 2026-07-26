@@ -223,7 +223,7 @@ export function BudgetView() {
                             justifyContent="center"
                             borderRadius="$3"
                           >
-                            <Trash2 size={16} color="$destructive" />
+                            <Trash2 size={16} color="$destructiveText" />
                           </YStack>
                         </Pressable>
                       </XStack>
@@ -240,7 +240,7 @@ export function BudgetView() {
                       <YStack
                         height="100%"
                         borderRadius={7}
-                        backgroundColor={isOverBudget ? '$destructive' : '$primary'}
+                        backgroundColor={isOverBudget ? '$destructive' : '$accentStrong'}
                         width={`${Math.min(percentage, 100)}%`}
                       />
                       {todayMarkerPercent !== null && (
@@ -390,7 +390,7 @@ export function BudgetView() {
           <FilledButton
             flex={1}
             backgroundColor="$muted"
-            pressStyle={{ backgroundColor: '$secondary' }}
+            pressStyle={{ backgroundColor: '$mutedPress' }}
             onPress={handleCloseBudgetModal}
           >
             <Text color="$foreground">취소</Text>

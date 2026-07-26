@@ -20,8 +20,8 @@ export default function MoreEditDelete({
       </Pressable>
       <Pressable onPress={onDelete}>
         <XStack paddingHorizontal="$4" paddingVertical="$4" gap="$2" alignItems="center">
-          <Trash2 size={16} color="$destructive" />
-          <Text color="$destructive">삭제</Text>
+          <Trash2 size={16} color="$destructiveText" />
+          <Text color="$destructiveText">삭제</Text>
         </XStack>
       </Pressable>
     </More>

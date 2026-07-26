@@ -53,8 +53,13 @@ export default function TripProgress({
           </Text>
         )}
       </XStack>
-      <YStack height={10} backgroundColor="$secondary" borderRadius={5} overflow="hidden">
-        <YStack height={10} backgroundColor="$primary" borderRadius={5} width={`${progress}%`} />
+      <YStack height={10} backgroundColor="$mutedStrong" borderRadius={5} overflow="hidden">
+        <YStack
+          height={10}
+          backgroundColor="$accentStrong"
+          borderRadius={5}
+          width={`${progress}%`}
+        />
       </YStack>
     </YStack>
   );

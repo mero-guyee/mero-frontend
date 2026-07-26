@@ -1,13 +1,16 @@
+import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { PressableYCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
-import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { useSyncContext } from '@/contexts';
 import { useFootprintPhotosQuery } from '@/hooks/queries/useFootprints';
 import { Calendar, Camera, Cloud, MapPin } from '@tamagui/lucide-icons';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Image, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { Footprint } from '../../types';
+
+const FOOTPRINT_THUMBNAIL_THUMBHASH = 'a8cVJYh4h3iPiHd3iHd3h4iPifiY';
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -33,21 +36,20 @@ export default function FootprintItem({ footprint, onPress, showSyncBadge = fals
   const dateLabel = `${month}월 ${day}일 (${weekday})`;
 
   const [weatherKey, ...weatherLabelParts] = footprint.weatherInfo?.split(' ') ?? [];
-  const WeatherIcon = weatherKey ? WEATHER_ICON_MAP[weatherKey] ?? Cloud : undefined;
+  const WeatherIcon = weatherKey ? (WEATHER_ICON_MAP[weatherKey] ?? Cloud) : undefined;
   const weatherLabel = weatherLabelParts.join(' ');
 
   return (
-    <PressableYCard
-      onPress={onPress}
-      padding={0}
-      marginBottom="$4"
-      position="relative"
-    >
+    <PressableYCard onPress={onPress} padding={0} marginBottom="$4" position="relative">
       {showSyncBadge && <SyncingResultBadge id={footprint.id} />}
 
       {thumbnailUri ? (
         <YStack position="relative" width="100%" aspectRatio={4 / 3}>
-          <Image source={{ uri: thumbnailUri }} width="100%" height="100%" objectFit="cover" />
+          <Image
+            source={{ uri: thumbnailUri }}
+            placeholder={{ thumbhash: FOOTPRINT_THUMBNAIL_THUMBHASH }}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
           <LinearGradient
             colors={['transparent', 'rgba(20,14,10,0.08)', 'rgba(20,14,10,0.78)']}
             locations={[0, 0.45, 1]}

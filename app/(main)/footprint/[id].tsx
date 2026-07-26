@@ -9,10 +9,11 @@ import { getCurrencyCode } from '@/data/constants';
 import { groupExpensesByCurrency } from '@/data/utils';
 import { formattedLocation } from '@/utils/location/location';
 import { ChevronDown, ChevronUp, Cloud, MapPin } from '@tamagui/lucide-icons';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Modal, Pressable, ScrollView, useWindowDimensions } from 'react-native';
-import { Image, Text, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { FilledButton } from '../../../components/ui';
 import { useExpenses, useFootprints } from '../../../contexts';
 import { useFootprintPhotosQuery } from '../../../hooks/queries/useFootprints';
@@ -152,7 +153,7 @@ export default function FootprintDetailScreen() {
                         style={{ width: SCREEN_WIDTH - 48, height: SCREEN_WIDTH * 0.75 }}
                         onPress={() => setSelectedPhoto(uri)}
                       >
-                        <Image source={{ uri }} width="100%" height="100%" resizeMode="cover" />
+                        <Image source={{ uri }} style={{ width: '100%', height: '100%' }} />
                       </Pressable>
                     );
                   })}
@@ -256,7 +257,7 @@ export default function FootprintDetailScreen() {
                                 {expense.currency} {expense.amount.toLocaleString()}
                               </Text>
                               <Pressable onPress={() => handleDeleteExpense(expense.id)}>
-                                <Text color="$destructive" fontSize={13}>
+                                <Text color="$destructiveText" fontSize={13}>
                                   삭제
                                 </Text>
                               </Pressable>

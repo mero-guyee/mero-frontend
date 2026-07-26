@@ -69,7 +69,7 @@ export default function MemoFormScreen() {
               borderWidth={0}
               padding={0}
             />
-            <YStack borderBottomWidth={1} borderColor="$secondary" />
+            <YStack borderBottomWidth={1} borderColor="$mutedStrong" />
             <TextArea
               placeholder="여행에 도움이 될 만한 간단한 메모를 남겨보세요"
               placeholderTextColor="$placeholderForeground"

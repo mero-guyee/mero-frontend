@@ -19,12 +19,12 @@ export default function Chip({ label, icon, onRemove }: Props) {
       borderRadius={20}
     >
       {icon}
-      <Text color="$accentForeground" fontSize={13}>
+      <Text color="$mutedForeground" fontSize={13}>
         {label}
       </Text>
       {onRemove && (
         <Pressable onPress={onRemove} hitSlop={8}>
-          <X size={12} color="$accentForeground" />
+          <X size={12} color="$mutedForeground" />
         </Pressable>
       )}
     </XStack>

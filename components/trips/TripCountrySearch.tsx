@@ -69,7 +69,7 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
               {...inputStyle}
               flexWrap="wrap"
               gap="$2"
-              backgroundColor="$transparent"
+              backgroundColor="transparent"
               paddingHorizontal="$3"
               paddingVertical="$2.5"
               minHeight="$5"
@@ -119,12 +119,12 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
                   justifyContent="space-between"
                 >
                   <Text
-                    color={isSelected ? '$accentForeground' : '$foreground'}
+                    color={isSelected ? '$mutedForeground' : '$foreground'}
                     fontWeight={isSelected ? '600' : '400'}
                   >
                     {name}
                   </Text>
-                  {isSelected && <Check size={16} color="$accentForeground" />}
+                  {isSelected && <Check size={16} color="$mutedForeground" />}
                 </XStack>
               </Pressable>
             );

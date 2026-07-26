@@ -67,7 +67,7 @@ export default function FootprintFormScreen() {
               padding={0}
               marginBottom="$3"
             />
-            <YStack borderBottomWidth={1} borderColor="$secondary" marginBottom="$3" />
+            <YStack borderBottomWidth={1} borderColor="$mutedStrong" marginBottom="$3" />
             <TextArea
               placeholder="어떤 여행이었나요? 자유롭게 작성해주세요"
               placeholderTextColor="$placeholderForeground"

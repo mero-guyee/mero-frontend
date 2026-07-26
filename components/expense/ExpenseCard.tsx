@@ -32,12 +32,12 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
         <YStack
           width={44}
           height={44}
-          backgroundColor="$accent"
+          backgroundColor="$muted"
           borderRadius="$3"
           alignItems="center"
           justifyContent="center"
         >
-          <CategoryIcon name={expense.categoryName!} size={18} />
+          <CategoryIcon name={expense.categoryName!} size={24} />
         </YStack>
         <YStack gap="$1">
           <Text color="$mutedForeground">{expense.categoryName}</Text>

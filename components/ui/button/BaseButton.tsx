@@ -5,7 +5,7 @@ export const filledButtonStyle: GetProps<typeof Stack> = {
   borderRadius: '$4',
   borderWidth: 0,
   backgroundColor: '$accent',
-  pressStyle: { backgroundColor: '$accentHover' },
+  pressStyle: { backgroundColor: '$accentPress' },
 };
 
 export const FilledButton = styled(TamaguiButton, {
@@ -13,7 +13,7 @@ export const FilledButton = styled(TamaguiButton, {
   borderRadius: '$4',
   borderWidth: 0,
   backgroundColor: '$accent',
-  pressStyle: { backgroundColor: '$accentHover' },
+  pressStyle: { backgroundColor: '$accentPress' },
 });
 
 export const CircularButton = styled(TamaguiButton, {
@@ -28,7 +28,7 @@ export const IconButton = styled(FilledButton, {
   size: '$1',
   height: '$10',
   borderRadius: '$4',
-  backgroundColor: '$transparent',
-  pressStyle: { backgroundColor: '$backgroundPress' },
+  backgroundColor: 'transparent',
+  pressStyle: { backgroundColor: '$cardPress' },
   hitSlop: 25,
 });

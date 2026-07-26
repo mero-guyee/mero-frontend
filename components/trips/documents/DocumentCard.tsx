@@ -116,7 +116,7 @@ export function DocumentCard({
           </YStack>
         </XStack>
         <Pressable onPress={onRemove} style={{ padding: 8 }}>
-          <Trash2 size={16} color="$destructive" />
+          <Trash2 size={16} color="$destructiveText" />
         </Pressable>
       </XCard>
     </Pressable>

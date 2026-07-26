@@ -72,8 +72,8 @@ export default function DatePickerInput({
             themeVariant="light"
           />
 
-          <FilledButton color="$accent" fontWeight="600" fontSize={16} onPress={handleConfirm}>
-            <Text>완료</Text>
+          <FilledButton fontWeight="600" fontSize={16} onPress={handleConfirm}>
+            <Text color="$foreground">완료</Text>
           </FilledButton>
         </AppBottomSheet>
       ) : (

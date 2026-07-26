@@ -45,7 +45,7 @@ export default function ProfileSettingsScreen() {
           <FormLabel marginBottom="$2">닉네임</FormLabel>
           <Input
             testID="profile-nickname-input"
-            borderColor={error ? '$destructive' : '$foreground'}
+            borderColor={error ? '$destructiveText' : '$foreground'}
             paddingHorizontal="$4"
             paddingVertical="$3"
             placeholder="닉네임을 입력하세요"
@@ -57,7 +57,7 @@ export default function ProfileSettingsScreen() {
             }}
             color="$foreground"
           />
-          <Text color="$destructive" fontSize={13} marginTop="$1" minHeight={14}>
+          <Text color="$destructiveText" fontSize={13} marginTop="$1" minHeight={14}>
             {error ?? ''}
           </Text>
         </YStack>

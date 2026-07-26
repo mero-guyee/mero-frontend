@@ -28,7 +28,7 @@ export function SyncListItem({ entry, isLast, isRetrying, onRetry }: SyncListIte
       borderBottomColor="$border"
       style={{ borderBottomColor: 'rgba(155, 196, 209, 0.2)' }}
     >
-      <Text flex={1} color={isFailed ? '$destructive' : '$foreground'} fontSize={14}>
+      <Text flex={1} color={isFailed ? '$destructiveText' : '$foreground'} fontSize={14}>
         {entry.dataName || '-'}
       </Text>
       <Text color="$mutedForeground" fontSize={12}>
@@ -36,7 +36,7 @@ export function SyncListItem({ entry, isLast, isRetrying, onRetry }: SyncListIte
       </Text>
 
       <IconButton onPress={onRetry} disabled={isRetrying}>
-        <RotateCcw size={16} color={isRetrying ? '$mutedForeground' : '$destructive'} />
+        <RotateCcw size={16} color={isRetrying ? '$mutedForeground' : '$destructiveText'} />
       </IconButton>
     </XStack>
   );

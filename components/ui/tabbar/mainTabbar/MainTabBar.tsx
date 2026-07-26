@@ -1,8 +1,8 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { Animated, Pressable, StyleSheet, Text } from 'react-native';
+import { Animated, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { View } from 'tamagui';
+import { Text, View } from 'tamagui';
 import { useTabBarNavigation } from './useTabBarNavigation';
 import { useTabPressAnimation } from './useTabPressAnimation';
 
@@ -43,7 +43,7 @@ export default function MainTabBar(props: BottomTabBarProps) {
         if (options.tabBarLabel === '설정') return null;
 
         const isFocused = state.index === index;
-        const color = isFocused ? '#9BC4D1' : '#8B7355';
+        const color = isFocused ? '$accentStrong' : '$foreground';
         const label = options.tabBarLabel as string;
 
         return (
@@ -64,7 +64,9 @@ export default function MainTabBar(props: BottomTabBarProps) {
               <Animated.View style={[styles.ripple, { opacity: animsOpacity[index] }]} />
               {options.tabBarIcon?.({ focused: isFocused, color, size: 24 })}
             </Animated.View>
-            <Text style={[styles.label, { color }]}>{label}</Text>
+            <Text fontWeight="300" style={[styles.label, { color }]}>
+              {label}
+            </Text>
           </Pressable>
         );
       })}
@@ -81,7 +83,6 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    fontWeight: '500',
     lineHeight: 14,
   },
   ripple: {
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     width: 51,
     height: 38,
     borderRadius: 16,
-    backgroundColor: '#C8E4C1',
+    backgroundColor: '#C8DEE6',
     alignSelf: 'center',
     top: -1,
   },

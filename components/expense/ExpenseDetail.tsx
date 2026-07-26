@@ -18,7 +18,7 @@ import { useExpenses } from '../../contexts';
 
 const plainInputStyle = {
   borderWidth: 0,
-  backgroundColor: '$transparent',
+  backgroundColor: 'transparent',
   height: 24,
   paddingHorizontal: '$0',
   paddingVertical: '$0',
@@ -121,7 +121,7 @@ export default function ExpenseDetail({ expenseId }: { expenseId: string }) {
     <YStack flex={1} backgroundColor="$background" px={4}>
       <BackActionHeader onBack={() => router.back()} label="상세 내역">
         <IconButton onPress={handleDelete}>
-          <Trash2 size="$6.5" color="$destructive" />
+          <Trash2 size="$6.5" color="$destructiveText" />
         </IconButton>
       </BackActionHeader>
 

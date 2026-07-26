@@ -43,7 +43,7 @@ export default function CategoryManagerScreen() {
       </BackActionHeader>
       <XStack paddingHorizontal="$4" paddingBottom="$3">
         <FilledButton
-          backgroundColor={isEditing ? '$primary' : '$muted'}
+          backgroundColor={isEditing ? '$accentStrong' : '$muted'}
           pressStyle={{ opacity: 0.8 }}
           paddingHorizontal="$4"
           paddingVertical="$2"
@@ -100,7 +100,7 @@ export default function CategoryManagerScreen() {
                           justifyContent="center"
                           borderRadius="$4"
                         >
-                          <Trash2 size={16} color="$destructive" />
+                          <Trash2 size={16} color="$destructiveText" />
                         </YStack>
                       </Pressable>
                     )}

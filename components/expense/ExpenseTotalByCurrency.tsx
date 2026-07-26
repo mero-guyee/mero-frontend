@@ -34,7 +34,7 @@ export default function ExpenseTotalByCurrency({
       </XStack>
       <YStack
         height={8}
-        backgroundColor="$secondary"
+        backgroundColor="$mutedStrong"
         borderRadius={4}
         overflow="hidden"
         marginBottom="$2"
@@ -42,7 +42,7 @@ export default function ExpenseTotalByCurrency({
         <YStack
           height="100%"
           borderRadius={4}
-          backgroundColor={percentage >= 100 ? '$destructive' : '$primary'}
+          backgroundColor={percentage >= 100 ? '$destructive' : '$accentStrong'}
           width={`${Math.min(percentage, 100)}%`}
         />
       </YStack>

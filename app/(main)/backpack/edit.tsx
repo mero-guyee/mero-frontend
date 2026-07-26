@@ -201,7 +201,7 @@ export default function EditBackPackScreen() {
                     marginBottom="$3"
                     opacity={0.4}
                   >
-                    <ImageIcon size={32} color="$primary" />
+                    <ImageIcon size={32} color="$accentStrong" />
                   </YStack>
                   <Text color="$foreground" marginBottom="$1">
                     이미지를 탭하여 업로드

@@ -12,8 +12,8 @@ export function SyncIndicator({ status, syncing }: SyncIndicatorProps) {
 
   return (
     <XStack alignItems="center" gap="$1">
-      <CloudOff size={12} color="$red9" />
-      <Text fontSize={11} color="$red9">
+      <CloudOff size={12} color="$destructiveText" />
+      <Text fontSize={11} color="$destructiveText">
         미동기화
       </Text>
     </XStack>

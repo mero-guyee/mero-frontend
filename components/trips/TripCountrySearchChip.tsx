@@ -19,11 +19,11 @@ export default function TripCountrySearchChip({
       backgroundColor="$accent"
       borderRadius={20}
     >
-      <Text color="$accentForeground" fontSize={13}>
+      <Text color="$mutedForeground" fontSize={13}>
         {country}
       </Text>
       <Pressable onPress={() => onRemove(country)} hitSlop={8}>
-        <X size={12} color="$accentForeground" />
+        <X size={12} color="$mutedForeground" />
       </Pressable>
     </XStack>
   );

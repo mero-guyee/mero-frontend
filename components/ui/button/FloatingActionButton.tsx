@@ -69,13 +69,12 @@ export default function FloatingActionButton({
           left={1}
           width="100%"
           height="100%"
-          backgroundColor="$accentHover"
+          backgroundColor="$accentPress"
           borderRadius="$4"
         />
       </Animated.View>
       <Animated.View style={{ transform: translate.getTranslateTransform() }}>
         <FilledButton
-          backgroundColor="#C8DEE6"
           borderRadius="$4"
           alignItems="center"
           justifyContent="center"

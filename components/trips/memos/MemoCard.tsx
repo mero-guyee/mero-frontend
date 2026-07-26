@@ -1,5 +1,4 @@
 import { PressableYCard } from '@/components/ui/Card';
-import { PressableStack } from '@/components/ui/pressFeedback';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { useSyncContext } from '@/contexts';
@@ -28,7 +27,7 @@ export default function MemoCard({
           </Text>
           <SyncIndicator status={syncStatus} syncing={isSyncing(id)} />
         </XStack>
-        <PressableStack
+        <XStack
           onPress={(e) => {
             e.stopPropagation();
             onDelete(memo.id);
@@ -38,8 +37,8 @@ export default function MemoCard({
           marginTop={-8}
           zIndex={1}
         >
-          <Trash2 size={16} color="$destructive" />
-        </PressableStack>
+          <Trash2 size={16} color="$destructiveText" />
+        </XStack>
       </XStack>
       <Text color="$mutedForeground" fontSize={14} numberOfLines={2} marginBottom="$2">
         {content}

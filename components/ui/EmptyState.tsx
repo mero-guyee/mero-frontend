@@ -46,7 +46,7 @@ export function EmptyState({ icon, title, description, action, ...stackProps }: 
       {action && (
         <FilledButton
           marginTop="$2"
-          backgroundColor="$primary"
+          backgroundColor="$accentStrong"
           pressStyle={{ opacity: 0.8 }}
           paddingHorizontal="$5"
           paddingVertical="$3"
