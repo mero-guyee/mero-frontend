@@ -1,6 +1,8 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useUserQuery } from '@/hooks/queries/useUser';
-import { Backpack, Settings } from '@tamagui/lucide-icons';
+import { Settings, User } from '@tamagui/lucide-icons';
+import { Image } from 'expo-image';
+import { useEffect, useState } from 'react';
 import { Text, XStack, YStack } from 'tamagui';
 import { CircularButton } from '../ui';
 
@@ -10,6 +12,14 @@ interface TripHeaderProps {
 
 export function TripHeader({ onSettings }: TripHeaderProps) {
   const { data: user } = useUserQuery();
+
+  const [imageError, setImageError] = useState(false);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [user?.profileImage]);
+
+  const showProfileImage = !!user?.profileImage && !imageError;
 
   return (
     <YStack backgroundColor="$background" padding={paddingHorizontalGeneral}>
@@ -22,8 +32,19 @@ export function TripHeader({ onSettings }: TripHeaderProps) {
             borderRadius={24}
             alignItems="center"
             justifyContent="center"
+            overflow="hidden"
           >
-            <Backpack size={24} color="$foreground" />
+            {showProfileImage ? (
+              <Image
+                source={{ uri: user.profileImage! }}
+                contentFit="cover"
+                cachePolicy="memory-disk"
+                style={{ width: 48, height: 48 }}
+                onError={() => setImageError(true)}
+              />
+            ) : (
+              <User size={24} color="$foreground" />
+            )}
           </YStack>
           <YStack>
             <Text fontSize={18} fontWeight="600" color="$foreground">
