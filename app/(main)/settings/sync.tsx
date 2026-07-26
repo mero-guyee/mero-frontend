@@ -8,13 +8,14 @@ import { syncFootprints } from '@/hooks/sync/syncFootprints';
 import { syncMemos } from '@/hooks/sync/syncMemos';
 import { syncTrips } from '@/hooks/sync/syncTrips';
 import { useDb } from '@/providers/DatabaseProvider';
-import { OutboxRepository, type OutboxEntry } from '@/repositories/outbox';
-import { CheckCircle, RefreshCw, Trash2 } from '@tamagui/lucide-icons';
+import { OutboxRepository, outboxKey, type OutboxEntry } from '@/repositories/outbox';
+import { CheckCircle, Trash2 } from '@tamagui/lucide-icons';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ScrollView } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { Text, XStack, YStack } from 'tamagui';
+import { Text, YStack } from 'tamagui';
 
 const DOMAIN_LABELS: Record<string, string> = {
   trips: '여행',
@@ -43,13 +44,12 @@ interface DomainGroup {
 export default function SyncStatusScreen() {
   const router = useRouter();
   const db = useDb();
-  const [groups, setGroups] = useState<DomainGroup[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const qc = useQueryClient();
   const [retrying, setRetrying] = useState<string | null>(null);
 
-  const loadOutbox = async () => {
-    try {
-      setIsLoading(true);
+  const { data: groups = [], isLoading } = useQuery({
+    queryKey: outboxKey,
+    queryFn: async (): Promise<DomainGroup[]> => {
       const outbox = new OutboxRepository(db);
       const entries = await outbox.getAll();
 
@@ -59,23 +59,12 @@ export default function SyncStatusScreen() {
         return acc;
       }, {});
 
-      setGroups(
-        Object.entries(grouped).map(([domain, domainEntries]) => ({
-          domain,
-          entries: domainEntries,
-        }))
-      );
-    } catch (e) {
-      console.error('Failed to load outbox entries', e);
-      setGroups([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadOutbox();
-  }, []);
+      return Object.entries(grouped).map(([domain, domainEntries]) => ({
+        domain,
+        entries: domainEntries,
+      }));
+    },
+  });
 
   const handleRetry = async (entry: OutboxEntry) => {
     const key = `${entry.domain}-${entry.dataId}`;
@@ -86,7 +75,7 @@ export default function SyncStatusScreen() {
       await outbox.resetToReady(entry.domain, entry.dataId);
       const syncFn = DOMAIN_SYNC_FNS[entry.domain];
       if (syncFn) await syncFn(db);
-      await loadOutbox();
+      await qc.invalidateQueries({ queryKey: outboxKey });
     } catch (e) {
       console.error('Failed to retry sync for entry', entry, e);
       Toast.show({
@@ -103,7 +92,7 @@ export default function SyncStatusScreen() {
     try {
       const outbox = new OutboxRepository(db);
       await outbox.clearAll();
-      await loadOutbox();
+      await qc.invalidateQueries({ queryKey: outboxKey });
     } catch (e) {
       console.error('Failed to clear outbox', e);
     }
@@ -114,16 +103,11 @@ export default function SyncStatusScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       <BackActionHeader onBack={() => router.back()} label="동기화 현황">
-        <XStack gap="$3">
-          {__DEV__ && (
-            <IconButton onPress={handleClearAll}>
-              <Trash2 size={20} color="$foreground" />
-            </IconButton>
-          )}
-          <IconButton onPress={loadOutbox} testID="sync-refresh-button">
-            <RefreshCw size={20} color="$foreground" />
+        {__DEV__ && (
+          <IconButton onPress={handleClearAll}>
+            <Trash2 size={20} color="$foreground" />
           </IconButton>
-        </XStack>
+        )}
       </BackActionHeader>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>

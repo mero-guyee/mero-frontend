@@ -1,4 +1,5 @@
 import { useDb } from '@/providers/DatabaseProvider';
+import { outboxKey } from '@/repositories/outbox';
 import { useQueryClient } from '@tanstack/react-query';
 import NetInfo from '@react-native-community/netinfo';
 import { useEffect, useRef } from 'react';
@@ -28,6 +29,7 @@ export function usePendingSync() {
     qc.invalidateQueries({ queryKey: ['footprints'] });
     qc.invalidateQueries({ queryKey: ['expenses'] });
     qc.invalidateQueries({ queryKey: ['budgets'] });
+    qc.invalidateQueries({ queryKey: outboxKey });
   }
 
   useEffect(() => {

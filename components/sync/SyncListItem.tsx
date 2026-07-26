@@ -1,6 +1,6 @@
 import { IconButton } from '@/components/ui/button/BaseButton';
 import type { OutboxEntry } from '@/repositories/outbox';
-import { RefreshCw } from '@tamagui/lucide-icons';
+import { RotateCcw } from '@tamagui/lucide-icons';
 import { Text, XStack } from 'tamagui';
 
 const OPERATION_LABELS: Record<string, string> = {
@@ -36,7 +36,7 @@ export function SyncListItem({ entry, isLast, isRetrying, onRetry }: SyncListIte
       </Text>
 
       <IconButton onPress={onRetry} disabled={isRetrying}>
-        <RefreshCw size={16} color={isRetrying ? '$mutedForeground' : '$destructive'} />
+        <RotateCcw size={16} color={isRetrying ? '$mutedForeground' : '$destructive'} />
       </IconButton>
     </XStack>
   );

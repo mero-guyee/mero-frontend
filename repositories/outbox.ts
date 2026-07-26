@@ -1,5 +1,7 @@
 import * as SQLite from 'expo-sqlite';
 
+export const outboxKey = ['outbox'] as const;
+
 export interface OutboxEntry {
   id: string;
   domain: string;
