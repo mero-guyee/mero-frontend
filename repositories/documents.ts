@@ -26,6 +26,7 @@ function rowToDocument(row: DocumentRow): TripDocument {
     fileName: row.fileName,
     fileUri: resolveAbsoluteFileUri(row.fileUri),
     fileSize: row.fileSize ?? undefined,
+    syncStatus: row.syncStatus,
   };
 }
 

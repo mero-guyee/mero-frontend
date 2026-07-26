@@ -26,8 +26,10 @@ export function DocumentsTab({ tripId }: { tripId: string }) {
                 {documents.map((doc) => (
                   <DocumentCard
                     key={doc.id}
+                    id={doc.id}
                     name={doc.fileName}
                     fileUri={doc.fileUri}
+                    syncStatus={doc.syncStatus}
                     onRemove={() => deleteDocument(doc.id)}
                     onImagePress={setSelectedImage}
                     onPdfPress={setSelectedPdf}

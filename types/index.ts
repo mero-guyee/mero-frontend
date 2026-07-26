@@ -30,6 +30,7 @@ export type TripDocument = {
   fileName: string;
   fileUri: string;
   fileSize?: number;
+  syncStatus?: 'pending' | 'synced';
 };
 
 export type TripDocumentFile = {
