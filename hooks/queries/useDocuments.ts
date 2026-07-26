@@ -4,6 +4,7 @@ import * as Crypto from 'expo-crypto';
 import { Directory, File, Paths } from 'expo-file-system';
 import { documentsApi } from '../../api/documents';
 import { tripsApi } from '../../api/trips';
+import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { DocumentRepository, TripRepository } from '../../repositories';
 import { TripDocumentFile } from '../../types';
@@ -54,6 +55,7 @@ export function useDocumentsQuery(tripId: string) {
 export function useCreateDocument() {
   const db = useDb();
   const qc = useQueryClient();
+  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
   return useMutation({
     mutationFn: async ({ tripId, data }: { tripId: string; data: TripDocumentFile }) => {
       const docRepo = new DocumentRepository(db);
@@ -62,6 +64,7 @@ export function useCreateDocument() {
       const doc = await docRepo.createDocument(tripId, persisted);
 
       (async () => {
+        markSyncing(doc.id);
         try {
           const trip = await tripRepo.getTripById(tripId);
           if (trip?.serverId) {
@@ -71,12 +74,16 @@ export function useCreateDocument() {
               file: data,
             });
             await docRepo.setServerId(doc.id, String(serverDoc.id));
+            markSyncSucceeded(doc.id);
             qc.invalidateQueries({ queryKey: documentKeys.byTrip(tripId) });
           }
         } catch (e) {
           if (e instanceof ApiError) {
             console.error('Failed to upload document to server:', e);
           }
+          markSyncFailed(doc.id);
+        } finally {
+          unmarkSyncing(doc.id);
         }
       })();
 
@@ -109,6 +116,7 @@ export function useDeleteDocument() {
             const trip = await tripRepo.getTripById(tripId);
             if (trip?.serverId) {
               await documentsApi.delete(parseInt(trip.serverId), parseInt(doc.serverId));
+              await docRepo.removeFromOutbox(id);
             }
           }
         } catch (e) {

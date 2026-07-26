@@ -3,6 +3,7 @@ import { YCard } from '@/components/ui/Card';
 import { IconButton } from '@/components/ui/button/BaseButton';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { syncBudgets } from '@/hooks/sync/syncBudgets';
+import { syncDocuments } from '@/hooks/sync/syncDocuments';
 import { syncExpenses } from '@/hooks/sync/syncExpenses';
 import { syncFootprints } from '@/hooks/sync/syncFootprints';
 import { syncMemos } from '@/hooks/sync/syncMemos';
@@ -34,6 +35,7 @@ const DOMAIN_SYNC_FNS: Record<string, SyncFn> = {
   footprints: syncFootprints,
   expenses: syncExpenses,
   budgets: syncBudgets,
+  documents: syncDocuments,
 };
 
 interface DomainGroup {

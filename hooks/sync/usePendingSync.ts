@@ -1,10 +1,11 @@
 import { useDb } from '@/providers/DatabaseProvider';
 import { outboxKey } from '@/repositories/outbox';
-import { useQueryClient } from '@tanstack/react-query';
 import NetInfo from '@react-native-community/netinfo';
+import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import { syncBudgets } from './syncBudgets';
+import { syncDocuments } from './syncDocuments';
 import { syncExpenses } from './syncExpenses';
 import { syncFootprints } from './syncFootprints';
 import { syncMemos } from './syncMemos';
@@ -18,7 +19,7 @@ export function usePendingSync() {
 
   async function runSync() {
     await syncTrips(db);
-    await Promise.all([syncMemos(db), syncFootprints(db), syncBudgets(db)]);
+    await Promise.all([syncMemos(db), syncFootprints(db), syncBudgets(db), syncDocuments(db)]);
     await syncPhotos(db);
     await syncExpenses(db);
   }
@@ -29,6 +30,7 @@ export function usePendingSync() {
     qc.invalidateQueries({ queryKey: ['footprints'] });
     qc.invalidateQueries({ queryKey: ['expenses'] });
     qc.invalidateQueries({ queryKey: ['budgets'] });
+    qc.invalidateQueries({ queryKey: ['documents'] });
     qc.invalidateQueries({ queryKey: outboxKey });
   }
 
@@ -38,7 +40,8 @@ export function usePendingSync() {
       if (isConnected && prevConnected.current === false) {
         try {
           await runSync();
-        } catch {} finally {
+        } catch {
+        } finally {
           invalidateAll();
         }
       }
@@ -49,7 +52,8 @@ export function usePendingSync() {
       if (next === 'active') {
         try {
           await runSync();
-        } catch {} finally {
+        } catch {
+        } finally {
           invalidateAll();
         }
       }

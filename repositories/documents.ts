@@ -13,7 +13,7 @@ export interface DocumentRow extends BaseEntity {
   fileSize?: number | null;
 }
 
-function resolveAbsoluteFileUri(storedUri: string): string {
+export function resolveAbsoluteFileUri(storedUri: string): string {
   if (/^https?:\/\//.test(storedUri)) return storedUri;
   return new File(new Directory(Paths.document, 'documents'), storedUri).uri;
 }
