@@ -6,11 +6,11 @@ import { IconButton } from '../button/BaseButton';
 
 export default function BackActionHeader({
   onBack,
-  label,
+  label = '',
   children,
 }: {
   onBack: () => void;
-  label: string;
+  label?: string;
   children?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
@@ -27,16 +27,18 @@ export default function BackActionHeader({
         </IconButton>
       </View>
       <View flex={1} height={48} alignItems="center" justifyContent="center" paddingHorizontal="$2">
-        <Text
-          textAlign="center"
-          color="$foreground"
-          fontSize="$5"
-          fontWeight="500"
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {label}
-        </Text>
+        {label && (
+          <Text
+            textAlign="center"
+            color="$foreground"
+            fontSize="$5"
+            fontWeight="500"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {label}
+          </Text>
+        )}
       </View>
       <View height={48} alignItems="flex-end" justifyContent="center">
         {children}

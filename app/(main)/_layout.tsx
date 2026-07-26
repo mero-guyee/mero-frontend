@@ -31,21 +31,27 @@ export default function MainLayout() {
           name="backpack"
           options={{
             tabBarLabel: '배낭',
-            tabBarIcon: ({ focused, color, size }) => <Backpack size={size} color={color} />,
+            tabBarIcon: ({ focused, color, size }) => (
+              <Backpack size={size} color={color} fill={focused ? '#C8DEE6' : 'none'} />
+            ),
           }}
         />
         <Tabs.Screen
           name="footprint"
           options={{
             tabBarLabel: '일지',
-            tabBarIcon: ({ focused, color, size }) => <BookOpen size={size} color={color} />,
+            tabBarIcon: ({ focused, color, size }) => (
+              <BookOpen size={size} color={color} fill={focused ? '#C8DEE6' : 'none'} />
+            ),
           }}
         />
         <Tabs.Screen
           name="expense"
           options={{
             tabBarLabel: '지갑',
-            tabBarIcon: ({ focused, color, size }) => <Wallet size={size} color={color} />,
+            tabBarIcon: ({ focused, color, size }) => (
+              <Wallet size={size} color={color} fill={focused ? '#C8DEE6' : 'none'} />
+            ),
           }}
         />
         <Tabs.Screen

@@ -48,7 +48,7 @@ export default function MemoFormScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      <BackActionHeader label={existingMemo ? '메모 수정' : '새 메모'} onBack={() => router.back()}>
+      <BackActionHeader onBack={() => router.back()}>
         <SubmitButton
           onPress={handleSubmit}
           disabled={!title.trim()}

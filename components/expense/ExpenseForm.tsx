@@ -104,10 +104,7 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      <BackActionHeader
-        label={isEdit ? '경비 수정' : '경비 추가'}
-        onBack={() => confirmLeave(() => router.back())}
-      >
+      <BackActionHeader onBack={() => confirmLeave(() => router.back())}>
         <SubmitButton onPress={handleSubmit} />
       </BackActionHeader>
 

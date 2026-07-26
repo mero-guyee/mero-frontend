@@ -43,7 +43,7 @@ export default function MainTabBar(props: BottomTabBarProps) {
         if (options.tabBarLabel === '설정') return null;
 
         const isFocused = state.index === index;
-        const color = isFocused ? '$accentStrong' : '$foreground';
+        const color = '$foreground';
         const label = options.tabBarLabel as string;
 
         return (
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     width: 51,
     height: 38,
     borderRadius: 16,
-    backgroundColor: '#C8DEE6',
+    backgroundColor: '#F5EFE0',
     alignSelf: 'center',
     top: -1,
   },

@@ -31,10 +31,7 @@ export default function FootprintFormScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      <BackActionHeader
-        label={existingFootprint ? '유랑 수정' : '새 유랑'}
-        onBack={() => router.back()}
-      >
+      <BackActionHeader onBack={() => router.back()}>
         <SubmitButton onPress={handleSubmit} />
       </BackActionHeader>
 
