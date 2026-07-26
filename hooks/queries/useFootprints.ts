@@ -10,7 +10,12 @@ import {
   TripRepository,
 } from '../../repositories';
 import { Footprint } from '../../types';
-import { createLocalPhotos, filterNewPhotoUris, uploadPhotosAndSync } from '../../utils/photoSync';
+import {
+  createLocalPhotos,
+  filterNewPhotoUris,
+  filterRemovedPhotos,
+  uploadPhotosAndSync,
+} from '../../utils/photoSync';
 
 export const footprintKeys = {
   byTrip: (tripId: string) => ['footprints', 'trip', tripId] as const,
@@ -139,6 +144,10 @@ export function useUpdateFootprint() {
       const updated = await repo.updateFootprint(footprint);
 
       const existingPhotos = await photoRepo.getByFootprintId(footprint.id);
+      const removedPhotos = filterRemovedPhotos(existingPhotos, photoUris);
+      for (const photo of removedPhotos) {
+        await photoRepo.delete(photo.id);
+      }
       const newLocalPhotos = await createLocalPhotos(
         photoRepo,
         footprint.id,

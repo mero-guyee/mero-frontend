@@ -11,6 +11,11 @@ export function filterNewPhotoUris(existing: FootprintPhoto[], uris: string[]): 
   return uris.filter(isLocalUri).filter((uri) => !existingUris.has(uri));
 }
 
+export function filterRemovedPhotos(existing: FootprintPhoto[], uris: string[]): FootprintPhoto[] {
+  const uriSet = new Set(uris);
+  return existing.filter((p) => !uriSet.has(p.s3Url || p.localUri));
+}
+
 export async function createLocalPhotos(
   photoRepo: PhotoRepository,
   footprintId: string,
