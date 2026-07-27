@@ -29,10 +29,6 @@ export default function SettingsScreen() {
     router.push('/settings/profile');
   };
 
-  const handleComingSoon = (feature: string) => {
-    Alert.alert('알림', `${feature} 기능은 준비 중입니다.`);
-  };
-
   const handleLogout = async () => {
     Alert.alert('로그아웃', '정말 로그아웃하시겠습니까?', [
       { text: '취소', style: 'cancel' },
@@ -171,7 +167,7 @@ export default function SettingsScreen() {
               <SettingItem
                 icon={<Info size={20} color="$foreground" />}
                 label="앱 정보"
-                onPress={() => handleComingSoon('앱 정보')}
+                onPress={() => router.push('/settings/about')}
               />
             </YCard>
           </YStack>

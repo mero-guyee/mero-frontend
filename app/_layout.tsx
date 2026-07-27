@@ -1,4 +1,5 @@
 import OfflineBanner from '@/components/network/OfflineBanner';
+import { toastConfig } from '@/components/ui/CustomToast';
 import { setNavigationColorByPath } from '@/utils/setNavigationColorByPath';
 import * as Sentry from '@sentry/react-native';
 import {
@@ -14,6 +15,7 @@ import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { PortalProvider } from 'tamagui';
 import {
   AuthProvider,
@@ -114,6 +116,7 @@ function AppContent() {
                 <SyncManager />
                 <StatusBar style={theme === 'dark' ? 'light' : 'dark'} backgroundColor="transparent" translucent />
                 <OfflineBanner />
+                <Toast config={toastConfig} />
                 <PortalProvider>
                   <Stack screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="index" />
