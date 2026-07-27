@@ -1,6 +1,6 @@
 import { useIsOffline } from '@/hooks/network/useIsOffline';
 import useLocation from '@/hooks/useLocation';
-import { ArrowLeft, Clock, Plane } from '@tamagui/lucide-icons';
+import { ArrowLeft, Plane } from '@tamagui/lucide-icons';
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -126,7 +126,7 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
         text1: '실시간 위치를 가져올 수 없어요',
         text2: '이전 위치를 기준으로 지도가 열립니다',
         position: 'bottom',
-        visibilityTime: 3000,
+        autoHide: false,
       });
     }
     if (locationSource === 'fallback') {
@@ -201,22 +201,6 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
                     </View>
                     <LocationSearch mapRef={mapRef} setSelected={setSelected} />
                   </XStack>
-                  {locationSource === 'lastKnown' && (
-                    <View
-                      style={[
-                        styles.amberChip,
-                        {
-                          backgroundColor: theme.warning.val,
-                          borderColor: theme.warningBorder.val,
-                        },
-                      ]}
-                    >
-                      <Clock size={12} color="$warningText" />
-                      <Text style={[styles.amberChipText, { color: theme.warningText.val }]}>
-                        이전 위치 기준
-                      </Text>
-                    </View>
-                  )}
                 </Stack>
 
                 {selected && (
@@ -303,18 +287,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   buttonText: { fontSize: 16, fontWeight: '600' },
-  amberChip: {
-    alignSelf: 'center',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-    marginTop: 8,
-  },
-  amberChipText: { fontSize: 12, fontWeight: '500' },
   fallbackCard: {
     position: 'absolute',
     top: '30%',
