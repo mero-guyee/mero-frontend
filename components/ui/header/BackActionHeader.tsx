@@ -8,10 +8,12 @@ export default function BackActionHeader({
   onBack,
   label = '',
   children,
+  icon = <ArrowLeft size="6.5" color="$foreground" />,
 }: {
   onBack: () => void;
   label?: string;
   children?: ReactNode;
+  icon?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
   return (
@@ -22,9 +24,7 @@ export default function BackActionHeader({
       paddingHorizontal="$3"
     >
       <View height={48} alignItems="flex-start" justifyContent="center">
-        <IconButton onPress={onBack}>
-          <ArrowLeft size="6.5" color="$foreground" />
-        </IconButton>
+        <IconButton onPress={onBack}>{icon}</IconButton>
       </View>
       <View flex={1} height={48} alignItems="center" justifyContent="center" paddingHorizontal="$2">
         {label && (

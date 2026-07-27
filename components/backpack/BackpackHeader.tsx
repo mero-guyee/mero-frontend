@@ -1,5 +1,6 @@
 import { useTrips } from '@/contexts';
 import { Trip } from '@/types';
+import { Home } from '@tamagui/lucide-icons';
 import { router } from 'expo-router';
 import { Alert } from 'react-native';
 import MoreEditDelete from '../ui/MoreEditDelete';
@@ -35,7 +36,11 @@ export default function BackpackHeader({ trip }: { trip: Trip }) {
   };
 
   return (
-    <BackActionHeader label={trip.title} onBack={handleBack}>
+    <BackActionHeader
+      label={trip.title}
+      onBack={handleBack}
+      icon={<Home size="6.5" color="$foreground" />}
+    >
       <MoreEditDelete onEdit={handleEdit} onDelete={handleDelete} />
     </BackActionHeader>
   );
