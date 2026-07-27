@@ -116,7 +116,6 @@ function AppContent() {
                 <SyncManager />
                 <StatusBar style={theme === 'dark' ? 'light' : 'dark'} backgroundColor="transparent" translucent />
                 <OfflineBanner />
-                <Toast config={toastConfig} />
                 <PortalProvider>
                   <Stack screenOptions={{ headerShown: false }}>
                     <Stack.Screen name="index" />
@@ -128,6 +127,7 @@ function AppContent() {
                     <Stack.Screen name="expense-detail" />
                   </Stack>
                 </PortalProvider>
+                <Toast config={toastConfig} />
               </BudgetProvider>
             </ExpenseProvider>
           </TripProvider>
