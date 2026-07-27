@@ -1,6 +1,7 @@
 import MapView, { MapPressEvent, Marker } from 'react-native-maps';
 import { View } from 'tamagui';
 import { useTheme as useAppTheme } from '../../contexts';
+import { darkMapStyle } from '../map/darkMapStyle';
 
 const MAP_BACKGROUND = { light: '#EDF6F9', dark: '#161A1C' };
 
@@ -45,6 +46,8 @@ export default function LocationView({
           zoomEnabled
           scrollEnabled
           rotateEnabled
+          userInterfaceStyle={theme}
+          customMapStyle={theme === 'dark' ? darkMapStyle : []}
           box-only
         >
           {selected && <Marker coordinate={selected} />}

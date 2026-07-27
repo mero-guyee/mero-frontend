@@ -8,7 +8,9 @@ import { StyleSheet, View } from 'react-native';
 import MapView from 'react-native-maps';
 import Supercluster from 'supercluster';
 import { Text } from 'tamagui';
+import { useTheme as useAppTheme } from '../../../contexts';
 import ClusterMarker from '../../map/ClusterMarker';
+import { darkMapStyle } from '../../map/darkMapStyle';
 import MapOfflineFallback from '../../map/MapOfflineFallback';
 import PinMarker from '../../map/PinMarker';
 import FadeWrapper from '../../ui/FadeWrapper';
@@ -29,6 +31,7 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
   } | null>(null);
   const [showModal, setShowModal] = useState(false);
   const isOffline = useIsOffline();
+  const { theme } = useAppTheme();
 
   const { validFootprints, footprintColors, allCoords } = useFootprintMapData(footprints);
 
@@ -114,6 +117,8 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
           style={StyleSheet.absoluteFillObject}
           onRegionChangeComplete={handleRegionChangeComplete}
           onPress={handleDeselect}
+          userInterfaceStyle={theme}
+          customMapStyle={theme === 'dark' ? darkMapStyle : []}
         >
           {clusters.map((point) => {
             const [longitude, latitude] = point.geometry.coordinates;
