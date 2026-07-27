@@ -1,5 +1,8 @@
 import MapView, { MapPressEvent, Marker } from 'react-native-maps';
 import { View } from 'tamagui';
+import { useTheme as useAppTheme } from '../../contexts';
+
+const MAP_BACKGROUND = { light: '#EDF6F9', dark: '#161A1C' };
 
 export default function LocationView({
   mapRef,
@@ -17,12 +20,14 @@ export default function LocationView({
   onMapPress: (e: MapPressEvent) => void;
   selected: { latitude: number; longitude: number } | null;
 }) {
+  const { theme } = useAppTheme();
+
   return (
     <View
       style={{
         flex: 1,
         position: 'relative',
-        backgroundColor: '#EDF6F9',
+        backgroundColor: MAP_BACKGROUND[theme],
         borderRadius: 16,
         overflow: 'hidden',
       }}

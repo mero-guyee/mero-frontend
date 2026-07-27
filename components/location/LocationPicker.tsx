@@ -16,11 +16,14 @@ import {
 import MapView, { MapPressEvent } from 'react-native-maps';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { Stack, XStack, YStack } from 'tamagui';
+import { Stack, useTheme, XStack, YStack } from 'tamagui';
+import { useTheme as useAppTheme } from '../../contexts';
 import MapOfflineFallback from '../map/MapOfflineFallback';
 import FadeWrapper from '../ui/FadeWrapper';
 import LocationSearch from './LocationSearch';
 import LocationView from './LocationView';
+
+const MAP_BACKGROUND = { light: '#EDF6F9', dark: '#161A1C' };
 
 type Coordinate = {
   latitude: number;
@@ -48,6 +51,9 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
   const mapRef = useRef<MapView>(null);
   const insets = useSafeAreaInsets();
   const isOffline = useIsOffline();
+  const theme = useTheme();
+  const { theme: appTheme } = useAppTheme();
+  const mapBackground = MAP_BACKGROUND[appTheme];
 
   const {
     status: locationPermissionStatus,
@@ -140,13 +146,13 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
   if (!visible) return null;
 
   return (
-    <Modal style={styles.fullscreen}>
+    <Modal style={[styles.fullscreen, { backgroundColor: theme.background.val }]}>
       <FadeWrapper>
-        <View style={styles.modalContainer}>
-          <View style={styles.container}>
+        <View style={[styles.modalContainer, { backgroundColor: theme.background.val }]}>
+          <View style={[styles.container, { backgroundColor: mapBackground }]}>
             {loading ? (
               <YStack flex={1} justifyContent="center" alignItems="center">
-                <Plane width={24} height={24} color="#A0A0A0" />
+                <Plane width={24} height={24} color="$placeholderForeground" />
               </YStack>
             ) : isOffline ? (
               <>
@@ -159,7 +165,7 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
                   }}
                 >
                   <Pressable onPress={() => onClose()} hitSlop={16}>
-                    <ArrowLeft />
+                    <ArrowLeft color="$foreground" />
                   </Pressable>
                 </View>
                 <MapOfflineFallback message="오프라인 상태에서는 위치를 선택할 수 없어요" />
@@ -183,24 +189,36 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
                   >
                     <View style={{ height: 44, justifyContent: 'center' }}>
                       <Pressable onPress={() => onClose()} hitSlop={16}>
-                        <ArrowLeft />
+                        <ArrowLeft color="$card" />
                       </Pressable>
                     </View>
                     <LocationSearch mapRef={mapRef} setSelected={setSelected} />
                   </XStack>
                   {locationSource === 'lastKnown' && (
-                    <View style={styles.amberChip}>
-                      <Clock size={12} color="#92400E" />
-                      <Text style={styles.amberChipText}>이전 위치 기준</Text>
+                    <View
+                      style={[
+                        styles.amberChip,
+                        {
+                          backgroundColor: theme.warning.val,
+                          borderColor: theme.warningBorder.val,
+                        },
+                      ]}
+                    >
+                      <Clock size={12} color="$warningText" />
+                      <Text style={[styles.amberChipText, { color: theme.warningText.val }]}>
+                        이전 위치 기준
+                      </Text>
                     </View>
                   )}
                 </Stack>
 
                 {locationSource === 'fallback' && !selected && (
-                  <View style={styles.fallbackCard}>
-                    <MapPin size={20} color="#6B7280" />
-                    <Text style={styles.fallbackCardTitle}>위치를 가져올 수 없어요</Text>
-                    <Text style={styles.fallbackCardSub}>
+                  <View style={[styles.fallbackCard, { backgroundColor: theme.card.val }]}>
+                    <MapPin size={20} color="$mutedForeground" />
+                    <Text style={[styles.fallbackCardTitle, { color: theme.foreground.val }]}>
+                      위치를 가져올 수 없어요
+                    </Text>
+                    <Text style={[styles.fallbackCardSub, { color: theme.mutedForeground.val }]}>
                       검색하거나 지도를 탭해서 직접 선택해 주세요
                     </Text>
                   </View>
@@ -208,13 +226,16 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
 
                 {selected && (
                   <TouchableOpacity
-                    style={styles.button}
+                    style={[styles.button, { backgroundColor: theme.accent.val }]}
                     onPress={() => {
                       onConfirm(selected);
                       onClose();
                     }}
                   >
-                    <Text style={styles.buttonText} pointerEvents="none">
+                    <Text
+                      style={[styles.buttonText, { color: theme.foreground.val }]}
+                      pointerEvents="none"
+                    >
                       이 위치로 선택
                     </Text>
                   </TouchableOpacity>
@@ -224,7 +245,6 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
           </View>
         </View>
       </FadeWrapper>
-      <Toast />
     </Modal>
   );
 }
@@ -237,11 +257,9 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     zIndex: 999,
-    backgroundColor: '#fff',
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
@@ -268,7 +286,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: 'relative',
-    backgroundColor: '#EDF6F9',
   },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   hint: {
@@ -285,33 +302,29 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 32,
     alignSelf: 'center',
-    backgroundColor: '#007AFF',
     paddingHorizontal: 32,
     paddingVertical: 14,
     borderRadius: 12,
   },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  buttonText: { fontSize: 16, fontWeight: '600' },
   amberChip: {
     alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#FEF3C7',
-    borderColor: '#F59E0B',
     borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 20,
     marginTop: 8,
   },
-  amberChipText: { color: '#92400E', fontSize: 12, fontWeight: '500' },
+  amberChipText: { fontSize: 12, fontWeight: '500' },
   fallbackCard: {
     position: 'absolute',
     top: '30%',
     alignSelf: 'center',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.95)',
     paddingHorizontal: 24,
     paddingVertical: 20,
     borderRadius: 16,
@@ -321,8 +334,8 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  fallbackCardTitle: { color: '#374151', fontSize: 15, fontWeight: '600' },
-  fallbackCardSub: { color: '#6B7280', fontSize: 13, textAlign: 'center' },
+  fallbackCardTitle: { fontSize: 15, fontWeight: '600' },
+  fallbackCardSub: { fontSize: 13, textAlign: 'center' },
 });
 
 function SkeletonBox({
