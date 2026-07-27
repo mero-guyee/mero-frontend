@@ -1,7 +1,7 @@
 import { toastConfig } from '@/components/ui/CustomToast';
 import MainTabBar from '@/components/ui/tabbar/mainTabbar/MainTabBar';
 import useBackHandler from '@/hooks/useBackHandler';
-import { Backpack, BookOpen, Wallet } from '@tamagui/lucide-icons';
+import { Backpack, BookOpen, Wallet } from 'phosphor-react-native';
 import { Tabs } from 'expo-router';
 import Toast from 'react-native-toast-message';
 import { useActiveTripGuard } from '../../hooks/useActiveTripGuard';
@@ -31,8 +31,8 @@ export default function MainLayout() {
           name="backpack"
           options={{
             tabBarLabel: '배낭',
-            tabBarIcon: ({ focused, color, size }) => (
-              <Backpack size={size} color={color} fill={focused ? '#C8DEE6' : 'none'} />
+            tabBarIcon: ({ focused, size }) => (
+              <Backpack size={size} color={focused ? '#9BC4D1' : '#30221B'} weight={focused ? 'fill' : 'regular'} />
             ),
           }}
         />
@@ -40,8 +40,8 @@ export default function MainLayout() {
           name="footprint"
           options={{
             tabBarLabel: '일지',
-            tabBarIcon: ({ focused, color, size }) => (
-              <BookOpen size={size} color={color} fill={focused ? '#C8DEE6' : 'none'} />
+            tabBarIcon: ({ focused, size }) => (
+              <BookOpen size={size} color={focused ? '#9BC4D1' : '#30221B'} weight={focused ? 'fill' : 'regular'} />
             ),
           }}
         />
@@ -49,8 +49,8 @@ export default function MainLayout() {
           name="expense"
           options={{
             tabBarLabel: '지갑',
-            tabBarIcon: ({ focused, color, size }) => (
-              <Wallet size={size} color={color} fill={focused ? '#C8DEE6' : 'none'} />
+            tabBarIcon: ({ focused, size }) => (
+              <Wallet size={size} color={focused ? '#9BC4D1' : '#30221B'} weight={focused ? 'fill' : 'regular'} />
             ),
           }}
         />
