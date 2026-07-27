@@ -1,6 +1,6 @@
 import { useIsOffline } from '@/hooks/network/useIsOffline';
 import useLocation from '@/hooks/useLocation';
-import { ArrowLeft, Clock, MapPin, Plane } from '@tamagui/lucide-icons';
+import { ArrowLeft, Clock, Plane } from '@tamagui/lucide-icons';
 import * as Location from 'expo-location';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -19,6 +19,7 @@ import Toast from 'react-native-toast-message';
 import { Stack, useTheme, XStack, YStack } from 'tamagui';
 import { useTheme as useAppTheme } from '../../contexts';
 import MapOfflineFallback from '../map/MapOfflineFallback';
+import { toastConfig } from '../ui/CustomToast';
 import FadeWrapper from '../ui/FadeWrapper';
 import LocationSearch from './LocationSearch';
 import LocationView from './LocationView';
@@ -132,12 +133,18 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
       Toast.show({
         type: 'error',
         text1: '위치를 가져올 수 없어요',
-        text2: '지도가 서울 중심으로 열립니다',
+        text2: '검색하거나 지도를 탭해서 직접 선택해 주세요',
         position: 'bottom',
-        visibilityTime: 3000,
+        autoHide: false,
       });
     }
   }, [visible, locationSource]);
+
+  useEffect(() => {
+    if (locationSource === 'fallback' && selected) {
+      Toast.hide();
+    }
+  }, [locationSource, selected]);
 
   const handleMapPress = (e: MapPressEvent) => {
     setSelected(e.nativeEvent.coordinate);
@@ -212,18 +219,6 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
                   )}
                 </Stack>
 
-                {locationSource === 'fallback' && !selected && (
-                  <View style={[styles.fallbackCard, { backgroundColor: theme.card.val }]}>
-                    <MapPin size={20} color="$mutedForeground" />
-                    <Text style={[styles.fallbackCardTitle, { color: theme.foreground.val }]}>
-                      위치를 가져올 수 없어요
-                    </Text>
-                    <Text style={[styles.fallbackCardSub, { color: theme.mutedForeground.val }]}>
-                      검색하거나 지도를 탭해서 직접 선택해 주세요
-                    </Text>
-                  </View>
-                )}
-
                 {selected && (
                   <TouchableOpacity
                     style={[styles.button, { backgroundColor: theme.accent.val }]}
@@ -245,6 +240,7 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
           </View>
         </View>
       </FadeWrapper>
+      <Toast config={toastConfig} />
     </Modal>
   );
 }
