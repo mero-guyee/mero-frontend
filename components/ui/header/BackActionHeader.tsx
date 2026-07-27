@@ -23,7 +23,7 @@ export default function BackActionHeader({
       paddingBottom="$1"
       paddingHorizontal="$3"
     >
-      <View height={48} alignItems="flex-start" justifyContent="center">
+      <View minWidth="$12" height={48} alignItems="flex-start" justifyContent="center">
         <IconButton onPress={onBack}>{icon}</IconButton>
       </View>
       <View flex={1} height={48} alignItems="center" justifyContent="center" paddingHorizontal="$2">
@@ -40,7 +40,7 @@ export default function BackActionHeader({
           </Text>
         )}
       </View>
-      <View height={48} alignItems="flex-end" justifyContent="center">
+      <View minWidth="$12" height={48} alignItems="flex-end" justifyContent="center">
         {children}
       </View>
     </XStack>
