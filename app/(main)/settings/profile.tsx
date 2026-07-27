@@ -30,7 +30,6 @@ export default function ProfileSettingsScreen() {
     updateNickname.mutate(trimmed, {
       onSuccess: () => router.back(),
       onError: (e) => {
-        console.log(e);
         Alert.alert('오류', '닉네임을 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.');
       },
     });

@@ -2,7 +2,7 @@ import { paddingHorizontalGeneral } from '@/constants/theme';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Animated, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Text, View } from 'tamagui';
+import { Text, useTheme, View } from 'tamagui';
 import { useTabBarNavigation } from './useTabBarNavigation';
 import { useTabPressAnimation } from './useTabPressAnimation';
 
@@ -14,6 +14,10 @@ export default function MainTabBar(props: BottomTabBarProps) {
   const { animsX, animsY, animsOpacity, playPressAnimation } = useTabPressAnimation(
     state.routes.length
   );
+  const theme = useTheme();
+  const foregroundColor = theme.foreground.val;
+  const accentStrongColor = theme.accentStrong.val;
+  const mutedColor = theme.muted.val;
 
   function handlePress(index: number, route: (typeof state.routes)[number], isFocused: boolean) {
     playPressAnimation(index);
@@ -25,7 +29,7 @@ export default function MainTabBar(props: BottomTabBarProps) {
   return (
     <View
       flexDirection="row"
-      backgroundColor="#ffffff"
+      backgroundColor="$card"
       paddingTop={8}
       paddingHorizontal={paddingHorizontalGeneral}
       borderTopLeftRadius={16}
@@ -43,7 +47,7 @@ export default function MainTabBar(props: BottomTabBarProps) {
         if (options.tabBarLabel === '설정') return null;
 
         const isFocused = state.index === index;
-        const color = '$foreground';
+        const iconColor = isFocused ? accentStrongColor : foregroundColor;
         const label = options.tabBarLabel as string;
 
         return (
@@ -61,10 +65,15 @@ export default function MainTabBar(props: BottomTabBarProps) {
                 height: 24,
               }}
             >
-              <Animated.View style={[styles.ripple, { opacity: animsOpacity[index] }]} />
-              {options.tabBarIcon?.({ focused: isFocused, color, size: 24 })}
+              <Animated.View
+                style={[
+                  styles.ripple,
+                  { backgroundColor: mutedColor, opacity: animsOpacity[index] },
+                ]}
+              />
+              {options.tabBarIcon?.({ focused: isFocused, color: iconColor, size: 24 })}
             </Animated.View>
-            <Text fontWeight="300" style={[styles.label, { color }]}>
+            <Text fontWeight="300" style={[styles.label, { color: foregroundColor }]}>
               {label}
             </Text>
           </Pressable>
@@ -90,7 +99,6 @@ const styles = StyleSheet.create({
     width: 51,
     height: 38,
     borderRadius: 16,
-    backgroundColor: '#F5EFE0',
     alignSelf: 'center',
     top: -1,
   },

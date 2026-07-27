@@ -13,7 +13,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Image, Text, XStack, YStack } from 'tamagui';
+import { Image, Text, useTheme, XStack, YStack } from 'tamagui';
 
 export default function NewTripFormDate() {
   const { newTrip, setNewTrip } = useNewTripForm();
@@ -21,6 +21,7 @@ export default function NewTripFormDate() {
   const [startDateError, setStartDateError] = useState<string | null>(null);
   const [endDateError, setEndDateError] = useState<string | null>(null);
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
 
   const handleNext = () => {
     const startErr = validateStartDate(newTrip.startDate);
@@ -93,7 +94,7 @@ export default function NewTripFormDate() {
                         position: 'absolute',
                         top: 12,
                         right: 12,
-                        backgroundColor: '#E89B8F',
+                        backgroundColor: theme.destructive.val,
                         borderRadius: 12,
                         padding: 8,
                       }}

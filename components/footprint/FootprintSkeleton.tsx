@@ -69,7 +69,7 @@ const ITEMS: { showImage: boolean }[] = [
 export default function FootprintSkeleton() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const color = theme.secondary?.val ?? '#E8D5B7';
+  const color = theme.mutedStrong.val;
 
   const opacity = useRef(new Animated.Value(0.4)).current;
 

@@ -3,7 +3,7 @@ import { useFocusEffect } from 'expo-router';
 import { ReactNode, useCallback, useRef, useState } from 'react';
 import { Animated, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Portal, View } from 'tamagui';
+import { Portal, useTheme, View } from 'tamagui';
 import { IconButton } from './button/BaseButton';
 
 const DURATION = 100;
@@ -12,6 +12,7 @@ export default function More({ children }: { children: ReactNode }) {
   const [showMenu, setShowMenu] = useState(false);
   const opacity = useRef(new Animated.Value(0)).current;
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
 
   const menuTop = insets.top + 44;
   const menuRight = 16;
@@ -61,7 +62,7 @@ export default function More({ children }: { children: ReactNode }) {
                 top: menuTop,
                 right: menuRight,
                 minWidth: 120,
-                backgroundColor: '#fff',
+                backgroundColor: theme.card.val,
                 borderRadius: 8,
                 overflow: 'hidden',
                 zIndex: 100,

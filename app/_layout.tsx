@@ -1,6 +1,11 @@
 import OfflineBanner from '@/components/network/OfflineBanner';
 import { setNavigationColorByPath } from '@/utils/setNavigationColorByPath';
 import * as Sentry from '@sentry/react-native';
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider as NavigationThemeProvider,
+} from '@react-navigation/native';
 import { TamaguiProvider } from '@tamagui/core';
 import { useFonts } from 'expo-font';
 import { Stack, usePathname } from 'expo-router';
@@ -15,8 +20,10 @@ import {
   BudgetProvider,
   ExpenseProvider,
   SyncProvider,
+  ThemeProvider,
   TripProvider,
   useSyncContext,
+  useTheme,
 } from '../contexts';
 import { usePendingSync } from '../hooks/sync/usePendingSync';
 import { useAuthGuard } from '../hooks/useAuthGuard';
@@ -24,6 +31,24 @@ import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
 import { QueryProvider } from '../providers/QueryProvider';
 import '../reactotron-config';
 import config from '../tamagui.config';
+
+const AppLightNavTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#F6F3EE',
+    card: '#ffffff',
+  },
+};
+
+const AppDarkNavTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: '#1A1714',
+    card: '#242019',
+  },
+};
 
 Sentry.init({
   dsn: 'https://d3584d51d314d552ed61e55ddd8405a3@o4511688550449152.ingest.us.sentry.io/4511688553136128',
@@ -50,9 +75,21 @@ function SyncManager() {
   return null;
 }
 
+function ThemedApp({ children }: { children: React.ReactNode }) {
+  const { theme } = useTheme();
+  return (
+    <TamaguiProvider config={config} defaultTheme={theme}>
+      <NavigationThemeProvider value={theme === 'dark' ? AppDarkNavTheme : AppLightNavTheme}>
+        {children}
+      </NavigationThemeProvider>
+    </TamaguiProvider>
+  );
+}
+
 function AppContent() {
   const isReady = useDbReady();
   const currentPath = usePathname();
+  const { theme } = useTheme();
 
   useEffect(() => {
     console.log('[route]', currentPath);
@@ -66,7 +103,7 @@ function AppContent() {
     );
   }
 
-  setNavigationColorByPath(currentPath);
+  setNavigationColorByPath(currentPath, theme);
   return (
     <AuthProvider>
       <AuthGuard>
@@ -75,7 +112,7 @@ function AppContent() {
             <ExpenseProvider>
               <BudgetProvider>
                 <SyncManager />
-                <StatusBar style="dark" backgroundColor="transparent" translucent />
+                <StatusBar style={theme === 'dark' ? 'light' : 'dark'} backgroundColor="transparent" translucent />
                 <OfflineBanner />
                 <PortalProvider>
                   <Stack screenOptions={{ headerShown: false }}>
@@ -116,13 +153,15 @@ export default Sentry.wrap(function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <TamaguiProvider config={config} defaultTheme="light">
-          <DatabaseProvider>
-            <QueryProvider>
-              <AppContent />
-            </QueryProvider>
-          </DatabaseProvider>
-        </TamaguiProvider>
+        <ThemeProvider>
+          <ThemedApp>
+            <DatabaseProvider>
+              <QueryProvider>
+                <AppContent />
+              </QueryProvider>
+            </DatabaseProvider>
+          </ThemedApp>
+        </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

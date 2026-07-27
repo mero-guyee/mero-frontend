@@ -1,8 +1,8 @@
 import { Animated } from 'react-native';
+import { useTheme } from 'tamagui';
 
 const PILL_HEIGHT = 32;
 const PILL_RADIUS = 8;
-const PILL_COLOR = '#ebdcb8';
 
 export namespace TabButtonOverlay {
   export const Click = ClickTabButtonOverlay;
@@ -22,6 +22,9 @@ function ClickTabButtonOverlay({
   swipePosition?: Animated.AnimatedInterpolation<number>;
   allLayoutsReady: boolean;
 }) {
+  const theme = useTheme();
+  const pillColor = theme.mutedStrong.val;
+
   return (
     <Animated.View
       pointerEvents="none"
@@ -32,7 +35,7 @@ function ClickTabButtonOverlay({
         height: PILL_HEIGHT,
         width: springWidth,
         borderRadius: PILL_RADIUS,
-        backgroundColor: PILL_COLOR,
+        backgroundColor: pillColor,
         opacity: swipePosition ? pressBlend : allLayoutsReady ? 1 : 0,
         transform: [{ translateX: springX }],
       }}
@@ -49,6 +52,9 @@ function SwipeTabButtonOverlay({
   swipePillBlend: Animated.Value;
   swipeRefWidth: React.MutableRefObject<number>;
 }) {
+  const theme = useTheme();
+  const pillColor = theme.mutedStrong.val;
+
   return (
     <Animated.View
       pointerEvents="none"
@@ -59,7 +65,7 @@ function SwipeTabButtonOverlay({
         height: PILL_HEIGHT,
         width: swipeRefWidth.current,
         borderRadius: PILL_RADIUS,
-        backgroundColor: PILL_COLOR,
+        backgroundColor: pillColor,
         opacity: swipePillBlend,
         transform: [{ translateX: swipeTX.current! }],
       }}

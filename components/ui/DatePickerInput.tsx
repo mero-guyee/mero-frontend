@@ -4,6 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import { Pressable } from 'react-native';
 import { Text, XStack } from 'tamagui';
+import { useTheme } from '../../contexts';
 import AppBottomSheet from './AppBottomSheet';
 import { inputStyle } from './Input';
 import { FilledButton } from './button/BaseButton';
@@ -23,6 +24,7 @@ export default function DatePickerInput({
 }: DatePickerInputProps) {
   const [show, setShow] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(value ? new Date(value) : new Date());
+  const { theme } = useTheme();
 
   const handleOpen = () => {
     setTempDate(value ? new Date(value) : new Date());
@@ -69,7 +71,7 @@ export default function DatePickerInput({
             display="spinner"
             onChange={handleSpinnerChange}
             style={{ height: 200 }}
-            themeVariant="light"
+            themeVariant={theme}
           />
 
           <FilledButton fontWeight="600" fontSize={16} onPress={handleConfirm}>

@@ -31,8 +31,8 @@ export default function MainLayout() {
           name="backpack"
           options={{
             tabBarLabel: '배낭',
-            tabBarIcon: ({ focused, size }) => (
-              <Backpack size={size} color={focused ? '#9BC4D1' : '#30221B'} weight={focused ? 'fill' : 'regular'} />
+            tabBarIcon: ({ focused, color, size }) => (
+              <Backpack size={size} color={color} weight={focused ? 'fill' : 'regular'} />
             ),
           }}
         />
@@ -40,8 +40,8 @@ export default function MainLayout() {
           name="footprint"
           options={{
             tabBarLabel: '일지',
-            tabBarIcon: ({ focused, size }) => (
-              <BookOpen size={size} color={focused ? '#9BC4D1' : '#30221B'} weight={focused ? 'fill' : 'regular'} />
+            tabBarIcon: ({ focused, color, size }) => (
+              <BookOpen size={size} color={color} weight={focused ? 'fill' : 'regular'} />
             ),
           }}
         />
@@ -49,8 +49,8 @@ export default function MainLayout() {
           name="expense"
           options={{
             tabBarLabel: '지갑',
-            tabBarIcon: ({ focused, size }) => (
-              <Wallet size={size} color={focused ? '#9BC4D1' : '#30221B'} weight={focused ? 'fill' : 'regular'} />
+            tabBarIcon: ({ focused, color, size }) => (
+              <Wallet size={size} color={color} weight={focused ? 'fill' : 'regular'} />
             ),
           }}
         />

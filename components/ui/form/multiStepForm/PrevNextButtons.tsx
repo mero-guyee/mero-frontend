@@ -19,6 +19,7 @@ export default function PrevNextButtons({
     <XStack columnGap="$3.5" mt="$3.5">
       <FilledButton
         flex={1}
+        color="$mutedForeground"
         backgroundColor="$muted"
         pressStyle={{ backgroundColor: '$mutedPress' }}
         onPress={onPrev || (() => router.back())}

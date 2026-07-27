@@ -14,11 +14,12 @@ import { Asset } from 'expo-asset';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Pressable, ScrollView } from 'react-native';
-import { Image, Text, XStack, YStack } from 'tamagui';
+import { Image, Text, useTheme, XStack, YStack } from 'tamagui';
 
 const DEFAULT_IMAGE = Asset.fromModule(require('@/assets/images/mountain.jpg')).uri;
 export default function EditBackPackScreen() {
   const router = useRouter();
+  const theme = useTheme();
 
   const { activeTrip, updateTrip } = useTrips();
   const { data: trip } = useTripQuery(activeTrip || '');
@@ -174,7 +175,7 @@ export default function EditBackPackScreen() {
                       position: 'absolute',
                       top: 12,
                       right: 12,
-                      backgroundColor: '#E89B8F',
+                      backgroundColor: theme.destructive.val,
                       borderRadius: 12,
                       padding: 8,
                       zIndex: 2,

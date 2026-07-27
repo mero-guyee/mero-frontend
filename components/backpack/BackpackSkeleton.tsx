@@ -32,7 +32,7 @@ function SkeletonBox({
 export default function BackpackSkeleton() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const skeletonColor = theme.secondary?.val ?? '#E8D5B7';
+  const skeletonColor = theme.mutedStrong.val;
 
   const opacity = useRef(new Animated.Value(0.4)).current;
 

@@ -5,3 +5,5 @@ export { useFootprints } from './FootprintContext';
 export { ExpenseProvider, useExpenses } from './ExpenseContext';
 export { BudgetProvider, useBudgets } from './BudgetContext';
 export { SyncProvider, useSyncContext } from './SyncContext';
+export { ThemeProvider, useTheme } from './ThemeContext';
+export type { ThemeMode } from './ThemeContext';

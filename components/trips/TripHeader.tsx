@@ -1,10 +1,13 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useUserQuery } from '@/hooks/queries/useUser';
-import { Settings, User } from '@tamagui/lucide-icons';
+import { Settings } from '@tamagui/lucide-icons';
+import { Asset } from 'expo-asset';
 import { Image } from 'expo-image';
 import { useEffect, useState } from 'react';
 import { Text, XStack, YStack } from 'tamagui';
 import { CircularButton } from '../ui';
+
+const DEFAULT_AVATAR = Asset.fromModule(require('@/assets/images/default-avatar.png')).uri;
 
 interface TripHeaderProps {
   onSettings: () => void;
@@ -13,13 +16,11 @@ interface TripHeaderProps {
 export function TripHeader({ onSettings }: TripHeaderProps) {
   const { data: user } = useUserQuery();
 
-  const [imageError, setImageError] = useState(false);
+  const [localUri, setLocalUri] = useState(user?.profileImage ?? DEFAULT_AVATAR);
 
   useEffect(() => {
-    setImageError(false);
+    setLocalUri(user?.profileImage ?? DEFAULT_AVATAR);
   }, [user?.profileImage]);
-
-  const showProfileImage = !!user?.profileImage && !imageError;
 
   return (
     <YStack backgroundColor="$background" padding={paddingHorizontalGeneral}>
@@ -34,17 +35,13 @@ export function TripHeader({ onSettings }: TripHeaderProps) {
             justifyContent="center"
             overflow="hidden"
           >
-            {showProfileImage ? (
-              <Image
-                source={{ uri: user.profileImage! }}
-                contentFit="cover"
-                cachePolicy="memory-disk"
-                style={{ width: 48, height: 48 }}
-                onError={() => setImageError(true)}
-              />
-            ) : (
-              <User size={24} color="$foreground" />
-            )}
+            <Image
+              source={{ uri: localUri }}
+              contentFit="cover"
+              cachePolicy="memory-disk"
+              style={{ width: 48, height: 48 }}
+              onError={() => setLocalUri(DEFAULT_AVATAR)}
+            />
           </YStack>
           <YStack>
             <Text fontSize={18} fontWeight="600" color="$foreground">

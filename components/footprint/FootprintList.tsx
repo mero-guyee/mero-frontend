@@ -86,8 +86,8 @@ export default function FootprintList({
       />
       <FloatingActionButton onPress={onCreateFootprint}>
         <XStack alignItems="center" gap="$2">
-          <Plus />
-          <Text>새 일지</Text>
+          <Plus color="$foreground" />
+          <Text color="$foreground">새 일지</Text>
         </XStack>
       </FloatingActionButton>
     </>
