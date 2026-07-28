@@ -395,7 +395,22 @@ export function BudgetView() {
           >
             <Text color="$foreground">취소</Text>
           </FilledButton>
-          <FilledButton flex={1} onPress={handleSaveBudget}>
+          <FilledButton
+            flex={1}
+            onPress={handleSaveBudget}
+            disabled={
+              !budgetForm.amount ||
+              isNaN(parseFloat(budgetForm.amount)) ||
+              parseFloat(budgetForm.amount) <= 0
+            }
+            opacity={
+              budgetForm.amount &&
+              !isNaN(parseFloat(budgetForm.amount)) &&
+              parseFloat(budgetForm.amount) > 0
+                ? 1
+                : 0.5
+            }
+          >
             <Text color="$foreground">{editingBudget ? '수정' : '추가'}</Text>
           </FilledButton>
         </XStack>

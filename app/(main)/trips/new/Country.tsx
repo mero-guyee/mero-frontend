@@ -51,7 +51,11 @@ export default function NewInputCountryStep() {
           />
         </YStack>
 
-        <PrevNextButtons isFirst onNext={handleNext} />
+        <PrevNextButtons
+          isFirst
+          onNext={handleNext}
+          nextDisabled={newTrip.countries.length === 0}
+        />
       </YStack>
     </FadeWrapper>
   );

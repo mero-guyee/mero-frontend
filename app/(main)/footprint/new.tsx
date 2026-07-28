@@ -32,7 +32,7 @@ export default function FootprintFormScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       <BackActionHeader onBack={() => router.back()}>
-        <SubmitButton onPress={handleSubmit} />
+        <SubmitButton onPress={handleSubmit} disabled={!title.trim()} opacity={title.trim() ? 1 : 0.5} />
       </BackActionHeader>
 
       <FadeWrapper>

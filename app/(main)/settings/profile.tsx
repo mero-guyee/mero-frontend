@@ -63,8 +63,8 @@ export default function ProfileSettingsScreen() {
 
         <FilledButton
           onPress={handleSubmit}
-          disabled={updateNickname.isPending}
-          opacity={updateNickname.isPending ? 0.6 : 1}
+          disabled={updateNickname.isPending || !nickname.trim()}
+          opacity={updateNickname.isPending || !nickname.trim() ? 0.6 : 1}
         >
           <Text color="$foreground" fontWeight="600" fontSize={16}>
             저장

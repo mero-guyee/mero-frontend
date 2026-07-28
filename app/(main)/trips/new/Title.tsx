@@ -72,7 +72,12 @@ export default function Title() {
             {titleError ?? ''}
           </Text>
         </YStack>
-        <PrevNextButtons isLast onNext={handleSubmit} isNextLoading={createTrip.isPending} />
+        <PrevNextButtons
+          isLast
+          onNext={handleSubmit}
+          isNextLoading={createTrip.isPending}
+          nextDisabled={!newTrip.title.trim()}
+        />
       </YStack>
     </FadeWrapper>
   );

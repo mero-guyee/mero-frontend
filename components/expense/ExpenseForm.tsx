@@ -105,7 +105,11 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
   return (
     <YStack flex={1} backgroundColor="$background">
       <BackActionHeader onBack={() => confirmLeave(() => router.back())}>
-        <SubmitButton onPress={handleSubmit} />
+        <SubmitButton
+          onPress={handleSubmit}
+          disabled={!amount || parseFloat(amount) <= 0 || !categoryId}
+          opacity={amount && parseFloat(amount) > 0 && categoryId ? 1 : 0.5}
+        />
       </BackActionHeader>
 
       <FadeWrapper>

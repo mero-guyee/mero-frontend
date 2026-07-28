@@ -8,12 +8,14 @@ export default function PrevNextButtons({
   onPrev,
   onNext,
   isNextLoading = false,
+  nextDisabled = false,
 }: {
   isFirst?: boolean;
   isLast?: boolean;
   onPrev?: () => void;
   onNext: () => void;
   isNextLoading?: boolean;
+  nextDisabled?: boolean;
 }) {
   return (
     <XStack columnGap="$3.5" mt="$3.5">
@@ -30,7 +32,8 @@ export default function PrevNextButtons({
       <FilledButton
         flex={1}
         onPress={onNext}
-        disabled={isNextLoading}
+        disabled={isNextLoading || nextDisabled}
+        opacity={!isNextLoading && nextDisabled ? 0.5 : 1}
         icon={isNextLoading ? <Spinner /> : undefined}
       >
         {isNextLoading ? null : isLast ? '완료' : '다음'}

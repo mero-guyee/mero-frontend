@@ -14,6 +14,8 @@ interface DatePickerInputProps {
   onChange: (date: string) => void;
   placeholder?: string;
   renderTrigger?: (onPress: () => void) => React.ReactNode;
+  minimumDate?: Date;
+  maximumDate?: Date;
 }
 
 export default function DatePickerInput({
@@ -21,6 +23,8 @@ export default function DatePickerInput({
   onChange,
   placeholder = 'YYYY-MM-DD',
   renderTrigger,
+  minimumDate,
+  maximumDate,
 }: DatePickerInputProps) {
   const [show, setShow] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(value ? new Date(value) : new Date());
@@ -72,6 +76,8 @@ export default function DatePickerInput({
             onChange={handleSpinnerChange}
             style={{ height: 200 }}
             themeVariant={theme}
+            minimumDate={minimumDate}
+            maximumDate={maximumDate}
           />
 
           <FilledButton fontWeight="600" fontSize={16} onPress={handleConfirm}>
@@ -85,6 +91,8 @@ export default function DatePickerInput({
             mode="date"
             display="default"
             onChange={handleAndroidChange}
+            minimumDate={minimumDate}
+            maximumDate={maximumDate}
           />
         )
       )}

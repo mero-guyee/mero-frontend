@@ -63,6 +63,7 @@ export default function NewTripFormDate() {
               <DatePickerInput
                 value={newTrip.endDate}
                 onChange={(date) => setNewTrip({ ...newTrip, endDate: date })}
+                minimumDate={newTrip.startDate ? new Date(newTrip.startDate) : undefined}
               />
               <ErrorText error={endDateError} />
             </YStack>
@@ -134,7 +135,13 @@ export default function NewTripFormDate() {
             </Pressable>
           </YStack>
         </YStack>
-        <PrevNextButtons onNext={handleNext} />
+        <PrevNextButtons
+          onNext={handleNext}
+          nextDisabled={
+            !!validateStartDate(newTrip.startDate) ||
+            !!validateEndDate(newTrip.endDate, newTrip.startDate)
+          }
+        />
       </YStack>
       <ImagePickerSheet
         open={showImagePicker}

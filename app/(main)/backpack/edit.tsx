@@ -77,7 +77,11 @@ export default function EditBackPackScreen() {
     <YStack flex={1} backgroundColor="$background">
       {/* Header */}
       <BackActionHeader label={trip.title} onBack={() => router.back()}>
-        <SubmitButton onPress={handleSubmit} />
+        <SubmitButton
+          onPress={handleSubmit}
+          disabled={!title.trim() || !startDate || !endDate}
+          opacity={title.trim() && startDate && endDate ? 1 : 0.5}
+        />
       </BackActionHeader>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
@@ -106,7 +110,11 @@ export default function EditBackPackScreen() {
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               귀환일
             </Text>
-            <DatePickerInput value={endDate} onChange={setEndDate} />
+            <DatePickerInput
+              value={endDate}
+              onChange={setEndDate}
+              minimumDate={startDate ? new Date(startDate) : undefined}
+            />
           </YStack>
         </XStack>
 

@@ -27,7 +27,7 @@ export default function MemoFormScreen() {
   }, [existingMemo]);
 
   const handleSubmit = () => {
-    if (!title.trim()) return;
+    if (!title.trim() || !content.trim()) return;
 
     if (existingMemo) {
       updateMemo({
@@ -51,8 +51,8 @@ export default function MemoFormScreen() {
       <BackActionHeader onBack={() => router.back()}>
         <SubmitButton
           onPress={handleSubmit}
-          disabled={!title.trim()}
-          opacity={title.trim() ? 1 : 0.5}
+          disabled={!title.trim() || !content.trim()}
+          opacity={title.trim() && content.trim() ? 1 : 0.5}
         />
       </BackActionHeader>
       <FadeWrapper>
