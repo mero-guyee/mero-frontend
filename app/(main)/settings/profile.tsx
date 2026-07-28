@@ -1,10 +1,10 @@
 import { FilledButton, Input } from '@/components/ui';
 import FormLabel from '@/components/ui/form/FormLabel';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
+import { useAppModal } from '@/contexts';
 import { useUpdateNickname, useUserQuery } from '@/hooks/queries/useUser';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, YStack } from 'tamagui';
 
@@ -15,6 +15,7 @@ export default function ProfileSettingsScreen() {
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | null>(null);
   const updateNickname = useUpdateNickname();
+  const { showAlert } = useAppModal();
 
   useEffect(() => {
     if (user) setNickname(user.nickname);
@@ -27,10 +28,15 @@ export default function ProfileSettingsScreen() {
       return;
     }
 
+    if (trimmed === user?.nickname) {
+      router.back();
+      return;
+    }
+
     updateNickname.mutate(trimmed, {
       onSuccess: () => router.back(),
       onError: (e) => {
-        Alert.alert('오류', '닉네임을 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.');
+        showAlert('오류', '닉네임을 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.');
       },
     });
   };
