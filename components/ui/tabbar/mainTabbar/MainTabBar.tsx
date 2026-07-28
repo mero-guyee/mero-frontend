@@ -16,7 +16,6 @@ export default function MainTabBar(props: BottomTabBarProps) {
   );
   const theme = useTheme();
   const foregroundColor = theme.foreground.val;
-  const accentStrongColor = theme.accentStrong.val;
   const mutedColor = theme.muted.val;
 
   function handlePress(index: number, route: (typeof state.routes)[number], isFocused: boolean) {
@@ -47,7 +46,6 @@ export default function MainTabBar(props: BottomTabBarProps) {
         if (options.tabBarLabel === '설정') return null;
 
         const isFocused = state.index === index;
-        const iconColor = isFocused ? accentStrongColor : foregroundColor;
         const label = options.tabBarLabel as string;
 
         return (
@@ -71,7 +69,7 @@ export default function MainTabBar(props: BottomTabBarProps) {
                   { backgroundColor: mutedColor, opacity: animsOpacity[index] },
                 ]}
               />
-              {options.tabBarIcon?.({ focused: isFocused, color: iconColor, size: 24 })}
+              {options.tabBarIcon?.({ focused: isFocused, color: foregroundColor, size: 24 })}
             </Animated.View>
             <Text fontWeight="300" style={[styles.label, { color: foregroundColor }]}>
               {label}
