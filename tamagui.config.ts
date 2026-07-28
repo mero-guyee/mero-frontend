@@ -201,6 +201,7 @@ export const config = createTamagui({
       destructiveForeground: tokens.color.destructiveForeground,
       placeholderForeground: tokens.color.placeholderForeground,
       border: tokens.color.border,
+      shadowColor: 'rgba(0,0,0,0.08)',
     },
     dark: {
       color: '#EDE6DC',
@@ -220,6 +221,7 @@ export const config = createTamagui({
       destructiveForeground: '#ffffff',
       placeholderForeground: '#8C7F6B',
       border: 'rgba(255, 245, 230, 0.12)',
+      shadowColor: 'rgba(0,0,0,0.3)',
     },
   },
   animations,
