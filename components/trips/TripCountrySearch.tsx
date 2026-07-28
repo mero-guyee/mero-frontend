@@ -124,7 +124,7 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
                   >
                     {name}
                   </Text>
-                  {isSelected && <Check size={16} color="$mutedForeground" />}
+                  {isSelected && <Check size={14} color="$mutedForeground" />}
                 </XStack>
               </Pressable>
             );
