@@ -2,7 +2,6 @@ import { FilledButton, Input } from '@/components/ui';
 import FormLabel from '@/components/ui/form/FormLabel';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import ImagePickerSheet from '@/components/ui/ImagePickerSheet';
-import { useAppModal } from '@/contexts';
 import { useUpdateNickname, useUpdateProfileImage, useUserQuery } from '@/hooks/queries/useUser';
 import { Camera } from '@tamagui/lucide-icons';
 import { Asset } from 'expo-asset';
@@ -10,6 +9,7 @@ import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { Text, XStack, YStack } from 'tamagui';
 
 const DEFAULT_AVATAR = Asset.fromModule(require('@/assets/images/default-avatar.png')).uri;
@@ -23,7 +23,6 @@ export default function ProfileSettingsScreen() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const updateNickname = useUpdateNickname();
   const updateProfileImage = useUpdateProfileImage();
-  const { showAlert } = useAppModal();
 
   useEffect(() => {
     if (user) setNickname(user.nickname ?? '');
@@ -32,7 +31,11 @@ export default function ProfileSettingsScreen() {
   const handleSelectImage = (uri: string) => {
     updateProfileImage.mutate(uri, {
       onError: () => {
-        showAlert('오류', '프로필 이미지를 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.');
+        Toast.show({
+          type: 'error',
+          text1: '오류',
+          text2: '프로필 이미지를 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+        });
       },
     });
   };
@@ -52,7 +55,11 @@ export default function ProfileSettingsScreen() {
     updateNickname.mutate(trimmed, {
       onSuccess: () => router.back(),
       onError: (e) => {
-        showAlert('오류', '닉네임을 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.');
+        Toast.show({
+          type: 'error',
+          text1: '오류',
+          text2: '닉네임을 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+        });
       },
     });
   };

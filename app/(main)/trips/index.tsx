@@ -58,7 +58,7 @@ export default function TripListScreen() {
       ) : (
         <FadeWrapper>
           {trips.length === 0 ? (
-            <YStack flex={1} alignItems="center" justifyContent="center">
+            <YStack flex={1} alignItems="center" justifyContent="flex-start" mt="-200">
               <TripEmptyState onCreateTrip={handleCreateTrip} />
             </YStack>
           ) : (

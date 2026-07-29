@@ -5,6 +5,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { TextArea, YStack } from 'tamagui';
 import { useMemos } from '../../../contexts';
 
@@ -26,7 +27,7 @@ export default function MemoFormScreen() {
     }
   }, [existingMemo]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title.trim() || !content.trim()) return;
 
     if (existingMemo) {
@@ -35,15 +36,24 @@ export default function MemoFormScreen() {
         title: title.trim(),
         content,
       });
-    } else {
-      addMemo({
+      router.back();
+      return;
+    }
+
+    try {
+      await addMemo({
         tripId: tripId || '',
         title: title.trim(),
         content,
       });
+      router.back();
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: '오류',
+        text2: '메모를 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
     }
-
-    router.back();
   };
 
   return (

@@ -20,7 +20,7 @@ interface TripContextType {
   setActiveTrip: (tripId: string | null) => void;
   addTrip: (trip: Omit<Trip, 'id'>, onSuccess?: (id: string) => void, onError?: () => void) => void;
   updateTrip: (trip: Trip) => void;
-  deleteTrip: (tripId: string) => void;
+  deleteTrip: (tripId: string) => Promise<void>;
   getTripById: (tripId: string) => Trip | undefined;
   documents: TripDocument[];
   createDocument: (tripId: string, document: TripDocumentFile) => void;
@@ -81,7 +81,7 @@ export function useTrips(): TripContextType {
     },
     updateTrip: (trip) => updateTripMut.mutate(trip),
     deleteTrip: (tripId) => {
-      deleteTripMut.mutate(tripId, {
+      return deleteTripMut.mutateAsync(tripId, {
         onSuccess: () => {
           if (ui.activeTrip === tripId) {
             ui.setActiveTrip(trips.find((t) => t.id !== tripId)?.id ?? null);

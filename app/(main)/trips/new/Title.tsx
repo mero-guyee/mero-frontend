@@ -5,12 +5,11 @@ import PrevNextButtons from '@/components/ui/form/multiStepForm/PrevNextButtons'
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useTrips } from '@/contexts';
 import { useNewTripForm } from '@/contexts/MultiStepForm/NewTripFormContext';
-import { validateTitle } from '@/contexts/MultiStepForm/newTripValidation';
 import { useCreateTrip } from '@/hooks/queries/useTrips';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { Text, YStack } from 'tamagui';
 
 export default function Title() {
@@ -21,10 +20,6 @@ export default function Title() {
   const createTrip = useCreateTrip();
 
   const handleSubmit = () => {
-    const err = validateTitle(newTrip.title);
-    setTitleError(err);
-    if (err) return;
-
     addTrip(
       {
         title: newTrip.title.trim(),
@@ -38,7 +33,11 @@ export default function Title() {
         router.push(`/(main)/trips?created=${id}`);
       },
       () => {
-        Alert.alert('오류', '여행을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.');
+        Toast.show({
+          type: 'error',
+          text1: '오류',
+          text2: '여행을 생성하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+        });
       }
     );
   };

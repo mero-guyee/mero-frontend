@@ -12,9 +12,10 @@ import { formatGeocode } from '@/utils/location/location';
 import { ChevronRight, Pencil, Trash2 } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { ComponentRef, useRef, useState } from 'react';
-import { Alert, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { ScrollView, Stack, Text, XStack, YStack } from 'tamagui';
-import { useExpenses } from '../../contexts';
+import { useAppModal, useExpenses } from '../../contexts';
 
 const plainInputStyle = {
   borderWidth: 0,
@@ -56,6 +57,7 @@ function FieldRow({
 export default function ExpenseDetail({ expenseId }: { expenseId: string }) {
   const router = useRouter();
   const { expenses, categories, updateExpense, deleteExpense } = useExpenses();
+  const { showConfirm } = useAppModal();
 
   const expense = expenses.find((e) => e.id === expenseId);
 
@@ -72,18 +74,22 @@ export default function ExpenseDetail({ expenseId }: { expenseId: string }) {
     );
   }
 
-  const handleDelete = () => {
-    Alert.alert('경비 삭제', '이 경비를 삭제하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
-      {
-        text: '삭제',
-        style: 'destructive',
-        onPress: () => {
-          deleteExpense(expense.id);
-          router.back();
-        },
-      },
-    ]);
+  const handleDelete = async () => {
+    const confirmed = await showConfirm('경비 삭제', '이 경비를 삭제하시겠습니까?', {
+      confirmText: '삭제',
+      destructive: true,
+    });
+    if (!confirmed) return;
+    try {
+      await deleteExpense(expense.id);
+      router.back();
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: '오류',
+        text2: '경비를 삭제하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
+    }
   };
 
   const handleAmountBlur = () => {

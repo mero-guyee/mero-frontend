@@ -10,9 +10,10 @@ import {
   Wallet,
 } from '@tamagui/lucide-icons';
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Text, XStack, YStack } from 'tamagui';
-import { useBudgets, useExpenses, useSyncContext, useTrips } from '../../contexts';
+import { useAppModal, useBudgets, useExpenses, useSyncContext, useTrips } from '../../contexts';
 import { CURRENCIES, getCurrencyCode } from '../../data/constants';
 import { Budget } from '../../types';
 import { EmptyState, FilledButton, Input } from '../ui';
@@ -33,6 +34,7 @@ export function BudgetView() {
   const { budgets, addBudget, updateBudget, deleteBudget } = useBudgets();
   const { isSyncing } = useSyncContext();
   const isKeyboardVisible = useKeyboardVisible();
+  const { showConfirm } = useAppModal();
 
   const filteredBudgets = budgets.filter((b) => !activeTrip || b.tripId === activeTrip);
   const filteredExpenses = expenses.filter((e) => !activeTrip || e.tripId === activeTrip);
@@ -130,28 +132,48 @@ export function BudgetView() {
   };
 
   const handleSaveBudget = async () => {
-    if (!activeTrip || !budgetForm.amount) return;
+    if (!budgetForm.amount) return;
     const amount = parseFloat(budgetForm.amount);
     if (isNaN(amount) || amount <= 0) return;
 
     if (editingBudget) {
       updateBudget({ ...editingBudget, currency: budgetForm.currency, amount });
-    } else {
+      handleCloseBudgetModal();
+      return;
+    }
+
+    try {
       const created = await addBudget({
-        tripId: activeTrip,
+        tripId: activeTrip!,
         currency: budgetForm.currency,
         amount,
       });
       setCreatedId(created.id);
+      handleCloseBudgetModal();
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: '오류',
+        text2: '예산을 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
     }
-    handleCloseBudgetModal();
   };
 
-  const handleDeleteBudget = (budgetId: string) => {
-    Alert.alert('예산 삭제', '이 예산을 삭제하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
-      { text: '삭제', style: 'destructive', onPress: () => deleteBudget(budgetId) },
-    ]);
+  const handleDeleteBudget = async (budgetId: string) => {
+    const confirmed = await showConfirm('예산 삭제', '이 예산을 삭제하시겠습니까?', {
+      confirmText: '삭제',
+      destructive: true,
+    });
+    if (!confirmed) return;
+    try {
+      await deleteBudget(budgetId);
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: '오류',
+        text2: '예산을 삭제하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
+    }
   };
 
   return (

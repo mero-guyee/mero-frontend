@@ -1,6 +1,6 @@
+import { usePermissionRequest } from '@/hooks/usePermissionRequest';
 import { Camera } from '@tamagui/lucide-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { Alert } from 'react-native';
 import ToolbarButton from './ToolbarButton';
 
 interface PhotoButtonProps {
@@ -8,12 +8,14 @@ interface PhotoButtonProps {
 }
 
 export default function PhotoButton({ onAdd }: PhotoButtonProps) {
+  const requestPermission = usePermissionRequest();
+
   const handlePress = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert('권한 필요', '사진을 선택하려면 갤러리 접근 권한이 필요합니다.');
-      return;
-    }
+    const granted = await requestPermission(
+      () => ImagePicker.requestMediaLibraryPermissionsAsync(),
+      '설정에서 갤러리 접근 권한을 허용해주세요.'
+    );
+    if (!granted) return;
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,

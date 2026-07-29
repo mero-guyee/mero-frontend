@@ -1,8 +1,8 @@
 import AppBottomSheet from '@/components/ui/AppBottomSheet';
+import { usePermissionRequest } from '@/hooks/usePermissionRequest';
 import { Camera, FileText, Image as ImageIcon } from '@tamagui/lucide-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import * as ImagePicker from 'expo-image-picker';
-import { Alert } from 'react-native';
 import { Text, XStack } from 'tamagui';
 
 interface DocumentFile {
@@ -17,12 +17,15 @@ interface DocumentAddSheetProps {
 }
 
 export default function DocumentAddSheet({ open, onOpenChange, onSelect }: DocumentAddSheetProps) {
+  const requestPermission = usePermissionRequest();
+
   const launchCamera = async () => {
-    const permission = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert('권한 필요', '카메라 접근 권한이 필요합니다.');
-      return;
-    }
+    const granted = await requestPermission(
+      () => ImagePicker.requestCameraPermissionsAsync(),
+      '설정에서 카메라 접근 권한을 허용해주세요.',
+      () => onOpenChange(false)
+    );
+    if (!granted) return;
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       quality: 0.8,
@@ -34,11 +37,12 @@ export default function DocumentAddSheet({ open, onOpenChange, onSelect }: Docum
   };
 
   const launchGallery = async () => {
-    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!permission.granted) {
-      Alert.alert('권한 필요', '갤러리 접근 권한이 필요합니다.');
-      return;
-    }
+    const granted = await requestPermission(
+      () => ImagePicker.requestMediaLibraryPermissionsAsync(),
+      '설정에서 갤러리 접근 권한을 허용해주세요.',
+      () => onOpenChange(false)
+    );
+    if (!granted) return;
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,

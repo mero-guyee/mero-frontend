@@ -18,6 +18,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { PortalProvider } from 'tamagui';
 import {
+  AppModalProvider,
   AuthProvider,
   BudgetProvider,
   ExpenseProvider,
@@ -107,33 +108,35 @@ function AppContent() {
 
   setNavigationColorByPath(currentPath, theme);
   return (
-    <AuthProvider>
-      <AuthGuard>
-        <SyncProvider>
-          <TripProvider>
-            <ExpenseProvider>
-              <BudgetProvider>
-                <SyncManager />
-                <StatusBar style={theme === 'dark' ? 'light' : 'dark'} backgroundColor="transparent" translucent />
-                <OfflineBanner />
-                <PortalProvider>
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="index" />
-                    <Stack.Screen name="(auth)" />
-                    <Stack.Screen name="onboarding" />
-                    <Stack.Screen name="(main)" />
-                    <Stack.Screen name="auth/naver/callback" />
-                    <Stack.Screen name="expense-new" />
-                    <Stack.Screen name="expense-detail" />
-                  </Stack>
-                </PortalProvider>
-                <Toast config={toastConfig} />
-              </BudgetProvider>
-            </ExpenseProvider>
-          </TripProvider>
-        </SyncProvider>
-      </AuthGuard>
-    </AuthProvider>
+    <PortalProvider>
+      <AppModalProvider>
+        <AuthProvider>
+          <AuthGuard>
+            <SyncProvider>
+              <TripProvider>
+                <ExpenseProvider>
+                  <BudgetProvider>
+                    <SyncManager />
+                    <StatusBar style={theme === 'dark' ? 'light' : 'dark'} backgroundColor="transparent" translucent />
+                    <OfflineBanner />
+                    <Stack screenOptions={{ headerShown: false }}>
+                      <Stack.Screen name="index" />
+                      <Stack.Screen name="(auth)" />
+                      <Stack.Screen name="onboarding" />
+                      <Stack.Screen name="(main)" />
+                      <Stack.Screen name="auth/naver/callback" />
+                      <Stack.Screen name="expense-new" />
+                      <Stack.Screen name="expense-detail" />
+                    </Stack>
+                    <Toast config={toastConfig} />
+                  </BudgetProvider>
+                </ExpenseProvider>
+              </TripProvider>
+            </SyncProvider>
+          </AuthGuard>
+        </AuthProvider>
+      </AppModalProvider>
+    </PortalProvider>
   );
 }
 

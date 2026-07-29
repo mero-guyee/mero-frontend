@@ -12,10 +12,11 @@ import { ChevronDown, ChevronUp, Cloud, MapPin } from '@tamagui/lucide-icons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Modal, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import { Modal, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Text, XStack, YStack } from 'tamagui';
 import { FilledButton } from '../../../components/ui';
-import { useExpenses, useFootprints } from '../../../contexts';
+import { useAppModal, useExpenses, useFootprints } from '../../../contexts';
 import { useFootprintPhotosQuery } from '../../../hooks/queries/useFootprints';
 
 export default function FootprintDetailScreen() {
@@ -25,6 +26,7 @@ export default function FootprintDetailScreen() {
 
   const { footprints, deleteFootprint } = useFootprints();
   const { getExpensesByFootprintId, deleteExpense } = useExpenses();
+  const { showConfirm } = useAppModal();
 
   const footprint = footprints.find((f) => f.id === (id || ''));
   const { data: photos = [] } = useFootprintPhotosQuery(id || '');
@@ -50,18 +52,22 @@ export default function FootprintDetailScreen() {
     router.push({ pathname: '/(main)/footprint/new', params: { footprintId: footprint.id } });
   };
 
-  const handleDelete = () => {
-    Alert.alert('일지 삭제', '이 기록을 삭제하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
-      {
-        text: '삭제',
-        style: 'destructive',
-        onPress: async () => {
-          await deleteFootprint(footprint.id);
-          router.push('/(main)/footprint');
-        },
-      },
-    ]);
+  const handleDelete = async () => {
+    const confirmed = await showConfirm('일지 삭제', '이 기록을 삭제하시겠습니까?', {
+      confirmText: '삭제',
+      destructive: true,
+    });
+    if (!confirmed) return;
+    try {
+      await deleteFootprint(footprint.id);
+      router.push('/(main)/footprint');
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: '오류',
+        text2: '일지를 삭제하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
+    }
   };
 
   const handleAddExpense = () => {
@@ -71,11 +77,21 @@ export default function FootprintDetailScreen() {
     });
   };
 
-  const handleDeleteExpense = (expenseId: string) => {
-    Alert.alert('지출 삭제', '이 지출을 삭제하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
-      { text: '삭제', style: 'destructive', onPress: () => deleteExpense(expenseId) },
-    ]);
+  const handleDeleteExpense = async (expenseId: string) => {
+    const confirmed = await showConfirm('지출 삭제', '이 지출을 삭제하시겠습니까?', {
+      confirmText: '삭제',
+      destructive: true,
+    });
+    if (!confirmed) return;
+    try {
+      await deleteExpense(expenseId);
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: '오류',
+        text2: '지출을 삭제하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
+    }
   };
 
   return (

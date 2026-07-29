@@ -3,36 +3,40 @@ import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { Edit3, GripVertical, Plus, Trash2 } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Text, XStack, YStack } from 'tamagui';
 import { CircularButton, FilledButton } from '../../../components/ui';
 import { XCard } from '../../../components/ui/Card';
-import { useExpenses } from '../../../contexts';
+import { useAppModal, useExpenses } from '../../../contexts';
 
 export default function CategoryManagerScreen() {
   const router = useRouter();
   const { categories, deleteCategory } = useExpenses();
+  const { showConfirm } = useAppModal();
 
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleDeleteCategory = (categoryId: string) => {
-    Alert.alert('카테고리 삭제', '이 카테고리를 삭제하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
-      {
-        text: '삭제',
-        style: 'destructive',
-        onPress: () => deleteCategory(categoryId),
-      },
-    ]);
+  const handleDeleteCategory = async (categoryId: string) => {
+    const confirmed = await showConfirm('카테고리 삭제', '이 카테고리를 삭제하시겠습니까?', {
+      confirmText: '삭제',
+      destructive: true,
+    });
+    if (!confirmed) return;
+    try {
+      await deleteCategory(categoryId);
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: '오류',
+        text2: '카테고리를 삭제하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
+    }
   };
 
-  const handleAddCategory = () => {
-    Alert.alert('알림', '카테고리 추가 기능은 준비 중입니다.');
-  };
+  const handleAddCategory = () => {};
 
-  const handleEditCategory = (categoryId: string) => {
-    Alert.alert('알림', '카테고리 수정 기능은 준비 중입니다.');
-  };
+  const handleEditCategory = (categoryId: string) => {};
 
   return (
     <YStack flex={1} backgroundColor="$background">

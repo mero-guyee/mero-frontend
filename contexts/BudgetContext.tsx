@@ -14,7 +14,7 @@ interface BudgetContextType {
   budgets: Budget[];
   addBudget: (budget: Omit<Budget, 'id' | 'syncStatus'>) => Promise<Budget>;
   updateBudget: (budget: Budget) => void;
-  deleteBudget: (budgetId: string) => void;
+  deleteBudget: (budgetId: string) => Promise<void>;
   deleteBudgetsByTripId: (tripId: string) => void;
   getBudgetsByTripId: (tripId: string) => Budget[];
   getBudgetByCurrency: (currency: string) => Budget | undefined;
@@ -37,9 +37,10 @@ export function useBudgets(): BudgetContextType {
     budgets,
     addBudget: (budget) => createBudget.mutateAsync(budget),
     updateBudget: (budget) => updateBudgetMut.mutate(budget),
-    deleteBudget: (budgetId) => {
+    deleteBudget: async (budgetId) => {
       const budget = budgets.find((b) => b.id === budgetId);
-      if (budget) deleteBudgetMut.mutate({ id: budgetId, tripId: budget.tripId });
+      if (!budget) return;
+      await deleteBudgetMut.mutateAsync({ id: budgetId, tripId: budget.tripId });
     },
     deleteBudgetsByTripId: (tripId) => {
       new BudgetRepository(db).deleteByTripId(tripId);

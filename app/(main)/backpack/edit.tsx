@@ -13,7 +13,7 @@ import { Image as ImageIcon, Plus, X } from '@tamagui/lucide-icons';
 import { Asset } from 'expo-asset';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
 import { Image, Text, useTheme, XStack, YStack } from 'tamagui';
 
 const DEFAULT_IMAGE = Asset.fromModule(require('@/assets/images/mountain.jpg')).uri;
@@ -52,11 +52,6 @@ export default function EditBackPackScreen() {
   }
 
   const handleSubmit = () => {
-    if (!title.trim() || !startDate || !endDate) {
-      Alert.alert('오류', '제목, 시작일, 종료일을 입력해주세요.');
-      return;
-    }
-
     updateTrip({
       ...trip,
       title: title.trim(),

@@ -1,13 +1,13 @@
 import { YCard } from '@/components/ui/Card';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
-import { ChevronRight, Cloud, Info, Monitor, Moon, Sun, Tag, User } from '@tamagui/lucide-icons';
+import { ChevronRight, Cloud, Info, Monitor, Moon, Sun, User } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
-import { Alert, Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
 import { FilledButton } from '../../../components/ui';
-import { ThemeMode, useAuth, useTheme } from '../../../contexts';
+import { ThemeMode, useAppModal, useAuth, useTheme } from '../../../contexts';
 
 const THEME_MODE_OPTIONS: { mode: ThemeMode; label: string; Icon: typeof Monitor }[] = [
   { mode: 'system', label: '시스템 설정', Icon: Monitor },
@@ -20,6 +20,7 @@ export default function SettingsScreen() {
   const { logout } = useAuth();
   const { mode, setMode } = useTheme();
   const insets = useSafeAreaInsets();
+  const { showConfirm } = useAppModal();
 
   const handleManageCategories = () => {
     router.push('/settings/categories');
@@ -30,17 +31,13 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = async () => {
-    Alert.alert('로그아웃', '정말 로그아웃하시겠습니까?', [
-      { text: '취소', style: 'cancel' },
-      {
-        text: '로그아웃',
-        style: 'destructive',
-        onPress: async () => {
-          logout();
-          router.replace('/');
-        },
-      },
-    ]);
+    const confirmed = await showConfirm('로그아웃', '정말 로그아웃하시겠습니까?', {
+      confirmText: '로그아웃',
+      destructive: true,
+    });
+    if (!confirmed) return;
+    logout();
+    router.replace('/');
   };
 
   const SettingItem = ({
@@ -107,7 +104,7 @@ export default function SettingsScreen() {
           </YStack>
 
           {/* Expense Section */}
-          <YStack marginBottom="$6">
+          {/* <YStack marginBottom="$6">
             <Text color="$mutedForeground" marginBottom="$3">
               경비
             </Text>
@@ -118,7 +115,7 @@ export default function SettingsScreen() {
                 onPress={handleManageCategories}
               />
             </YCard>
-          </YStack>
+          </YStack> */}
 
           {/* Display Section */}
           <YStack marginBottom="$6">

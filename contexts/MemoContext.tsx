@@ -9,9 +9,9 @@ import { useTrips } from './TripContext';
 
 interface MemoContextType {
   memos: Memo[];
-  addMemo: (memo: Omit<Memo, 'id' | 'createdAt' | 'updatedAt' | 'syncStatus'>) => void;
+  addMemo: (memo: Omit<Memo, 'id' | 'createdAt' | 'updatedAt' | 'syncStatus'>) => Promise<Memo>;
   updateMemo: (memo: Memo) => void;
-  deleteMemo: (memoId: string) => void;
+  deleteMemo: (memoId: string) => Promise<void>;
 }
 
 export function useMemos(): MemoContextType {
@@ -24,11 +24,12 @@ export function useMemos(): MemoContextType {
 
   return {
     memos,
-    addMemo: (memo) => createMemo.mutate(memo),
+    addMemo: (memo) => createMemo.mutateAsync(memo),
     updateMemo: (memo) => updateMemoMut.mutate(memo),
-    deleteMemo: (memoId) => {
+    deleteMemo: async (memoId) => {
       const memo = memos.find((n) => n.id === memoId);
-      if (memo) deleteMemoMut.mutate({ id: memoId, tripId: memo.tripId });
+      if (!memo) return;
+      await deleteMemoMut.mutateAsync({ id: memoId, tripId: memo.tripId });
     },
   };
 }

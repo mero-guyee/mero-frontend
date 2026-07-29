@@ -19,12 +19,12 @@ interface ExpenseContextType {
   categories: ExpenseCategory[];
   addExpense: (expense: Omit<Expense, 'id' | 'createdAt' | 'syncStatus'>) => Promise<Expense>;
   updateExpense: (expense: Expense) => void;
-  deleteExpense: (expenseId: string) => void;
+  deleteExpense: (expenseId: string) => Promise<void>;
   deleteExpensesByFootprintId: (footprintId: string) => void;
   deleteExpensesByTripId: (tripId: string) => void;
   addCategory: (category: Omit<ExpenseCategory, 'id'>) => void;
   updateCategory: (category: ExpenseCategory) => void;
-  deleteCategory: (categoryId: string) => void;
+  deleteCategory: (categoryId: string) => Promise<void>;
   getExpensesByTripId: (tripId: string) => Expense[];
   getExpensesByFootprintId: (footprintId: string) => Expense[];
 }
@@ -51,9 +51,10 @@ export function useExpenses(): ExpenseContextType {
     categories,
     addExpense: (expense) => createExpense.mutateAsync(expense),
     updateExpense: (expense) => updateExpenseMut.mutate(expense),
-    deleteExpense: (expenseId) => {
+    deleteExpense: async (expenseId) => {
       const expense = expenses.find((e) => e.id === expenseId);
-      if (expense) deleteExpenseMut.mutate({ id: expenseId, tripId: expense.tripId });
+      if (!expense) return;
+      await deleteExpenseMut.mutateAsync({ id: expenseId, tripId: expense.tripId });
     },
     deleteExpensesByFootprintId: (footprintId) => {
       new ExpenseRepository(db).deleteByFootprintId(footprintId);
@@ -63,7 +64,7 @@ export function useExpenses(): ExpenseContextType {
     },
     addCategory: (category) => createCategory.mutate(category),
     updateCategory: (category) => updateCategoryMut.mutate(category),
-    deleteCategory: (categoryId) => deleteCategoryMut.mutate(categoryId),
+    deleteCategory: (categoryId) => deleteCategoryMut.mutateAsync(categoryId),
     getExpensesByTripId: (tripId) => expenses.filter((e) => e.tripId === tripId),
     getExpensesByFootprintId: (footprintId) =>
       expenses.filter((e) => e.footprintId === footprintId),

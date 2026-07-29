@@ -2,9 +2,9 @@ import { useFootprints, useTrips } from '@/contexts';
 import { FootprintLocation } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { PhotoRepository } from '../../repositories';
+import Toast from 'react-native-toast-message';
 import { useDb } from '../../providers/DatabaseProvider';
-import { Alert } from 'react-native';
+import { PhotoRepository } from '../../repositories';
 
 export function useFootprintForm() {
   const { footprintId } = useLocalSearchParams<{ footprintId?: string }>();
@@ -46,11 +46,6 @@ export function useFootprintForm() {
   };
 
   const handleSubmit = async () => {
-    if (!title.trim() || !tripId) {
-      Alert.alert('오류', '제목과 여행을 선택해주세요.');
-      return;
-    }
-
     const footprintData = {
       tripId,
       title: title.trim(),
@@ -63,9 +58,18 @@ export function useFootprintForm() {
     if (existingFootprint) {
       updateFootprint({ ...existingFootprint, ...footprintData, photoUris: photoUrls });
       router.push('/(main)/footprint');
-    } else {
+      return;
+    }
+
+    try {
       const created = await addFootprint({ ...footprintData, photoUris: photoUrls });
       router.push(`/(main)/footprint?created=${created.id}`);
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: '오류',
+        text2: '일지를 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
     }
   };
 

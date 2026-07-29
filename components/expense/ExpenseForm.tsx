@@ -11,7 +11,8 @@ import { formatGeocode } from '@/utils/location/location';
 import { MapPin } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView } from 'react-native';
+import { Pressable, ScrollView } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Text, XStack, YStack } from 'tamagui';
 import { Input } from '../../components/ui';
 import { useExpenses, useTrips } from '../../contexts';
@@ -61,15 +62,6 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
   };
 
   const handleSubmit = async () => {
-    if (!amount || parseFloat(amount) <= 0) {
-      Alert.alert('오류', '금액을 입력해주세요.');
-      return;
-    }
-    if (!categoryId) {
-      Alert.alert('오류', '카테고리를 선택해주세요.');
-      return;
-    }
-
     markSaved();
 
     if (isEdit) {
@@ -83,7 +75,10 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
         location: location.trim() || undefined,
       });
       router.back();
-    } else {
+      return;
+    }
+
+    try {
       const created = await addExpense({
         tripId: effectiveTripId,
         footprintId,
@@ -99,6 +94,12 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
       } else {
         router.dismissTo({ pathname: '/(main)/expense', params: { created: created.id } });
       }
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: '오류',
+        text2: '경비를 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
     }
   };
 

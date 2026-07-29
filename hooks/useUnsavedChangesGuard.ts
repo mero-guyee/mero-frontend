@@ -1,12 +1,14 @@
+import { useAppModal } from '@/contexts';
 import { usePreventRemove } from '@react-navigation/native';
 import { useFocusEffect, useNavigation, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef } from 'react';
-import { Alert, BackHandler } from 'react-native';
+import { BackHandler } from 'react-native';
 
 export function useUnsavedChangesGuard(isDirty: boolean) {
   const navigation = useNavigation();
   const router = useRouter();
   const bypassRef = useRef(false);
+  const { showConfirm } = useAppModal();
 
   useFocusEffect(
     useCallback(() => {
@@ -15,24 +17,21 @@ export function useUnsavedChangesGuard(isDirty: boolean) {
   );
 
   const confirmLeave = useCallback(
-    (leave: () => void) => {
+    async (leave: () => void) => {
       if (!isDirty || bypassRef.current) {
         leave();
         return;
       }
-      Alert.alert('저장하지 않고 나가시겠습니까?', '작성한 내용이 사라집니다.', [
-        { text: '계속 작성', style: 'cancel' },
-        {
-          text: '나가기',
-          style: 'destructive',
-          onPress: () => {
-            bypassRef.current = true;
-            leave();
-          },
-        },
-      ]);
+      const confirmed = await showConfirm(
+        '저장하지 않고 나가시겠습니까?',
+        '작성한 내용이 사라집니다.',
+        { confirmText: '나가기', cancelText: '계속 작성', destructive: true }
+      );
+      if (!confirmed) return;
+      bypassRef.current = true;
+      leave();
     },
-    [isDirty]
+    [isDirty, showConfirm]
   );
 
   usePreventRemove(isDirty, ({ data }) => {

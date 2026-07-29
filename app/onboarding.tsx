@@ -1,10 +1,10 @@
 import { FilledButton, Input } from '@/components/ui';
-import { useAppModal } from '@/contexts';
 import { useCompleteOnboarding } from '@/hooks/queries/useUser';
 import { Plane } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { AnimatePresence, Text, XStack, YStack } from 'tamagui';
 
 export default function OnboardingScreen() {
@@ -13,7 +13,6 @@ export default function OnboardingScreen() {
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | null>(null);
   const completeOnboarding = useCompleteOnboarding();
-  const { showAlert } = useAppModal();
 
   const handleSubmit = () => {
     const trimmed = nickname.trim();
@@ -25,7 +24,11 @@ export default function OnboardingScreen() {
     completeOnboarding.mutate(trimmed, {
       onSuccess: () => router.replace('/(main)/trips'),
       onError: () =>
-        showAlert('오류', '닉네임을 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.'),
+        Toast.show({
+          type: 'error',
+          text1: '오류',
+          text2: '닉네임을 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+        }),
     });
   };
 

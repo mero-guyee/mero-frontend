@@ -3,15 +3,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Platform } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Image, Text, XStack, YStack, useTheme } from 'tamagui';
 import { FilledButton } from '../../components/ui';
-import { useAppModal, useAuth } from '../../contexts';
+import { useAuth } from '../../contexts';
 
 export default function LoginScreen() {
   const { loginWithGoogle, loginWithApple } = useAuth();
   const router = useRouter();
   const theme = useTheme();
-  const { showAlert } = useAppModal();
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
 
@@ -20,7 +20,11 @@ export default function LoginScreen() {
     try {
       await loginWithGoogle();
     } catch (e: any) {
-      showAlert('Google 로그인 실패', e?.message ?? '다시 시도해주세요.');
+      Toast.show({
+        type: 'error',
+        text1: 'Google 로그인 실패',
+        text2: e?.message ?? '다시 시도해주세요.',
+      });
     } finally {
       setGoogleLoading(false);
     }
@@ -31,7 +35,11 @@ export default function LoginScreen() {
     try {
       await loginWithApple();
     } catch (e: any) {
-      showAlert('Apple 로그인 실패', e?.message ?? '다시 시도해주세요.');
+      Toast.show({
+        type: 'error',
+        text1: 'Apple 로그인 실패',
+        text2: e?.message ?? '다시 시도해주세요.',
+      });
     } finally {
       setAppleLoading(false);
     }
