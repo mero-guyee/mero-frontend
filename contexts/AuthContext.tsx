@@ -15,7 +15,6 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   setIsAuthenticated: (value: boolean) => void;
-  login: ({ email, password }: { email: string; password: string }) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   loginWithApple: () => Promise<void>;
   logout: () => void;
@@ -52,13 +51,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => setAuthExpiredHandler(null);
   }, []);
 
-  const login = async ({ email, password }: { email: string; password: string }) => {
-    const res = await authApi.login({ email, password });
-    setIsAuthenticated(true);
-    await cacheCurrentUser();
-    router.push(res.isNewUser ? '/onboarding' : '/(main)/trips');
-  };
-
   const loginWithGoogle = async () => {
     try {
       await GoogleSignin.hasPlayServices();
@@ -70,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!idToken) throw new Error('Google idToken을 가져올 수 없습니다.');
       const res = await authApi.googleLogin(idToken);
       setIsAuthenticated(true);
-      await cacheCurrentUser();
+      if (!res.isNewUser) await cacheCurrentUser();
       router.push(res.isNewUser ? '/onboarding' : '/(main)/trips');
     } catch (e: any) {
       console.error('Google 로그인 실패:', e);
@@ -90,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!credential.identityToken) throw new Error('Apple identityToken을 가져올 수 없습니다.');
       const res = await authApi.appleLogin(credential.identityToken);
       setIsAuthenticated(true);
-      await cacheCurrentUser();
+      if (!res.isNewUser) await cacheCurrentUser();
       router.push(res.isNewUser ? '/onboarding' : '/(main)/trips');
     } catch (e: any) {
       if (e?.code === 'ERR_REQUEST_CANCELED') {
@@ -111,7 +103,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated,
     isLoading,
     setIsAuthenticated,
-    login,
     loginWithGoogle,
     loginWithApple,
     logout,

@@ -1,5 +1,5 @@
 import { UserResponse } from './auth';
-import { apiRequest } from './client';
+import { apiFormRequest, apiRequest } from './client';
 
 export interface UpdateNicknameRequest {
   nickname: string;
@@ -12,4 +12,13 @@ export const userApi = {
       method: 'PATCH',
       body: JSON.stringify(data),
     }),
+  uploadProfileImage: (uri: string): Promise<UserResponse> => {
+    const form = new FormData();
+    form.append('image', {
+      uri,
+      name: 'profile.jpg',
+      type: 'image/jpeg',
+    } as any);
+    return apiFormRequest('/api/users/me/profile-image', form);
+  },
 };

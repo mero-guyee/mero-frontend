@@ -1,12 +1,18 @@
 import { FilledButton, Input } from '@/components/ui';
 import FormLabel from '@/components/ui/form/FormLabel';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
+import ImagePickerSheet from '@/components/ui/ImagePickerSheet';
 import { useAppModal } from '@/contexts';
-import { useUpdateNickname, useUserQuery } from '@/hooks/queries/useUser';
+import { useUpdateNickname, useUpdateProfileImage, useUserQuery } from '@/hooks/queries/useUser';
+import { Camera } from '@tamagui/lucide-icons';
+import { Asset } from 'expo-asset';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Text, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
+
+const DEFAULT_AVATAR = Asset.fromModule(require('@/assets/images/default-avatar.png')).uri;
 
 export default function ProfileSettingsScreen() {
   const router = useRouter();
@@ -14,12 +20,22 @@ export default function ProfileSettingsScreen() {
   const { data: user } = useUserQuery();
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const updateNickname = useUpdateNickname();
+  const updateProfileImage = useUpdateProfileImage();
   const { showAlert } = useAppModal();
 
   useEffect(() => {
-    if (user) setNickname(user.nickname);
+    if (user) setNickname(user.nickname ?? '');
   }, [user]);
+
+  const handleSelectImage = (uri: string) => {
+    updateProfileImage.mutate(uri, {
+      onError: () => {
+        showAlert('오류', '프로필 이미지를 저장하는 중 오류가 발생했습니다. 다시 시도해주세요.');
+      },
+    });
+  };
 
   const handleSubmit = () => {
     const trimmed = nickname.trim();
@@ -47,6 +63,47 @@ export default function ProfileSettingsScreen() {
 
       <YStack padding="$4" flex={1} justifyContent="space-between">
         <YStack>
+          <XStack justifyContent="center" marginBottom="$4">
+            <YStack width={88} height={88}>
+              <YStack
+                testID="profile-image-button"
+                onPress={() => setPickerOpen(true)}
+                width={88}
+                height={88}
+                backgroundColor="$accent"
+                borderRadius={44}
+                alignItems="center"
+                justifyContent="center"
+                overflow="hidden"
+                opacity={updateProfileImage.isPending ? 0.6 : 1}
+              >
+                <Image
+                  source={{ uri: user?.profileImage ?? DEFAULT_AVATAR }}
+                  contentFit="cover"
+                  cachePolicy="memory-disk"
+                  style={{ width: 88, height: 88 }}
+                />
+              </YStack>
+
+              <YStack
+                position="absolute"
+                bottom={0}
+                right={0}
+                width={28}
+                height={28}
+                borderRadius={14}
+                backgroundColor="$foreground"
+                borderWidth={2}
+                borderColor="$background"
+                alignItems="center"
+                justifyContent="center"
+                pointerEvents="none"
+              >
+                <Camera size={14} color="$background" />
+              </YStack>
+            </YStack>
+          </XStack>
+
           <FormLabel marginBottom="$2">닉네임</FormLabel>
           <Input
             testID="profile-nickname-input"
@@ -77,6 +134,13 @@ export default function ProfileSettingsScreen() {
           </Text>
         </FilledButton>
       </YStack>
+
+      <ImagePickerSheet
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        onSelect={handleSelectImage}
+        aspect={[1, 1]}
+      />
     </YStack>
   );
 }

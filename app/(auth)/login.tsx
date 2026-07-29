@@ -1,14 +1,17 @@
 import LoadingDots from '@/components/ui/button/Loading';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import { Image, Text, XStack, YStack, useTheme } from 'tamagui';
 import { FilledButton } from '../../components/ui';
-import { useAuth } from '../../contexts';
+import { useAppModal, useAuth } from '../../contexts';
 
 export default function LoginScreen() {
   const { loginWithGoogle, loginWithApple } = useAuth();
+  const router = useRouter();
   const theme = useTheme();
+  const { showAlert } = useAppModal();
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
 
@@ -17,7 +20,7 @@ export default function LoginScreen() {
     try {
       await loginWithGoogle();
     } catch (e: any) {
-      Alert.alert('Google 로그인 실패', e?.message ?? '다시 시도해주세요.');
+      showAlert('Google 로그인 실패', e?.message ?? '다시 시도해주세요.');
     } finally {
       setGoogleLoading(false);
     }
@@ -28,7 +31,7 @@ export default function LoginScreen() {
     try {
       await loginWithApple();
     } catch (e: any) {
-      Alert.alert('Apple 로그인 실패', e?.message ?? '다시 시도해주세요.');
+      showAlert('Apple 로그인 실패', e?.message ?? '다시 시도해주세요.');
     } finally {
       setAppleLoading(false);
     }
@@ -77,7 +80,11 @@ export default function LoginScreen() {
           </FilledButton>
           {/* Apple Login */}
           {Platform.OS === 'ios' && (
-            <FilledButton onPress={handleAppleLogin} disabled={appleLoading} opacity={appleLoading ? 0.6 : 1}>
+            <FilledButton
+              onPress={handleAppleLogin}
+              disabled={appleLoading}
+              opacity={appleLoading ? 0.6 : 1}
+            >
               {appleLoading ? (
                 <LoadingDots />
               ) : (

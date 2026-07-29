@@ -28,6 +28,7 @@ export function useUserQuery() {
       (async () => {
         try {
           const serverUser = await userApi.getMe();
+          if (serverUser.nickname === null) return;
           await repo.upsertFromServer(serverUser);
           qc.setQueryData(userKeys.me, serverUser);
         } catch {}
@@ -47,6 +48,39 @@ export function useUpdateNickname() {
       await userApi.updateNickname({ nickname });
       const repo = new UserRepository(db);
       await repo.updateNickname(nickname);
+      return repo.getUser();
+    },
+    onSuccess: (row) => {
+      if (row) qc.setQueryData(userKeys.me, rowToUser(row));
+    },
+  });
+}
+
+export function useUpdateProfileImage() {
+  const db = useDb();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (uri: string) => {
+      const updated = await userApi.uploadProfileImage(uri);
+      const repo = new UserRepository(db);
+      await repo.upsertFromServer(updated);
+      return repo.getUser();
+    },
+    onSuccess: (row) => {
+      if (row) qc.setQueryData(userKeys.me, rowToUser(row));
+    },
+  });
+}
+
+export function useCompleteOnboarding() {
+  const db = useDb();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (nickname: string) => {
+      await userApi.updateNickname({ nickname });
+      const repo = new UserRepository(db);
+      const freshUser = await userApi.getMe();
+      await repo.upsertFromServer({ ...freshUser, nickname });
       return repo.getUser();
     },
     onSuccess: (row) => {

@@ -24,7 +24,7 @@ export interface LoginResponse {
 export interface UserResponse {
   id: number;
   email: string;
-  nickname: string;
+  nickname: string | null;
   profileImage?: string;
   createdAt: string;
 }
