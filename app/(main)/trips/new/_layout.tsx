@@ -5,7 +5,6 @@ export default function NewTripLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Country" />
       <Stack.Screen name="DateAndThumbnail" />
-      <Stack.Screen name="Title" />
     </Stack>
   );
 }

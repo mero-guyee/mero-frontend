@@ -1,25 +1,23 @@
 import TripCountrySearch from '@/components/trips/TripCountrySearch';
 import TripCountrySearchChip from '@/components/trips/TripCountrySearchChip';
+import TripCoverImagePicker from '@/components/trips/TripCoverImagePicker';
 import { FilledButton, Input } from '@/components/ui';
 import AppBottomSheet from '@/components/ui/AppBottomSheet';
 import SubmitButton from '@/components/ui/button/SubmitButton';
-import { YCard } from '@/components/ui/Card';
 import DatePickerInput from '@/components/ui/DatePickerInput';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
-import ImagePickerSheet from '@/components/ui/ImagePickerSheet';
 import { useTrips } from '@/contexts';
 import { useTripQuery } from '@/hooks/queries/useTrips';
-import { Image as ImageIcon, Plus, X } from '@tamagui/lucide-icons';
+import { Plus } from '@tamagui/lucide-icons';
 import { Asset } from 'expo-asset';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView } from 'react-native';
-import { Image, Text, useTheme, XStack, YStack } from 'tamagui';
+import { ScrollView } from 'react-native';
+import { Text, XStack, YStack } from 'tamagui';
 
 const DEFAULT_IMAGE = Asset.fromModule(require('@/assets/images/mountain.jpg')).uri;
 export default function EditBackPackScreen() {
   const router = useRouter();
-  const theme = useTheme();
 
   const { activeTrip, updateTrip } = useTrips();
   const { data: trip } = useTripQuery(activeTrip || '');
@@ -31,7 +29,6 @@ export default function EditBackPackScreen() {
   const [countries, setCountries] = useState<string[]>([]);
   const [showCountrySheet, setShowCountrySheet] = useState(false);
   const [draftCountries, setDraftCountries] = useState<string[]>([]);
-  const [showImagePicker, setShowImagePicker] = useState(false);
 
   useEffect(() => {
     if (trip) {
@@ -79,151 +76,79 @@ export default function EditBackPackScreen() {
         />
       </BackActionHeader>
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            모험의 이름
-          </Text>
-          <Input
-            placeholder="예: 2026 남미 여행"
-            placeholderTextColor="$placeholderForeground"
-            value={title}
-            onChangeText={setTitle}
-            color="$foreground"
-          />
-        </YStack>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 24 }}>
+        <TripCoverImagePicker
+          imageUrl={imageUrl}
+          onChange={setImageUrl}
+          onRemove={() => setImageUrl('')}
+        />
 
-        {/* Dates */}
-        <XStack gap="$4" marginBottom="$6">
-          <YStack flex={1}>
+        <YStack padding={24}>
+          <YStack marginBottom="$6">
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              출발일
+              모험의 이름
             </Text>
-            <DatePickerInput value={startDate} onChange={setStartDate} />
-          </YStack>
-          <YStack flex={1}>
-            <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              귀환일
-            </Text>
-            <DatePickerInput
-              value={endDate}
-              onChange={setEndDate}
-              minimumDate={startDate ? new Date(startDate) : undefined}
+            <Input
+              placeholder="예: 2026 남미 여행"
+              placeholderTextColor="$placeholderForeground"
+              value={title}
+              onChangeText={setTitle}
+              color="$foreground"
             />
           </YStack>
-        </XStack>
 
-        {/* Countries */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            거쳐갈 땅
-          </Text>
-
-          <XStack flex={1} flexWrap="wrap" gap="$2" alignItems="center">
-            {countries.map((country) => (
-              <TripCountrySearchChip
-                key={country}
-                country={country}
-                onRemove={handleRemoveCountry}
+          {/* Dates */}
+          <XStack gap="$4" marginBottom="$6">
+            <YStack flex={1}>
+              <Text color="$foreground" marginBottom="$2" fontWeight="500">
+                출발일
+              </Text>
+              <DatePickerInput value={startDate} onChange={setStartDate} />
+            </YStack>
+            <YStack flex={1}>
+              <Text color="$foreground" marginBottom="$2" fontWeight="500">
+                귀환일
+              </Text>
+              <DatePickerInput
+                value={endDate}
+                onChange={setEndDate}
+                minimumDate={startDate ? new Date(startDate) : undefined}
               />
-            ))}
-
-            <FilledButton
-              backgroundColor={'$accent'}
-              height={'$40'}
-              borderRadius={'$3'}
-              aspectRatio={1}
-              hitSlop={8}
-              onPress={() => {
-                setDraftCountries([...countries]);
-                setShowCountrySheet(true);
-              }}
-            >
-              <Plus size={'$5'} color="$foreground" />
-            </FilledButton>
+            </YStack>
           </XStack>
-        </YStack>
 
-        {/* Cover Image */}
-        <YStack marginBottom="$6">
-          <Text color="$foreground" marginBottom="$2" fontWeight="500">
-            대표 풍경
-          </Text>
-          <Pressable onPress={() => setShowImagePicker(true)}>
-            <YCard overflow="hidden" minHeight={imageUrl ? undefined : 192}>
-              {imageUrl ? (
-                <YStack position="relative" aspectRatio={16 / 9}>
-                  <Image source={{ uri: imageUrl }} width="100%" height="100%" resizeMode="cover" />
-                  <YStack
-                    position="absolute"
-                    top={0}
-                    left={0}
-                    width="100%"
-                    height="100%"
-                    backgroundColor="rgba(0,0,0,0.3)"
-                    opacity={1}
-                    hoverStyle={{ opacity: 1 }}
-                    justifyContent="center"
-                    alignItems="center"
-                    zIndex={1}
-                  >
-                    <Text>이미지를 탭하여 업로드</Text>
-                  </YStack>
-                  <Pressable
-                    onPress={(e) => {
-                      e.stopPropagation();
-                      setImageUrl('');
-                    }}
-                    style={{
-                      position: 'absolute',
-                      top: 12,
-                      right: 12,
-                      backgroundColor: theme.destructive.val,
-                      borderRadius: 12,
-                      padding: 8,
-                      zIndex: 2,
-                    }}
-                  >
-                    <X size={16} color="white" />
-                  </Pressable>
-                </YStack>
-              ) : (
-                <YStack
-                  flex={1}
-                  alignItems="center"
-                  justifyContent="center"
-                  padding="$6"
-                  minHeight={192}
-                >
-                  <YStack
-                    width={64}
-                    height={64}
-                    backgroundColor="$accent"
-                    borderRadius={32}
-                    alignItems="center"
-                    justifyContent="center"
-                    marginBottom="$3"
-                    opacity={0.4}
-                  >
-                    <ImageIcon size={32} color="$accentStrong" />
-                  </YStack>
-                  <Text color="$foreground" marginBottom="$1">
-                    이미지를 탭하여 업로드
-                  </Text>
-                  <Text color="$mutedForeground" fontSize={14}>
-                    PNG, JPG, WEBP 파일 지원
-                  </Text>
-                </YStack>
-              )}
-            </YCard>
-          </Pressable>
+          {/* Countries */}
+          <YStack marginBottom="$6">
+            <Text color="$foreground" marginBottom="$2" fontWeight="500">
+              거쳐갈 땅
+            </Text>
+
+            <XStack flex={1} flexWrap="wrap" gap="$2" alignItems="center">
+              {countries.map((country) => (
+                <TripCountrySearchChip
+                  key={country}
+                  country={country}
+                  onRemove={handleRemoveCountry}
+                />
+              ))}
+
+              <FilledButton
+                backgroundColor={'$accent'}
+                height={'$40'}
+                borderRadius={'$3'}
+                aspectRatio={1}
+                hitSlop={8}
+                onPress={() => {
+                  setDraftCountries([...countries]);
+                  setShowCountrySheet(true);
+                }}
+              >
+                <Plus size={'$5'} color="$foreground" />
+              </FilledButton>
+            </XStack>
+          </YStack>
         </YStack>
       </ScrollView>
-      <ImagePickerSheet
-        open={showImagePicker}
-        onOpenChange={setShowImagePicker}
-        onSelect={setImageUrl}
-      />
       <AppBottomSheet
         open={showCountrySheet}
         onOpenChange={setShowCountrySheet}
