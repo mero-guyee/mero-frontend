@@ -27,7 +27,7 @@ export default function BackpackHeader({ trip }: { trip: Trip }) {
     if (!confirmed) return;
     try {
       await deleteTrip(trip.id || '');
-      router.replace('/trips');
+      router.replace('/(main)/trips');
     } catch {
       Toast.show({
         type: 'error',
