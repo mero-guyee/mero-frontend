@@ -22,19 +22,7 @@ export function EmptyState({ icon, title, description, action, ...stackProps }: 
       gap="$4"
       {...stackProps}
     >
-      {icon && (
-        <YStack
-          width={72}
-          height={72}
-          backgroundColor="$accent"
-          borderRadius={36}
-          alignItems="center"
-          justifyContent="center"
-          opacity={0.6}
-        >
-          {icon}
-        </YStack>
-      )}
+      {icon && <>{icon}</>}
 
       <YStack alignItems="center" gap="$1">
         <Text fontSize={16} fontWeight="600" color="$foreground">

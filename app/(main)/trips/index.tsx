@@ -84,9 +84,11 @@ export default function TripListScreen() {
               showsVerticalScrollIndicator={false}
             />
           )}
-          <FloatingActionButton onPress={handleCreateTrip} noBottomTabBar testID="new-trip-fab">
-            <Plane size={44} strokeWidth={1} />
-          </FloatingActionButton>
+          {trips.length > 0 && (
+            <FloatingActionButton onPress={handleCreateTrip} noBottomTabBar testID="new-trip-fab">
+              <Plane size={44} strokeWidth={1} />
+            </FloatingActionButton>
+          )}
         </FadeWrapper>
       )}
     </YStack>
