@@ -1,4 +1,5 @@
 import { Trip } from '@/types';
+import { formatDateRange } from '@/utils/date';
 import { Calendar, Globe } from '@tamagui/lucide-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Text, XStack, YStack } from 'tamagui';
@@ -6,13 +7,6 @@ import { Text, XStack, YStack } from 'tamagui';
 type Props = {
   trip: Trip;
 };
-
-function formatDateRange(start: string, end: string) {
-  const [sy, sm, sd] = start.split('-');
-  const [ey, em, ed] = end.split('-');
-  if (sy === ey) return `${sy}.${sm}.${sd} — ${em}.${ed}`;
-  return `${sy}.${sm}.${sd} — ${ey}.${em}.${ed}`;
-}
 
 export default function TripCoverMeta({ trip }: Props) {
   const dateLabel = formatDateRange(trip.startDate, trip.endDate);

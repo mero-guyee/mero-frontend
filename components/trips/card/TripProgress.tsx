@@ -1,4 +1,5 @@
 import { TripStatus } from '@/types';
+import { formatDateRange } from '@/utils/date';
 import { Text, XStack, YStack } from 'tamagui';
 
 const tripProgressStatusText: Record<TripStatus, string> = {
@@ -38,9 +39,11 @@ export default function TripProgress({
 
   return (
     <YStack backgroundColor="$muted" borderRadius="$4" padding="$3">
-      <XStack justifyContent="space-between" marginBottom="$2">
+      <XStack justifyContent="space-between" alignItems="center" marginBottom="$2">
         <Text color="$mutedForeground" fontSize={14}>
-          {tripProgressStatusText[currentState]}
+          {currentState === 'completed'
+            ? tripProgressStatusText[currentState]
+            : formatDateRange(tripStartDate, tripEndDate)}
         </Text>
         {currentState === 'ongoing' && (
           <Text color="$mutedForeground" fontSize={14}>
@@ -52,8 +55,19 @@ export default function TripProgress({
             D-{daysRemaining}
           </Text>
         )}
+        {currentState === 'completed' && (
+          <Text color="$mutedForeground" fontSize={14}>
+            {formatDateRange(tripStartDate, tripEndDate)}
+          </Text>
+        )}
       </XStack>
-      <YStack height={10} backgroundColor="$mutedStrong" borderRadius={5} overflow="hidden">
+      <YStack
+        height={10}
+        backgroundColor="$mutedStrong"
+        borderRadius={5}
+        overflow="hidden"
+        opacity={currentState === 'planned' ? 0.5 : 1}
+      >
         <YStack
           height={10}
           backgroundColor="$accentStrong"
