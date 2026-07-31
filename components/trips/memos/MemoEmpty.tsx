@@ -6,7 +6,7 @@ export function MemoEmpty() {
     <EmptyState
       icon={<StickyNote size={32} color="$mutedForeground" />}
       title="메모가 없어요"
-      description="여행 중 생각난 것들을 기록해보세요"
+      description="잊지 말아야 할 것들을 메모해보세요"
     />
   );
 }
