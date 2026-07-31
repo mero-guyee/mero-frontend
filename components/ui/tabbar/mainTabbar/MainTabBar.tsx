@@ -1,8 +1,12 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
+import { useTrips } from '@/contexts';
+import { getDaysUntilTripStart } from '@/data/utils';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Animated, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 import { Text, useTheme, View } from 'tamagui';
+import TabLockBadge from './TabLockBadge';
 import { useTabBarNavigation } from './useTabBarNavigation';
 import { useTabPressAnimation } from './useTabPressAnimation';
 
@@ -17,8 +21,27 @@ export default function MainTabBar(props: BottomTabBarProps) {
   const theme = useTheme();
   const foregroundColor = theme.foreground.val;
   const mutedColor = theme.muted.val;
+  const mutedForegroundColor = theme.mutedForeground.val;
 
-  function handlePress(index: number, route: (typeof state.routes)[number], isFocused: boolean) {
+  const { activeTrip, getTripById } = useTrips();
+  const trip = activeTrip ? getTripById(activeTrip) : undefined;
+  const daysUntilStart = trip ? getDaysUntilTripStart(trip.startDate) : 0;
+  const tripNotStarted = daysUntilStart > 0;
+
+  function handlePress(
+    index: number,
+    route: (typeof state.routes)[number],
+    isFocused: boolean,
+    isDisabled: boolean
+  ) {
+    if (isDisabled) {
+      Toast.show({
+        type: 'info',
+        text1: '여행 시작 후 이용할 수 있어요',
+        text2: `D-${daysUntilStart} 남았어요`,
+      });
+      return;
+    }
     playPressAnimation(index);
     navigateToTab(route, isFocused);
   }
@@ -47,20 +70,24 @@ export default function MainTabBar(props: BottomTabBarProps) {
 
         const isFocused = state.index === index;
         const label = options.tabBarLabel as string;
+        const isDisabled = label === '일지' && tripNotStarted;
+        const tabColor = isDisabled ? mutedForegroundColor : foregroundColor;
 
         return (
           <Pressable
             key={route.key}
             style={styles.tab}
-            onPress={() => handlePress(index, route, isFocused)}
+            onPress={() => handlePress(index, route, isFocused, isDisabled)}
             accessibilityRole="button"
-            accessibilityState={{ selected: isFocused }}
+            accessibilityState={{ selected: isFocused, disabled: isDisabled }}
             accessibilityLabel={options.tabBarAccessibilityLabel}
           >
             <Animated.View
               style={{
                 transform: [{ scaleX: animsX[index] }, { scaleY: animsY[index] }],
                 height: 24,
+                opacity: isDisabled ? 0.5 : 1,
+                position: 'relative',
               }}
             >
               <Animated.View
@@ -69,9 +96,14 @@ export default function MainTabBar(props: BottomTabBarProps) {
                   { backgroundColor: mutedColor, opacity: animsOpacity[index] },
                 ]}
               />
-              {options.tabBarIcon?.({ focused: isFocused, color: foregroundColor, size: 24 })}
+              {options.tabBarIcon?.({ focused: isFocused, color: tabColor, size: 24 })}
+              {isDisabled && <TabLockBadge color={tabColor} />}
             </Animated.View>
-            <Text fontWeight="300" style={[styles.label, { color: foregroundColor }]}>
+            <Text
+              fontWeight="300"
+              opacity={isDisabled ? 0.5 : 1}
+              style={[styles.label, { color: tabColor }]}
+            >
               {label}
             </Text>
           </Pressable>

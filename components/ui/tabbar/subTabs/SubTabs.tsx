@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { Animated } from 'react-native';
-import { Text, XStack, YStack, type YStackProps } from 'tamagui';
+import { Text, useTheme, XStack, YStack, type YStackProps } from 'tamagui';
 
+import TabLockBadge from '../mainTabbar/TabLockBadge';
 import { TabButtonOverlay } from './TabButtonOverlay';
 import { useClickAnimation } from './useClickAnimation';
 import { useSwipeAnimation } from './useSwipeAnimation';
@@ -9,12 +10,14 @@ import { useSwipeAnimation } from './useSwipeAnimation';
 interface Tab<T extends string> {
   value: T;
   label: string;
+  disabled?: boolean;
 }
 
 interface SubTabsProps<T extends string> extends Omit<YStackProps, 'children'> {
   tabs: Tab<T>[];
   activeTab: T;
   onTabChange: (tab: T) => void;
+  onDisabledPress?: (tab: T) => void;
   swipePosition?: Animated.AnimatedInterpolation<number>;
 }
 
@@ -24,11 +27,14 @@ export function SubTabs<T extends string>({
   tabs,
   activeTab,
   onTabChange,
+  onDisabledPress,
   swipePosition,
   ...containerProps
 }: SubTabsProps<T>) {
   const { swipePillBlend, swipeTX, swipeRefWidth, initSwipe } = useSwipeAnimation();
   const { springX, springWidth, pressBlend, initSpring, animateTo } = useClickAnimation();
+  const theme = useTheme();
+  const mutedForegroundColor = theme.mutedForeground.val;
 
   const tabLayouts = useRef<Record<string, { x: number; width: number }>>({});
   const initialized = useRef(false);
@@ -55,7 +61,12 @@ export function SubTabs<T extends string>({
     setAllLayoutsReady(true);
   };
 
-  const handleTabChange = (tab: T) => {
+  const handleTabChange = (tab: T, disabled?: boolean) => {
+    if (disabled) {
+      onDisabledPress?.(tab);
+      return;
+    }
+
     const target = tabLayouts.current[tab];
     const current = tabLayouts.current[activeTab];
 
@@ -96,17 +107,28 @@ export function SubTabs<T extends string>({
             h={PILL_HEIGHT}
             paddingHorizontal="$3"
             alignItems="center"
+            gap="$1"
+            position="relative"
             pressStyle={{ opacity: 0.7 }}
-            onPress={() => handleTabChange(tab.value)}
+            onPress={() => handleTabChange(tab.value, tab.disabled)}
             zIndex={1}
           >
-            <Text
-              color={activeTab === tab.value ? '$foreground' : '$mutedForeground'}
-              fontSize={14}
-              fontWeight="500"
-            >
-              {tab.label}
-            </Text>
+            <XStack position="relative" opacity={tab.disabled ? 0.6 : 1}>
+              <Text
+                color={
+                  tab.disabled
+                    ? '$mutedForeground'
+                    : activeTab === tab.value
+                      ? '$foreground'
+                      : '$mutedForeground'
+                }
+                fontSize={14}
+                fontWeight="500"
+              >
+                {tab.label}
+              </Text>
+              {tab.disabled && <TabLockBadge color={mutedForegroundColor} />}
+            </XStack>
           </XStack>
         ))}
       </XStack>

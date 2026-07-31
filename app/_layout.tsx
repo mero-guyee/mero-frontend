@@ -128,7 +128,7 @@ function AppContent() {
                       <Stack.Screen name="expense-new" />
                       <Stack.Screen name="expense-detail" />
                     </Stack>
-                    <Toast config={toastConfig} />
+                    <Toast config={toastConfig} position="bottom" />
                   </BudgetProvider>
                 </ExpenseProvider>
               </TripProvider>
