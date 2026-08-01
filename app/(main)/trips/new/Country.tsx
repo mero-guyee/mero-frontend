@@ -30,7 +30,8 @@ export default function NewInputCountryStep() {
       <YStack
         flex={1}
         backgroundColor="$background"
-        paddingVertical={24 + insets.top}
+        paddingTop={24 + insets.top}
+        paddingBottom={24}
         paddingHorizontal={paddingHorizontalGeneral}
         justifyContent="flex-end"
       >
@@ -47,6 +48,7 @@ export default function NewInputCountryStep() {
             onRemove={(country) =>
               setNewTrip({ ...newTrip, countries: newTrip.countries.filter((c) => c !== country) })
             }
+            onClearAll={() => setNewTrip({ ...newTrip, countries: [] })}
             error={error}
           />
         </YStack>
