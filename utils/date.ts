@@ -6,10 +6,14 @@ function getWeekday(dateStr: string) {
 }
 
 export function formatDateRange(start: string, end: string) {
-  const [sy, sm, sd] = start.split('-');
-  const [ey, em, ed] = end.split('-');
-  const startLabel = `${sm}.${sd}(${getWeekday(start)})`;
-  const endLabel = `${em}.${ed}(${getWeekday(end)})`;
-  if (sy === ey) return `${sy}.${startLabel} — ${endLabel}`;
-  return `${sy}.${startLabel} — ${ey}.${endLabel}`;
+  const [sy, sm, sd] = start.split('-').map(Number);
+  const [ey, em, ed] = end.split('-').map(Number);
+  const startLabel = `${sm}월 ${sd}일(${getWeekday(start)})`;
+  const endLabel = `${em}월 ${ed}일(${getWeekday(end)})`;
+
+  const currentYear = new Date().getFullYear();
+  const yearPrefix = sy === currentYear ? '' : `${sy}년 `;
+
+  if (sy === ey) return `${yearPrefix}${startLabel} — ${endLabel}`;
+  return `${yearPrefix}${startLabel} — ${ey}년 ${endLabel}`;
 }
