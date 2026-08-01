@@ -2,6 +2,8 @@ import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useTrips } from '@/contexts';
 import { getDaysUntilTripStart } from '@/data/utils';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { ArrowLeft } from '@tamagui/lucide-icons';
+import { router } from 'expo-router';
 import { Animated, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
@@ -64,6 +66,29 @@ export default function MainTabBar(props: BottomTabBarProps) {
       style={{ elevation: 2 }}
       paddingBottom={tabBarPadding}
     >
+      <Pressable
+        style={styles.backButton}
+        onPress={() => router.navigate('/(main)/trips')}
+        accessibilityRole="button"
+        accessibilityLabel="여행으로 나가기"
+      >
+        <View
+          width={40}
+          height={40}
+          borderRadius={20}
+          backgroundColor="$muted"
+          alignItems="center"
+          justifyContent="center"
+          shadowColor="rgba(0,0,0,0.2)"
+          shadowOffset={{ width: 0, height: 2 }}
+          shadowOpacity={0.2}
+          shadowRadius={4}
+          style={{ elevation: 4 }}
+        >
+          <ArrowLeft size={20} color={foregroundColor} />
+        </View>
+      </Pressable>
+
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         if (options.tabBarLabel === '여행') return null;
@@ -115,6 +140,10 @@ export default function MainTabBar(props: BottomTabBarProps) {
 }
 
 const styles = StyleSheet.create({
+  backButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   tab: {
     flex: 1,
     alignItems: 'center',
