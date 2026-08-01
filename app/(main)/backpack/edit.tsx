@@ -176,6 +176,7 @@ export default function EditBackPackScreen() {
           selectedCountries={draftCountries}
           onAdd={(c) => setDraftCountries((prev) => [...prev, c])}
           onRemove={(c) => setDraftCountries((prev) => prev.filter((x) => x !== c))}
+          onClearAll={() => setDraftCountries([])}
           error={null}
         />
       </AppBottomSheet>

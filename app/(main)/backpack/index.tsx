@@ -1,6 +1,5 @@
 import BackpackHeader from '@/components/backpack/BackpackHeader';
 import BackpackSkeleton from '@/components/backpack/BackpackSkeleton';
-import TripCoverImage from '@/components/trips/TripCoverImage';
 import { DocumentsTab } from '@/components/trips/documents/DocumentsTab';
 import MemoTab from '@/components/trips/memos/MemoTab';
 import FadeWrapper from '@/components/ui/FadeWrapper';
@@ -49,8 +48,6 @@ export default function TripHomeScreen() {
       <BackpackHeader trip={trip} />
       <FadeWrapper>
         <YStack flex={1}>
-          <TripCoverImage key={trip.id} uri={trip.imageUrl} trip={trip} />
-
           <TabView
             navigationState={{ index, routes }}
             renderScene={({ route }) => {

@@ -2,6 +2,7 @@ import { paddingHorizontalGeneral } from '@/constants/theme';
 import { Trip } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SectionList } from 'react-native';
+import Toast from 'react-native-toast-message';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
@@ -14,15 +15,16 @@ import { TripCard } from '../../../components/trips/card/TripCard';
 import { TripEmptyState } from '../../../components/trips/TripEmptyState';
 import { TripHeader } from '../../../components/trips/TripHeader';
 import { UnrecordedTripsBanner } from '../../../components/trips/UnrecordedTripsBanner';
-import { useTrips } from '../../../contexts';
+import { useAppModal, useTrips } from '../../../contexts';
 
 export default function TripListScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const isFocused = useIsFocused();
+  const { showConfirm } = useAppModal();
 
   const { created } = useLocalSearchParams<{ created?: string }>();
-  const { tripsByProgress, trips, setActiveTrip, isTripsLoading } = useTrips();
+  const { tripsByProgress, trips, setActiveTrip, deleteTrip, isTripsLoading } = useTrips();
 
   const sections: { title: string; data: Trip[] }[] = [
     { title: '여행 중', data: tripsByProgress.ongoing },
@@ -37,6 +39,29 @@ export default function TripListScreen() {
 
   const handleCreateTrip = () => {
     router.push('/(main)/trips/new/Country');
+  };
+
+  const handleEditTrip = (tripId: string) => {
+    setActiveTrip(tripId);
+    router.push('/backpack/edit');
+  };
+
+  const handleDeleteTrip = async (trip: Trip) => {
+    const confirmed = await showConfirm(
+      '여행 삭제',
+      '이 여행과 관련된 모든 일기와 경비가 삭제됩니다. 정말 삭제하시겠습니까?',
+      { confirmText: '삭제', destructive: true }
+    );
+    if (!confirmed) return;
+    try {
+      await deleteTrip(trip.id);
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: '오류',
+        text2: '여행을 삭제하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
+    }
   };
 
   if (!isFocused) {
@@ -83,6 +108,8 @@ export default function TripListScreen() {
                     <TripCard
                       trip={item}
                       onPress={() => handleSelectTrip(item.id)}
+                      onEdit={() => handleEditTrip(item.id)}
+                      onDelete={() => handleDeleteTrip(item)}
                       showSyncBadge={created === item.id}
                     />
                   </FadeWrapper>
