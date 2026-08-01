@@ -78,6 +78,7 @@ export default function SyncStatusScreen() {
       const syncFn = DOMAIN_SYNC_FNS[entry.domain];
       if (syncFn) await syncFn(db);
       await qc.invalidateQueries({ queryKey: outboxKey });
+      await qc.invalidateQueries({ queryKey: [entry.domain] });
     } catch (e) {
       console.error('Failed to retry sync for entry', entry, e);
       Toast.show({
