@@ -51,6 +51,13 @@ export class DocumentRepository extends BaseRepository<DocumentRow> {
     return rows.map(rowToDocument);
   }
 
+  async getTripIdsWithDocuments(): Promise<Set<string>> {
+    const rows = await this.db.getAllAsync<{ tripId: string }>(
+      `SELECT DISTINCT tripId FROM documents WHERE deletedAt IS NULL`
+    );
+    return new Set(rows.map((r) => r.tripId));
+  }
+
   async createDocument(tripId: string, data: TripDocumentFile): Promise<TripDocument> {
     const row = await this.create({
       tripId,

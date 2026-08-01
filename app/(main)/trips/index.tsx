@@ -2,6 +2,7 @@ import { paddingHorizontalGeneral } from '@/constants/theme';
 import { Trip } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SectionList } from 'react-native';
+import Animated, { LinearTransition } from 'react-native-reanimated';
 
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
@@ -12,6 +13,7 @@ import { Text, View, YStack } from 'tamagui';
 import { TripCard } from '../../../components/trips/card/TripCard';
 import { TripEmptyState } from '../../../components/trips/TripEmptyState';
 import { TripHeader } from '../../../components/trips/TripHeader';
+import { UnrecordedTripsBanner } from '../../../components/trips/UnrecordedTripsBanner';
 import { useTrips } from '../../../contexts';
 
 export default function TripListScreen() {
@@ -67,19 +69,24 @@ export default function TripListScreen() {
               keyExtractor={(item) => item.id}
               stickySectionHeadersEnabled={false}
               contentContainerStyle={{ padding: paddingHorizontalGeneral, paddingTop: 0 }}
+              ListHeaderComponent={<UnrecordedTripsBanner tripsByStatus={tripsByProgress} />}
               renderSectionHeader={({ section }) => (
-                <Text fontSize={20} fontWeight="600" color="$foreground" paddingVertical="$2">
-                  {section.title}
-                </Text>
+                <Animated.View layout={LinearTransition.springify().damping(70).stiffness(350)}>
+                  <Text fontSize={20} fontWeight="600" color="$foreground" paddingVertical="$2">
+                    {section.title}
+                  </Text>
+                </Animated.View>
               )}
               renderItem={({ item }) => (
-                <FadeWrapper>
-                  <TripCard
-                    trip={item}
-                    onPress={() => handleSelectTrip(item.id)}
-                    showSyncBadge={created === item.id}
-                  />
-                </FadeWrapper>
+                <Animated.View layout={LinearTransition.springify().damping(70).stiffness(350)}>
+                  <FadeWrapper>
+                    <TripCard
+                      trip={item}
+                      onPress={() => handleSelectTrip(item.id)}
+                      showSyncBadge={created === item.id}
+                    />
+                  </FadeWrapper>
+                </Animated.View>
               )}
               showsVerticalScrollIndicator={false}
             />

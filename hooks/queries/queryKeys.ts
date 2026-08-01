@@ -3,6 +3,10 @@ export const tripKeys = {
   detail: (id: string) => ['trips', id] as const,
 };
 
+export const unrecordedTripsKeys = {
+  all: ['trips', 'withoutRecords'] as const,
+};
+
 export const documentKeys = {
   byTrip: (tripId: string) => ['documents', tripId] as const,
 };

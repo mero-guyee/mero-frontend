@@ -8,7 +8,7 @@ import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { DocumentRepository, TripRepository } from '../../repositories';
 import { TripDocumentFile } from '../../types';
-import { documentKeys } from './queryKeys';
+import { documentKeys, unrecordedTripsKeys } from './queryKeys';
 
 function persistToDocumentDirectory(ogFile: TripDocumentFile): TripDocumentFile {
   const documentsDir = new Directory(Paths.document, 'documents');
@@ -91,6 +91,7 @@ export function useCreateDocument() {
     },
     onSuccess: (_, { tripId }) => {
       qc.invalidateQueries({ queryKey: documentKeys.byTrip(tripId) });
+      qc.invalidateQueries({ queryKey: unrecordedTripsKeys.all });
     },
   });
 }
@@ -128,6 +129,7 @@ export function useDeleteDocument() {
     },
     onSuccess: (_, { tripId }) => {
       qc.invalidateQueries({ queryKey: documentKeys.byTrip(tripId) });
+      qc.invalidateQueries({ queryKey: unrecordedTripsKeys.all });
     },
   });
 }

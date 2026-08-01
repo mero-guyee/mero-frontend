@@ -58,6 +58,13 @@ export class FootprintRepository extends BaseRepository<FootprintRow> {
     return rows.map(rowToFootprint);
   }
 
+  async getTripIdsWithFootprints(): Promise<Set<string>> {
+    const rows = await this.db.getAllAsync<{ tripId: string }>(
+      `SELECT DISTINCT tripId FROM footprints WHERE deletedAt IS NULL`
+    );
+    return new Set(rows.map((r) => r.tripId));
+  }
+
   async createFootprint(data: Omit<Footprint, 'id' | 'serverId'>): Promise<Footprint> {
     const row = await this.create({
       ...data,

@@ -3,9 +3,15 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { tripsApi } from '../../api/trips';
 import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
-import { MemoRepository, TripRepository } from '../../repositories';
+import {
+  BudgetRepository,
+  DocumentRepository,
+  FootprintRepository,
+  MemoRepository,
+  TripRepository,
+} from '../../repositories';
 import { Trip } from '../../types';
-import { tripKeys } from './queryKeys';
+import { tripKeys, unrecordedTripsKeys } from './queryKeys';
 
 export { tripKeys } from './queryKeys';
 
@@ -144,6 +150,65 @@ export function useUpdateTrip() {
       qc.invalidateQueries({ queryKey: tripKeys.all });
       qc.invalidateQueries({ queryKey: tripKeys.detail(trip.id) });
     },
+  });
+}
+
+export interface TripsByStatus {
+  ongoing: Trip[];
+  planned: Trip[];
+  completed: Trip[];
+}
+
+export type UnrecordedTarget = 'footprint' | 'memo' | 'document' | 'budget';
+
+export interface UnrecordedTrip {
+  trip: Trip;
+  status: 'ongoing' | 'planned';
+  target: UnrecordedTarget;
+}
+
+export function useTripsWithoutRecordsQuery(tripsByStatus: TripsByStatus) {
+  const db = useDb();
+  const allTripIds = [...tripsByStatus.ongoing, ...tripsByStatus.planned].map((t) => t.id);
+
+  return useQuery({
+    queryKey: [...unrecordedTripsKeys.all, allTripIds],
+    queryFn: async (): Promise<UnrecordedTrip[]> => {
+      const memoRepo = new MemoRepository(db);
+      const footprintRepo = new FootprintRepository(db);
+      const documentRepo = new DocumentRepository(db);
+      const budgetRepo = new BudgetRepository(db);
+
+      const [memoTripIds, footprintTripIds, documentTripIds, budgetTripIds] = await Promise.all([
+        memoRepo.getTripIdsWithMemos(),
+        footprintRepo.getTripIdsWithFootprints(),
+        documentRepo.getTripIdsWithDocuments(),
+        budgetRepo.getTripIdsWithBudgets(),
+      ]);
+
+      const isFullyRecorded = (id: string) => memoTripIds.has(id) && footprintTripIds.has(id);
+      const hasAnyPrep = (id: string) => documentTripIds.has(id) || budgetTripIds.has(id);
+
+      const plannedByStartDateAsc = [...tripsByStatus.planned].sort(
+        (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      );
+
+      return [
+        ...tripsByStatus.ongoing
+          .filter((trip) => !isFullyRecorded(trip.id))
+          .map(
+            (trip): UnrecordedTrip => ({
+              trip,
+              status: 'ongoing',
+              target: footprintTripIds.has(trip.id) ? 'memo' : 'footprint',
+            })
+          ),
+        ...plannedByStartDateAsc
+          .filter((trip) => !hasAnyPrep(trip.id))
+          .map((trip): UnrecordedTrip => ({ trip, status: 'planned', target: 'document' })),
+      ];
+    },
+    enabled: allTripIds.length > 0,
   });
 }
 

@@ -4,7 +4,7 @@ import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { MemoRepository, TripRepository } from '../../repositories';
 import { Memo } from '../../types';
-import { memoKeys } from './queryKeys';
+import { memoKeys, unrecordedTripsKeys } from './queryKeys';
 
 export function useMemosQuery(tripId: string) {
   const db = useDb();
@@ -68,7 +68,10 @@ export function useCreateMemo() {
 
       return localMemo;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: memoKeys.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: memoKeys.all });
+      qc.invalidateQueries({ queryKey: unrecordedTripsKeys.all });
+    },
   });
 }
 
@@ -136,6 +139,9 @@ export function useDeleteMemo() {
 
       return tripId;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: memoKeys.all }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: memoKeys.all });
+      qc.invalidateQueries({ queryKey: unrecordedTripsKeys.all });
+    },
   });
 }

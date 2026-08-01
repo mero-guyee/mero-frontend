@@ -6,7 +6,8 @@ import MemoTab from '@/components/trips/memos/MemoTab';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import { SubTabs } from '@/components/ui/tabbar/subTabs/SubTabs';
 import { useTripQuery } from '@/hooks/queries/useTrips';
-import { useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { TabView } from 'react-native-tab-view';
 import { Text, YStack } from 'tamagui';
@@ -22,8 +23,14 @@ export default function TripHomeScreen() {
   const { data: trip, isLoading } = useTripQuery(activeTrip || '');
   const { memos } = useMemos();
   const layout = useWindowDimensions();
+  const { tab } = useLocalSearchParams<{ tab?: string }>();
 
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(tab === 'files' ? 1 : 0);
+
+  useEffect(() => {
+    if (tab === 'files') setIndex(1);
+    else if (tab === 'memos') setIndex(0);
+  }, [tab]);
 
   if (isLoading) {
     return <BackpackSkeleton />;

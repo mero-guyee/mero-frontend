@@ -57,6 +57,13 @@ export class MemoRepository extends BaseRepository<MemoRow> {
     return rows.map(rowToMemo);
   }
 
+  async getTripIdsWithMemos(): Promise<Set<string>> {
+    const rows = await this.db.getAllAsync<{ tripId: string }>(
+      `SELECT DISTINCT tripId FROM memos WHERE deletedAt IS NULL`
+    );
+    return new Set(rows.map((r) => r.tripId));
+  }
+
   async createMemo(
     data: Omit<Memo, 'id' | 'createdAt' | 'updatedAt' | 'syncStatus'>
   ): Promise<Memo> {

@@ -49,6 +49,13 @@ export class BudgetRepository extends BaseRepository<BudgetRow> {
     return rows.map(rowToBudget);
   }
 
+  async getTripIdsWithBudgets(): Promise<Set<string>> {
+    const rows = await this.db.getAllAsync<{ tripId: string }>(
+      `SELECT DISTINCT tripId FROM budgets WHERE deletedAt IS NULL`
+    );
+    return new Set(rows.map((r) => r.tripId));
+  }
+
   async createBudget(data: Omit<Budget, 'id' | 'serverId' | 'syncStatus'>): Promise<Budget> {
     const row = await this.create({
       ...data,

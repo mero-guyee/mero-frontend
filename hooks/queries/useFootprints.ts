@@ -16,6 +16,7 @@ import {
   filterRemovedPhotos,
   uploadPhotosAndSync,
 } from '../../utils/photoSync';
+import { unrecordedTripsKeys } from './queryKeys';
 
 export const footprintKeys = {
   byTrip: (tripId: string) => ['footprints', 'trip', tripId] as const,
@@ -127,6 +128,7 @@ export function useCreateFootprint() {
     },
     onSuccess: (footprint) => {
       qc.invalidateQueries({ queryKey: footprintKeys.byTrip(footprint.tripId) });
+      qc.invalidateQueries({ queryKey: unrecordedTripsKeys.all });
     },
   });
 }
@@ -241,6 +243,7 @@ export function useDeleteFootprint() {
     },
     onSuccess: (tripId) => {
       qc.invalidateQueries({ queryKey: footprintKeys.byTrip(tripId) });
+      qc.invalidateQueries({ queryKey: unrecordedTripsKeys.all });
     },
   });
 }

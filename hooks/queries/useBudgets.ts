@@ -4,6 +4,7 @@ import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { BudgetRepository, TripRepository } from '../../repositories';
 import { Budget } from '../../types';
+import { unrecordedTripsKeys } from './queryKeys';
 
 const DEFAULT_EXCHANGE_RATE = 1;
 
@@ -79,6 +80,7 @@ export function useCreateBudget() {
     onSuccess: (budget) => {
       qc.invalidateQueries({ queryKey: budgetKeys.all });
       qc.invalidateQueries({ queryKey: budgetKeys.byTrip(budget.tripId) });
+      qc.invalidateQueries({ queryKey: unrecordedTripsKeys.all });
     },
   });
 }
@@ -155,6 +157,7 @@ export function useDeleteBudget() {
     onSuccess: (tripId) => {
       qc.invalidateQueries({ queryKey: budgetKeys.all });
       qc.invalidateQueries({ queryKey: budgetKeys.byTrip(tripId) });
+      qc.invalidateQueries({ queryKey: unrecordedTripsKeys.all });
     },
   });
 }
