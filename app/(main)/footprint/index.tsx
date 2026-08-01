@@ -3,6 +3,7 @@ import FootprintSkeleton from '@/components/footprint/FootprintSkeleton';
 import FootprintMapView from '@/components/footprint/map/FootprintMapView';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
+import { formatDateLabel, getTripDayNumber } from '@/utils/date';
 import { List, Map } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
@@ -14,7 +15,7 @@ export default function FootprintListScreen() {
   const router = useRouter();
   const { created } = useLocalSearchParams<{ created?: string }>();
 
-  const { activeTrip } = useTrips();
+  const { activeTrip, getTripById } = useTrips();
   const { footprints, isFootPrintLoading } = useFootprints();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -33,21 +34,24 @@ export default function FootprintListScreen() {
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [footprints, activeTrip, searchQuery]);
 
-  const footprintsByMonth = useMemo(() => {
+  const footprintsByDate = useMemo(() => {
     const grouped = filteredFootprints.reduce(
       (acc, footprint) => {
-        const monthKey = new Date(footprint.date).toLocaleDateString('ko-KR', {
-          year: 'numeric',
-          month: 'long',
-        });
-        if (!acc[monthKey]) acc[monthKey] = [];
-        acc[monthKey].push(footprint);
+        if (!acc[footprint.date]) acc[footprint.date] = [];
+        acc[footprint.date].push(footprint);
         return acc;
       },
       {} as Record<string, typeof filteredFootprints>
     );
-    return Object.entries(grouped).map(([title, data]) => ({ title, data }));
-  }, [filteredFootprints]);
+    return Object.entries(grouped).map(([date, data]) => {
+      const trip = getTripById(data[0].tripId);
+      return {
+        title: formatDateLabel(date),
+        dayLabel: trip ? `${getTripDayNumber(trip.startDate, date)}일차` : undefined,
+        data,
+      };
+    });
+  }, [filteredFootprints, getTripById]);
 
   if (isFootPrintLoading) {
     return <FootprintSkeleton />;
@@ -74,7 +78,7 @@ export default function FootprintListScreen() {
           <FootprintMapView footprints={filteredFootprints} isLoading={isFootPrintLoading} />
         ) : (
           <FootprintList
-            sections={footprintsByMonth}
+            sections={footprintsByDate}
             showSearch={showSearch}
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}

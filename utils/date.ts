@@ -5,6 +5,19 @@ function getWeekday(dateStr: string) {
   return WEEKDAYS[new Date(y, m - 1, d).getDay()];
 }
 
+export function formatDateLabel(dateStr: string) {
+  const [, m, d] = dateStr.split('-').map(Number);
+  return `${m}월 ${d}일 (${getWeekday(dateStr)})`;
+}
+
+export function getTripDayNumber(tripStartDate: string, dateStr: string) {
+  const [sy, sm, sd] = tripStartDate.split('-').map(Number);
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const start = Date.UTC(sy, sm - 1, sd);
+  const current = Date.UTC(y, m - 1, d);
+  return Math.round((current - start) / 86400000) + 1;
+}
+
 export function formatDateRange(start: string, end: string) {
   const [sy, sm, sd] = start.split('-').map(Number);
   const [ey, em, ed] = end.split('-').map(Number);

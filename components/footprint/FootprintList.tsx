@@ -2,12 +2,13 @@ import { EmptyState, Input } from '@/components/ui';
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import { NotebookPen, Plus } from '@tamagui/lucide-icons';
 import { SectionList } from 'react-native';
-import { Text, XStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { Footprint } from '../../types';
 import FootprintItem from './FootprintItem';
 
 interface FootprintSection {
   title: string;
+  dayLabel?: string;
   data: Footprint[];
 }
 
@@ -29,6 +30,34 @@ function EmptyList() {
       title="아직 일지가 없어요"
       description="여행의 순간순간을 기록해보세요"
     />
+  );
+}
+
+function DateHeaderContent({
+  section,
+  showDivider,
+}: {
+  section: FootprintSection;
+  showDivider: boolean;
+}) {
+  return (
+    <YStack backgroundColor="$background" paddingVertical="$2">
+      <YStack
+        height={1}
+        backgroundColor={showDivider ? '$border' : 'transparent'}
+        marginBottom="$3"
+      />
+      <XStack alignItems="center" gap="$1.5">
+        <Text fontSize={16} fontWeight="600" color="$foreground">
+          {section.title}
+        </Text>
+        {section.dayLabel && (
+          <Text fontSize={13} fontWeight="500" color="$mutedForeground">
+            · {section.dayLabel}
+          </Text>
+        )}
+      </XStack>
+    </YStack>
   );
 }
 
@@ -65,6 +94,11 @@ export default function FootprintList({
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
+        renderSectionHeader={({ section }) => (
+          <YStack marginTop="$4">
+            <DateHeaderContent section={section} showDivider={sections.indexOf(section) > 0} />
+          </YStack>
+        )}
         renderItem={({ item }) => (
           <FootprintItem
             footprint={item}
@@ -78,11 +112,10 @@ export default function FootprintList({
         ListEmptyComponent={EmptyList}
         contentContainerStyle={{
           paddingHorizontal: 16,
-          paddingTop: 16,
           paddingBottom: 100,
           flexGrow: isEmpty ? 1 : undefined,
         }}
-        stickySectionHeadersEnabled={true}
+        stickySectionHeadersEnabled={false}
       />
       <FloatingActionButton onPress={onCreateFootprint}>
         <XStack alignItems="center" gap="$2">

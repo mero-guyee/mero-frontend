@@ -4,15 +4,12 @@ import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { useSyncContext } from '@/contexts';
 import { useFootprintPhotosQuery } from '@/hooks/queries/useFootprints';
-import { Calendar, Camera, Cloud, MapPin } from '@tamagui/lucide-icons';
+import { Camera, Cloud, MapPin } from '@tamagui/lucide-icons';
 import { Image } from 'expo-image';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Text, XStack, YStack } from 'tamagui';
 import { Footprint } from '../../types';
 
 const FOOTPRINT_THUMBNAIL_THUMBHASH = 'a8cVJYh4h3iPiHd3iHd3h4iPifiY';
-
-const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
 interface Props {
   footprint: Footprint;
@@ -31,74 +28,27 @@ export default function FootprintItem({ footprint, onPress, showSyncBadge = fals
     ? `${firstLocation.placeName}${extraLocationCount > 0 ? ` 외 ${extraLocationCount}곳` : ''}`
     : undefined;
 
-  const [year, month, day] = footprint.date.split('-').map(Number);
-  const weekday = WEEKDAYS[new Date(year, month - 1, day).getDay()];
-  const dateLabel = `${month}월 ${day}일 (${weekday})`;
-
   const [weatherKey, ...weatherLabelParts] = footprint.weatherInfo?.split(' ') ?? [];
   const WeatherIcon = weatherKey ? (WEATHER_ICON_MAP[weatherKey] ?? Cloud) : undefined;
   const weatherLabel = weatherLabelParts.join(' ');
 
   return (
-    <PressableYCard onPress={onPress} padding={0} marginBottom="$4" position="relative">
+    <PressableYCard onPress={onPress} padding={0} marginBottom="$2" position="relative">
       {showSyncBadge && <SyncingResultBadge id={footprint.id} />}
 
       {thumbnailUri ? (
-        <YStack position="relative" width="100%" aspectRatio={4 / 3}>
+        <YStack height={180} overflow="hidden" position="relative">
           <Image
             source={{ uri: thumbnailUri }}
             placeholder={{ thumbhash: FOOTPRINT_THUMBNAIL_THUMBHASH }}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
-          <LinearGradient
-            colors={['transparent', 'rgba(20,14,10,0.08)', 'rgba(20,14,10,0.78)']}
-            locations={[0, 0.45, 1]}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              padding: 14,
-              justifyContent: 'space-between',
-            }}
-          >
-            {locationLabel ? (
-              <XStack
-                alignSelf="flex-start"
-                alignItems="center"
-                gap="$1.5"
-                backgroundColor="rgba(0,0,0,0.5)"
-                borderWidth={1}
-                borderColor="rgba(255,255,255,0.2)"
-                borderRadius={999}
-                paddingHorizontal="$2.5"
-                paddingVertical="$1.5"
-              >
-                <MapPin size={12} color="white" />
-                <Text color="white" fontSize={12} fontWeight="600" numberOfLines={1}>
-                  {locationLabel}
-                </Text>
-              </XStack>
-            ) : (
-              <XStack />
-            )}
-            <XStack justifyContent="space-between" alignItems="flex-end" gap="$2">
-              <Text flex={1} color="white" fontSize={18} fontWeight="600" numberOfLines={2}>
-                {footprint.title}
-              </Text>
-              <SyncIndicator
-                status={footprint.syncStatus ?? 'pending'}
-                syncing={isSyncing(footprint.id)}
-              />
-            </XStack>
-          </LinearGradient>
           {photos.length > 1 && (
             <XStack
               position="absolute"
-              bottom={12}
-              right={12}
-              backgroundColor="rgba(0,0,0,0.5)"
+              top={10}
+              right={10}
+              backgroundColor="rgba(0,0,0,0.35)"
               borderRadius={999}
               paddingHorizontal="$2"
               paddingVertical="$1"
@@ -114,54 +64,34 @@ export default function FootprintItem({ footprint, onPress, showSyncBadge = fals
         </YStack>
       ) : null}
 
-      <YStack padding="$5" gap="$3">
-        {!thumbnailUri && (
-          <YStack gap="$1">
-            <XStack justifyContent="space-between" alignItems="center" gap="$2">
-              <Text flex={1} color="$foreground" fontSize={18} fontWeight="600" numberOfLines={1}>
-                {footprint.title}
-              </Text>
-              <SyncIndicator
-                status={footprint.syncStatus ?? 'pending'}
-                syncing={isSyncing(footprint.id)}
-              />
-            </XStack>
-            {locationLabel && (
+      <YStack padding="$5" gap="$1.5">
+        <XStack justifyContent="space-between" alignItems="center" gap="$2">
+          <XStack flex={1} alignItems="center" gap="$1.5">
+            <MapPin size={14} color="$foreground" />
+            <Text flex={1} numberOfLines={1} color="$foreground" fontSize={16} fontWeight="700">
+              {locationLabel ?? '위치 정보가 없어요.'}
+            </Text>
+            {WeatherIcon && (
               <XStack alignItems="center" gap="$1">
-                <MapPin size={13} color="$foreground" />
-                <Text color="$foreground" fontSize={13} fontWeight="600" numberOfLines={1}>
-                  {locationLabel}
-                </Text>
-              </XStack>
-            )}
-          </YStack>
-        )}
-
-        <Text color="$mutedForeground" fontSize={13} lineHeight={19} numberOfLines={2}>
-          {footprint.content}
-        </Text>
-
-        <XStack alignItems="center" gap="$1.5" flexWrap="wrap">
-          <Calendar size={12} color="$mutedForeground" />
-          <Text color="$mutedForeground" fontSize={12}>
-            {dateLabel}
-          </Text>
-          {WeatherIcon && (
-            <>
-              <Text color="$mutedForeground" fontSize={12} opacity={0.5}>
-                ·
-              </Text>
-              <XStack alignItems="center" gap="$1">
-                <WeatherIcon size={12} color="$mutedForeground" />
+                <WeatherIcon size={13} color="$mutedForeground" />
                 {weatherLabel.length > 0 && (
                   <Text color="$mutedForeground" fontSize={12}>
                     {weatherLabel}
                   </Text>
                 )}
               </XStack>
-            </>
-          )}
+            )}
+          </XStack>
+          <SyncIndicator status={footprint.syncStatus ?? 'pending'} syncing={isSyncing(footprint.id)} />
         </XStack>
+
+        <Text color="$foreground" fontSize={14} fontWeight="500" numberOfLines={1}>
+          {footprint.title}
+        </Text>
+
+        <Text color="$mutedForeground" fontSize={13} lineHeight={19} numberOfLines={2}>
+          {footprint.content}
+        </Text>
       </YStack>
     </PressableYCard>
   );
