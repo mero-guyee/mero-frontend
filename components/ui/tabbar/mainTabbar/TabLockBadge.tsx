@@ -1,12 +1,17 @@
-import { Lock } from 'phosphor-react-native';
+import { ClockIcon } from 'phosphor-react-native';
 import { View } from 'tamagui';
 
-export default function TabLockBadge({ color }: { color: string }) {
+type Props = {
+  color: string;
+  offset?: { top?: number; right?: number };
+};
+
+export default function TabLockBadge({ color, offset }: Props) {
   return (
     <View
       position="absolute"
-      top={-6}
-      right={-8}
+      top={offset?.top ?? -6}
+      right={offset?.right ?? -8}
       width={20}
       height={20}
       borderRadius={999}
@@ -15,7 +20,7 @@ export default function TabLockBadge({ color }: { color: string }) {
       justifyContent="center"
       zIndex={2}
     >
-      <Lock size={13} color={color} weight="fill" />
+      <ClockIcon size={13} color={color} weight="fill" />
     </View>
   );
 }
