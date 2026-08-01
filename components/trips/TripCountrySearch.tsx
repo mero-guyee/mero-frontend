@@ -1,8 +1,8 @@
 import { Check } from '@tamagui/lucide-icons';
 import isoCountries from 'i18n-iso-countries';
 import koLocale from 'i18n-iso-countries/langs/ko.json';
-import { useEffect, useRef, useState } from 'react';
-import { Pressable, TextInput, useWindowDimensions } from 'react-native';
+import { useRef, useState } from 'react';
+import { Pressable, TextInput } from 'react-native';
 import { Input, ScrollView, Text, XStack, YStack, useTheme } from 'tamagui';
 import Chip from '../ui/Chip';
 import { inputStyle } from '../ui/Input';
@@ -10,7 +10,19 @@ import ErrorText from '../ui/form/ErrorText';
 
 isoCountries.registerLocale(koLocale);
 
-const ALL_COUNTRIES = Object.values(isoCountries.getNames('ko'));
+const COUNTRY_NAMES = isoCountries.getNames('ko');
+const ALL_COUNTRIES = Object.values(COUNTRY_NAMES);
+const COUNTRY_CODE_BY_NAME = Object.fromEntries(
+  Object.entries(COUNTRY_NAMES).map(([code, name]) => [name, code])
+);
+
+function getCountryFlag(name: string) {
+  const code = COUNTRY_CODE_BY_NAME[name];
+  if (!code) return '';
+  return code
+    .toUpperCase()
+    .replace(/./g, (char) => String.fromCodePoint(127397 + char.charCodeAt(0)));
+}
 
 function isSubsequenceMatch(target: string, query: string) {
   let queryIndex = 0;
@@ -30,7 +42,6 @@ interface Props {
 export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, error }: Props) {
   const [query, setQuery] = useState('');
   const [searchResults, setSearchResults] = useState<string[]>(ALL_COUNTRIES);
-  const { height: screenHeight } = useWindowDimensions();
   const theme = useTheme();
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -42,7 +53,7 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     if (!text.trim()) {
-      setSearchResults([]);
+      setSearchResults(ALL_COUNTRIES);
       return;
     }
 
@@ -51,12 +62,6 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
       setSearchResults(results.length > 0 ? results : ALL_COUNTRIES);
     }, 300);
   };
-
-  useEffect(() => {
-    if (query.trim() === '') {
-      setSearchResults(ALL_COUNTRIES);
-    }
-  }, [query]);
 
   const handleSelectCountry = (country: string) => {
     if (selectedCountries.includes(country)) {
@@ -70,7 +75,7 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
 
   return (
     <YStack flex={1}>
-      <YStack rowGap="$1.5">
+      <YStack rowGap="$1.5" flex={1}>
         <YStack>
           <Pressable onPress={() => textInputRef.current?.focus()}>
             <XStack
@@ -85,7 +90,12 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
               height="auto"
             >
               {selectedCountries.map((country) => (
-                <Chip key={country} label={country} onRemove={() => onRemove(country)} />
+                <Chip
+                  key={country}
+                  label={country}
+                  icon={<Text fontSize={13}>{getCountryFlag(country)}</Text>}
+                  onRemove={() => onRemove(country)}
+                />
               ))}
               <TextInput
                 ref={textInputRef}
@@ -107,12 +117,7 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
           <ErrorText error={error} />
         </YStack>
 
-        <ScrollView
-          backgroundColor="$card"
-          borderRadius="$6"
-          height={screenHeight * 0.5}
-          overflow="scroll"
-        >
+        <ScrollView backgroundColor="$card" borderRadius="$6" flex={1} overflow="scroll">
           {searchResults.map((name, index) => {
             const isSelected = selectedCountries.includes(name);
             return (
@@ -126,12 +131,15 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
                   alignItems="center"
                   justifyContent="space-between"
                 >
-                  <Text
-                    color={isSelected ? '$mutedForeground' : '$foreground'}
-                    fontWeight={isSelected ? '600' : '400'}
-                  >
-                    {name}
-                  </Text>
+                  <XStack alignItems="center" gap="$2">
+                    <Text fontSize={15}>{getCountryFlag(name)}</Text>
+                    <Text
+                      color={isSelected ? '$mutedForeground' : '$foreground'}
+                      fontWeight={isSelected ? '600' : '400'}
+                    >
+                      {name}
+                    </Text>
+                  </XStack>
                   {isSelected && <Check size={14} color="$mutedForeground" />}
                 </XStack>
               </Pressable>
