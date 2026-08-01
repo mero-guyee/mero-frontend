@@ -12,6 +12,14 @@ isoCountries.registerLocale(koLocale);
 
 const ALL_COUNTRIES = Object.values(isoCountries.getNames('ko'));
 
+function isSubsequenceMatch(target: string, query: string) {
+  let queryIndex = 0;
+  for (let i = 0; i < target.length && queryIndex < query.length; i++) {
+    if (target[i] === query[queryIndex]) queryIndex++;
+  }
+  return queryIndex === query.length;
+}
+
 interface Props {
   selectedCountries: string[];
   onAdd: (country: string) => void;
@@ -39,7 +47,7 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
     }
 
     debounceRef.current = setTimeout(() => {
-      const results = ALL_COUNTRIES.filter((name) => name.includes(text.trim()));
+      const results = ALL_COUNTRIES.filter((name) => isSubsequenceMatch(name, text.trim()));
       setSearchResults(results.length > 0 ? results : ALL_COUNTRIES);
     }, 300);
   };
