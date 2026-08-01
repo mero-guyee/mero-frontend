@@ -31,6 +31,7 @@ export default function ExpenseScreen() {
       type: 'info',
       text1: '여행 시작 후 이용할 수 있어요',
       text2: `D-${daysUntilStart} 남았어요`,
+      bottomOffset: 100,
     });
   };
 
