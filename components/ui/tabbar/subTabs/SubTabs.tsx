@@ -127,7 +127,7 @@ export function SubTabs<T extends string>({
               >
                 {tab.label}
               </Text>
-              {tab.disabled && <TabLockBadge color={mutedForegroundColor} />}
+              {tab.disabled && <TabLockBadge color={mutedForegroundColor} offset={{ top: -12 }} />}
             </XStack>
           </XStack>
         ))}
