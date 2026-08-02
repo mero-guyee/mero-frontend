@@ -1,4 +1,5 @@
 import { Expense } from '@/types';
+import { formatDateLabel } from '@/utils/date';
 import { Text, XStack, YStack } from 'tamagui';
 
 export default function ExpenseDayTotal({
@@ -19,14 +20,7 @@ export default function ExpenseDayTotal({
         marginBottom="$2"
         paddingHorizontal="$1"
       >
-        <Text color="$foreground">
-          {new Date(date).toLocaleDateString('ko-KR', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            weekday: 'short',
-          })}
-        </Text>
+        <Text color="$foreground">{formatDateLabel(date)}</Text>
       </XStack>
     </YStack>
   );
