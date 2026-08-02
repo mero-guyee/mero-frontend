@@ -8,7 +8,7 @@ import { List, Map } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable } from 'react-native';
-import { YStack } from 'tamagui';
+import { Stack, YStack } from 'tamagui';
 import { useFootprints, useTrips } from '../../../contexts';
 
 export default function FootprintListScreen() {
@@ -77,16 +77,18 @@ export default function FootprintListScreen() {
         {viewMode === 'map' ? (
           <FootprintMapView footprints={filteredFootprints} isLoading={isFootPrintLoading} />
         ) : (
-          <FootprintList
-            sections={footprintsByDate}
-            showSearch={showSearch}
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            onCreateFootprint={() => router.push('/(main)/footprint/new')}
-            onSelectFootprint={(id) => router.push(`/(main)/footprint/${id}`)}
-            isEmpty={filteredFootprints.length === 0}
-            createdId={created}
-          />
+          <Stack mt="$4">
+            <FootprintList
+              sections={footprintsByDate}
+              showSearch={showSearch}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onCreateFootprint={() => router.push('/(main)/footprint/new')}
+              onSelectFootprint={(id) => router.push(`/(main)/footprint/${id}`)}
+              isEmpty={filteredFootprints.length === 0}
+              createdId={created}
+            />
+          </Stack>
         )}
       </FadeWrapper>
     </YStack>
