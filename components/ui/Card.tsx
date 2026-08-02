@@ -3,13 +3,15 @@ import { Pressable, StyleProp, ViewStyle } from 'react-native';
 import { XStack, YStack } from 'tamagui';
 import { cardScaleStyle, PressFeedbackBackdrop } from './pressFeedback';
 
+const boxShadow = '0 1px 6px rgba(0,0,0,0.04)';
+
 export function XCard({ children, ...rest }: React.ComponentProps<typeof XStack>) {
   return (
     <XStack
       backgroundColor="$card"
       borderRadius="$4"
       borderWidth={0}
-      boxShadow="0 1px 4px rgba(0,0,0,0.08)"
+      boxShadow={boxShadow}
       overflow="hidden"
       {...rest}
     >
@@ -24,7 +26,7 @@ export function YCard({ children, ...rest }: React.ComponentProps<typeof YStack>
       backgroundColor="$card"
       borderRadius="$4"
       borderWidth={0}
-      boxShadow="0 1px 4px rgba(0,0,0,0.08)"
+      boxShadow={boxShadow}
       overflow="hidden"
       {...rest}
     >
