@@ -1,7 +1,8 @@
 import { EmptyState, Input } from '@/components/ui';
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import { NotebookPen, Plus } from '@tamagui/lucide-icons';
-import { SectionList } from 'react-native';
+import { useRef, useState } from 'react';
+import { SectionList, ViewToken } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 import { Footprint } from '../../types';
 import FootprintItem from './FootprintItem';
@@ -60,6 +61,16 @@ export default function FootprintList({
   isEmpty,
   createdId,
 }: Props) {
+  const [currentSection, setCurrentSection] = useState<FootprintSection | undefined>(sections[0]);
+
+  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    if (viewableItems.length > 0) {
+      setCurrentSection(viewableItems[0].section);
+    }
+  }).current;
+
+  const viewabilityConfig = useRef({ itemVisiblePercentThreshold: 0 }).current;
+
   return (
     <>
       {showSearch && (
@@ -80,29 +91,38 @@ export default function FootprintList({
           />
         </XStack>
       )}
-      <SectionList
-        sections={sections}
-        keyExtractor={(item) => item.id}
-        renderSectionHeader={({ section }) => <DateHeaderContent section={section} />}
-        renderItem={({ item }) => (
-          <FootprintItem
-            footprint={item}
-            onPress={() => onSelectFootprint(item.id)}
-            showSyncBadge={
-              item.id === createdId &&
-              (item.syncStatus === 'pending' || item.syncStatus === 'synced')
-            }
-          />
+      <YStack>
+        <SectionList
+          sections={sections}
+          keyExtractor={(item) => item.id}
+          renderSectionHeader={({ section }) => <DateHeaderContent section={section} />}
+          renderItem={({ item }) => (
+            <FootprintItem
+              footprint={item}
+              onPress={() => onSelectFootprint(item.id)}
+              showSyncBadge={
+                item.id === createdId &&
+                (item.syncStatus === 'pending' || item.syncStatus === 'synced')
+              }
+            />
+          )}
+          renderSectionFooter={() => <YStack height="$6" />}
+          ListEmptyComponent={EmptyList}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingBottom: 100,
+            flexGrow: isEmpty ? 1 : undefined,
+          }}
+          stickySectionHeadersEnabled={false}
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={viewabilityConfig}
+        />
+        {!isEmpty && currentSection && (
+          <YStack position="absolute" top={0} left={0} right={0} zIndex={1} paddingHorizontal={16}>
+            <DateHeaderContent section={currentSection} />
+          </YStack>
         )}
-        renderSectionFooter={() => <YStack height="$6" />}
-        ListEmptyComponent={EmptyList}
-        contentContainerStyle={{
-          paddingHorizontal: 16,
-          paddingBottom: 100,
-          flexGrow: isEmpty ? 1 : undefined,
-        }}
-        stickySectionHeadersEnabled={false}
-      />
+      </YStack>
       <FloatingActionButton onPress={onCreateFootprint}>
         <XStack alignItems="center" gap="$2">
           <Plus color="$foreground" />
