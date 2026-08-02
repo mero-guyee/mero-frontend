@@ -1,8 +1,8 @@
-import BackpackHeader from '@/components/backpack/BackpackHeader';
 import BackpackSkeleton from '@/components/backpack/BackpackSkeleton';
 import { DocumentsTab } from '@/components/trips/documents/DocumentsTab';
 import MemoTab from '@/components/trips/memos/MemoTab';
 import FadeWrapper from '@/components/ui/FadeWrapper';
+import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { SubTabs } from '@/components/ui/tabbar/subTabs/SubTabs';
 import { useTripQuery } from '@/hooks/queries/useTrips';
 import { useLocalSearchParams } from 'expo-router';
@@ -45,7 +45,7 @@ export default function TripHomeScreen() {
 
   return (
     <YStack flex={1} backgroundColor="$background">
-      <BackpackHeader trip={trip} />
+      <TabScreenHeader label="배낭" />
       <FadeWrapper>
         <YStack flex={1}>
           <TabView
