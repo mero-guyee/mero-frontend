@@ -2,8 +2,8 @@ import { paddingHorizontalGeneral } from '@/constants/theme';
 import { Trip } from '@/types';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SectionList } from 'react-native';
-import Toast from 'react-native-toast-message';
 import Animated, { LinearTransition } from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
@@ -42,8 +42,7 @@ export default function TripListScreen() {
   };
 
   const handleEditTrip = (tripId: string) => {
-    setActiveTrip(tripId);
-    router.push('/backpack/edit');
+    router.push({ pathname: '/trips/edit', params: { tripId } });
   };
 
   const handleDeleteTrip = async (trip: Trip) => {

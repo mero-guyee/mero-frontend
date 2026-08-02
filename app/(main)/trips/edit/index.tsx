@@ -8,19 +8,20 @@ import DatePickerInput from '@/components/ui/DatePickerInput';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { useTrips } from '@/contexts';
 import { useTripQuery } from '@/hooks/queries/useTrips';
-import { Plus } from '@tamagui/lucide-icons';
+import { Plane, Plus } from '@tamagui/lucide-icons';
 import { Asset } from 'expo-asset';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
-import { Text, XStack, YStack } from 'tamagui';
+import { Text, View, XStack, YStack } from 'tamagui';
 
 const DEFAULT_IMAGE = Asset.fromModule(require('@/assets/images/mountain.jpg')).uri;
-export default function EditBackPackScreen() {
+export default function EditTripScreen() {
   const router = useRouter();
+  const { tripId } = useLocalSearchParams<{ tripId: string }>();
 
-  const { activeTrip, updateTrip } = useTrips();
-  const { data: trip } = useTripQuery(activeTrip || '');
+  const { updateTrip } = useTrips();
+  const { data: trip, isLoading } = useTripQuery(tripId || '');
 
   const [title, setTitle] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -39,6 +40,13 @@ export default function EditBackPackScreen() {
       setCountries(trip.countries);
     }
   }, [trip]);
+  if (isLoading) {
+    return (
+      <View flex={1} alignItems="center" justifyContent="center" backgroundColor="$background">
+        <Plane size={44} color="$mutedForeground" />
+      </View>
+    );
+  }
 
   if (!trip) {
     return (
@@ -172,13 +180,14 @@ export default function EditBackPackScreen() {
             </Text>
           </FilledButton>
         </XStack>
-        <TripCountrySearch
-          selectedCountries={draftCountries}
-          onAdd={(c) => setDraftCountries((prev) => [...prev, c])}
-          onRemove={(c) => setDraftCountries((prev) => prev.filter((x) => x !== c))}
-          onClearAll={() => setDraftCountries([])}
-          error={null}
-        />
+        {showCountrySheet && (
+          <TripCountrySearch
+            selectedCountries={draftCountries}
+            onAdd={(c) => setDraftCountries((prev) => [...prev, c])}
+            onRemove={(c) => setDraftCountries((prev) => prev.filter((x) => x !== c))}
+            error={null}
+          />
+        )}
       </AppBottomSheet>
     </YStack>
   );

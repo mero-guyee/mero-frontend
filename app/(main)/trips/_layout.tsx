@@ -7,6 +7,7 @@ export default function TripsLayout() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="new" />
+        <Stack.Screen name="edit" />
       </Stack>
     </NewTripFormProvider>
   );
