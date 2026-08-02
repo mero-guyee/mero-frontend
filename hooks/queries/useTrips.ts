@@ -46,22 +46,27 @@ export function useTripsQuery() {
 
 export function useTripQuery(id: string) {
   const db = useDb();
+  const qc = useQueryClient();
   return useQuery({
     queryKey: tripKeys.detail(id),
     queryFn: async () => {
       const repo = new TripRepository(db);
       const tripRow = await repo.getTripById(id);
 
-      try {
-        if (tripRow?.serverId) {
-          const serverTrip = await tripsApi.getById(parseInt(tripRow.serverId));
-          await repo.upsertFromServer(serverTrip);
-        }
-      } catch (e) {
-        console.error('Failed to fetch trip from server:', e);
+      if (tripRow?.serverId) {
+        (async () => {
+          try {
+            const serverTrip = await tripsApi.getById(parseInt(tripRow.serverId!));
+            await repo.upsertFromServer(serverTrip);
+            const fresh = await repo.getTripById(id);
+            qc.setQueryData(tripKeys.detail(id), fresh);
+          } catch (e) {
+            console.error('Failed to fetch trip from server:', e);
+          }
+        })();
       }
 
-      return repo.getTripById(id);
+      return tripRow;
     },
     enabled: !!id,
   });
