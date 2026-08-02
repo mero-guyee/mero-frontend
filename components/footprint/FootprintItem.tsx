@@ -69,7 +69,7 @@ export default function FootprintItem({ footprint, onPress, showSyncBadge = fals
           <XStack flex={1} alignItems="center" gap="$1.5">
             <MapPin size={14} color="$foreground" />
             <Text flex={1} numberOfLines={1} color="$foreground" fontSize={16} fontWeight="700">
-              {locationLabel ?? '위치 정보가 없어요.'}
+              {locationLabel ?? '위치 정보가 없어요'}
             </Text>
             {WeatherIcon && (
               <XStack alignItems="center" gap="$1">
