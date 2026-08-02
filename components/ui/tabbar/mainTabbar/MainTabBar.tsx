@@ -79,8 +79,8 @@ export default function MainTabBar(props: BottomTabBarProps) {
           backgroundColor="$muted"
           alignItems="center"
           justifyContent="center"
-          shadowColor="rgba(0,0,0,0.2)"
-          shadowOffset={{ width: 0, height: 2 }}
+          shadowColor="rgba(0,0,0,0.1)"
+          shadowOffset={{ width: 0, height: 1 }}
           shadowOpacity={0.2}
           shadowRadius={4}
           style={{ elevation: 4 }}
