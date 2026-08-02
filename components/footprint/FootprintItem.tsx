@@ -82,7 +82,10 @@ export default function FootprintItem({ footprint, onPress, showSyncBadge = fals
               </XStack>
             )}
           </XStack>
-          <SyncIndicator status={footprint.syncStatus ?? 'pending'} syncing={isSyncing(footprint.id)} />
+          <SyncIndicator
+            status={footprint.syncStatus ?? 'pending'}
+            syncing={isSyncing(footprint.id)}
+          />
         </XStack>
 
         <Text color="$foreground" fontSize={14} fontWeight="500" numberOfLines={1}>

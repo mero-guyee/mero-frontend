@@ -33,20 +33,9 @@ function EmptyList() {
   );
 }
 
-function DateHeaderContent({
-  section,
-  showDivider,
-}: {
-  section: FootprintSection;
-  showDivider: boolean;
-}) {
+function DateHeaderContent({ section }: { section: FootprintSection }) {
   return (
-    <YStack backgroundColor="$background" paddingVertical="$2">
-      <YStack
-        height={1}
-        backgroundColor={showDivider ? '$border' : 'transparent'}
-        marginBottom="$3"
-      />
+    <YStack backgroundColor="$background" paddingBottom="$2">
       <XStack alignItems="center" gap="$1.5">
         <Text fontSize={16} fontWeight="600" color="$foreground">
           {section.title}
@@ -94,11 +83,7 @@ export default function FootprintList({
       <SectionList
         sections={sections}
         keyExtractor={(item) => item.id}
-        renderSectionHeader={({ section }) => (
-          <YStack marginTop="$4">
-            <DateHeaderContent section={section} showDivider={sections.indexOf(section) > 0} />
-          </YStack>
-        )}
+        renderSectionHeader={({ section }) => <DateHeaderContent section={section} />}
         renderItem={({ item }) => (
           <FootprintItem
             footprint={item}
@@ -109,6 +94,7 @@ export default function FootprintList({
             }
           />
         )}
+        renderSectionFooter={() => <YStack height="$6" />}
         ListEmptyComponent={EmptyList}
         contentContainerStyle={{
           paddingHorizontal: 16,
