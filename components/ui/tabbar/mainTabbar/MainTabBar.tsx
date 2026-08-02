@@ -67,7 +67,7 @@ export default function MainTabBar(props: BottomTabBarProps) {
       paddingBottom={tabBarPadding}
     >
       <Pressable
-        style={styles.backButton}
+        style={({ pressed }) => [styles.backButton, { opacity: pressed ? 0.6 : 1 }]}
         onPress={() => router.navigate('/(main)/trips')}
         accessibilityRole="button"
         accessibilityLabel="여행으로 나가기"
@@ -79,11 +79,6 @@ export default function MainTabBar(props: BottomTabBarProps) {
           backgroundColor="$muted"
           alignItems="center"
           justifyContent="center"
-          shadowColor="rgba(0,0,0,0.1)"
-          shadowOffset={{ width: 0, height: 1 }}
-          shadowOpacity={0.2}
-          shadowRadius={4}
-          style={{ elevation: 4 }}
         >
           <ArrowLeft size={20} color={foregroundColor} />
         </View>
