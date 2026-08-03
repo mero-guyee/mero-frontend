@@ -1,4 +1,4 @@
-import { Currency } from './auth';
+import { Currency } from '@/data/constants';
 import { apiRequest } from './client';
 
 export interface BudgetCreateRequest {

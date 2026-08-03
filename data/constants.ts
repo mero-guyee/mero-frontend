@@ -43,6 +43,8 @@ export const CURRENCIES = [
   { code: 'INR', symbol: '₹', name: '인도 루피' },
 ] as const;
 
+export type Currency = (typeof CURRENCIES)[number]['code'];
+
 export const getCurrencySymbol = (code: string) =>
   CURRENCIES.find((c) => c.code === code)?.symbol || code;
 
