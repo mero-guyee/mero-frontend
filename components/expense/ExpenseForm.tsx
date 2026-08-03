@@ -19,10 +19,10 @@ import { useExpenses, useTrips } from '../../contexts';
 import { Expense } from '../../types';
 
 type ExpenseFormProps =
-  | { mode: 'edit'; expense: Expense; tripId?: never; footprintId?: never }
-  | { mode: 'new'; expense?: never; tripId?: string; footprintId?: string };
+  | { mode: 'edit'; expense: Expense; tripId?: never; footprintId?: never; date?: never }
+  | { mode: 'new'; expense?: never; tripId?: string; footprintId?: string; date?: string };
 
-export default function ExpenseForm({ mode, expense, tripId, footprintId }: ExpenseFormProps) {
+export default function ExpenseForm({ mode, expense, tripId, footprintId, date: initialDate }: ExpenseFormProps) {
   const isEdit = mode === 'edit';
   const router = useRouter();
   const { activeTrip } = useTrips();
@@ -32,7 +32,9 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
   const [amount, setAmount] = useState(expense?.amount?.toString() ?? '');
   const [currency, setCurrency] = useState(expense?.currency ?? 'KRW');
   const [categoryId, setCategoryId] = useState(expense?.categoryId ?? categories[0]?.id ?? '');
-  const [date, setDate] = useState(expense?.date ?? new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(
+    expense?.date ?? initialDate ?? new Date().toISOString().split('T')[0]
+  );
   const [description, setDescription] = useState(expense?.description ?? '');
   const [location, setLocation] = useState(expense?.location ?? '');
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
@@ -41,7 +43,7 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
     amount !== (expense?.amount?.toString() ?? '') ||
     currency !== (expense?.currency ?? 'KRW') ||
     categoryId !== (expense?.categoryId ?? categories[0]?.id ?? '') ||
-    date !== (expense?.date ?? new Date().toISOString().split('T')[0]) ||
+    date !== (expense?.date ?? initialDate ?? new Date().toISOString().split('T')[0]) ||
     description !== (expense?.description ?? '') ||
     location !== (expense?.location ?? '');
 
@@ -150,11 +152,6 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId }: Expe
               날짜
             </Text>
             <DatePickerInput value={date} onChange={setDate} />
-            {!isEdit && footprintId && (
-              <Text color="$mutedForeground" marginTop="$1" fontSize={14}>
-                일지 날짜로 자동 설정됨
-              </Text>
-            )}
           </YStack>
 
           {/* Description */}
