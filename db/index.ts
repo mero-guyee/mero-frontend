@@ -6,13 +6,19 @@ let db: SQLite.SQLiteDatabase | null = null;
 export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   if (db) return db;
 
-  db = await SQLite.openDatabaseAsync('mero.db');
+  const database = await SQLite.openDatabaseAsync('mero.db');
 
-  await db.execAsync('PRAGMA foreign_keys = ON;');
-  await db.execAsync('PRAGMA journal_mode = WAL;');
+  try {
+    await database.execAsync('PRAGMA foreign_keys = ON;');
+    await database.execAsync('PRAGMA journal_mode = WAL;');
 
-  await runMigrations(db);
+    await runMigrations(database);
+  } catch (error) {
+    await database.closeAsync();
+    throw error;
+  }
 
+  db = database;
   return db;
 }
 
