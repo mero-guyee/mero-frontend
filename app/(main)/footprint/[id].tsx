@@ -73,7 +73,7 @@ export default function FootprintDetailScreen() {
   const handleAddExpense = () => {
     router.push({
       pathname: '/expense-new',
-      params: { footprintId: footprint.id, tripId: footprint.tripId },
+      params: { footprintId: footprint.id, tripId: footprint.tripId, date: footprint.date },
     });
   };
 
@@ -272,11 +272,6 @@ export default function FootprintDetailScreen() {
                               <Text color="$foreground" fontWeight="500">
                                 {expense.currency} {expense.amount.toLocaleString()}
                               </Text>
-                              <Pressable onPress={() => handleDeleteExpense(expense.id)}>
-                                <Text color="$destructiveText" fontSize={13}>
-                                  삭제
-                                </Text>
-                              </Pressable>
                             </XStack>
                           </XStack>
                         </Pressable>
