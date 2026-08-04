@@ -2,11 +2,14 @@ import { footprintsApi } from '@/api/footprints';
 import { FootprintRepository, OutboxRepository, TripRepository } from '@/repositories';
 import * as SQLite from 'expo-sqlite';
 
-export async function syncFootprints(db: SQLite.SQLiteDatabase): Promise<void> {
+export async function syncFootprints(
+  db: SQLite.SQLiteDatabase,
+  maxAgeMinutes?: number
+): Promise<void> {
   const repo = new FootprintRepository(db);
   const tripRepo = new TripRepository(db);
   const outbox = new OutboxRepository(db);
-  const ready = await outbox.getReady('footprints');
+  const ready = await outbox.getReady('footprints', maxAgeMinutes);
 
   for (const { dataId, operation } of ready) {
     try {

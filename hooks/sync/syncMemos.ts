@@ -2,11 +2,11 @@ import { memosApi } from '@/api/memos';
 import { MemoRepository, OutboxRepository, TripRepository } from '@/repositories';
 import * as SQLite from 'expo-sqlite';
 
-export async function syncMemos(db: SQLite.SQLiteDatabase): Promise<void> {
+export async function syncMemos(db: SQLite.SQLiteDatabase, maxAgeMinutes?: number): Promise<void> {
   const repo = new MemoRepository(db);
   const tripRepo = new TripRepository(db);
   const outbox = new OutboxRepository(db);
-  const ready = await outbox.getReady('memos');
+  const ready = await outbox.getReady('memos', maxAgeMinutes);
 
   for (const { dataId, operation } of ready) {
     try {

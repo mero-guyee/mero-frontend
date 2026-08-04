@@ -3,11 +3,14 @@ import { DocumentRepository, OutboxRepository, TripRepository } from '@/reposito
 import { resolveAbsoluteFileUri } from '@/repositories/documents';
 import * as SQLite from 'expo-sqlite';
 
-export async function syncDocuments(db: SQLite.SQLiteDatabase): Promise<void> {
+export async function syncDocuments(
+  db: SQLite.SQLiteDatabase,
+  maxAgeMinutes?: number
+): Promise<void> {
   const docRepo = new DocumentRepository(db);
   const tripRepo = new TripRepository(db);
   const outbox = new OutboxRepository(db);
-  const ready = await outbox.getReady('documents');
+  const ready = await outbox.getReady('documents', maxAgeMinutes);
 
   for (const { dataId, operation } of ready) {
     try {

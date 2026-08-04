@@ -3,7 +3,7 @@ import { FootprintRepository, OutboxRepository, PhotoRepository, TripRepository 
 import { uploadPhotosAndSync } from '@/utils/photoSync';
 import * as SQLite from 'expo-sqlite';
 
-export async function syncPhotos(db: SQLite.SQLiteDatabase): Promise<void> {
+export async function syncPhotos(db: SQLite.SQLiteDatabase, maxAgeMinutes?: number): Promise<void> {
   const photoRepo = new PhotoRepository(db);
   const footprintRepo = new FootprintRepository(db);
   const tripRepo = new TripRepository(db);
@@ -32,7 +32,7 @@ export async function syncPhotos(db: SQLite.SQLiteDatabase): Promise<void> {
   }
 
   // 2. Delete photos from outbox
-  const readyDeletes = await outbox.getReady('photos');
+  const readyDeletes = await outbox.getReady('photos', maxAgeMinutes);
   for (const { dataId } of readyDeletes) {
     try {
       const photo = await photoRepo.findByIdIncludeDeleted(dataId);

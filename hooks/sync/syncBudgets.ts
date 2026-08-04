@@ -2,11 +2,11 @@ import { budgetsApi } from '@/api/budgets';
 import { BudgetRepository, OutboxRepository, TripRepository } from '@/repositories';
 import * as SQLite from 'expo-sqlite';
 
-export async function syncBudgets(db: SQLite.SQLiteDatabase): Promise<void> {
+export async function syncBudgets(db: SQLite.SQLiteDatabase, maxAgeMinutes?: number): Promise<void> {
   const repo = new BudgetRepository(db);
   const tripRepo = new TripRepository(db);
   const outbox = new OutboxRepository(db);
-  const ready = await outbox.getReady('budgets');
+  const ready = await outbox.getReady('budgets', maxAgeMinutes);
 
   for (const { dataId, operation } of ready) {
     try {

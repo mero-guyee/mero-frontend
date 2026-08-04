@@ -15,9 +15,10 @@ export interface OutboxEntry {
 export class OutboxRepository {
   constructor(private db: SQLite.SQLiteDatabase) {}
 
-  async getReady(domain: string): Promise<OutboxEntry[]> {
+  async getReady(domain: string, maxAgeMinutes?: number): Promise<OutboxEntry[]> {
+    const ageClause = maxAgeMinutes != null ? `AND createdAt >= datetime('now', '-${maxAgeMinutes} minutes')` : '';
     return this.db.getAllAsync<OutboxEntry>(
-      `SELECT * FROM outbox WHERE domain = ? AND status IN ('pending', 'failed') ORDER BY createdAt ASC`,
+      `SELECT * FROM outbox WHERE domain = ? AND status IN ('pending', 'failed') ${ageClause} ORDER BY createdAt ASC`,
       [domain]
     );
   }

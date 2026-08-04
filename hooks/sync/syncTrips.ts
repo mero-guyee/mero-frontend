@@ -2,10 +2,10 @@ import { tripsApi } from '@/api/trips';
 import { OutboxRepository, TripRepository } from '@/repositories';
 import * as SQLite from 'expo-sqlite';
 
-export async function syncTrips(db: SQLite.SQLiteDatabase): Promise<void> {
+export async function syncTrips(db: SQLite.SQLiteDatabase, maxAgeMinutes?: number): Promise<void> {
   const repo = new TripRepository(db);
   const outbox = new OutboxRepository(db);
-  const ready = await outbox.getReady('trips');
+  const ready = await outbox.getReady('trips', maxAgeMinutes);
 
   for (const { dataId, operation } of ready) {
     try {

@@ -12,16 +12,24 @@ import { syncMemos } from './syncMemos';
 import { syncPhotos } from './syncPhotos';
 import { syncTrips } from './syncTrips';
 
+const PERIODIC_INTERVAL_MS = 60_000;
+const PERIODIC_MAX_AGE_MINUTES = 7;
+
 export function usePendingSync() {
   const db = useDb();
   const qc = useQueryClient();
   const prevConnected = useRef<boolean | null>(false);
 
-  async function runSync() {
-    await syncTrips(db);
-    await Promise.all([syncMemos(db), syncFootprints(db), syncBudgets(db), syncDocuments(db)]);
-    await syncPhotos(db);
-    await syncExpenses(db);
+  async function runSync(maxAgeMinutes?: number) {
+    await syncTrips(db, maxAgeMinutes);
+    await Promise.all([
+      syncMemos(db, maxAgeMinutes),
+      syncFootprints(db, maxAgeMinutes),
+      syncBudgets(db, maxAgeMinutes),
+      syncDocuments(db, maxAgeMinutes),
+    ]);
+    await syncPhotos(db, maxAgeMinutes);
+    await syncExpenses(db, maxAgeMinutes);
   }
 
   function invalidateAll() {
@@ -60,9 +68,19 @@ export function usePendingSync() {
     };
     const unsubscribeApp = AppState.addEventListener('change', handleAppState);
 
+    const interval = setInterval(async () => {
+      try {
+        await runSync(PERIODIC_MAX_AGE_MINUTES);
+      } catch {
+      } finally {
+        invalidateAll();
+      }
+    }, PERIODIC_INTERVAL_MS);
+
     return () => {
       unsubscribeNet();
       unsubscribeApp.remove();
+      clearInterval(interval);
     };
   }, [db]);
 }
