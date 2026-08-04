@@ -73,8 +73,6 @@ export default function SyncStatusScreen() {
 
     setRetrying(key);
     try {
-      const outbox = new OutboxRepository(db);
-      await outbox.resetToReady(entry.domain, entry.dataId);
       const syncFn = DOMAIN_SYNC_FNS[entry.domain];
       if (syncFn) await syncFn(db);
       await qc.invalidateQueries({ queryKey: outboxKey });

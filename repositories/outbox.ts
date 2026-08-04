@@ -17,7 +17,7 @@ export class OutboxRepository {
 
   async getReady(domain: string): Promise<OutboxEntry[]> {
     return this.db.getAllAsync<OutboxEntry>(
-      `SELECT * FROM outbox WHERE domain = ? AND status = 'pending' ORDER BY createdAt ASC`,
+      `SELECT * FROM outbox WHERE domain = ? AND status IN ('pending', 'failed') ORDER BY createdAt ASC`,
       [domain]
     );
   }
@@ -28,13 +28,6 @@ export class OutboxRepository {
 
   async markFailed(domain: string, dataId: string): Promise<void> {
     await this.db.runAsync(`UPDATE outbox SET status = 'failed' WHERE domain = ? AND dataId = ?`, [
-      domain,
-      dataId,
-    ]);
-  }
-
-  async resetToReady(domain: string, dataId: string): Promise<void> {
-    await this.db.runAsync(`UPDATE outbox SET status = 'pending' WHERE domain = ? AND dataId = ?`, [
       domain,
       dataId,
     ]);
