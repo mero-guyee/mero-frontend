@@ -73,7 +73,13 @@ export default function FootprintDetailScreen() {
   const handleAddExpense = () => {
     router.push({
       pathname: '/expense-new',
-      params: { footprintId: footprint.id, tripId: footprint.tripId, date: footprint.date },
+      params: {
+        footprintId: footprint.id,
+        tripId: footprint.tripId,
+        date: footprint.date,
+        location:
+          footprint.locations.length === 1 ? formattedLocation(footprint.locations[0]) : undefined,
+      },
     });
   };
 

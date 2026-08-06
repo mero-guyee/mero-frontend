@@ -16,6 +16,7 @@ import {
   filterRemovedPhotos,
   uploadPhotosAndSync,
 } from '../../utils/photoSync';
+import { enqueueMutation } from './mutationQueue';
 import { unrecordedTripsKeys } from './queryKeys';
 
 export const footprintKeys = {
@@ -85,20 +86,22 @@ export function useCreateFootprint() {
 
       const localPhotos = await createLocalPhotos(photoRepo, localFootprint.id, photoUris);
 
-      (async () => {
+      enqueueMutation(localFootprint.id, async () => {
         markSyncing(localFootprint.id);
         try {
-          const trip = await tripRepo.getTripById(data.tripId);
+          const fresh = await repo.getFootprintById(localFootprint.id);
+          if (!fresh || fresh.serverId) return;
+          const trip = await tripRepo.getTripById(fresh.tripId);
           if (trip?.serverId) {
             const serverFootprint = await footprintsApi.create(parseInt(trip.serverId), {
-              clientId: localFootprint.id,
-              title: data.title,
-              content: data.content,
-              date: data.date,
-              wheaterInfo: data.weatherInfo,
-              locations: data.locations,
+              clientId: fresh.id,
+              title: fresh.title,
+              content: fresh.content,
+              date: fresh.date,
+              wheaterInfo: fresh.weatherInfo,
+              locations: fresh.locations,
             });
-            await repo.setServerId(localFootprint.id, String(serverFootprint.id));
+            await repo.setServerId(fresh.id, String(serverFootprint.id));
 
             if (localPhotos.length > 0) {
               try {
@@ -114,7 +117,7 @@ export function useCreateFootprint() {
             }
 
             markSyncSucceeded(localFootprint.id);
-            qc.invalidateQueries({ queryKey: footprintKeys.byTrip(data.tripId) });
+            qc.invalidateQueries({ queryKey: footprintKeys.byTrip(fresh.tripId) });
             qc.invalidateQueries({ queryKey: footprintKeys.photos(localFootprint.id) });
           }
         } catch {
@@ -122,7 +125,7 @@ export function useCreateFootprint() {
         } finally {
           unmarkSyncing(localFootprint.id);
         }
-      })();
+      });
 
       return localFootprint;
     },
@@ -157,17 +160,18 @@ export function useUpdateFootprint() {
         existingPhotos.length
       );
 
-      (async () => {
+      enqueueMutation(footprint.id, async () => {
         markSyncing(footprint.id);
         try {
-          if (footprint.serverId) {
-            const trip = await tripRepo.getTripById(footprint.tripId);
+          const fresh = await repo.getFootprintById(footprint.id);
+          if (fresh?.serverId) {
+            const trip = await tripRepo.getTripById(fresh.tripId);
             if (trip?.serverId) {
-              await footprintsApi.update(parseInt(trip.serverId), parseInt(footprint.serverId), {
-                title: footprint.title,
-                content: footprint.content,
-                date: footprint.date,
-                locations: footprint.locations,
+              await footprintsApi.update(parseInt(trip.serverId), parseInt(fresh.serverId), {
+                title: fresh.title,
+                content: fresh.content,
+                date: fresh.date,
+                locations: fresh.locations,
               });
               await repo.markSynced(footprint.id);
               markSyncSucceeded(footprint.id);
@@ -177,11 +181,11 @@ export function useUpdateFootprint() {
                   photoRepo,
                   newLocalPhotos,
                   parseInt(trip.serverId),
-                  parseInt(footprint.serverId)
+                  parseInt(fresh.serverId)
                 );
               }
 
-              qc.invalidateQueries({ queryKey: footprintKeys.byTrip(footprint.tripId) });
+              qc.invalidateQueries({ queryKey: footprintKeys.byTrip(fresh.tripId) });
               qc.invalidateQueries({ queryKey: footprintKeys.detail(footprint.id) });
               qc.invalidateQueries({ queryKey: footprintKeys.photos(footprint.id) });
             }
@@ -191,7 +195,7 @@ export function useUpdateFootprint() {
         } finally {
           unmarkSyncing(footprint.id);
         }
-      })();
+      });
 
       return updated;
     },
