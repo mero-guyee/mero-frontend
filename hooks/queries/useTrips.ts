@@ -11,16 +11,10 @@ import {
   TripRepository,
 } from '../../repositories';
 import { Trip } from '../../types';
+import { enqueueMutation } from './mutationQueue';
 import { tripKeys, unrecordedTripsKeys } from './queryKeys';
 
 export { tripKeys } from './queryKeys';
-
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), ms)),
-  ]);
-}
 
 export function useTripsQuery() {
   const db = useDb();
@@ -81,18 +75,20 @@ export function useCreateTrip() {
       const repo = new TripRepository(db);
       const localTrip = await repo.createTrip(data);
 
-      (async () => {
+      enqueueMutation(localTrip.id, async () => {
         markSyncing(localTrip.id);
         try {
+          const fresh = await repo.getTripById(localTrip.id);
+          if (!fresh || fresh.serverId) return;
           const serverTrip = await tripsApi.create({
-            clientId: localTrip.id,
-            title: data.title,
-            startDate: data.startDate,
-            endDate: data.endDate,
-            countries: data.countries,
-            imageUrl: data.imageUrl,
+            clientId: fresh.id,
+            title: fresh.title,
+            startDate: fresh.startDate,
+            endDate: fresh.endDate,
+            countries: fresh.countries,
+            imageUrl: fresh.imageUrl,
           });
-          await repo.setServerId(localTrip.id, String(serverTrip.id));
+          await repo.setServerId(fresh.id, String(serverTrip.id));
           markSyncSucceeded(localTrip.id);
           qc.invalidateQueries({ queryKey: tripKeys.all });
         } catch (e) {
@@ -103,7 +99,7 @@ export function useCreateTrip() {
         } finally {
           unmarkSyncing(localTrip.id);
         }
-      })();
+      });
 
       return localTrip;
     },
@@ -122,19 +118,20 @@ export function useUpdateTrip() {
       const repo = new TripRepository(db);
       const updated = await repo.updateTrip(trip);
 
-      (async () => {
+      enqueueMutation(trip.id, async () => {
         markSyncing(trip.id);
         try {
-          if (trip.serverId) {
-            await tripsApi.update(parseInt(trip.serverId), {
-              title: trip.title,
-              startDate: trip.startDate,
-              endDate: trip.endDate,
-              countries: trip.countries,
+          const fresh = await repo.getTripById(trip.id);
+          if (fresh?.serverId) {
+            await tripsApi.update(parseInt(fresh.serverId), {
+              title: fresh.title,
+              startDate: fresh.startDate,
+              endDate: fresh.endDate,
+              countries: fresh.countries,
             });
 
-            if (trip.imageUrl) {
-              await tripsApi.uploadImage(parseInt(trip.serverId), trip.imageUrl);
+            if (fresh.imageUrl) {
+              await tripsApi.uploadImage(parseInt(fresh.serverId), fresh.imageUrl);
             }
 
             await repo.markSynced(trip.id);
@@ -147,7 +144,7 @@ export function useUpdateTrip() {
         } finally {
           unmarkSyncing(trip.id);
         }
-      })();
+      });
 
       return updated;
     },

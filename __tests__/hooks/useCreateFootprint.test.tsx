@@ -44,7 +44,13 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockDb.runAsync.mockResolvedValue(undefined);
   mockDb.withTransactionAsync.mockImplementation(async (fn: () => Promise<void>) => fn());
-  mockDb.getFirstAsync.mockResolvedValue({ serverId: '123' });
+  mockDb.getFirstAsync.mockImplementation(async (sql: string) => {
+    if (sql.includes('FROM trips')) return { serverId: '123' };
+    if (sql.includes('FROM footprints')) {
+      return { id: 'footprint-1', serverId: null, ...footprintData, locations: '[]' };
+    }
+    return null;
+  });
 });
 
 describe('useCreateFootprint - outbox', () => {

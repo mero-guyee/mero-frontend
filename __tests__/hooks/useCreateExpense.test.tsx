@@ -47,6 +47,7 @@ beforeEach(() => {
   mockDb.getFirstAsync.mockImplementation(async (sql: string) => {
     if (sql.includes('FROM trips')) return { serverId: '123' };
     if (sql.includes('FROM expense_categories')) return { serverId: '456' };
+    if (sql.includes('FROM expenses')) return { id: 'expense-1', serverId: null, ...expenseData };
     return null;
   });
 });

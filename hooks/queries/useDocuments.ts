@@ -7,7 +7,9 @@ import { tripsApi } from '../../api/trips';
 import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { DocumentRepository, TripRepository } from '../../repositories';
+import { resolveAbsoluteFileUri } from '../../repositories/documents';
 import { TripDocumentFile } from '../../types';
+import { enqueueMutation } from './mutationQueue';
 import { documentKeys, unrecordedTripsKeys } from './queryKeys';
 
 function persistToDocumentDirectory(ogFile: TripDocumentFile): TripDocumentFile {
@@ -63,19 +65,21 @@ export function useCreateDocument() {
       const persisted = persistToDocumentDirectory(data);
       const doc = await docRepo.createDocument(tripId, persisted);
 
-      (async () => {
+      enqueueMutation(doc.id, async () => {
         markSyncing(doc.id);
         try {
-          const trip = await tripRepo.getTripById(tripId);
+          const fresh = await docRepo.findById(doc.id);
+          if (!fresh || fresh.serverId) return;
+          const trip = await tripRepo.getTripById(fresh.tripId);
           if (trip?.serverId) {
             const serverDoc = await documentsApi.upload({
               tripId: parseInt(trip.serverId),
-              clientId: doc.id,
-              file: data,
+              clientId: fresh.id,
+              file: { fileName: fresh.fileName, fileUri: resolveAbsoluteFileUri(fresh.fileUri) },
             });
-            await docRepo.setServerId(doc.id, String(serverDoc.id));
+            await docRepo.setServerId(fresh.id, String(serverDoc.id));
             markSyncSucceeded(doc.id);
-            qc.invalidateQueries({ queryKey: documentKeys.byTrip(tripId) });
+            qc.invalidateQueries({ queryKey: documentKeys.byTrip(fresh.tripId) });
           }
         } catch (e) {
           if (e instanceof ApiError) {
@@ -85,7 +89,7 @@ export function useCreateDocument() {
         } finally {
           unmarkSyncing(doc.id);
         }
-      })();
+      });
 
       return doc;
     },

@@ -4,6 +4,7 @@ import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { BudgetRepository, TripRepository } from '../../repositories';
 import { Budget } from '../../types';
+import { enqueueMutation } from './mutationQueue';
 import { unrecordedTripsKeys } from './queryKeys';
 
 const DEFAULT_EXCHANGE_RATE = 1;
@@ -52,28 +53,30 @@ export function useCreateBudget() {
       const repo = new BudgetRepository(db);
       const localBudget = await repo.createBudget(data);
 
-      (async () => {
+      enqueueMutation(localBudget.id, async () => {
         markSyncing(localBudget.id);
         try {
-          const trip = await tripRepo.getTripById(data.tripId);
+          const fresh = await repo.findById(localBudget.id);
+          if (!fresh || fresh.serverId) return;
+          const trip = await tripRepo.getTripById(fresh.tripId);
           if (trip?.serverId) {
             const serverBudget = await budgetsApi.create(parseInt(trip.serverId), {
-              clientId: localBudget.id,
-              amount: data.amount,
-              currency: data.currency as any,
-              exchangeRate: data.exchangeRate || DEFAULT_EXCHANGE_RATE,
+              clientId: fresh.id,
+              amount: fresh.amount,
+              currency: fresh.currency as any,
+              exchangeRate: fresh.exchangeRate || DEFAULT_EXCHANGE_RATE,
             });
-            await repo.setServerId(localBudget.id, String(serverBudget.id));
+            await repo.setServerId(fresh.id, String(serverBudget.id));
             markSyncSucceeded(localBudget.id);
             qc.invalidateQueries({ queryKey: budgetKeys.all });
-            qc.invalidateQueries({ queryKey: budgetKeys.byTrip(data.tripId) });
+            qc.invalidateQueries({ queryKey: budgetKeys.byTrip(fresh.tripId) });
           }
         } catch {
           markSyncFailed(localBudget.id);
         } finally {
           unmarkSyncing(localBudget.id);
         }
-      })();
+      });
 
       return localBudget;
     },
@@ -95,21 +98,22 @@ export function useUpdateBudget() {
       const repo = new BudgetRepository(db);
       const updated = await repo.updateBudget(budget);
 
-      (async () => {
+      enqueueMutation(budget.id, async () => {
         markSyncing(budget.id);
         try {
-          if (budget.serverId) {
-            const trip = await tripRepo.getTripById(budget.tripId);
+          const fresh = await repo.findById(budget.id);
+          if (fresh?.serverId) {
+            const trip = await tripRepo.getTripById(fresh.tripId);
             if (trip?.serverId) {
-              await budgetsApi.update(parseInt(trip.serverId), parseInt(budget.serverId), {
-                amount: budget.amount,
-                currency: budget.currency as any,
-                exchangeRate: budget.exchangeRate,
+              await budgetsApi.update(parseInt(trip.serverId), parseInt(fresh.serverId), {
+                amount: fresh.amount,
+                currency: fresh.currency as any,
+                exchangeRate: fresh.exchangeRate ?? undefined,
               });
               await repo.markSynced(budget.id);
               markSyncSucceeded(budget.id);
               qc.invalidateQueries({ queryKey: budgetKeys.all });
-              qc.invalidateQueries({ queryKey: budgetKeys.byTrip(budget.tripId) });
+              qc.invalidateQueries({ queryKey: budgetKeys.byTrip(fresh.tripId) });
             }
           }
         } catch {
@@ -117,7 +121,7 @@ export function useUpdateBudget() {
         } finally {
           unmarkSyncing(budget.id);
         }
-      })();
+      });
 
       return updated;
     },

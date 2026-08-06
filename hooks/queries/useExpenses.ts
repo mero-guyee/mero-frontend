@@ -2,8 +2,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { expenseCategoriesApi, expensesApi } from '../../api/expenses';
 import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
-import { ExpenseCategoryRepository, ExpenseRepository, TripRepository } from '../../repositories';
+import {
+  ExpenseCategoryRepository,
+  ExpenseRepository,
+  FootprintRepository,
+  TripRepository,
+} from '../../repositories';
 import { Expense, ExpenseCategory } from '../../types';
+import { enqueueMutation } from './mutationQueue';
 
 export const expenseKeys = {
   byTrip: (tripId: string) => ['expenses', 'trip', tripId] as const,
@@ -57,34 +63,40 @@ export function useCreateExpense() {
         categoryColor: category?.color,
       });
 
-      (async () => {
+      enqueueMutation(localExpense.id, async () => {
         markSyncing(localExpense.id);
         try {
-          const trip = await tripRepo.getTripById(data.tripId);
+          const fresh = await repo.findById(localExpense.id);
+          if (!fresh || fresh.serverId) return;
+          const trip = await tripRepo.getTripById(fresh.tripId);
           const categoryServerId = (
-            await new ExpenseCategoryRepository(db).findById(data.categoryId)
+            await new ExpenseCategoryRepository(db).findById(fresh.categoryId)
           )?.serverId;
+          const footprintServerId = fresh.footprintId
+            ? (await new FootprintRepository(db).findById(fresh.footprintId))?.serverId
+            : undefined;
           if (trip?.serverId && categoryServerId) {
             const serverExpense = await expensesApi.create(parseInt(trip.serverId), {
-              clientId: localExpense.id,
+              clientId: fresh.id,
               tripId: parseInt(trip.serverId),
-              amount: data.amount,
-              currency: data.currency as any,
+              footprintId: footprintServerId ? parseInt(footprintServerId) : undefined,
+              amount: fresh.amount,
+              currency: fresh.currency as any,
               categoryId: parseInt(categoryServerId),
-              description: data.description,
-              date: data.date,
-              location: data.location,
+              description: fresh.description ?? undefined,
+              date: fresh.date,
+              location: fresh.location ?? undefined,
             });
-            await repo.setServerId(localExpense.id, String(serverExpense.id));
+            await repo.setServerId(fresh.id, String(serverExpense.id));
             markSyncSucceeded(localExpense.id);
-            qc.invalidateQueries({ queryKey: expenseKeys.byTrip(data.tripId) });
+            qc.invalidateQueries({ queryKey: expenseKeys.byTrip(fresh.tripId) });
           }
         } catch {
           markSyncFailed(localExpense.id);
         } finally {
           unmarkSyncing(localExpense.id);
         }
-      })();
+      });
 
       return localExpense;
     },
@@ -110,26 +122,31 @@ export function useUpdateExpense() {
         categoryColor: category?.color,
       });
 
-      (async () => {
+      enqueueMutation(expense.id, async () => {
         markSyncing(expense.id);
         try {
-          if (expense.serverId) {
-            const trip = await tripRepo.getTripById(expense.tripId);
+          const fresh = await repo.findById(expense.id);
+          if (fresh?.serverId) {
+            const trip = await tripRepo.getTripById(fresh.tripId);
             const categoryServerId = (
-              await new ExpenseCategoryRepository(db).findById(expense.categoryId)
+              await new ExpenseCategoryRepository(db).findById(fresh.categoryId)
             )?.serverId;
+            const footprintServerId = fresh.footprintId
+              ? (await new FootprintRepository(db).findById(fresh.footprintId))?.serverId
+              : undefined;
             if (trip?.serverId && categoryServerId) {
-              await expensesApi.update(parseInt(trip.serverId), parseInt(expense.serverId), {
-                amount: expense.amount,
-                currency: expense.currency as any,
+              await expensesApi.update(parseInt(trip.serverId), parseInt(fresh.serverId), {
+                footprintId: footprintServerId ? parseInt(footprintServerId) : null,
+                amount: fresh.amount,
+                currency: fresh.currency as any,
                 categoryId: parseInt(categoryServerId),
-                description: expense.description,
-                date: expense.date,
-                location: expense.location,
+                description: fresh.description ?? undefined,
+                date: fresh.date,
+                location: fresh.location ?? undefined,
               });
               await repo.markSynced(expense.id);
               markSyncSucceeded(expense.id);
-              qc.invalidateQueries({ queryKey: expenseKeys.byTrip(expense.tripId) });
+              qc.invalidateQueries({ queryKey: expenseKeys.byTrip(fresh.tripId) });
             }
           }
         } catch {
@@ -137,7 +154,7 @@ export function useUpdateExpense() {
         } finally {
           unmarkSyncing(expense.id);
         }
-      })();
+      });
 
       return updated;
     },

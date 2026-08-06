@@ -38,10 +38,22 @@ const tripData = {
   imageUrl: '',
 };
 
+const tripRow = {
+  id: 'trip-1',
+  serverId: null,
+  title: tripData.title,
+  imageUrl: tripData.imageUrl,
+  startDate: tripData.startDate,
+  endDate: tripData.endDate,
+  countries: JSON.stringify(tripData.countries),
+  syncStatus: 'pending',
+};
+
 beforeEach(() => {
   jest.clearAllMocks();
   mockDb.runAsync.mockResolvedValue(undefined);
   mockDb.withTransactionAsync.mockImplementation(async (fn: () => Promise<void>) => fn());
+  mockDb.getFirstAsync.mockResolvedValue(tripRow);
 });
 
 describe('useCreateTrip - outbox', () => {

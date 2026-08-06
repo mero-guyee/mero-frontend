@@ -1,4 +1,5 @@
 import { photosApi } from '@/api/photos';
+import { enqueueMutation } from '@/hooks/queries/mutationQueue';
 import { FootprintRepository, OutboxRepository, PhotoRepository, TripRepository } from '@/repositories';
 import { uploadPhotosAndSync } from '@/utils/photoSync';
 import * as SQLite from 'expo-sqlite';
@@ -20,41 +21,50 @@ export async function syncPhotos(db: SQLite.SQLiteDatabase, maxAgeMinutes?: numb
   }
 
   for (const [footprintId, photos] of byFootprint) {
-    try {
-      const footprint = await footprintRepo.findById(footprintId);
-      if (!footprint?.serverId) continue;
-      const trip = await tripRepo.getTripById(footprint.tripId);
-      if (!trip?.serverId) continue;
-      await uploadPhotosAndSync(photoRepo, photos, parseInt(trip.serverId), parseInt(footprint.serverId));
-    } catch {
-      // leave as pending for next sync
-    }
+    await enqueueMutation(footprintId, async () => {
+      try {
+        const footprint = await footprintRepo.findById(footprintId);
+        if (!footprint?.serverId) return;
+        const trip = await tripRepo.getTripById(footprint.tripId);
+        if (!trip?.serverId) return;
+        await uploadPhotosAndSync(
+          photoRepo,
+          photos,
+          parseInt(trip.serverId),
+          parseInt(footprint.serverId)
+        );
+      } catch {
+        // leave as pending for next sync
+      }
+    });
   }
 
   // 2. Delete photos from outbox
   const readyDeletes = await outbox.getReady('photos', maxAgeMinutes);
   for (const { dataId } of readyDeletes) {
-    try {
-      const photo = await photoRepo.findByIdIncludeDeleted(dataId);
-      if (!photo?.serverId) {
+    await enqueueMutation(dataId, async () => {
+      try {
+        const photo = await photoRepo.findByIdIncludeDeleted(dataId);
+        if (!photo?.serverId) {
+          await outbox.remove('photos', dataId);
+          return;
+        }
+        const footprint = await footprintRepo.findByIdIncludeDeleted(photo.footprintId);
+        if (!footprint?.serverId) {
+          await outbox.remove('photos', dataId);
+          return;
+        }
+        const trip = await tripRepo.getTripById(footprint.tripId);
+        if (!trip?.serverId) return;
+        await photosApi.delete(
+          parseInt(trip.serverId),
+          parseInt(footprint.serverId),
+          parseInt(photo.serverId)
+        );
         await outbox.remove('photos', dataId);
-        continue;
+      } catch {
+        await outbox.markFailed('photos', dataId);
       }
-      const footprint = await footprintRepo.findByIdIncludeDeleted(photo.footprintId);
-      if (!footprint?.serverId) {
-        await outbox.remove('photos', dataId);
-        continue;
-      }
-      const trip = await tripRepo.getTripById(footprint.tripId);
-      if (!trip?.serverId) continue;
-      await photosApi.delete(
-        parseInt(trip.serverId),
-        parseInt(footprint.serverId),
-        parseInt(photo.serverId)
-      );
-      await outbox.remove('photos', dataId);
-    } catch {
-      await outbox.markFailed('photos', dataId);
-    }
+    });
   }
 }

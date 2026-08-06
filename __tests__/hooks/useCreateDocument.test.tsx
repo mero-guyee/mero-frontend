@@ -9,6 +9,29 @@ import { mockDb } from '../../test-utils/mockDb';
 
 jest.mock('expo-crypto');
 
+jest.mock('expo-file-system', () => {
+  class MockFile {
+    uri: string;
+    name: string;
+    constructor(...args: any[]) {
+      const last = String(args[args.length - 1] ?? 'file');
+      this.uri = `file:///mock/${last}`;
+      this.name = last;
+    }
+    copy() {}
+  }
+  class MockDirectory {
+    exists = true;
+    constructor(..._args: any[]) {}
+    create() {}
+  }
+  return {
+    Directory: MockDirectory,
+    File: MockFile,
+    Paths: { document: 'file:///mock-documents/' },
+  };
+});
+
 jest.mock('@/api/documents', () => ({
   documentsApi: { upload: jest.fn() },
 }));
@@ -42,7 +65,13 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockDb.runAsync.mockResolvedValue(undefined);
   mockDb.withTransactionAsync.mockImplementation(async (fn: () => Promise<void>) => fn());
-  mockDb.getFirstAsync.mockResolvedValue({ serverId: '123' });
+  mockDb.getFirstAsync.mockImplementation(async (sql: string) => {
+    if (sql.includes('FROM trips')) return { serverId: '123' };
+    if (sql.includes('FROM documents')) {
+      return { id: 'document-1', serverId: null, tripId: documentInput.tripId, ...documentInput.data };
+    }
+    return null;
+  });
 });
 
 describe('useCreateDocument - outbox', () => {

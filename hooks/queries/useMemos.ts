@@ -4,6 +4,7 @@ import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { MemoRepository, TripRepository } from '../../repositories';
 import { Memo } from '../../types';
+import { enqueueMutation } from './mutationQueue';
 import { memoKeys, unrecordedTripsKeys } from './queryKeys';
 
 export function useMemosQuery(tripId: string) {
@@ -45,17 +46,19 @@ export function useCreateMemo() {
       const memoRepo = new MemoRepository(db);
       const localMemo = await memoRepo.createMemo(data);
 
-      (async () => {
+      enqueueMutation(localMemo.id, async () => {
         markSyncing(localMemo.id);
         try {
-          const trip = await tripRepo.getTripById(data.tripId);
+          const fresh = await memoRepo.getMemoById(localMemo.id);
+          if (!fresh || fresh.serverId) return;
+          const trip = await tripRepo.getTripById(fresh.tripId);
           if (trip?.serverId) {
             const serverMemo = await memosApi.create(parseInt(trip.serverId), {
-              clientId: localMemo.id,
-              title: data.title,
-              content: data.content,
+              clientId: fresh.id,
+              title: fresh.title,
+              content: fresh.content,
             });
-            await memoRepo.setServerId(localMemo.id, String(serverMemo.id));
+            await memoRepo.setServerId(fresh.id, String(serverMemo.id));
             markSyncSucceeded(localMemo.id);
             qc.invalidateQueries({ queryKey: memoKeys.all });
           }
@@ -64,7 +67,7 @@ export function useCreateMemo() {
         } finally {
           unmarkSyncing(localMemo.id);
         }
-      })();
+      });
 
       return localMemo;
     },
@@ -85,15 +88,16 @@ export function useUpdateMemo() {
       const memoRepo = new MemoRepository(db);
       const updated = await memoRepo.updateMemo(memo);
 
-      (async () => {
+      enqueueMutation(memo.id, async () => {
         markSyncing(memo.id);
         try {
-          if (memo.serverId) {
-            const trip = await tripRepo.getTripById(memo.tripId);
+          const fresh = await memoRepo.getMemoById(memo.id);
+          if (fresh?.serverId) {
+            const trip = await tripRepo.getTripById(fresh.tripId);
             if (trip?.serverId) {
-              await memosApi.update(parseInt(trip.serverId), parseInt(memo.serverId), {
-                title: memo.title,
-                content: memo.content,
+              await memosApi.update(parseInt(trip.serverId), parseInt(fresh.serverId), {
+                title: fresh.title,
+                content: fresh.content,
               });
               await memoRepo.markSynced(memo.id);
               markSyncSucceeded(memo.id);
@@ -105,7 +109,7 @@ export function useUpdateMemo() {
         } finally {
           unmarkSyncing(memo.id);
         }
-      })();
+      });
 
       return updated;
     },
