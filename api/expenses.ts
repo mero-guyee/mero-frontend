@@ -14,7 +14,7 @@ export interface ExpenseCreateRequest {
 }
 
 export interface ExpenseUpdateRequest {
-  footprintId?: number;
+  footprintId?: number | null;
   amount: number;
   currency: Currency;
   categoryId: number;

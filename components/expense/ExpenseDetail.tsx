@@ -9,13 +9,13 @@ import DatePickerInput from '@/components/ui/DatePickerInput';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { formatGeocode } from '@/utils/location/location';
-import { ChevronRight, Pencil, Trash2 } from '@tamagui/lucide-icons';
+import { ChevronRight, Link2Off, Pencil, Trash2 } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { ComponentRef, useRef, useState } from 'react';
 import { Pressable } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { ScrollView, Stack, Text, XStack, YStack } from 'tamagui';
-import { useAppModal, useExpenses } from '../../contexts';
+import { useAppModal, useExpenses, useFootprints } from '../../contexts';
 
 const plainInputStyle = {
   borderWidth: 0,
@@ -57,9 +57,11 @@ function FieldRow({
 export default function ExpenseDetail({ expenseId }: { expenseId: string }) {
   const router = useRouter();
   const { expenses, categories, updateExpense, deleteExpense } = useExpenses();
+  const { footprints } = useFootprints();
   const { showConfirm } = useAppModal();
 
   const expense = expenses.find((e) => e.id === expenseId);
+  const linkedFootprint = footprints.find((f) => f.id === expense?.footprintId);
 
   const [tempAmount, setTempAmount] = useState(expense?.amount?.toString() ?? '');
   const [tempDescription, setTempDescription] = useState(expense?.description ?? '');
@@ -107,6 +109,23 @@ export default function ExpenseDetail({ expenseId }: { expenseId: string }) {
     if (trimmed !== (expense.description ?? '')) {
       updateExpense({ ...expense, description: trimmed || undefined });
     }
+  };
+
+  const handleNavigateToFootprint = () => {
+    if (linkedFootprint) router.push(`/(main)/footprint/${linkedFootprint.id}`);
+  };
+
+  const handleUnlinkFootprint = async () => {
+    const confirmed = await showConfirm(
+      '일지 연결 해제',
+      '이 경비와 일지의 연결을 해제하시겠습니까?',
+      {
+        confirmText: '연결 해제',
+        destructive: true,
+      }
+    );
+    if (!confirmed) return;
+    updateExpense({ ...expense, footprintId: undefined });
   };
 
   const handleLocationConfirm = ({
@@ -226,6 +245,28 @@ export default function ExpenseDetail({ expenseId }: { expenseId: string }) {
               placeholder="예: 마추픽추"
               onPress={() => setLocationPickerOpen(true)}
             />
+
+            {/* Linked Footprint */}
+            {linkedFootprint && (
+              <XStack alignItems="center" justifyContent="space-between">
+                <Text color="$mutedForeground" fontSize={13} fontWeight="500">
+                  일지
+                </Text>
+                <XStack alignItems="center" gap="$2">
+                  <Pressable onPress={handleNavigateToFootprint}>
+                    <Text color="$foreground" fontSize={16}>
+                      {linkedFootprint.title}
+                    </Text>
+                  </Pressable>
+                  <Pressable onPress={handleUnlinkFootprint} hitSlop={8}>
+                    <Link2Off size={16} color="$destructiveText" />
+                  </Pressable>
+                  <Pressable onPress={handleNavigateToFootprint} hitSlop={8}>
+                    <ChevronRight size={18} color="$mutedForeground" />
+                  </Pressable>
+                </XStack>
+              </XStack>
+            )}
           </YCard>
         </ScrollView>
       </FadeWrapper>

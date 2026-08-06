@@ -19,10 +19,31 @@ import { useExpenses, useTrips } from '../../contexts';
 import { Expense } from '../../types';
 
 type ExpenseFormProps =
-  | { mode: 'edit'; expense: Expense; tripId?: never; footprintId?: never; date?: never }
-  | { mode: 'new'; expense?: never; tripId?: string; footprintId?: string; date?: string };
+  | {
+      mode: 'edit';
+      expense: Expense;
+      tripId?: never;
+      footprintId?: never;
+      date?: never;
+      location?: never;
+    }
+  | {
+      mode: 'new';
+      expense?: never;
+      tripId?: string;
+      footprintId?: string;
+      date?: string;
+      location?: string;
+    };
 
-export default function ExpenseForm({ mode, expense, tripId, footprintId, date: initialDate }: ExpenseFormProps) {
+export default function ExpenseForm({
+  mode,
+  expense,
+  tripId,
+  footprintId,
+  date: initialDate,
+  location: initialLocation,
+}: ExpenseFormProps) {
   const isEdit = mode === 'edit';
   const router = useRouter();
   const { activeTrip } = useTrips();
@@ -36,7 +57,7 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId, date: 
     expense?.date ?? initialDate ?? new Date().toISOString().split('T')[0]
   );
   const [description, setDescription] = useState(expense?.description ?? '');
-  const [location, setLocation] = useState(expense?.location ?? '');
+  const [location, setLocation] = useState(expense?.location ?? initialLocation ?? '');
   const [locationPickerOpen, setLocationPickerOpen] = useState(false);
 
   const isDirty =
@@ -45,7 +66,7 @@ export default function ExpenseForm({ mode, expense, tripId, footprintId, date: 
     categoryId !== (expense?.categoryId ?? categories[0]?.id ?? '') ||
     date !== (expense?.date ?? initialDate ?? new Date().toISOString().split('T')[0]) ||
     description !== (expense?.description ?? '') ||
-    location !== (expense?.location ?? '');
+    location !== (expense?.location ?? initialLocation ?? '');
 
   const { confirmLeave, markSaved } = useUnsavedChangesGuard(isDirty);
 
