@@ -4,6 +4,7 @@ import { photosApi } from '../../api/photos';
 import { useSyncContext } from '../../contexts/SyncContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import {
+  FootprintDraftRepository,
   FootprintRepository,
   OutboxRepository,
   PhotoRepository,
@@ -24,6 +25,19 @@ export const footprintKeys = {
   detail: (id: string) => ['footprints', id] as const,
   photos: (footprintId: string) => ['footprints', footprintId, 'photos'] as const,
 };
+
+export const footprintDraftKeys = {
+  byTrip: (tripId: string) => ['footprintDrafts', 'trip', tripId] as const,
+};
+
+export function useFootprintDraftsQuery(tripId: string) {
+  const db = useDb();
+  return useQuery({
+    queryKey: footprintDraftKeys.byTrip(tripId),
+    queryFn: () => new FootprintDraftRepository(db).getByTripId(tripId),
+    enabled: !!tripId,
+  });
+}
 
 export function useFootprintPhotosQuery(footprintId: string) {
   const db = useDb();

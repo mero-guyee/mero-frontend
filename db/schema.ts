@@ -1,12 +1,15 @@
-export const SCHEMA_VERSION = 18;
+export const SCHEMA_VERSION = 21;
 
 export const DROP_TABLES = `
   DROP TABLE IF EXISTS outbox;
   DROP TABLE IF EXISTS users;
   DROP TABLE IF EXISTS expenses;
   DROP TABLE IF EXISTS budgets;
+  DROP TABLE IF EXISTS memo_drafts;
   DROP TABLE IF EXISTS memos;
   DROP TABLE IF EXISTS documents;
+  DROP TABLE IF EXISTS footprint_photos_drafts;
+  DROP TABLE IF EXISTS footprint_drafts;
   DROP TABLE IF EXISTS photos;
   DROP TABLE IF EXISTS footprints;
   DROP TABLE IF EXISTS expense_categories;
@@ -91,6 +94,34 @@ export const CREATE_TABLES = `
     FOREIGN KEY (footprintId) REFERENCES footprints(id)
   );
 
+  CREATE TABLE IF NOT EXISTS footprint_drafts (
+    id          TEXT PRIMARY KEY NOT NULL,
+    tripId      TEXT NOT NULL,
+    title       TEXT NOT NULL DEFAULT '',
+    content     TEXT NOT NULL DEFAULT '',
+    date        TEXT NOT NULL,
+    locations   TEXT NOT NULL DEFAULT '[]',
+    weatherInfo TEXT,
+    createdAt   TEXT NOT NULL,
+    updatedAt   TEXT NOT NULL,
+    FOREIGN KEY (tripId) REFERENCES trips(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS footprint_photos_drafts (
+    id               TEXT PRIMARY KEY NOT NULL,
+    footprintDraftId TEXT NOT NULL,
+    localUri         TEXT NOT NULL,
+    originalFilename TEXT,
+    fileSize         REAL,
+    mimeType         TEXT,
+    width            INTEGER,
+    height           INTEGER,
+    orderIndex       INTEGER,
+    createdAt        TEXT NOT NULL,
+    updatedAt        TEXT NOT NULL,
+    FOREIGN KEY (footprintDraftId) REFERENCES footprint_drafts(id)
+  );
+
   CREATE TABLE IF NOT EXISTS memos (
     id          TEXT PRIMARY KEY NOT NULL,
     serverId    TEXT,
@@ -101,6 +132,16 @@ export const CREATE_TABLES = `
     updatedAt   TEXT NOT NULL,
     syncStatus  TEXT NOT NULL DEFAULT 'pending',
     deletedAt   TEXT,
+    FOREIGN KEY (tripId) REFERENCES trips(id)
+  );
+
+  CREATE TABLE IF NOT EXISTS memo_drafts (
+    id        TEXT PRIMARY KEY NOT NULL,
+    tripId    TEXT NOT NULL,
+    title     TEXT NOT NULL,
+    content   TEXT NOT NULL DEFAULT '',
+    createdAt TEXT NOT NULL,
+    updatedAt TEXT NOT NULL,
     FOREIGN KEY (tripId) REFERENCES trips(id)
   );
 

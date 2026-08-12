@@ -5,15 +5,20 @@ import { useEffect, useState } from 'react';
 import Toast from 'react-native-toast-message';
 import { useDb } from '../../providers/DatabaseProvider';
 import { PhotoRepository } from '../../repositories';
+import { useFootprintDraftForm } from './useFootprintDraftForm';
 
 export function useFootprintForm() {
-  const { footprintId } = useLocalSearchParams<{ footprintId?: string }>();
+  const { footprintId, draftId: draftIdParam } = useLocalSearchParams<{
+    footprintId?: string;
+    draftId?: string;
+  }>();
   const router = useRouter();
   const db = useDb();
   const { trips, activeTrip } = useTrips();
   const { footprints, addFootprint, updateFootprint } = useFootprints();
 
   const existingFootprint = footprintId ? footprints.find((f) => f.id === footprintId) : undefined;
+  const isDraftMode = !footprintId;
 
   const [title, setTitle] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -24,25 +29,46 @@ export function useFootprintForm() {
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
 
   useEffect(() => {
-    if (existingFootprint) {
-      setTitle(existingFootprint.title);
-      setDate(existingFootprint.date);
-      setContent(existingFootprint.content);
-      setTripId(existingFootprint.tripId);
-      setWeatherInfo(existingFootprint.weatherInfo || '');
-      setLocations(existingFootprint.locations);
-      new PhotoRepository(db).getByFootprintId(existingFootprint.id).then((photos) => {
-        setPhotoUrls(photos.map((p) => p.s3Url || p.localUri));
-      });
-    }
+    if (!existingFootprint) return;
+    setTitle(existingFootprint.title);
+    setDate(existingFootprint.date);
+    setContent(existingFootprint.content);
+    setTripId(existingFootprint.tripId);
+    setWeatherInfo(existingFootprint.weatherInfo || '');
+    setLocations(existingFootprint.locations);
+    new PhotoRepository(db).getByFootprintId(existingFootprint.id).then((photos) => {
+      setPhotoUrls(photos.map((p) => p.s3Url || p.localUri));
+    });
   }, [existingFootprint, db]);
 
-  const handleAddPhotos = (uris: string[]) => {
+  const draft = useFootprintDraftForm({
+    enabled: isDraftMode,
+    draftIdParam,
+    tripId,
+    title,
+    content,
+    date,
+    locations,
+    weatherInfo,
+    setTitle,
+    setContent,
+    setDate,
+    setTripId,
+    setWeatherInfo,
+    setLocations,
+    setPhotoUrls,
+  });
+
+  const handleAddPhotos = async (uris: string[]) => {
+    const startIndex = photoUrls.length;
     setPhotoUrls((prev) => [...prev, ...uris]);
+    await draft.persistPhotoAdd(uris, startIndex);
   };
 
   const handleRemovePhoto = (index: number) => {
+    const uri = photoUrls[index];
     setPhotoUrls((prev) => prev.filter((_, i) => i !== index));
+    draft.persistPhotoRemove(uri);
   };
 
   const handleSubmit = async () => {
@@ -63,6 +89,7 @@ export function useFootprintForm() {
 
     try {
       const created = await addFootprint({ ...footprintData, photoUris: photoUrls });
+      await draft.deleteDraft();
       router.push(`/(main)/footprint?created=${created.id}`);
     } catch {
       Toast.show({
@@ -75,6 +102,8 @@ export function useFootprintForm() {
 
   return {
     existingFootprint,
+    isDraftMode,
+    isExistingDraft: draft.isExistingDraft,
     title,
     setTitle,
     date,
@@ -91,5 +120,6 @@ export function useFootprintForm() {
     handleAddPhotos,
     handleRemovePhoto,
     handleSubmit,
+    handleDeleteDraft: draft.handleDeleteDraft,
   };
 }

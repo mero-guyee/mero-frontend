@@ -1,10 +1,11 @@
 import FootprintToolbar from '@/components/footprint/new/toolbar/FootprintToolbar';
 import MetadataChips from '@/components/footprint/new/toolbar/MetadataChips';
+import { IconButton } from '@/components/ui/button/BaseButton';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { useFootprintForm } from '@/hooks/form/useFootprintForm';
-import { X } from '@tamagui/lucide-icons';
+import { Trash2, X } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import { Pressable, ScrollView } from 'react-native';
 import { Image, TextArea, XStack, YStack } from 'tamagui';
@@ -13,6 +14,8 @@ export default function FootprintFormScreen() {
   const router = useRouter();
   const {
     existingFootprint,
+    isDraftMode,
+    isExistingDraft,
     title,
     setTitle,
     date,
@@ -27,12 +30,24 @@ export default function FootprintFormScreen() {
     handleAddPhotos,
     handleRemovePhoto,
     handleSubmit,
+    handleDeleteDraft,
   } = useFootprintForm();
 
   return (
     <YStack flex={1} backgroundColor="$background">
       <BackActionHeader onBack={() => router.back()}>
-        <SubmitButton onPress={handleSubmit} disabled={!title.trim()} opacity={title.trim() ? 1 : 0.5} />
+        <XStack alignItems="center" gap="$2">
+          {isDraftMode && isExistingDraft && (
+            <IconButton onPress={handleDeleteDraft}>
+              <Trash2 size={18} color="$destructiveText" />
+            </IconButton>
+          )}
+          <SubmitButton
+            onPress={handleSubmit}
+            disabled={!title.trim()}
+            opacity={title.trim() ? 1 : 0.5}
+          />
+        </XStack>
       </BackActionHeader>
 
       <FadeWrapper>

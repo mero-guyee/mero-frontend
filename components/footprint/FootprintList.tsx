@@ -6,7 +6,8 @@ import { useRef, useState } from 'react';
 import { SectionList, ViewToken } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Text, useTheme, XStack, YStack } from 'tamagui';
-import { Footprint } from '../../types';
+import { Footprint, FootprintDraft } from '../../types';
+import FootprintDraftItem from './FootprintDraftItem';
 import FootprintItem from './FootprintItem';
 
 function hexToRgba(hex: string, alpha: number) {
@@ -24,11 +25,13 @@ interface FootprintSection {
 
 interface Props {
   sections: FootprintSection[];
+  drafts: FootprintDraft[];
   showSearch: boolean;
   searchQuery: string;
   onSearchChange: (query: string) => void;
   onCreateFootprint: () => void;
   onSelectFootprint: (id: string) => void;
+  onSelectDraft: (id: string) => void;
   isEmpty: boolean;
   createdId?: string;
 }
@@ -93,11 +96,13 @@ function FloatingDateHeader({ section }: { section: FootprintSection }) {
 
 export default function FootprintList({
   sections,
+  drafts,
   showSearch,
   searchQuery,
   onSearchChange,
   onCreateFootprint,
   onSelectFootprint,
+  onSelectDraft,
   isEmpty,
   createdId,
 }: Props) {
@@ -136,6 +141,22 @@ export default function FootprintList({
           sections={sections}
           keyExtractor={(item) => item.id}
           renderSectionHeader={({ section }) => <DateHeaderContent section={section} />}
+          ListHeaderComponent={
+            drafts.length > 0 ? (
+              <YStack marginBottom="$3">
+                <Text fontSize={13} fontWeight="600" color="$mutedForeground" marginBottom="$2">
+                  작성 중 ({drafts.length})
+                </Text>
+                {drafts.map((draft) => (
+                  <FootprintDraftItem
+                    key={draft.id}
+                    draft={draft}
+                    onPress={() => onSelectDraft(draft.id)}
+                  />
+                ))}
+              </YStack>
+            ) : null
+          }
           renderItem={({ item }) => (
             <FootprintItem
               footprint={item}

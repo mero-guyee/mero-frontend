@@ -1,6 +1,8 @@
 export { BudgetRepository } from './budgets';
 export { DocumentRepository } from './documents';
 export { ExpenseCategoryRepository, ExpenseRepository } from './expenses';
+export { FootprintDraftRepository } from './footprintDrafts';
+export type { FootprintDraftPhoto } from './footprintDrafts';
 export { FootprintRepository } from './footprints';
 export { OutboxRepository } from './outbox';
 export { PhotoRepository } from './photos';

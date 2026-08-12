@@ -65,6 +65,18 @@ export type Footprint = {
   syncStatus?: SyncStatus;
 };
 
+export type FootprintDraft = {
+  id: string;
+  tripId: string;
+  title: string;
+  content: string;
+  date: string;
+  locations: FootprintLocation[];
+  weatherInfo?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type Memo = {
   id: string;
   serverId?: string;

@@ -3,20 +3,31 @@ import FootprintSkeleton from '@/components/footprint/FootprintSkeleton';
 import FootprintMapView from '@/components/footprint/map/FootprintMapView';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
+import { footprintDraftKeys } from '@/hooks/queries/useFootprints';
 import { formatDateLabel, getTripDayNumber } from '@/utils/date';
 import { List, Map } from '@tamagui/lucide-icons';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
 import { Pressable } from 'react-native';
 import { Stack, YStack } from 'tamagui';
 import { useFootprints, useTrips } from '../../../contexts';
 
 export default function FootprintListScreen() {
   const router = useRouter();
+  const qc = useQueryClient();
   const { created } = useLocalSearchParams<{ created?: string }>();
 
   const { activeTrip, getTripById } = useTrips();
-  const { footprints, isFootPrintLoading } = useFootprints();
+  const { footprints, drafts, isFootPrintLoading } = useFootprints();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (activeTrip) {
+        qc.invalidateQueries({ queryKey: footprintDraftKeys.byTrip(activeTrip) });
+      }
+    }, [activeTrip, qc])
+  );
 
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
@@ -77,14 +88,18 @@ export default function FootprintListScreen() {
         {viewMode === 'map' ? (
           <FootprintMapView footprints={filteredFootprints} isLoading={isFootPrintLoading} />
         ) : (
-          <Stack mt="$4">
+          <Stack flex={1} mt="$4">
             <FootprintList
               sections={footprintsByDate}
+              drafts={drafts}
               showSearch={showSearch}
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
               onCreateFootprint={() => router.push('/(main)/footprint/new')}
               onSelectFootprint={(id) => router.push(`/(main)/footprint/${id}`)}
+              onSelectDraft={(id) =>
+                router.push({ pathname: '/(main)/footprint/new', params: { draftId: id } })
+              }
               isEmpty={filteredFootprints.length === 0}
               createdId={created}
             />
