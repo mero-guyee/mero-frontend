@@ -74,6 +74,11 @@ export default function SyncStatusScreen() {
     setRetrying(key);
     try {
       const syncFn = DOMAIN_SYNC_FNS[entry.domain];
+      Toast.show({
+        type: 'info',
+        text1: '동기화 시도',
+        text2: `${DOMAIN_LABELS[entry.domain] ?? entry.domain} 항목을 다시 동기화하는 중입니다...`,
+      });
       if (syncFn) await syncFn(db);
       await qc.invalidateQueries({ queryKey: outboxKey });
       await qc.invalidateQueries({ queryKey: [entry.domain] });
