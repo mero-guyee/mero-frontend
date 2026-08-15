@@ -1,4 +1,5 @@
 import AppBottomSheet from '@/components/ui/AppBottomSheet';
+import { useAppModal } from '@/contexts';
 import { usePermissionRequest } from '@/hooks/usePermissionRequest';
 import { Camera, FileText, Image as ImageIcon } from '@tamagui/lucide-icons';
 import * as DocumentPicker from 'expo-document-picker';
@@ -16,8 +17,17 @@ interface DocumentAddSheetProps {
   onSelect: (file: DocumentFile) => void;
 }
 
+const MAX_FILE_SIZE = 20 * 1024 * 1024;
+
 export default function DocumentAddSheet({ open, onOpenChange, onSelect }: DocumentAddSheetProps) {
   const requestPermission = usePermissionRequest();
+  const { showAlert } = useAppModal();
+
+  const isOverSizeLimit = async (fileSize?: number) => {
+    if (fileSize === undefined || fileSize <= MAX_FILE_SIZE) return false;
+    await showAlert('파일 용량 초과', '20MB 이하 파일만 업로드할 수 있어요.');
+    return true;
+  };
 
   const launchCamera = async () => {
     const granted = await requestPermission(
@@ -31,6 +41,7 @@ export default function DocumentAddSheet({ open, onOpenChange, onSelect }: Docum
       quality: 0.8,
     });
     if (!result.canceled && result.assets[0]) {
+      if (await isOverSizeLimit(result.assets[0].fileSize)) return;
       onSelect({ fileName: `document_${Date.now()}.jpg`, fileUri: result.assets[0].uri });
       onOpenChange(false);
     }
@@ -49,6 +60,7 @@ export default function DocumentAddSheet({ open, onOpenChange, onSelect }: Docum
       quality: 0.8,
     });
     if (!result.canceled && result.assets[0]) {
+      if (await isOverSizeLimit(result.assets[0].fileSize)) return;
       onSelect({ fileName: `document_${Date.now()}.jpg`, fileUri: result.assets[0].uri });
       onOpenChange(false);
     }
@@ -60,7 +72,8 @@ export default function DocumentAddSheet({ open, onOpenChange, onSelect }: Docum
         type: ['application/pdf', 'image/jpeg', 'image/png'],
       });
       if (!result.canceled && result.assets[0]) {
-        const { name, uri } = result.assets[0];
+        const { name, uri, size } = result.assets[0];
+        if (await isOverSizeLimit(size)) return;
         onSelect({ fileName: name, fileUri: uri });
         onOpenChange(false);
       }
