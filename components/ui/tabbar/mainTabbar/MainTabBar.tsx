@@ -1,5 +1,5 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
-import { useTrips } from '@/contexts';
+import { useTheme as useThemeMode, useTrips } from '@/contexts';
 import { getDaysUntilTripStart } from '@/data/utils';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { ArrowLeft } from '@tamagui/lucide-icons';
@@ -24,6 +24,8 @@ export default function MainTabBar(props: BottomTabBarProps) {
   const foregroundColor = theme.foreground.val;
   const mutedColor = theme.muted.val;
   const mutedForegroundColor = theme.mutedForeground.val;
+  const { theme: colorMode } = useThemeMode();
+  const backButtonBackground = colorMode === 'dark' ? '$mutedStrong' : '$muted';
 
   const { activeTrip, getTripById } = useTrips();
   const trip = activeTrip ? getTripById(activeTrip) : undefined;
@@ -76,7 +78,7 @@ export default function MainTabBar(props: BottomTabBarProps) {
           width={40}
           height={40}
           borderRadius={20}
-          backgroundColor="$muted"
+          backgroundColor={backButtonBackground}
           alignItems="center"
           justifyContent="center"
         >
