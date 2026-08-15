@@ -1,21 +1,14 @@
 import { EmptyState, Input } from '@/components/ui';
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
+import { useScrolledPastElement } from '@/hooks/useScrolledPastElement';
 import { NotebookPen, Plus } from '@tamagui/lucide-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRef, useState } from 'react';
 import { SectionList, ViewToken } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
-import { Text, useTheme, XStack, YStack } from 'tamagui';
+import { Text, XStack, YStack } from 'tamagui';
 import { Footprint, FootprintDraft } from '../../types';
 import FootprintDraftItem from './FootprintDraftItem';
 import FootprintItem from './FootprintItem';
-
-function hexToRgba(hex: string, alpha: number) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
 
 interface FootprintSection {
   title: string;
@@ -76,20 +69,32 @@ function DateHeaderContent({ section }: { section: FootprintSection }) {
 }
 
 function FloatingDateHeader({ section }: { section: FootprintSection }) {
-  const theme = useTheme();
-
   return (
-    <YStack position="absolute" top={0} left={0} right={0} zIndex={1}>
-      <YStack backgroundColor="$background" paddingHorizontal={16}>
-        <Animated.View key={section.title} entering={FadeIn} exiting={FadeOut}>
+    <YStack
+      position="absolute"
+      top={0}
+      left={0}
+      right={0}
+      zIndex={1}
+      overflow="hidden"
+      paddingBottom={8}
+      pointerEvents="box-none"
+    >
+      <Animated.View key={section.title} entering={FadeIn} exiting={FadeOut}>
+        <YStack
+          backgroundColor="$background"
+          paddingHorizontal={16}
+          borderBottomWidth={1}
+          borderBottomColor="$border"
+          shadowColor="$shadowColor"
+          shadowOffset={{ width: 0, height: 4 }}
+          shadowOpacity={0.1}
+          shadowRadius={4}
+          elevation={2}
+        >
           <DateHeaderContent section={section} />
-        </Animated.View>
-      </YStack>
-      <LinearGradient
-        colors={[theme.background.val, hexToRgba(theme.background.val, 0)]}
-        style={{ height: 32 }}
-        pointerEvents="none"
-      />
+        </YStack>
+      </Animated.View>
     </YStack>
   );
 }
@@ -107,6 +112,7 @@ export default function FootprintList({
   createdId,
 }: Props) {
   const [currentSection, setCurrentSection] = useState<FootprintSection | undefined>(sections[0]);
+  const { onElementLayout, onScroll, hasScrolledPast } = useScrolledPastElement();
 
   const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
     if (viewableItems.length > 0) {
@@ -140,7 +146,15 @@ export default function FootprintList({
         <SectionList
           sections={sections}
           keyExtractor={(item) => item.id}
-          renderSectionHeader={({ section }) => <DateHeaderContent section={section} />}
+          renderSectionHeader={({ section }) =>
+            section === sections[0] ? (
+              <YStack onLayout={onElementLayout}>
+                <DateHeaderContent section={section} />
+              </YStack>
+            ) : (
+              <DateHeaderContent section={section} />
+            )
+          }
           ListHeaderComponent={
             drafts.length > 0 ? (
               <YStack marginBottom="$3">
@@ -177,8 +191,12 @@ export default function FootprintList({
           stickySectionHeadersEnabled={false}
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={viewabilityConfig}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
         />
-        {!isEmpty && currentSection && <FloatingDateHeader section={currentSection} />}
+        {!isEmpty && currentSection && hasScrolledPast && (
+          <FloatingDateHeader section={currentSection} />
+        )}
       </YStack>
       <FloatingActionButton onPress={onCreateFootprint}>
         <XStack alignItems="center" gap="$2">
