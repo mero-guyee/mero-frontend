@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useDb } from '../../providers/DatabaseProvider';
 import { FootprintDraftRepository } from '../../repositories';
 
+const DRAFT_SAVE_DEBOUNCE_MS = 600;
+
 interface Params {
   enabled: boolean;
   draftIdParam?: string;
@@ -89,7 +91,7 @@ export function useFootprintDraftForm({
         locations,
         weatherInfo: weatherInfo.trim() || undefined,
       });
-    }, 1000);
+    }, DRAFT_SAVE_DEBOUNCE_MS);
     return () => clearTimeout(timeout);
   }, [enabled, isHydrating, draftId, db, tripId, title, content, date, locations, weatherInfo]);
 
