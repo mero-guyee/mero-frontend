@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 21;
+export const SCHEMA_VERSION = 22;
 
 export const DROP_TABLES = `
   DROP TABLE IF EXISTS outbox;
@@ -27,6 +27,7 @@ export const CREATE_TABLES = `
     email        TEXT NOT NULL,
     nickname     TEXT NOT NULL,
     profileImage TEXT,
+    thumbhash    TEXT,
     createdAt    TEXT NOT NULL,
     updatedAt    TEXT NOT NULL
   );
@@ -36,6 +37,7 @@ export const CREATE_TABLES = `
     serverId    TEXT,
     title       TEXT NOT NULL,
     imageUrl    TEXT NOT NULL DEFAULT '',
+    thumbhash   TEXT,
     startDate   TEXT NOT NULL,
     endDate     TEXT NOT NULL,
     countries   TEXT NOT NULL DEFAULT '[]',
@@ -81,6 +83,7 @@ export const CREATE_TABLES = `
     localUri         TEXT NOT NULL,
     serverId         TEXT,
     s3Url            TEXT,
+    thumbhash        TEXT,
     originalFilename TEXT,
     fileSize         REAL,
     mimeType         TEXT,
@@ -111,6 +114,7 @@ export const CREATE_TABLES = `
     id               TEXT PRIMARY KEY NOT NULL,
     footprintDraftId TEXT NOT NULL,
     localUri         TEXT NOT NULL,
+    thumbhash        TEXT,
     originalFilename TEXT,
     fileSize         REAL,
     mimeType         TEXT,

@@ -6,6 +6,7 @@ export interface FootprintDraftPhoto {
   id: string;
   footprintDraftId: string;
   localUri: string;
+  thumbhash: string | null;
   orderIndex: number | null;
 }
 
@@ -112,16 +113,21 @@ export class FootprintDraftRepository {
 
   async getPhotos(draftId: string): Promise<FootprintDraftPhoto[]> {
     return this.db.getAllAsync<FootprintDraftPhoto>(
-      `SELECT id, footprintDraftId, localUri, orderIndex FROM footprint_photos_drafts WHERE footprintDraftId = ? ORDER BY orderIndex ASC, createdAt ASC`,
+      `SELECT id, footprintDraftId, localUri, thumbhash, orderIndex FROM footprint_photos_drafts WHERE footprintDraftId = ? ORDER BY orderIndex ASC, createdAt ASC`,
       [draftId]
     );
   }
 
-  async addPhoto(draftId: string, localUri: string, orderIndex?: number): Promise<void> {
+  async addPhoto(
+    draftId: string,
+    localUri: string,
+    orderIndex?: number,
+    thumbhash?: string | null
+  ): Promise<void> {
     const now = new Date().toISOString();
     await this.db.runAsync(
-      `INSERT INTO footprint_photos_drafts (id, footprintDraftId, localUri, originalFilename, fileSize, mimeType, width, height, orderIndex, createdAt, updatedAt) VALUES (?,?,?,NULL,NULL,NULL,NULL,NULL,?,?,?)`,
-      [Crypto.randomUUID(), draftId, localUri, orderIndex ?? null, now, now]
+      `INSERT INTO footprint_photos_drafts (id, footprintDraftId, localUri, thumbhash, originalFilename, fileSize, mimeType, width, height, orderIndex, createdAt, updatedAt) VALUES (?,?,?,?,NULL,NULL,NULL,NULL,NULL,?,?,?)`,
+      [Crypto.randomUUID(), draftId, localUri, thumbhash ?? null, orderIndex ?? null, now, now]
     );
   }
 

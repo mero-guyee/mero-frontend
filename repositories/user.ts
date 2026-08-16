@@ -9,6 +9,7 @@ export interface UserRow {
   email: string;
   nickname: string;
   profileImage: string | null;
+  thumbhash: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,16 +21,19 @@ export class UserRepository {
     return this.db.getFirstAsync<UserRow>(`SELECT * FROM users WHERE id = ?`, [LOCAL_ID]);
   }
 
-  async upsertFromServer(user: UserResponse): Promise<void> {
+  async upsertFromServer(user: UserResponse, thumbhash?: string | null): Promise<void> {
+    const existing = await this.getUser();
+    const resolvedThumbhash = thumbhash !== undefined ? thumbhash : (existing?.thumbhash ?? null);
     await this.db.runAsync(
-      `INSERT OR REPLACE INTO users (id, serverId, email, nickname, profileImage, createdAt, updatedAt)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT OR REPLACE INTO users (id, serverId, email, nickname, profileImage, thumbhash, createdAt, updatedAt)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         LOCAL_ID,
         String(user.id),
         user.email,
         user.nickname,
         user.profileImage ?? null,
+        resolvedThumbhash,
         user.createdAt,
         new Date().toISOString(),
       ]

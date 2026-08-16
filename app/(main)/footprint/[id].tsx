@@ -5,6 +5,7 @@ import Chip from '@/components/ui/Chip';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import MoreEditDelete from '@/components/ui/MoreEditDelete';
+import { DEFAULT_THUMBHASH_PLACEHOLDER } from '@/constants/image';
 import { getCurrencyCode } from '@/data/constants';
 import { groupExpensesByCurrency } from '@/data/utils';
 import { formattedLocation } from '@/utils/location/location';
@@ -175,7 +176,11 @@ export default function FootprintDetailScreen() {
                         style={{ width: SCREEN_WIDTH - 48, height: SCREEN_WIDTH * 0.75 }}
                         onPress={() => setSelectedPhoto(uri)}
                       >
-                        <Image source={{ uri }} style={{ width: '100%', height: '100%' }} />
+                        <Image
+                          source={{ uri }}
+                          placeholder={{ thumbhash: photo.thumbhash ?? DEFAULT_THUMBHASH_PLACEHOLDER }}
+                          style={{ width: '100%', height: '100%' }}
+                        />
                       </Pressable>
                     );
                   })}

@@ -1,4 +1,5 @@
 import ImagePickerSheet from '@/components/ui/ImagePickerSheet';
+import { DEFAULT_THUMBHASH_PLACEHOLDER } from '@/constants/image';
 import { Camera, X } from '@tamagui/lucide-icons';
 import { Asset } from 'expo-asset';
 import { Image } from 'expo-image';
@@ -28,6 +29,7 @@ export default function TripCoverImagePicker({
     <YStack width="100%" height={height} position="relative" overflow="hidden">
       <Image
         source={{ uri: imageUrl || DEFAULT_IMAGE }}
+        placeholder={{ thumbhash: DEFAULT_THUMBHASH_PLACEHOLDER }}
         contentFit="cover"
         cachePolicy="memory-disk"
         style={{ width: '100%', height: '100%' }}

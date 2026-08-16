@@ -11,6 +11,7 @@ import {
   TripRepository,
 } from '../../repositories';
 import { Trip } from '../../types';
+import { resolveThumbhash } from '../../utils/thumbhash';
 import { enqueueMutation } from './mutationQueue';
 import { tripKeys, unrecordedTripsKeys } from './queryKeys';
 
@@ -73,7 +74,8 @@ export function useCreateTrip() {
   return useMutation({
     mutationFn: async (data: Omit<Trip, 'id'>) => {
       const repo = new TripRepository(db);
-      const localTrip = await repo.createTrip(data);
+      const thumbhash = await resolveThumbhash(data.imageUrl);
+      const localTrip = await repo.createTrip({ ...data, thumbhash });
 
       enqueueMutation(localTrip.id, async () => {
         markSyncing(localTrip.id);
@@ -116,7 +118,8 @@ export function useUpdateTrip() {
   return useMutation({
     mutationFn: async (trip: Trip) => {
       const repo = new TripRepository(db);
-      const updated = await repo.updateTrip(trip);
+      const thumbhash = await resolveThumbhash(trip.imageUrl, trip.thumbhash);
+      const updated = await repo.updateTrip({ ...trip, thumbhash });
 
       enqueueMutation(trip.id, async () => {
         markSyncing(trip.id);

@@ -7,6 +7,7 @@ export interface TripRow extends BaseEntity {
   serverId?: string | null;
   title: string;
   imageUrl: string;
+  thumbhash?: string | null;
   startDate: string;
   endDate: string;
   countries: string;
@@ -25,6 +26,7 @@ function rowToTrip(row: TripRow): Trip {
     serverId: row.serverId ?? undefined,
     title: row.title,
     imageUrl: row.imageUrl,
+    thumbhash: row.thumbhash ?? undefined,
     startDate: row.startDate,
     endDate: row.endDate,
     countries: typeof row.countries === 'string' ? JSON.parse(row.countries) : row.countries,
@@ -68,6 +70,7 @@ export class TripRepository extends BaseRepository<TripRow> {
     const row = await this.update(trip.id, {
       title: trip.title,
       imageUrl: trip.imageUrl,
+      thumbhash: trip.thumbhash ?? null,
       startDate: trip.startDate,
       endDate: trip.endDate,
       countries: JSON.stringify(trip.countries),

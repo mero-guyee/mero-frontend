@@ -1,0 +1,1 @@
+export const DEFAULT_THUMBHASH_PLACEHOLDER = 'a8cVJYh4h3iPiHd3iHd3h4iPifiY';

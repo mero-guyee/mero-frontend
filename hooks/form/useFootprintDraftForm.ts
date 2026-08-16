@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { useDb } from '../../providers/DatabaseProvider';
 import { FootprintDraftRepository } from '../../repositories';
+import { computeThumbhash } from '../../utils/thumbhash';
 
 const DRAFT_SAVE_DEBOUNCE_MS = 600;
 
@@ -106,7 +107,8 @@ export function useFootprintDraftForm({
       weatherInfo: weatherInfo.trim() || undefined,
     });
     for (const [i, uri] of uris.entries()) {
-      await draftRepo.addPhoto(draftId, uri, startIndex + i);
+      const thumbhash = await computeThumbhash(uri);
+      await draftRepo.addPhoto(draftId, uri, startIndex + i, thumbhash);
     }
   };
 

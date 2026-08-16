@@ -1,3 +1,4 @@
+import { DEFAULT_THUMBHASH_PLACEHOLDER } from '@/constants/image';
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { useUserQuery } from '@/hooks/queries/useUser';
 import { Settings } from '@tamagui/lucide-icons';
@@ -37,6 +38,7 @@ export function TripHeader({ onSettings }: TripHeaderProps) {
           >
             <Image
               source={{ uri: localUri }}
+              placeholder={{ thumbhash: user?.thumbhash ?? DEFAULT_THUMBHASH_PLACEHOLDER }}
               contentFit="cover"
               cachePolicy="memory-disk"
               style={{ width: 48, height: 48 }}

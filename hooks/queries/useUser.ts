@@ -1,18 +1,20 @@
 import { UserResponse } from '@/api/auth';
 import { userApi } from '@/api/user';
 import { UserRepository, UserRow } from '@/repositories';
+import { computeThumbhash } from '@/utils/thumbhash';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useDb } from '../../providers/DatabaseProvider';
 import { userKeys } from './queryKeys';
 
 export { userKeys } from './queryKeys';
 
-function rowToUser(row: UserRow): UserResponse {
+function rowToUser(row: UserRow): UserResponse & { thumbhash?: string } {
   return {
     id: Number(row.serverId),
     email: row.email,
     nickname: row.nickname,
     profileImage: row.profileImage ?? undefined,
+    thumbhash: row.thumbhash ?? undefined,
     createdAt: row.createdAt,
   };
 }
@@ -30,7 +32,8 @@ export function useUserQuery() {
           const serverUser = await userApi.getMe();
           if (serverUser.nickname === null) return;
           await repo.upsertFromServer(serverUser);
-          qc.setQueryData(userKeys.me, serverUser);
+          const freshRow = await repo.getUser();
+          if (freshRow) qc.setQueryData(userKeys.me, rowToUser(freshRow));
         } catch {}
       })();
 
@@ -61,9 +64,10 @@ export function useUpdateProfileImage() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (uri: string) => {
+      const thumbhash = await computeThumbhash(uri);
       const updated = await userApi.uploadProfileImage(uri);
       const repo = new UserRepository(db);
-      await repo.upsertFromServer(updated);
+      await repo.upsertFromServer(updated, thumbhash);
       return repo.getUser();
     },
     onSuccess: (row) => {

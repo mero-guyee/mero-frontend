@@ -15,6 +15,7 @@ export type Trip = {
   serverId?: string;
   title: string;
   imageUrl?: string;
+  thumbhash?: string;
   startDate: string;
   endDate: string;
   countries: string[];
@@ -44,6 +45,7 @@ export type FootprintPhoto = {
   localUri: string;
   serverId?: string;
   s3Url?: string;
+  thumbhash?: string;
   originalFilename?: string;
   fileSize?: number;
   mimeType?: string;

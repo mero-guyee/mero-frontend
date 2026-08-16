@@ -9,6 +9,7 @@ export interface PhotoRow extends BaseEntity {
   localUri: string;
   serverId: string | null;
   s3Url: string | null;
+  thumbhash: string | null;
   originalFilename: string | null;
   fileSize: number | null;
   mimeType: string | null;
@@ -24,6 +25,7 @@ function rowToPhoto(row: PhotoRow): FootprintPhoto {
     localUri: row.localUri,
     serverId: row.serverId ?? undefined,
     s3Url: row.s3Url ?? undefined,
+    thumbhash: row.thumbhash ?? undefined,
     originalFilename: row.originalFilename ?? undefined,
     fileSize: row.fileSize ?? undefined,
     mimeType: row.mimeType ?? undefined,
@@ -69,13 +71,15 @@ export class PhotoRepository extends BaseRepository<PhotoRow> {
   async createPhoto(
     footprintId: string,
     localUri: string,
-    orderIndex?: number
+    orderIndex?: number,
+    thumbhash?: string | null
   ): Promise<FootprintPhoto> {
     const row = await this.create({
       footprintId,
       localUri,
       serverId: null,
       s3Url: null,
+      thumbhash: thumbhash ?? null,
       originalFilename: null,
       fileSize: null,
       mimeType: null,

@@ -2,14 +2,13 @@ import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { PressableYCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
+import { DEFAULT_THUMBHASH_PLACEHOLDER } from '@/constants/image';
 import { useSyncContext } from '@/contexts';
 import { useFootprintPhotosQuery } from '@/hooks/queries/useFootprints';
 import { Camera, Cloud, MapPin } from '@tamagui/lucide-icons';
 import { Image } from 'expo-image';
 import { Text, XStack, YStack } from 'tamagui';
 import { Footprint } from '../../types';
-
-const FOOTPRINT_THUMBNAIL_THUMBHASH = 'a8cVJYh4h3iPiHd3iHd3h4iPifiY';
 
 interface Props {
   footprint: Footprint;
@@ -21,6 +20,7 @@ export default function FootprintItem({ footprint, onPress, showSyncBadge = fals
   const { isSyncing } = useSyncContext();
   const { data: photos = [] } = useFootprintPhotosQuery(footprint.id);
   const thumbnailUri = photos[0] ? photos[0].s3Url || photos[0].localUri : undefined;
+  const thumbnailHash = photos[0]?.thumbhash ?? DEFAULT_THUMBHASH_PLACEHOLDER;
 
   const firstLocation = footprint.locations[0];
   const extraLocationCount = footprint.locations.length - 1;
@@ -40,7 +40,7 @@ export default function FootprintItem({ footprint, onPress, showSyncBadge = fals
         <YStack height={180} overflow="hidden" position="relative">
           <Image
             source={{ uri: thumbnailUri }}
-            placeholder={{ thumbhash: FOOTPRINT_THUMBNAIL_THUMBHASH }}
+            placeholder={{ thumbhash: thumbnailHash }}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
           {photos.length > 1 && (

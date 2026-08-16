@@ -1,10 +1,7 @@
 import { PhotoResponse, photosApi } from '@/api/photos';
 import { PhotoRepository } from '@/repositories';
 import { FootprintPhoto } from '@/types';
-
-function isLocalUri(uri: string): boolean {
-  return uri.startsWith('file://') || uri.startsWith('content://');
-}
+import { computeThumbhash, isLocalUri } from '@/utils/thumbhash';
 
 export function filterNewPhotoUris(existing: FootprintPhoto[], uris: string[]): string[] {
   const existingUris = new Set(existing.map((p) => p.localUri));
@@ -24,7 +21,8 @@ export async function createLocalPhotos(
 ): Promise<FootprintPhoto[]> {
   const photos: FootprintPhoto[] = [];
   for (const [i, uri] of uris.entries()) {
-    photos.push(await photoRepo.createPhoto(footprintId, uri, startIndex + i));
+    const thumbhash = await computeThumbhash(uri);
+    photos.push(await photoRepo.createPhoto(footprintId, uri, startIndex + i, thumbhash));
   }
   return photos;
 }

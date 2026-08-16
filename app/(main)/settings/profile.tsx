@@ -2,6 +2,7 @@ import { FilledButton, Input } from '@/components/ui';
 import FormLabel from '@/components/ui/form/FormLabel';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import ImagePickerSheet from '@/components/ui/ImagePickerSheet';
+import { DEFAULT_THUMBHASH_PLACEHOLDER } from '@/constants/image';
 import { useUpdateNickname, useUpdateProfileImage, useUserQuery } from '@/hooks/queries/useUser';
 import { Camera } from '@tamagui/lucide-icons';
 import { Asset } from 'expo-asset';
@@ -86,6 +87,7 @@ export default function ProfileSettingsScreen() {
               >
                 <Image
                   source={{ uri: user?.profileImage ?? DEFAULT_AVATAR }}
+                  placeholder={{ thumbhash: user?.thumbhash ?? DEFAULT_THUMBHASH_PLACEHOLDER }}
                   contentFit="cover"
                   cachePolicy="memory-disk"
                   style={{ width: 88, height: 88 }}
