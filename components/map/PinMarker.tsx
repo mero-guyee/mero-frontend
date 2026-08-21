@@ -26,8 +26,6 @@ export default function PinMarker({ coordinate, color, isSelected, onPress }: Pi
 
   useEffect(() => {
     setTracksViewChanges(true);
-    const timer = setTimeout(() => setTracksViewChanges(false), 100);
-    return () => clearTimeout(timer);
   }, [isSelected]);
 
   return (
@@ -36,7 +34,7 @@ export default function PinMarker({ coordinate, color, isSelected, onPress }: Pi
       tracksViewChanges={tracksViewChanges}
       onPress={onPress}
       anchor={{ x: 0.5, y: 1.0 }}
-      onLayout={() => setTracksViewChanges(false)}
+      onLayout={() => requestAnimationFrame(() => setTracksViewChanges(false))}
     >
       <View style={styles.container}>
         <View
