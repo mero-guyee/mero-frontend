@@ -1,6 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { Marker } from 'react-native-maps';
+
+const BASE_SIZE = 45;
+const SELECTED_SIZE = 55;
+const TRIANGLE_HEIGHT = 10;
+const TRIANGLE_HEIGHT_SELECTED = 13;
+const CONTAINER_WIDTH = SELECTED_SIZE;
+const CONTAINER_HEIGHT = SELECTED_SIZE + TRIANGLE_HEIGHT_SELECTED - 1;
 
 interface PinMarkerProps {
   coordinate: { latitude: number; longitude: number };
@@ -23,9 +30,13 @@ function darkenHex(hex: string, amount: number = 0.4): string {
 
 export default function PinMarker({ coordinate, color, isSelected, onPress }: PinMarkerProps) {
   const [tracksViewChanges, setTracksViewChanges] = useState(true);
+  const hasLoadedRef = useRef(false);
 
   useEffect(() => {
+    if (!hasLoadedRef.current) return;
     setTracksViewChanges(true);
+    const timer = setTimeout(() => setTracksViewChanges(false), 100);
+    return () => clearTimeout(timer);
   }, [isSelected]);
 
   return (
@@ -34,26 +45,34 @@ export default function PinMarker({ coordinate, color, isSelected, onPress }: Pi
       tracksViewChanges={tracksViewChanges}
       onPress={onPress}
       anchor={{ x: 0.5, y: 1.0 }}
-      onLayout={() => requestAnimationFrame(() => setTracksViewChanges(false))}
     >
       <View style={styles.container}>
-        <View
-          style={[
-            styles.circle,
-            { backgroundColor: color, borderColor: darkenHex(color, 0.35) },
-            isSelected && {
-              borderWidth: 8,
-              shadowColor: color,
-              shadowOpacity: 0.9,
-              shadowRadius: 12,
-              shadowOffset: { width: 0, height: 0 },
-              elevation: 14,
-            },
-          ]}
-        >
-          <Image source={require('@/assets/icon.png')} style={styles.icon} resizeMode="cover" />
+        <View style={styles.pinContent}>
+          <View
+            style={[
+              styles.circle,
+              { backgroundColor: color, borderColor: darkenHex(color, 0.35) },
+              isSelected && styles.circleSelected,
+            ]}
+          >
+            <Image
+              source={require('@/assets/icon.png')}
+              style={styles.icon}
+              resizeMode="cover"
+              onLoad={() => {
+                hasLoadedRef.current = true;
+                setTracksViewChanges(false);
+              }}
+            />
+          </View>
+          <View
+            style={[
+              styles.triangle,
+              { borderTopColor: darkenHex(color, 0.35) },
+              isSelected && styles.triangleSelected,
+            ]}
+          />
         </View>
-        <View style={[styles.triangle, { borderTopColor: darkenHex(color, 0.35) }]} />
       </View>
     </Marker>
   );
@@ -61,12 +80,20 @@ export default function PinMarker({ coordinate, color, isSelected, onPress }: Pi
 
 const styles = StyleSheet.create({
   container: {
+    width: CONTAINER_WIDTH,
+    height: CONTAINER_HEIGHT,
+  },
+  pinContent: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     alignItems: 'center',
   },
   circle: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
+    width: BASE_SIZE,
+    height: BASE_SIZE,
+    borderRadius: BASE_SIZE / 2,
     borderWidth: 6,
     overflow: 'hidden',
     shadowColor: 'black',
@@ -74,6 +101,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 4,
     elevation: 8,
+  },
+  circleSelected: {
+    width: SELECTED_SIZE,
+    height: SELECTED_SIZE,
+    borderRadius: SELECTED_SIZE / 2,
   },
   icon: {
     width: '100%',
@@ -84,9 +116,14 @@ const styles = StyleSheet.create({
     height: 0,
     borderLeftWidth: 7,
     borderRightWidth: 7,
-    borderTopWidth: 10,
+    borderTopWidth: TRIANGLE_HEIGHT,
     borderLeftColor: 'transparent',
     borderRightColor: 'transparent',
     marginTop: -1,
+  },
+  triangleSelected: {
+    borderLeftWidth: 9,
+    borderRightWidth: 9,
+    borderTopWidth: TRIANGLE_HEIGHT_SELECTED,
   },
 });

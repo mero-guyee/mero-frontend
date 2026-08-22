@@ -1,12 +1,11 @@
-import { useFootprintClusters } from '@/hooks/map/useFootprintClusters';
 import { useFootprintMapData } from '@/hooks/map/useFootprintMapData';
 import { useIsOffline } from '@/hooks/network/useIsOffline';
 import { Footprint } from '@/types';
 import { Plane } from '@tamagui/lucide-icons';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import ClusteredMapView from 'react-native-map-clustering';
 import MapView from 'react-native-maps';
-import Supercluster from 'supercluster';
 import { Text } from 'tamagui';
 import { useTheme as useAppTheme } from '../../../contexts';
 import ClusterMarker from '../../map/ClusterMarker';
@@ -15,6 +14,8 @@ import MapOfflineFallback from '../../map/MapOfflineFallback';
 import PinMarker from '../../map/PinMarker';
 import FadeWrapper from '../../ui/FadeWrapper';
 import FootprintMapModal from './FootprintMapModal';
+
+const PIN_COLOR = '#9BC4D1';
 
 interface FootprintMapViewProps {
   isLoading: boolean;
@@ -30,47 +31,44 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
     longitude: number;
   } | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [isMapReady, setIsMapReady] = useState(false);
   const isOffline = useIsOffline();
   const { theme } = useAppTheme();
 
-  const { validFootprints, footprintColors, allCoords } = useFootprintMapData(footprints);
+  const { points, allCoords } = useFootprintMapData(footprints);
 
-  const { clusters, handleRegionChangeComplete, handleClusterPress } = useFootprintClusters(
-    mapRef,
-    validFootprints
-  );
+  const initialRegion = useMemo(() => {
+    const target = allCoords[allCoords.length - 1];
+    return {
+      latitude: target?.latitude ?? 37.5665,
+      longitude: target?.longitude ?? 126.978,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    };
+  }, [allCoords]);
+
+  const hasFocusedRef = useRef(false);
 
   useEffect(() => {
-    if (allCoords.length === 0) return;
-    setTimeout(() => {
-      const target = allCoords[allCoords.length - 1];
-      mapRef.current?.animateToRegion(
-        {
-          latitude: target.latitude,
-          longitude: target.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        },
-        300
-      );
-    }, 300);
-  }, [allCoords]);
+    if (hasFocusedRef.current || !isMapReady || allCoords.length === 0) return;
+    hasFocusedRef.current = true;
+    const target = allCoords[allCoords.length - 1];
+    mapRef.current?.animateToRegion(
+      {
+        latitude: target.latitude,
+        longitude: target.longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      },
+      300
+    );
+  }, [allCoords, isMapReady]);
 
   const handleSelectFootprint = (footprint: Footprint, latitude: number, longitude: number) => {
     isSelectingRef.current = true;
     setSelectedFootprint(footprint);
     setSelectedPoint({ latitude, longitude });
     setShowModal(true);
-
-    mapRef.current?.animateToRegion(
-      {
-        latitude,
-        longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
-      },
-      300
-    );
   };
 
   const handleDeselect = () => {
@@ -87,6 +85,22 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
     setSelectedPoint(null);
     setShowModal(false);
   };
+
+  const pinMarkers = useMemo(
+    () =>
+      points.map((p, i) => (
+        <PinMarker
+          key={`${p.footprint.id}-${i}`}
+          coordinate={{ latitude: p.latitude, longitude: p.longitude }}
+          color={PIN_COLOR}
+          isSelected={
+            selectedPoint?.latitude === p.latitude && selectedPoint?.longitude === p.longitude
+          }
+          onPress={() => handleSelectFootprint(p.footprint, p.latitude, p.longitude)}
+        />
+      )),
+    [points, selectedPoint]
+  );
 
   if (isLoading) {
     return (
@@ -111,47 +125,41 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
   return (
     <FadeWrapper>
       <View style={styles.container}>
-        <MapView
-          ref={mapRef}
+        <ClusteredMapView
+          mapRef={(ref: React.Ref<MapView>) => {
+            mapRef.current = ref as MapView | null;
+          }}
+          initialRegion={initialRegion}
+          radius={60}
+          maxZoom={16}
+          renderCluster={({
+            geometry,
+            properties,
+            onPress,
+          }: {
+            geometry: { coordinates: [number, number] };
+            properties: { cluster_id: number; point_count: number };
+            onPress: () => void;
+          }) => (
+            <ClusterMarker
+              key={`cluster-${properties.cluster_id}`}
+              coordinate={{
+                latitude: geometry.coordinates[1],
+                longitude: geometry.coordinates[0],
+              }}
+              count={properties.point_count}
+              onPress={onPress}
+            />
+          )}
           showsPointsOfInterest={false}
           style={StyleSheet.absoluteFillObject}
-          onRegionChangeComplete={handleRegionChangeComplete}
+          onMapReady={() => setIsMapReady(true)}
           onPress={handleDeselect}
           userInterfaceStyle={theme}
           customMapStyle={theme === 'dark' ? darkMapStyle : []}
         >
-          {clusters.map((point) => {
-            const [longitude, latitude] = point.geometry.coordinates;
-
-            if ('cluster' in point.properties && point.properties.cluster) {
-              const clusterProps = point.properties as Supercluster.ClusterProperties;
-              return (
-                <ClusterMarker
-                  key={`cluster-${clusterProps.cluster_id}`}
-                  coordinate={{ latitude, longitude }}
-                  count={clusterProps.point_count}
-                  onPress={() => handleClusterPress(clusterProps.cluster_id, latitude, longitude)}
-                />
-              );
-            }
-
-            const { footprintId } = point.properties as { footprintId: string };
-            const footprint = validFootprints.find((f) => f.id === footprintId);
-            if (!footprint) return null;
-
-            return (
-              <PinMarker
-                key={`marker-${footprintId}-${longitude}-${latitude}`}
-                coordinate={{ latitude, longitude }}
-                color={footprintColors[footprintId]}
-                isSelected={
-                  selectedPoint?.latitude === latitude && selectedPoint?.longitude === longitude
-                }
-                onPress={() => handleSelectFootprint(footprint, latitude, longitude)}
-              />
-            );
-          })}
-        </MapView>
+          {pinMarkers}
+        </ClusteredMapView>
 
         <FootprintMapModal
           visible={showModal}

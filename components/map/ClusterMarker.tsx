@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Marker } from 'react-native-maps';
 
@@ -14,13 +14,17 @@ interface ClusterMarkerProps {
 export default function ClusterMarker({ coordinate, count, onPress }: ClusterMarkerProps) {
   const [tracksViewChanges, setTracksViewChanges] = useState(true);
 
+  useEffect(() => {
+    const timer = setTimeout(() => setTracksViewChanges(false), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <Marker
       coordinate={coordinate}
       tracksViewChanges={tracksViewChanges}
       onPress={onPress}
       anchor={{ x: 0.5, y: 1.0 }}
-      onLayout={() => requestAnimationFrame(() => setTracksViewChanges(false))}
     >
       <View style={styles.container}>
         <View style={styles.circle}>

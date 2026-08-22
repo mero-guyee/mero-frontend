@@ -1,16 +1,13 @@
 import { Footprint } from '@/types';
 import { useMemo } from 'react';
 
-const FOOTPRINT_COLORS = [
-  '#9BC4D1',
-  '#C8E4C1',
-  '#F5D5A8',
-  '#D5B8E8',
-  '#E89B8F',
-  '#E8D5B7',
-  '#C8DEE6',
-  '#8B7355',
-];
+const JITTER_RADIUS_DEG = 0.00008;
+
+export interface FootprintMapPoint {
+  footprint: Footprint;
+  latitude: number;
+  longitude: number;
+}
 
 export function useFootprintMapData(footprints: Footprint[]) {
   const validFootprints = useMemo(
@@ -21,21 +18,43 @@ export function useFootprintMapData(footprints: Footprint[]) {
     [footprints]
   );
 
-  const footprintColors = useMemo(() => {
-    const colorMap: Record<string, string> = {};
-    validFootprints.forEach((f, i) => {
-      colorMap[f.id] = FOOTPRINT_COLORS[i % FOOTPRINT_COLORS.length];
+  const points = useMemo<FootprintMapPoint[]>(() => {
+    const raw = validFootprints.flatMap((f) =>
+      f.locations.map((loc) => ({
+        footprint: f,
+        latitude: loc.latitude!,
+        longitude: loc.longitude!,
+      }))
+    );
+
+    const groups = new Map<string, typeof raw>();
+    raw.forEach((p) => {
+      const key = `${p.latitude},${p.longitude}`;
+      const group = groups.get(key);
+      if (group) group.push(p);
+      else groups.set(key, [p]);
     });
-    return colorMap;
+
+    const result: FootprintMapPoint[] = [];
+    groups.forEach((group) => {
+      group.forEach((p, i) => {
+        let { latitude, longitude } = p;
+        if (group.length > 1) {
+          const angle = (2 * Math.PI * i) / group.length;
+          latitude += JITTER_RADIUS_DEG * Math.sin(angle);
+          longitude += (JITTER_RADIUS_DEG * Math.cos(angle)) / Math.cos((latitude * Math.PI) / 180);
+        }
+        result.push({ footprint: p.footprint, latitude, longitude });
+      });
+    });
+
+    return result;
   }, [validFootprints]);
 
   const allCoords = useMemo(
-    () =>
-      validFootprints.flatMap((f) =>
-        f.locations.map((loc) => ({ latitude: loc.latitude!, longitude: loc.longitude! }))
-      ),
-    [validFootprints]
+    () => points.map((p) => ({ latitude: p.latitude, longitude: p.longitude })),
+    [points]
   );
 
-  return { validFootprints, footprintColors, allCoords };
+  return { validFootprints, points, allCoords };
 }
