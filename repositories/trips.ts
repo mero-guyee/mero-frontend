@@ -101,12 +101,13 @@ export class TripRepository extends BaseRepository<TripRow> {
       );
     } else {
       await this.db.runAsync(
-        `INSERT OR IGNORE INTO trips (id, serverId, title, imageUrl, startDate, endDate, countries, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,?,?,'synced',NULL)`,
+        `INSERT OR IGNORE INTO trips (id, serverId, title, imageUrl, thumbhash, startDate, endDate, countries, createdAt, updatedAt, syncStatus, deletedAt) VALUES (?,?,?,?,?,?,?,?,?,?,'synced',NULL)`,
         [
           serverTrip.clientId,
           String(serverTrip.id),
           serverTrip.title,
           serverTrip.imageUrl ?? '',
+          null,
           serverTrip.startDate,
           serverTrip.endDate,
           JSON.stringify(serverTrip.countries),

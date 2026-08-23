@@ -1,4 +1,3 @@
-import TripCoverMeta from '@/components/trips/TripCoverMeta';
 import { DEFAULT_THUMBHASH_PLACEHOLDER } from '@/constants/image';
 import { Trip } from '@/types';
 import { Edit3 } from '@tamagui/lucide-icons';
@@ -34,7 +33,6 @@ export default function TripDetailCoverImage({
         style={{ width: '100%', height: 192 }}
         onError={() => setLocalUri(DEFAULT_IMAGE)}
       />
-      {trip && <TripCoverMeta trip={trip} />}
       {onEdit && (
         <YStack
           position="absolute"

@@ -54,7 +54,8 @@ export async function computeThumbhash(uri: string): Promise<string | null> {
     if (!pixels) return null;
 
     return bytesToBase64(rgbaToThumbHash(width, height, pixels));
-  } catch {
+  } catch (e) {
+    console.warn('[thumbhash] computeThumbhash threw', { uri, error: e });
     return null;
   }
 }
