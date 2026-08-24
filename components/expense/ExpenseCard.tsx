@@ -22,6 +22,8 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
       onPress={() =>
         router.push({ pathname: '/expense/detail', params: { expenseId: expense.id } })
       }
+      animation="lazy"
+      enterStyle={{ opacity: 0 }}
       padding="$4"
       alignItems="flex-start"
       justifyContent="space-between"
