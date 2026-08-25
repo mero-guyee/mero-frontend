@@ -42,8 +42,8 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
     return {
       latitude: target?.latitude ?? 37.5665,
       longitude: target?.longitude ?? 126.978,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01,
+      latitudeDelta: 6,
+      longitudeDelta: 6,
     };
   }, [allCoords]);
 
@@ -57,8 +57,8 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
       {
         latitude: target.latitude,
         longitude: target.longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
+        latitudeDelta: 6,
+        longitudeDelta: 6,
       },
       300
     );
