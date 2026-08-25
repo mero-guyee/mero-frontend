@@ -22,10 +22,10 @@ export default function MainTabBar(props: BottomTabBarProps) {
   );
   const theme = useTheme();
   const foregroundColor = theme.foreground.val;
-  const mutedColor = theme.muted.val;
   const mutedForegroundColor = theme.mutedForeground.val;
   const { theme: colorMode } = useThemeMode();
   const backButtonBackground = colorMode === 'dark' ? '$mutedStrong' : '$muted';
+  const mutedColor = colorMode === 'dark' ? theme.mutedStrong.val : theme.muted.val;
 
   const { activeTrip, getTripById } = useTrips();
   const trip = activeTrip ? getTripById(activeTrip) : undefined;
