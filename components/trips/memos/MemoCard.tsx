@@ -18,7 +18,14 @@ export default function MemoCard({
   const { isSyncing } = useSyncContext();
   const { id, title, content, syncStatus } = memo;
   return (
-    <PressableYCard key={id} padding="$4" position="relative" onPress={() => onPress(memo.id)}>
+    <PressableYCard
+      key={id}
+      padding="$4"
+      position="relative"
+      animation="lazy"
+      enterStyle={{ opacity: 0 }}
+      onPress={() => onPress(memo.id)}
+    >
       <SyncingResultBadge id={id} />
       <XStack alignItems="flex-start" justifyContent="space-between" marginBottom="$2">
         <XStack flex={1} paddingRight="$2" gap="$1">
