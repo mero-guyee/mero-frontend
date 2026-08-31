@@ -11,7 +11,7 @@ import { syncTrips } from '@/hooks/sync/syncTrips';
 import { useDomainSync } from '@/hooks/sync/useDomainSync';
 import { useDb } from '@/providers/DatabaseProvider';
 import { OutboxRepository, outboxKey, type OutboxEntry } from '@/repositories/outbox';
-import { CheckCircle, Trash2 } from '@tamagui/lucide-icons';
+import { CheckCircle, Plane, Trash2 } from '@tamagui/lucide-icons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
@@ -49,11 +49,13 @@ export default function SyncStatusScreen() {
   const db = useDb();
   const qc = useQueryClient();
   const [retrying, setRetrying] = useState<string | null>(null);
+  const [isSyncing, setIsSyncing] = useState(true);
   const syncAndInvalidate = useDomainSync(db);
 
   useFocusEffect(
     useCallback(() => {
-      syncAndInvalidate();
+      setIsSyncing(true);
+      syncAndInvalidate().finally(() => setIsSyncing(false));
     }, [syncAndInvalidate])
   );
 
@@ -125,7 +127,14 @@ export default function SyncStatusScreen() {
       </BackActionHeader>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>
-        {!isLoading && totalCount === 0 ? (
+        {isSyncing || isLoading ? (
+          <YStack alignItems="center" paddingTop="$12" gap="$3">
+            <Plane size={40} color="$mutedForeground" />
+            <Text color="$mutedForeground" textAlign="center">
+              동기화하는 중입니다...
+            </Text>
+          </YStack>
+        ) : totalCount === 0 ? (
           <YStack alignItems="center" paddingTop="$12" gap="$3">
             <CheckCircle size={40} color="$mutedForeground" />
             <Text color="$mutedForeground" textAlign="center">
