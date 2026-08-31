@@ -6,7 +6,7 @@ import * as SQLite from 'expo-sqlite';
 export async function syncFootprints(
   db: SQLite.SQLiteDatabase,
   maxAgeMinutes?: number
-): Promise<void> {
+): Promise<boolean> {
   const repo = new FootprintRepository(db);
   const tripRepo = new TripRepository(db);
   const outbox = new OutboxRepository(db);
@@ -68,4 +68,6 @@ export async function syncFootprints(
       }
     });
   }
+
+  return ready.length > 0;
 }

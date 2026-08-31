@@ -3,7 +3,10 @@ import { enqueueMutation } from '@/hooks/queries/mutationQueue';
 import { BudgetRepository, OutboxRepository, TripRepository } from '@/repositories';
 import * as SQLite from 'expo-sqlite';
 
-export async function syncBudgets(db: SQLite.SQLiteDatabase, maxAgeMinutes?: number): Promise<void> {
+export async function syncBudgets(
+  db: SQLite.SQLiteDatabase,
+  maxAgeMinutes?: number
+): Promise<boolean> {
   const repo = new BudgetRepository(db);
   const tripRepo = new TripRepository(db);
   const outbox = new OutboxRepository(db);
@@ -57,4 +60,6 @@ export async function syncBudgets(db: SQLite.SQLiteDatabase, maxAgeMinutes?: num
       }
     });
   }
+
+  return ready.length > 0;
 }

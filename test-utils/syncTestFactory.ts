@@ -26,7 +26,7 @@ export function expectMarkFailed() {
 }
 
 export interface SyncTestConfig {
-  syncFn: (db: any) => Promise<void>;
+  syncFn: (db: any) => Promise<void | boolean>;
   domain: string;
   api: { create: jest.Mock; update: jest.Mock; delete: jest.Mock };
   makeEntity: (attributes?: Record<string, any>) => Record<string, any>;

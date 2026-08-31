@@ -7,7 +7,7 @@ import * as SQLite from 'expo-sqlite';
 export async function syncDocuments(
   db: SQLite.SQLiteDatabase,
   maxAgeMinutes?: number
-): Promise<void> {
+): Promise<boolean> {
   const docRepo = new DocumentRepository(db);
   const tripRepo = new TripRepository(db);
   const outbox = new OutboxRepository(db);
@@ -46,4 +46,6 @@ export async function syncDocuments(
       }
     });
   }
+
+  return ready.length > 0;
 }

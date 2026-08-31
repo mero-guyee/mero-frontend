@@ -12,7 +12,7 @@ import * as SQLite from 'expo-sqlite';
 export async function syncExpenses(
   db: SQLite.SQLiteDatabase,
   maxAgeMinutes?: number
-): Promise<void> {
+): Promise<boolean> {
   const repo = new ExpenseRepository(db);
   const tripRepo = new TripRepository(db);
   const footprintRepo = new FootprintRepository(db);
@@ -91,4 +91,6 @@ export async function syncExpenses(
       }
     });
   }
+
+  return ready.length > 0;
 }
