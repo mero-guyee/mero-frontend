@@ -69,6 +69,23 @@ export class DocumentRepository extends BaseRepository<DocumentRow> {
     return rowToDocument(row);
   }
 
+  async deleteByTripId(tripId: string): Promise<void> {
+    const rows = await this.db.getAllAsync<DocumentRow>(
+      `SELECT * FROM documents WHERE tripId = ? AND deletedAt IS NULL`,
+      [tripId]
+    );
+    for (const row of rows) {
+      if (row.fileUri && !/^https?:\/\//.test(row.fileUri)) {
+        const file = new File(new Directory(Paths.document, 'documents'), row.fileUri);
+        if (file.exists) file.delete();
+      }
+    }
+    await this.db.runAsync(
+      `UPDATE documents SET deletedAt = datetime('now'), updatedAt = datetime('now'), syncStatus = 'pending' WHERE tripId = ?`,
+      [tripId]
+    );
+  }
+
   async upsertFromServer(tripId: string, serverDoc: ServerTripDocument): Promise<void> {
     const serverIdStr = String(serverDoc.id);
     const existing = await this.db.getFirstAsync<DocumentRow>(

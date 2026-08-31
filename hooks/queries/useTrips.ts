@@ -6,6 +6,7 @@ import { useDb } from '../../providers/DatabaseProvider';
 import {
   BudgetRepository,
   DocumentRepository,
+  ExpenseRepository,
   FootprintRepository,
   MemoRepository,
   TripRepository,
@@ -224,9 +225,17 @@ export function useDeleteTrip() {
     mutationFn: async (tripId: string) => {
       const repo = new TripRepository(db);
       const memoRepo = new MemoRepository(db);
+      const footprintRepo = new FootprintRepository(db);
+      const budgetRepo = new BudgetRepository(db);
+      const expenseRepo = new ExpenseRepository(db);
+      const documentRepo = new DocumentRepository(db);
       const trip = await repo.getTripById(tripId);
       await repo.deleteTrip(tripId);
       await memoRepo.deleteByTripId(tripId);
+      await footprintRepo.deleteByTripId(tripId);
+      await budgetRepo.deleteByTripId(tripId);
+      await expenseRepo.deleteByTripId(tripId);
+      await documentRepo.deleteByTripId(tripId);
 
       (async () => {
         try {
