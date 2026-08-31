@@ -8,12 +8,13 @@ import { syncExpenses } from '@/hooks/sync/syncExpenses';
 import { syncFootprints } from '@/hooks/sync/syncFootprints';
 import { syncMemos } from '@/hooks/sync/syncMemos';
 import { syncTrips } from '@/hooks/sync/syncTrips';
+import { useDomainSync } from '@/hooks/sync/useDomainSync';
 import { useDb } from '@/providers/DatabaseProvider';
 import { OutboxRepository, outboxKey, type OutboxEntry } from '@/repositories/outbox';
 import { CheckCircle, Trash2 } from '@tamagui/lucide-icons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { ScrollView } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { Text, YStack } from 'tamagui';
@@ -27,7 +28,7 @@ const DOMAIN_LABELS: Record<string, string> = {
   documents: '문서',
 };
 
-type SyncFn = (db: ReturnType<typeof useDb>) => Promise<void>;
+type SyncFn = (db: ReturnType<typeof useDb>) => Promise<void | boolean>;
 
 const DOMAIN_SYNC_FNS: Record<string, SyncFn> = {
   trips: syncTrips,
@@ -48,6 +49,13 @@ export default function SyncStatusScreen() {
   const db = useDb();
   const qc = useQueryClient();
   const [retrying, setRetrying] = useState<string | null>(null);
+  const syncAndInvalidate = useDomainSync(db);
+
+  useFocusEffect(
+    useCallback(() => {
+      syncAndInvalidate();
+    }, [syncAndInvalidate])
+  );
 
   const { data: groups = [], isLoading } = useQuery({
     queryKey: outboxKey,
