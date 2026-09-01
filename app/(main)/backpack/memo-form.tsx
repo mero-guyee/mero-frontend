@@ -1,19 +1,22 @@
+import { IconButton } from '@/components/ui/button/BaseButton';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
+import { Trash2 } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { TextArea, YStack } from 'tamagui';
-import { useMemos } from '../../../contexts';
+import { TextArea, XStack, YStack } from 'tamagui';
+import { useAppModal, useMemos } from '../../../contexts';
 
 export default function MemoFormScreen() {
   const { tripId, memoId } = useLocalSearchParams<{ tripId: string; memoId?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { memos, addMemo, updateMemo } = useMemos();
+  const { memos, addMemo, updateMemo, deleteMemo } = useMemos();
+  const { showConfirm } = useAppModal();
 
   const existingMemo = memoId ? memos.find((n) => n.id === memoId) : undefined;
 
@@ -56,14 +59,40 @@ export default function MemoFormScreen() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!existingMemo) return;
+    const confirmed = await showConfirm('메모 삭제', '이 메모를 삭제하시겠습니까?', {
+      confirmText: '삭제',
+      destructive: true,
+    });
+    if (!confirmed) return;
+    try {
+      await deleteMemo(existingMemo.id);
+      router.back();
+    } catch {
+      Toast.show({
+        type: 'error',
+        text1: '오류',
+        text2: '메모를 삭제하는 중 오류가 발생했습니다. 다시 시도해주세요.',
+      });
+    }
+  };
+
   return (
     <YStack flex={1} backgroundColor="$background">
       <BackActionHeader onBack={() => router.back()}>
-        <SubmitButton
-          onPress={handleSubmit}
-          disabled={!title.trim() || !content.trim()}
-          opacity={title.trim() && content.trim() ? 1 : 0.5}
-        />
+        <XStack alignItems="center" gap="$2">
+          {existingMemo && (
+            <IconButton onPress={handleDelete}>
+              <Trash2 size="$6.5" color="$destructiveText" />
+            </IconButton>
+          )}
+          <SubmitButton
+            onPress={handleSubmit}
+            disabled={!title.trim() || !content.trim()}
+            opacity={title.trim() && content.trim() ? 1 : 0.5}
+          />
+        </XStack>
       </BackActionHeader>
       <FadeWrapper>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
