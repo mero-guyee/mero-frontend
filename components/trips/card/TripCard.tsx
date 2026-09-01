@@ -3,7 +3,6 @@ import { YCard } from '@/components/ui/Card';
 import { pressFeedbackStyle } from '@/components/ui/pressFeedback';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
-import { useSyncContext } from '@/contexts';
 import { MoreVertical, Pencil, Trash2 } from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { Text, XStack, YStack } from 'tamagui';
@@ -26,7 +25,6 @@ export function TripCard({
   onDelete,
   showSyncBadge = false,
 }: TripCardProps) {
-  const { isSyncing } = useSyncContext();
   const [showActions, setShowActions] = useState(false);
 
   return (
@@ -34,6 +32,10 @@ export function TripCard({
       <YStack height={180} overflow="hidden" position="relative">
         <TripCoverImage uri={trip.imageUrl} trip={trip} />
         {showSyncBadge && <SyncingResultBadge id={trip.id} />}
+
+        <XStack position="absolute" top="$3" left="$3" zIndex={2}>
+          <SyncIndicator status={trip.syncStatus ?? 'pending'} onImage />
+        </XStack>
 
         <XStack
           position="absolute"
@@ -52,13 +54,7 @@ export function TripCard({
           <MoreVertical size={20} color="white" />
         </XStack>
 
-        <TripCoverMeta
-          trip={trip}
-          showProgress
-          rightSlot={
-            <SyncIndicator status={trip.syncStatus ?? 'pending'} syncing={isSyncing(trip.id)} />
-          }
-        />
+        <TripCoverMeta trip={trip} showProgress />
       </YStack>
 
       <AppBottomSheet open={showActions} onOpenChange={setShowActions}>

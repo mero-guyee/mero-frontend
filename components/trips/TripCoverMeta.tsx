@@ -2,7 +2,6 @@ import { Trip } from '@/types';
 import { formatDateRange } from '@/utils/date';
 import { Calendar, MapPin } from '@tamagui/lucide-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ReactNode } from 'react';
 import { Text, XStack, YStack } from 'tamagui';
 
 const textShadow = {
@@ -36,11 +35,10 @@ function getTripProgressLabel(tripStartDate: string, tripEndDate: string) {
 
 type Props = {
   trip: Trip;
-  rightSlot?: ReactNode;
   showProgress?: boolean;
 };
 
-export default function TripCoverMeta({ trip, rightSlot, showProgress = false }: Props) {
+export default function TripCoverMeta({ trip, showProgress = false }: Props) {
   const dateLabel = formatDateRange(trip.startDate, trip.endDate);
   const progressLabel = showProgress ? getTripProgressLabel(trip.startDate, trip.endDate) : null;
 
@@ -58,12 +56,9 @@ export default function TripCoverMeta({ trip, rightSlot, showProgress = false }:
       }}
     >
       <YStack gap="$1.5">
-        <XStack justifyContent="space-between" alignItems="center" gap="$2">
-          <Text flex={1} numberOfLines={1} fontSize={19} fontWeight="700" color="white" {...textShadow}>
-            {trip.title}
-          </Text>
-          {rightSlot}
-        </XStack>
+        <Text numberOfLines={1} fontSize={19} fontWeight="700" color="white" {...textShadow}>
+          {trip.title}
+        </Text>
 
         <XStack alignItems="center" gap="$1.5">
           <Calendar size={12} color="rgba(255,255,255,0.85)" />

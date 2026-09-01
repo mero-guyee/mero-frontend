@@ -3,7 +3,6 @@ import { PressableYCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
 import { DEFAULT_THUMBHASH_PLACEHOLDER } from '@/constants/image';
-import { useSyncContext } from '@/contexts';
 import { useFootprintPhotosQuery } from '@/hooks/queries/useFootprints';
 import { Camera, Cloud, MapPin } from '@tamagui/lucide-icons';
 import { Image } from 'expo-image';
@@ -17,7 +16,6 @@ interface Props {
 }
 
 export default function FootprintItem({ footprint, onPress, showSyncBadge = false }: Props) {
-  const { isSyncing } = useSyncContext();
   const { data: photos = [] } = useFootprintPhotosQuery(footprint.id);
   const thumbnailUri = photos[0] ? photos[0].s3Url || photos[0].localUri : undefined;
   const thumbnailHash = photos[0]?.thumbhash ?? DEFAULT_THUMBHASH_PLACEHOLDER;
@@ -82,10 +80,7 @@ export default function FootprintItem({ footprint, onPress, showSyncBadge = fals
               </XStack>
             )}
           </XStack>
-          <SyncIndicator
-            status={footprint.syncStatus ?? 'pending'}
-            syncing={isSyncing(footprint.id)}
-          />
+          <SyncIndicator status={footprint.syncStatus ?? 'pending'} />
         </XStack>
 
         <Text color="$foreground" fontSize={14} fontWeight="500" numberOfLines={1}>

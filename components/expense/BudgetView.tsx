@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { Text, XStack, YStack } from 'tamagui';
-import { useAppModal, useBudgets, useExpenses, useSyncContext, useTrips } from '../../contexts';
+import { useAppModal, useBudgets, useExpenses, useTrips } from '../../contexts';
 import { CURRENCIES, getCurrencyCode } from '../../data/constants';
 import { Budget } from '../../types';
 import { EmptyState, FilledButton, Input } from '../ui';
@@ -32,7 +32,6 @@ export function BudgetView() {
   const { activeTrip, getTripById } = useTrips();
   const { expenses } = useExpenses();
   const { budgets, addBudget, updateBudget, deleteBudget } = useBudgets();
-  const { isSyncing } = useSyncContext();
   const isKeyboardVisible = useKeyboardVisible();
   const { showConfirm } = useAppModal();
 
@@ -223,7 +222,7 @@ export function BudgetView() {
                             ? `${getCurrencyCode(budget.currency)} ${(spent - budget.amount).toLocaleString()} 초과했어요`
                             : `${getCurrencyCode(budget.currency)} ${remaining.toLocaleString()} 남았어요`}
                         </Text>
-                        <SyncIndicator status={budget.syncStatus} syncing={isSyncing(budget.id)} />
+                        <SyncIndicator status={budget.syncStatus} />
                       </XStack>
                       <XStack gap="$3">
                         <Pressable onPress={() => handleOpenBudgetModal(budget)}>

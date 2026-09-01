@@ -1,7 +1,6 @@
 import { XCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
-import { useSyncContext } from '@/contexts';
 import {
   Archive,
   File,
@@ -65,7 +64,6 @@ export function DocumentCard({
   onImagePress,
   onPdfPress,
 }: DocumentCardProps) {
-  const { isSyncing } = useSyncContext();
   const { icon: IconComponent = File, mime, ctg } = getFileType(name) ?? {};
 
   const handlePress = async () => {
@@ -111,7 +109,7 @@ export function DocumentCard({
               <Text color="$foreground" fontSize={14} numberOfLines={1}>
                 {name}
               </Text>
-              <SyncIndicator status={syncStatus ?? 'pending'} syncing={isSyncing(id)} />
+              <SyncIndicator status={syncStatus ?? 'pending'} />
             </XStack>
           </YStack>
         </XStack>

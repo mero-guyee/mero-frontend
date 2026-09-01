@@ -2,7 +2,6 @@ import { CategoryIcon } from '@/components/expense/CategoryIcon';
 import { PressableXCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
-import { useSyncContext } from '@/contexts';
 import { useRouter } from 'expo-router';
 import { Text, XStack, YStack } from 'tamagui';
 import { getCurrencyCode } from '../../data/constants';
@@ -15,7 +14,6 @@ interface ExpenseCardProps {
 
 export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps) {
   const router = useRouter();
-  const { isSyncing } = useSyncContext();
 
   return (
     <PressableXCard
@@ -47,7 +45,7 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
         </YStack>
       </XStack>
       <XStack alignItems="center" gap="$2">
-        <SyncIndicator status={expense.syncStatus} syncing={isSyncing(expense.id)} />
+        <SyncIndicator status={expense.syncStatus} />
         <Text color="$foreground">
           {getCurrencyCode(expense.currency)} {expense.amount.toLocaleString()}
         </Text>
