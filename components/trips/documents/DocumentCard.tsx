@@ -1,20 +1,11 @@
 import { XCard } from '@/components/ui/Card';
 import { SyncIndicator } from '@/components/ui/SyncIndicator';
 import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
-import {
-  Archive,
-  File,
-  FileCode,
-  FileSpreadsheet,
-  FileText,
-  Image,
-  Trash2,
-} from '@tamagui/lucide-icons';
-import * as Sharing from 'expo-sharing';
+import { Archive, File, FileCode, FileSpreadsheet, FileText, Image } from '@tamagui/lucide-icons';
 import { Pressable } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
 
-interface FileTypeConfig {
+export interface FileTypeConfig {
   icon: React.ComponentType<{ size?: number; color?: string }>;
   mime?: string;
   ctg?: 'image' | 'pdf';
@@ -40,7 +31,7 @@ const FILE_TYPES: Record<string, FileTypeConfig> = {
   zip: { icon: Archive, mime: 'application/zip' },
 };
 
-function getFileType(fileName: string): FileTypeConfig | undefined {
+export function getFileType(fileName: string): FileTypeConfig | undefined {
   const ext = fileName.split('.').pop()?.toLowerCase() ?? '';
   return FILE_TYPES[ext];
 }
@@ -48,42 +39,15 @@ function getFileType(fileName: string): FileTypeConfig | undefined {
 interface DocumentCardProps {
   id: string;
   name: string;
-  fileUri: string;
   syncStatus?: 'pending' | 'synced';
-  onRemove: () => void;
-  onImagePress?: (uri: string) => void;
-  onPdfPress?: (uri: string) => void;
+  onPress: () => void;
 }
 
-export function DocumentCard({
-  id,
-  name,
-  fileUri,
-  syncStatus,
-  onRemove,
-  onImagePress,
-  onPdfPress,
-}: DocumentCardProps) {
-  const { icon: IconComponent = File, mime, ctg } = getFileType(name) ?? {};
-
-  const handlePress = async () => {
-    if (ctg === 'image') {
-      onImagePress?.(fileUri);
-      return;
-    }
-    if (ctg === 'pdf') {
-      onPdfPress?.(fileUri);
-      return;
-    }
-    if (!(await Sharing.isAvailableAsync())) return;
-    await Sharing.shareAsync(fileUri, {
-      mimeType: mime ?? 'application/octet-stream',
-      dialogTitle: name,
-    });
-  };
+export function DocumentCard({ id, name, syncStatus, onPress }: DocumentCardProps) {
+  const { icon: IconComponent = File } = getFileType(name) ?? {};
 
   return (
-    <Pressable onPress={handlePress}>
+    <Pressable onPress={onPress}>
       <XCard
         backgroundColor="$card"
         padding="$3"
@@ -105,17 +69,12 @@ export function DocumentCard({
             <IconComponent size={20} color="$foreground" />
           </YStack>
           <YStack flex={1}>
-            <XStack alignItems="center" gap="$1">
-              <Text color="$foreground" fontSize={14} numberOfLines={1}>
-                {name}
-              </Text>
-              <SyncIndicator status={syncStatus ?? 'pending'} />
-            </XStack>
+            <Text color="$foreground" fontSize={14} numberOfLines={1}>
+              {name}
+            </Text>
           </YStack>
         </XStack>
-        <Pressable onPress={onRemove} style={{ padding: 8 }}>
-          <Trash2 size={16} color="$destructiveText" />
-        </Pressable>
+        <SyncIndicator status={syncStatus ?? 'pending'} />
       </XCard>
     </Pressable>
   );

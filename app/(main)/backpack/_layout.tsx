@@ -5,6 +5,7 @@ export default function BackpackLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="memo-form" />
+      <Stack.Screen name="document-detail" />
     </Stack>
   );
 }
