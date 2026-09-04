@@ -2,7 +2,14 @@ import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/goo
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useRouter } from 'expo-router';
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { authApi, setAuthExpiredHandler, tokenStorage, userApi } from '../api';
+import {
+  ApiError,
+  authApi,
+  isTokenExpired,
+  setAuthExpiredHandler,
+  tokenStorage,
+  userApi,
+} from '../api';
 import { useDb } from '../providers/DatabaseProvider';
 import { UserRepository } from '../repositories';
 
@@ -38,12 +45,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
-    tokenStorage
-      .getAccessToken()
-      .then((token) => {
-        if (token) setIsAuthenticated(true);
-      })
-      .finally(() => setIsLoading(false));
+    (async () => {
+      const token = await tokenStorage.getAccessToken();
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+
+      if (!isTokenExpired(token)) {
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        await userApi.getMe();
+        setIsAuthenticated(true);
+      } catch (e) {
+        if (e instanceof ApiError && e.status === 401) {
+          setIsAuthenticated(false);
+        } else {
+          setIsAuthenticated(true);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, []);
 
   useEffect(() => {
