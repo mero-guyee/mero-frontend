@@ -8,7 +8,7 @@ import { validateCountries } from '@/contexts/MultiStepForm/newTripValidation';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { YStack } from 'tamagui';
+import { View, YStack } from 'tamagui';
 
 export default function NewInputCountryStep() {
   const { newTrip, setNewTrip } = useNewTripForm();
@@ -48,16 +48,17 @@ export default function NewInputCountryStep() {
             onRemove={(country) =>
               setNewTrip({ ...newTrip, countries: newTrip.countries.filter((c) => c !== country) })
             }
-            onClearAll={() => setNewTrip({ ...newTrip, countries: [] })}
             error={error}
           />
         </YStack>
 
-        <PrevNextButtons
-          isFirst
-          onNext={handleNext}
-          nextDisabled={newTrip.countries.length === 0}
-        />
+        <View paddingBottom={insets.bottom}>
+          <PrevNextButtons
+            isFirst
+            onNext={handleNext}
+            nextDisabled={newTrip.countries.length === 0}
+          />
+        </View>
       </YStack>
     </FadeWrapper>
   );
