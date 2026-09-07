@@ -66,7 +66,7 @@ export default function MainTabBar(props: BottomTabBarProps) {
       shadowOpacity={0.08}
       shadowRadius={4}
       style={{ elevation: 2 }}
-      paddingBottom={tabBarPadding}
+      paddingBottom={tabBarPadding + 8}
     >
       <Pressable
         style={({ pressed }) => [styles.backButton, { opacity: pressed ? 0.6 : 1 }]}

@@ -1,3 +1,4 @@
+import { paddingHorizontalGeneral } from '@/constants/theme';
 import { ComponentProps, ReactNode } from 'react';
 import { Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -44,7 +45,7 @@ export default function AppBottomSheet({
         onPress={() => Keyboard.dismiss()}
       />
       <Sheet.Handle />
-      <Sheet.Frame paddingBottom={insets.bottom || 8} {...frameProps}>
+      <Sheet.Frame {...frameProps} paddingBottom={insets.bottom + paddingHorizontalGeneral}>
         {children}
       </Sheet.Frame>
     </Sheet>
