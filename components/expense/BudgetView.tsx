@@ -215,40 +215,46 @@ export function BudgetView() {
                   <YCard key={budget.id} padding="$5" position="relative">
                     {budget.id === createdId && <SyncingResultBadge id={budget.id} />}
 
-                    <XStack alignItems="center" justifyContent="space-between" marginBottom="$4">
-                      <XStack alignItems="center" gap="$2" flex={1}>
-                        <Text color="$foreground" fontSize={20} fontWeight="700">
+                    <YStack gap="$2" marginBottom="$4">
+                      <XStack alignItems="center" justifyContent="space-between">
+                        <Text
+                          color="$foreground"
+                          fontSize={20}
+                          fontWeight="700"
+                          flex={1}
+                          paddingRight="$2"
+                        >
                           {isOverBudget
                             ? `${getCurrencyCode(budget.currency)} ${(spent - budget.amount).toLocaleString()} 초과했어요`
                             : `${getCurrencyCode(budget.currency)} ${remaining.toLocaleString()} 남았어요`}
                         </Text>
-                        <SyncIndicator status={budget.syncStatus} />
+                        <XStack gap="$3">
+                          <Pressable onPress={() => handleOpenBudgetModal(budget)}>
+                            <YStack
+                              width={32}
+                              height={32}
+                              alignItems="center"
+                              justifyContent="center"
+                              borderRadius="$3"
+                            >
+                              <Pencil size={16} color="$foreground" />
+                            </YStack>
+                          </Pressable>
+                          <Pressable onPress={() => handleDeleteBudget(budget.id)}>
+                            <YStack
+                              width={32}
+                              height={32}
+                              alignItems="center"
+                              justifyContent="center"
+                              borderRadius="$3"
+                            >
+                              <Trash2 size={16} color="$destructiveText" />
+                            </YStack>
+                          </Pressable>
+                        </XStack>
                       </XStack>
-                      <XStack gap="$3">
-                        <Pressable onPress={() => handleOpenBudgetModal(budget)}>
-                          <YStack
-                            width={32}
-                            height={32}
-                            alignItems="center"
-                            justifyContent="center"
-                            borderRadius="$3"
-                          >
-                            <Pencil size={16} color="$foreground" />
-                          </YStack>
-                        </Pressable>
-                        <Pressable onPress={() => handleDeleteBudget(budget.id)}>
-                          <YStack
-                            width={32}
-                            height={32}
-                            alignItems="center"
-                            justifyContent="center"
-                            borderRadius="$3"
-                          >
-                            <Trash2 size={16} color="$destructiveText" />
-                          </YStack>
-                        </Pressable>
-                      </XStack>
-                    </XStack>
+                      <SyncIndicator status={budget.syncStatus} />
+                    </YStack>
 
                     <YStack
                       height={14}
