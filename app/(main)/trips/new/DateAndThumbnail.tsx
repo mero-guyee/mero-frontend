@@ -18,7 +18,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { XStack, YStack } from 'tamagui';
+import { View, XStack, YStack } from 'tamagui';
 
 const DEFAULT_IMAGE = Asset.fromModule(require('../../../../assets/images/mountain.jpg')).uri;
 
@@ -117,16 +117,18 @@ export default function NewTripFormDate() {
             </XStack>
           </YStack>
 
-          <PrevNextButtons
-            isLast
-            onNext={handleSubmit}
-            isNextLoading={isSubmitting}
-            nextDisabled={
-              !newTrip.title.trim() ||
-              !!validateStartDate(newTrip.startDate) ||
-              !!validateEndDate(newTrip.endDate, newTrip.startDate)
-            }
-          />
+          <View paddingBottom={insets.bottom}>
+            <PrevNextButtons
+              isLast
+              onNext={handleSubmit}
+              isNextLoading={isSubmitting}
+              nextDisabled={
+                !newTrip.title.trim() ||
+                !!validateStartDate(newTrip.startDate) ||
+                !!validateEndDate(newTrip.endDate, newTrip.startDate)
+              }
+            />
+          </View>
         </YStack>
       </YStack>
     </FadeWrapper>
