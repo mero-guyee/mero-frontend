@@ -35,15 +35,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const db = useDb();
 
-  const cacheCurrentUser = async () => {
-    try {
-      const user = await userApi.getMe();
-      await new UserRepository(db).upsertFromServer(user);
-    } catch (e) {
-      console.error('Failed to cache user:', e);
-    }
-  };
-
   useEffect(() => {
     (async () => {
       const token = await tokenStorage.getAccessToken();
@@ -89,7 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!idToken) throw new Error('Google idToken을 가져올 수 없습니다.');
       const res = await authApi.googleLogin(idToken);
       setIsAuthenticated(true);
-      if (!res.isNewUser) await cacheCurrentUser();
       router.push(res.isNewUser ? '/onboarding' : '/(main)/trips');
     } catch (e: any) {
       console.error('Google 로그인 실패:', e);
@@ -109,7 +99,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!credential.identityToken) throw new Error('Apple identityToken을 가져올 수 없습니다.');
       const res = await authApi.appleLogin(credential.identityToken);
       setIsAuthenticated(true);
-      if (!res.isNewUser) await cacheCurrentUser();
       router.push(res.isNewUser ? '/onboarding' : '/(main)/trips');
     } catch (e: any) {
       if (e?.code === 'ERR_REQUEST_CANCELED') {

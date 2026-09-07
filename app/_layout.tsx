@@ -29,6 +29,7 @@ import {
   useTheme,
 } from '../contexts';
 import { usePendingSync } from '../hooks/sync/usePendingSync';
+import { useAuthDataSync } from '../hooks/useAuthDataSync';
 import { useAuthGuard } from '../hooks/useAuthGuard';
 import { DatabaseProvider, useDbReady } from '../providers/DatabaseProvider';
 import { QueryProvider } from '../providers/QueryProvider';
@@ -65,6 +66,11 @@ Sentry.init({
 function AuthGuard({ children }: { children: React.ReactNode }) {
   useAuthGuard();
   return <>{children}</>;
+}
+
+function AuthDataSync() {
+  useAuthDataSync();
+  return null;
 }
 
 function SyncManager() {
@@ -112,6 +118,7 @@ function AppContent() {
       <AppModalProvider>
         <AuthProvider>
           <AuthGuard>
+            <AuthDataSync />
             <SyncProvider>
               <TripProvider>
                 <ExpenseProvider>
