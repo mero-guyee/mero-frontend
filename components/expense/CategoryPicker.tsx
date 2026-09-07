@@ -1,5 +1,5 @@
 import AppBottomSheet from '@/components/ui/AppBottomSheet';
-import { inputStyle } from '@/components/ui/Input';
+import { InputBox } from '@/components/ui/Input';
 import { ExpenseCategory } from '@/types';
 import { ChevronRight } from '@tamagui/lucide-icons';
 import { useState } from 'react';
@@ -24,13 +24,13 @@ export default function CategoryPicker({ categories, value, onChange, renderTrig
         renderTrigger(() => setOpen(true))
       ) : (
         <Pressable onPress={() => setOpen(true)}>
-          <XStack {...inputStyle} alignItems="center" justifyContent="space-between">
+          <InputBox active={open} justifyContent="space-between">
             <XStack alignItems="center" gap="$2">
               {selected && <CategoryIcon name={selected.name} size={18} />}
               <Text color="$foreground">{selected?.name ?? '카테고리 선택'}</Text>
             </XStack>
             <ChevronRight size={18} color="$mutedForeground" />
-          </XStack>
+          </InputBox>
         </Pressable>
       )}
 

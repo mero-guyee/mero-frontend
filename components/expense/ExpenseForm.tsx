@@ -14,7 +14,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { Text, XStack, YStack } from 'tamagui';
-import { Input } from '../../components/ui';
+import { FormInput, FormInputBox, Input } from '../../components/ui';
 import { useExpenses, useTrips } from '../../contexts';
 import { Expense } from '../../types';
 
@@ -143,22 +143,27 @@ export default function ExpenseForm({
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               금액
             </Text>
-            <XStack {...inputStyle} alignItems="center" paddingHorizontal="$0">
-              <Input
-                flex={1}
-                placeholder="0"
-                placeholderTextColor="$placeholderForeground"
-                value={amount}
-                onChangeText={setAmount}
-                keyboardType="number-pad"
-                color="$foreground"
-                borderWidth={0}
-                height={44}
-                focusStyle={{ borderWidth: 0 }}
-                autoFocus
-              />
-              <CurrencyPicker value={currency} onChange={setCurrency} />
-            </XStack>
+            <FormInputBox paddingHorizontal="$0">
+              {(focusProps) => (
+                <>
+                  <FormInput
+                    autoFocus
+                    flex={1}
+                    placeholder="0"
+                    placeholderTextColor="$placeholderForeground"
+                    value={amount}
+                    onChangeText={setAmount}
+                    keyboardType="number-pad"
+                    color="$foreground"
+                    borderWidth={0}
+                    height={44}
+                    focusStyle={{ borderWidth: 0 }}
+                    {...focusProps}
+                  />
+                  <CurrencyPicker value={currency} onChange={setCurrency} />
+                </>
+              )}
+            </FormInputBox>
           </YStack>
           {/* Category */}
           <YStack marginBottom="$6">

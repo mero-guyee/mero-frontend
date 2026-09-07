@@ -1,5 +1,5 @@
 import TripCoverImagePicker from '@/components/trips/TripCoverImagePicker';
-import { Input } from '@/components/ui';
+import { FormInput } from '@/components/ui';
 import DatePickerInput from '@/components/ui/DatePickerInput';
 import FadeWrapper from '@/components/ui/FadeWrapper';
 import ErrorText from '@/components/ui/form/ErrorText';
@@ -83,7 +83,8 @@ export default function NewTripFormDate() {
           <YStack>
             <YStack marginBottom="$4">
               <FormLabel marginBottom="$2">모험의 이름</FormLabel>
-              <Input
+              <FormInput
+                autoFocus
                 placeholder="예: 2026 남미 여행"
                 placeholderTextColor="$placeholderForeground"
                 value={newTrip.title}

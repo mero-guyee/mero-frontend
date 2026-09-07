@@ -3,6 +3,7 @@ import MetadataChips from '@/components/footprint/new/toolbar/MetadataChips';
 import { IconButton } from '@/components/ui/button/BaseButton';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
+import { FormInput } from '@/components/ui/FormInput';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { useFootprintForm } from '@/hooks/form/useFootprintForm';
 import { Trash2, X } from '@tamagui/lucide-icons';
@@ -67,7 +68,9 @@ export default function FootprintFormScreen() {
             showsVerticalScrollIndicator={false}
             style={{ flex: 1 }}
           >
-            <TextArea
+            <FormInput
+              multiline
+              autoFocus={!existingFootprint}
               placeholder="제목을 입력해주세요"
               placeholderTextColor="$placeholderForeground"
               value={title}

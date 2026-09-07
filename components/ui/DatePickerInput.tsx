@@ -3,10 +3,10 @@ import { isIos } from '@/utils/platform';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useState } from 'react';
 import { Pressable } from 'react-native';
-import { Text, XStack } from 'tamagui';
+import { Text } from 'tamagui';
 import { useTheme } from '../../contexts';
 import AppBottomSheet from './AppBottomSheet';
-import { inputStyle } from './Input';
+import { InputBox } from './Input';
 import { FilledButton } from './button/BaseButton';
 
 interface DatePickerInputProps {
@@ -16,6 +16,7 @@ interface DatePickerInputProps {
   renderTrigger?: (onPress: () => void) => React.ReactNode;
   minimumDate?: Date;
   maximumDate?: Date;
+  zIndex?: number;
 }
 
 export default function DatePickerInput({
@@ -25,6 +26,7 @@ export default function DatePickerInput({
   renderTrigger,
   minimumDate,
   maximumDate,
+  zIndex,
 }: DatePickerInputProps) {
   const [show, setShow] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(value ? new Date(value) : new Date());
@@ -57,9 +59,9 @@ export default function DatePickerInput({
         renderTrigger(handleOpen)
       ) : (
         <Pressable onPress={handleOpen}>
-          <XStack alignItems="center" {...inputStyle}>
+          <InputBox active={show}>
             <Text color={value ? '$foreground' : '$mutedForeground'}>{value || placeholder}</Text>
-          </XStack>
+          </InputBox>
         </Pressable>
       )}
 
@@ -68,6 +70,7 @@ export default function DatePickerInput({
           open={show}
           onOpenChange={setShow}
           frameProps={{ paddingHorizontal: paddingHorizontalGeneral * 2 }}
+          zIndex={zIndex}
         >
           <DateTimePicker
             value={tempDate}

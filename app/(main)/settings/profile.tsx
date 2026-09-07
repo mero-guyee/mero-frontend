@@ -1,4 +1,4 @@
-import { FilledButton, Input } from '@/components/ui';
+import { FilledButton, FormInput } from '@/components/ui';
 import FormLabel from '@/components/ui/form/FormLabel';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import ImagePickerSheet from '@/components/ui/ImagePickerSheet';
@@ -114,7 +114,8 @@ export default function ProfileSettingsScreen() {
           </XStack>
 
           <FormLabel marginBottom="$2">닉네임</FormLabel>
-          <Input
+          <FormInput
+            autoFocus
             testID="profile-nickname-input"
             borderColor={error ? '$destructiveText' : '$foreground'}
             paddingHorizontal="$4"

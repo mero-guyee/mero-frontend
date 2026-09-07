@@ -8,11 +8,10 @@ import { Text, XStack, YStack } from 'tamagui';
 import { useAppModal, useBudgets, useExpenses, useTrips } from '../../contexts';
 import { CURRENCIES } from '../../data/constants';
 import { Budget } from '../../types';
-import { EmptyState, FilledButton, Input } from '../ui';
+import { EmptyState, FilledButton, FormInputBox, Input } from '../ui';
 import AppBottomSheet from '../ui/AppBottomSheet';
 import FloatingActionButton from '../ui/button/FloatingActionButton';
 import { YCard } from '../ui/Card';
-import { inputStyle } from '../ui/Input';
 import { BudgetCard } from './BudgetCard';
 import CurrencyPicker from './CurrencyPicker';
 
@@ -176,30 +175,30 @@ export function BudgetView() {
           {editingBudget ? '예산 수정' : '예산 추가'}
         </Text>
 
-        <YStack>
-          <Text color="$mutedForeground" marginBottom="$2">
-            예산 금액
-          </Text>
-          <XStack {...inputStyle} alignItems="center" paddingHorizontal="$0">
-            <Input
-              flex={1}
-              placeholder="0"
-              placeholderTextColor="$placeholderForeground"
-              value={budgetForm.amount}
-              onChangeText={(text) => setBudgetForm({ ...budgetForm, amount: text })}
-              keyboardType="numeric"
-              color="$foreground"
-              borderWidth={0}
-              height={44}
-              focusStyle={{ borderWidth: 0 }}
-            />
-            <CurrencyPicker
-              value={budgetForm.currency}
-              onChange={(currency) => setBudgetForm({ ...budgetForm, currency })}
-              disabledCurrencies={usedCurrencies}
-            />
-          </XStack>
-        </YStack>
+        <FormInputBox>
+          {(focusProps) => (
+            <>
+              <Input
+                flex={1}
+                placeholder="0"
+                placeholderTextColor="$placeholderForeground"
+                value={budgetForm.amount}
+                onChangeText={(text) => setBudgetForm({ ...budgetForm, amount: text })}
+                keyboardType="numeric"
+                color="$foreground"
+                borderWidth={0}
+                height={44}
+                focusStyle={{ borderWidth: 0 }}
+                {...focusProps}
+              />
+              <CurrencyPicker
+                value={budgetForm.currency}
+                onChange={(currency) => setBudgetForm({ ...budgetForm, currency })}
+                disabledCurrencies={usedCurrencies}
+              />
+            </>
+          )}
+        </FormInputBox>
 
         <XStack gap="$3">
           <FilledButton

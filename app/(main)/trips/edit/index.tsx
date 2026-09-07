@@ -1,7 +1,7 @@
 import TripCountrySearch from '@/components/trips/TripCountrySearch';
 import TripCountrySearchChip from '@/components/trips/TripCountrySearchChip';
 import TripCoverImagePicker from '@/components/trips/TripCoverImagePicker';
-import { FilledButton, Input } from '@/components/ui';
+import { FilledButton, FormInput } from '@/components/ui';
 import AppBottomSheet from '@/components/ui/AppBottomSheet';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import DatePickerInput from '@/components/ui/DatePickerInput';
@@ -89,6 +89,7 @@ export default function EditTripScreen() {
           imageUrl={imageUrl}
           onChange={setImageUrl}
           onRemove={() => setImageUrl('')}
+          zIndex={100001}
         />
 
         <YStack padding={24}>
@@ -96,7 +97,8 @@ export default function EditTripScreen() {
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               모험의 이름
             </Text>
-            <Input
+            <FormInput
+              autoFocus
               placeholder="예: 2026 남미 여행"
               placeholderTextColor="$placeholderForeground"
               value={title}
@@ -111,7 +113,7 @@ export default function EditTripScreen() {
               <Text color="$foreground" marginBottom="$2" fontWeight="500">
                 출발일
               </Text>
-              <DatePickerInput value={startDate} onChange={setStartDate} />
+              <DatePickerInput value={startDate} onChange={setStartDate} zIndex={100002} />
             </YStack>
             <YStack flex={1}>
               <Text color="$foreground" marginBottom="$2" fontWeight="500">
@@ -121,6 +123,7 @@ export default function EditTripScreen() {
                 value={endDate}
                 onChange={setEndDate}
                 minimumDate={startDate ? new Date(startDate) : undefined}
+                zIndex={100003}
               />
             </YStack>
           </XStack>
@@ -162,6 +165,7 @@ export default function EditTripScreen() {
         onOpenChange={setShowCountrySheet}
         snapPoints={[85]}
         frameProps={{ padding: '$4' }}
+        zIndex={100004}
       >
         <XStack justifyContent="space-between" alignItems="center" marginBottom="$3">
           <Text color="$foreground" fontWeight="600" fontSize={16}>

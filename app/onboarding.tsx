@@ -1,4 +1,4 @@
-import { FilledButton, Input } from '@/components/ui';
+import { FilledButton, FormInput } from '@/components/ui';
 import { useCompleteOnboarding } from '@/hooks/queries/useUser';
 import { Plane } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
@@ -44,7 +44,8 @@ export default function OnboardingScreen() {
           여행자님의 이름을 알려주세요
         </Text>
 
-        <Input
+        <FormInput
+          autoFocus
           testID="onboarding-nickname-input"
           borderColor={error ? '$destructiveText' : '$foreground'}
           paddingHorizontal="$4"

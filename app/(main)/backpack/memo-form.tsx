@@ -1,6 +1,7 @@
 import { IconButton } from '@/components/ui/button/BaseButton';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import FadeWrapper from '@/components/ui/FadeWrapper';
+import { FormInput } from '@/components/ui/FormInput';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { Trash2 } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -97,7 +98,9 @@ export default function MemoFormScreen() {
       <FadeWrapper>
         <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
           <YStack flex={1} justifyContent="flex-start" gap="$3">
-            <TextArea
+            <FormInput
+              multiline
+              autoFocus={!existingMemo}
               placeholder="제목을 입력해주세요"
               placeholderTextColor="$placeholderForeground"
               value={title}
