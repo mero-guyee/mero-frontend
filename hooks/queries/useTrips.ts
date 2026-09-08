@@ -1,7 +1,7 @@
 import { ApiError } from '@/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { tripsApi } from '../../api/trips';
-import { useSyncContext } from '../../contexts/SyncContext';
+import { useSyncingContext } from '../../contexts/SyncingContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import {
   BudgetRepository,
@@ -71,7 +71,8 @@ export function useTripQuery(id: string) {
 export function useCreateTrip() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
   return useMutation({
     mutationFn: async (data: Omit<Trip, 'id'>) => {
       const repo = new TripRepository(db);
@@ -92,13 +93,13 @@ export function useCreateTrip() {
             imageUrl: fresh.imageUrl,
           });
           await repo.setServerId(fresh.id, String(serverTrip.id));
-          markSyncSucceeded(localTrip.id);
+          markSyncingSucceeded(localTrip.id);
           qc.invalidateQueries({ queryKey: tripKeys.all });
         } catch (e) {
           if (e instanceof ApiError) {
             console.error('Failed to create trip on server:', e.status, e.message);
           }
-          markSyncFailed(localTrip.id);
+          markSyncingFailed(localTrip.id);
         } finally {
           unmarkSyncing(localTrip.id);
         }
@@ -115,7 +116,8 @@ export function useCreateTrip() {
 export function useUpdateTrip() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
   return useMutation({
     mutationFn: async (trip: Trip) => {
       const repo = new TripRepository(db);
@@ -139,12 +141,12 @@ export function useUpdateTrip() {
             }
 
             await repo.markSynced(trip.id);
-            markSyncSucceeded(trip.id);
+            markSyncingSucceeded(trip.id);
             qc.invalidateQueries({ queryKey: tripKeys.all });
             qc.invalidateQueries({ queryKey: tripKeys.detail(trip.id) });
           }
         } catch {
-          markSyncFailed(trip.id);
+          markSyncingFailed(trip.id);
         } finally {
           unmarkSyncing(trip.id);
         }

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { expenseCategoriesApi, expensesApi } from '../../api/expenses';
-import { useSyncContext } from '../../contexts/SyncContext';
+import { useSyncingContext } from '../../contexts/SyncingContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import {
   ExpenseCategoryRepository,
@@ -50,7 +50,8 @@ export function useExpensesQuery(tripId: string) {
 export function useCreateExpense() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
   return useMutation({
     mutationFn: async (data: Omit<Expense, 'id' | 'serverId' | 'createdAt' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
@@ -88,11 +89,11 @@ export function useCreateExpense() {
               location: fresh.location ?? undefined,
             });
             await repo.setServerId(fresh.id, String(serverExpense.id));
-            markSyncSucceeded(localExpense.id);
+            markSyncingSucceeded(localExpense.id);
             qc.invalidateQueries({ queryKey: expenseKeys.byTrip(fresh.tripId) });
           }
         } catch {
-          markSyncFailed(localExpense.id);
+          markSyncingFailed(localExpense.id);
         } finally {
           unmarkSyncing(localExpense.id);
         }
@@ -109,7 +110,8 @@ export function useCreateExpense() {
 export function useUpdateExpense() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
   return useMutation({
     mutationFn: async (expense: Expense) => {
       const tripRepo = new TripRepository(db);
@@ -145,12 +147,12 @@ export function useUpdateExpense() {
                 location: fresh.location ?? undefined,
               });
               await repo.markSynced(expense.id);
-              markSyncSucceeded(expense.id);
+              markSyncingSucceeded(expense.id);
               qc.invalidateQueries({ queryKey: expenseKeys.byTrip(fresh.tripId) });
             }
           }
         } catch {
-          markSyncFailed(expense.id);
+          markSyncingFailed(expense.id);
         } finally {
           unmarkSyncing(expense.id);
         }

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { memosApi } from '../../api/memos';
-import { useSyncContext } from '../../contexts/SyncContext';
+import { useSyncingContext } from '../../contexts/SyncingContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { MemoRepository, TripRepository } from '../../repositories';
 import { Memo } from '../../types';
@@ -39,7 +39,8 @@ export function useMemosQuery(tripId: string) {
 export function useCreateMemo() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
   return useMutation({
     mutationFn: async (data: Omit<Memo, 'id' | 'createdAt' | 'updatedAt' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
@@ -59,11 +60,11 @@ export function useCreateMemo() {
               content: fresh.content,
             });
             await memoRepo.setServerId(fresh.id, String(serverMemo.id));
-            markSyncSucceeded(localMemo.id);
+            markSyncingSucceeded(localMemo.id);
             qc.invalidateQueries({ queryKey: memoKeys.all });
           }
         } catch {
-          markSyncFailed(localMemo.id);
+          markSyncingFailed(localMemo.id);
         } finally {
           unmarkSyncing(localMemo.id);
         }
@@ -81,7 +82,8 @@ export function useCreateMemo() {
 export function useUpdateMemo() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
   return useMutation({
     mutationFn: async (memo: Memo) => {
       const tripRepo = new TripRepository(db);
@@ -100,12 +102,12 @@ export function useUpdateMemo() {
                 content: fresh.content,
               });
               await memoRepo.markSynced(memo.id);
-              markSyncSucceeded(memo.id);
+              markSyncingSucceeded(memo.id);
               qc.invalidateQueries({ queryKey: memoKeys.all });
             }
           }
         } catch {
-          markSyncFailed(memo.id);
+          markSyncingFailed(memo.id);
         } finally {
           unmarkSyncing(memo.id);
         }

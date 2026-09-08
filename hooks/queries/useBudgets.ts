@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { budgetsApi } from '../../api/budgets';
-import { useSyncContext } from '../../contexts/SyncContext';
+import { useSyncingContext } from '../../contexts/SyncingContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { BudgetRepository, TripRepository } from '../../repositories';
 import { Budget } from '../../types';
@@ -46,7 +46,8 @@ export function useBudgetsQuery(tripId: string) {
 export function useCreateBudget() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
   return useMutation({
     mutationFn: async (data: Omit<Budget, 'id' | 'syncStatus'>) => {
       const tripRepo = new TripRepository(db);
@@ -67,12 +68,12 @@ export function useCreateBudget() {
               exchangeRate: fresh.exchangeRate || DEFAULT_EXCHANGE_RATE,
             });
             await repo.setServerId(fresh.id, String(serverBudget.id));
-            markSyncSucceeded(localBudget.id);
+            markSyncingSucceeded(localBudget.id);
             qc.invalidateQueries({ queryKey: budgetKeys.all });
             qc.invalidateQueries({ queryKey: budgetKeys.byTrip(fresh.tripId) });
           }
         } catch {
-          markSyncFailed(localBudget.id);
+          markSyncingFailed(localBudget.id);
         } finally {
           unmarkSyncing(localBudget.id);
         }
@@ -91,7 +92,8 @@ export function useCreateBudget() {
 export function useUpdateBudget() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
   return useMutation({
     mutationFn: async (budget: Budget) => {
       const tripRepo = new TripRepository(db);
@@ -111,13 +113,13 @@ export function useUpdateBudget() {
                 exchangeRate: fresh.exchangeRate ?? undefined,
               });
               await repo.markSynced(budget.id);
-              markSyncSucceeded(budget.id);
+              markSyncingSucceeded(budget.id);
               qc.invalidateQueries({ queryKey: budgetKeys.all });
               qc.invalidateQueries({ queryKey: budgetKeys.byTrip(fresh.tripId) });
             }
           }
         } catch {
-          markSyncFailed(budget.id);
+          markSyncingFailed(budget.id);
         } finally {
           unmarkSyncing(budget.id);
         }

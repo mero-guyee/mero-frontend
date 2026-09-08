@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { footprintsApi } from '../../api/footprints';
 import { photosApi } from '../../api/photos';
-import { useSyncContext } from '../../contexts/SyncContext';
+import { useSyncingContext } from '../../contexts/SyncingContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import {
   FootprintDraftRepository,
@@ -86,7 +86,8 @@ export function useFootprintsQuery(tripId: string) {
 export function useCreateFootprint() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
   return useMutation({
     mutationFn: async ({
       photoUris,
@@ -130,12 +131,12 @@ export function useCreateFootprint() {
               }
             }
 
-            markSyncSucceeded(localFootprint.id);
+            markSyncingSucceeded(localFootprint.id);
             qc.invalidateQueries({ queryKey: footprintKeys.byTrip(fresh.tripId) });
             qc.invalidateQueries({ queryKey: footprintKeys.photos(localFootprint.id) });
           }
         } catch {
-          markSyncFailed(localFootprint.id);
+          markSyncingFailed(localFootprint.id);
         } finally {
           unmarkSyncing(localFootprint.id);
         }
@@ -153,7 +154,8 @@ export function useCreateFootprint() {
 export function useUpdateFootprint() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
   return useMutation({
     mutationFn: async ({ photoUris, ...footprint }: Footprint & { photoUris: string[] }) => {
       const tripRepo = new TripRepository(db);
@@ -188,7 +190,7 @@ export function useUpdateFootprint() {
                 locations: fresh.locations,
               });
               await repo.markSynced(footprint.id);
-              markSyncSucceeded(footprint.id);
+              markSyncingSucceeded(footprint.id);
 
               if (newLocalPhotos.length > 0) {
                 await uploadPhotosAndSync(
@@ -205,7 +207,7 @@ export function useUpdateFootprint() {
             }
           }
         } catch {
-          markSyncFailed(footprint.id);
+          markSyncingFailed(footprint.id);
         } finally {
           unmarkSyncing(footprint.id);
         }

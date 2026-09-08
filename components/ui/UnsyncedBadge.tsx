@@ -1,9 +1,11 @@
 import { CloudUpload } from '@tamagui/lucide-icons';
 import { Text, XStack } from 'tamagui';
+import { useSyncingContext } from '../../contexts/SyncingContext';
 import type { SyncStatus } from '../../repositories/base';
 
-interface SyncIndicatorProps {
+interface UnsyncedBadgeProps {
   status: SyncStatus;
+  id?: string;
   onImage?: boolean;
 }
 
@@ -13,8 +15,10 @@ const textShadow = {
   textShadowRadius: 3,
 } as const;
 
-export function SyncIndicator({ status, onImage = false }: SyncIndicatorProps) {
+export function UnsyncedBadge({ status, id, onImage = false }: UnsyncedBadgeProps) {
+  const { isSyncing } = useSyncingContext();
   if (status !== 'pending') return null;
+  if (id && isSyncing(id)) return null;
 
   return (
     <XStack alignItems="center" gap="$1">

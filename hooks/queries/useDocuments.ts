@@ -4,7 +4,7 @@ import * as Crypto from 'expo-crypto';
 import { Directory, File, Paths } from 'expo-file-system';
 import { documentsApi } from '../../api/documents';
 import { tripsApi } from '../../api/trips';
-import { useSyncContext } from '../../contexts/SyncContext';
+import { useSyncingContext } from '../../contexts/SyncingContext';
 import { useDb } from '../../providers/DatabaseProvider';
 import { DocumentRepository, TripRepository } from '../../repositories';
 import { resolveAbsoluteFileUri } from '../../repositories/documents';
@@ -57,7 +57,8 @@ export function useDocumentsQuery(tripId: string) {
 export function useCreateDocument() {
   const db = useDb();
   const qc = useQueryClient();
-  const { markSyncing, unmarkSyncing, markSyncSucceeded, markSyncFailed } = useSyncContext();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
   return useMutation({
     mutationFn: async ({ tripId, data }: { tripId: string; data: TripDocumentFile }) => {
       const docRepo = new DocumentRepository(db);
@@ -78,14 +79,14 @@ export function useCreateDocument() {
               file: { fileName: fresh.fileName, fileUri: resolveAbsoluteFileUri(fresh.fileUri) },
             });
             await docRepo.setServerId(fresh.id, String(serverDoc.id));
-            markSyncSucceeded(doc.id);
+            markSyncingSucceeded(doc.id);
             qc.invalidateQueries({ queryKey: documentKeys.byTrip(fresh.tripId) });
           }
         } catch (e) {
           if (e instanceof ApiError) {
             console.error('Failed to upload document to server:', e);
           }
-          markSyncFailed(doc.id);
+          markSyncingFailed(doc.id);
         } finally {
           unmarkSyncing(doc.id);
         }

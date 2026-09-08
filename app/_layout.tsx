@@ -22,10 +22,10 @@ import {
   AuthProvider,
   BudgetProvider,
   ExpenseProvider,
-  SyncProvider,
+  SyncingProvider,
   ThemeProvider,
   TripProvider,
-  useSyncContext,
+  useSyncingContext,
   useTheme,
 } from '../contexts';
 import { usePendingSync } from '../hooks/sync/usePendingSync';
@@ -75,12 +75,12 @@ function AuthDataSync() {
 
 function SyncManager() {
   usePendingSync();
-  const { clearTransientState } = useSyncContext();
+  const { clearStaleSyncingResults } = useSyncingContext();
   const currentPath = usePathname();
 
   useEffect(() => {
-    clearTransientState();
-  }, [clearTransientState, currentPath]);
+    clearStaleSyncingResults();
+  }, [clearStaleSyncingResults, currentPath]);
   return null;
 }
 
@@ -119,12 +119,16 @@ function AppContent() {
         <AuthProvider>
           <AuthGuard>
             <AuthDataSync />
-            <SyncProvider>
+            <SyncingProvider>
               <TripProvider>
                 <ExpenseProvider>
                   <BudgetProvider>
                     <SyncManager />
-                    <StatusBar style={theme === 'dark' ? 'light' : 'dark'} backgroundColor="transparent" translucent />
+                    <StatusBar
+                      style={theme === 'dark' ? 'light' : 'dark'}
+                      backgroundColor="transparent"
+                      translucent
+                    />
                     <OfflineBanner />
                     <Stack screenOptions={{ headerShown: false }}>
                       <Stack.Screen name="index" />
@@ -139,7 +143,7 @@ function AppContent() {
                   </BudgetProvider>
                 </ExpenseProvider>
               </TripProvider>
-            </SyncProvider>
+            </SyncingProvider>
           </AuthGuard>
         </AuthProvider>
       </AppModalProvider>

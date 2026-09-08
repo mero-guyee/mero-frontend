@@ -5,6 +5,6 @@ export { useMemos } from './MemoContext';
 export { useFootprints } from './FootprintContext';
 export { ExpenseProvider, useExpenses } from './ExpenseContext';
 export { BudgetProvider, useBudgets } from './BudgetContext';
-export { SyncProvider, useSyncContext } from './SyncContext';
+export { SyncingProvider, useSyncingContext } from './SyncingContext';
 export { ThemeProvider, useTheme } from './ThemeContext';
 export type { ThemeMode } from './ThemeContext';

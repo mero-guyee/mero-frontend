@@ -3,7 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import React from 'react';
 
 import { expensesApi } from '../../api/expenses';
-import { SyncProvider } from '../../contexts/SyncContext';
+import { SyncingProvider } from '../../contexts/SyncingContext';
 import { useCreateExpense } from '../../hooks/queries/useExpenses';
 import { mockDb } from '../../test-utils/mockDb';
 
@@ -25,7 +25,7 @@ function createWrapper() {
   return function Wrapper({ children }: { children: React.ReactNode }) {
     return (
       <QueryClientProvider client={queryClient}>
-        <SyncProvider>{children}</SyncProvider>
+        <SyncingProvider>{children}</SyncingProvider>
       </QueryClientProvider>
     );
   };

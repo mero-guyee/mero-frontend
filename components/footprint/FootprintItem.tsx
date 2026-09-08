@@ -1,7 +1,6 @@
 import { WEATHER_ICON_MAP } from '@/components/footprint/new/WeatherSheet';
 import { PressableYCard } from '@/components/ui/Card';
-import { SyncIndicator } from '@/components/ui/SyncIndicator';
-import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
+import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator';
 import { DEFAULT_THUMBHASH_PLACEHOLDER } from '@/constants/image';
 import { useFootprintPhotosQuery } from '@/hooks/queries/useFootprints';
 import { Camera, Cloud, MapPin } from '@tamagui/lucide-icons';
@@ -32,8 +31,6 @@ export default function FootprintItem({ footprint, onPress, showSyncBadge = fals
 
   return (
     <PressableYCard onPress={onPress} padding={0} marginBottom="$2" position="relative">
-      {showSyncBadge && <SyncingResultBadge id={footprint.id} />}
-
       {thumbnailUri ? (
         <YStack height={180} overflow="hidden" position="relative">
           <Image
@@ -80,7 +77,11 @@ export default function FootprintItem({ footprint, onPress, showSyncBadge = fals
               </XStack>
             )}
           </XStack>
-          <SyncIndicator status={footprint.syncStatus ?? 'pending'} />
+          <SyncStatusIndicator
+            id={footprint.id}
+            status={footprint.syncStatus ?? 'pending'}
+            showSyncBadge={showSyncBadge}
+          />
         </XStack>
 
         <Text color="$foreground" fontSize={14} fontWeight="500" numberOfLines={1}>

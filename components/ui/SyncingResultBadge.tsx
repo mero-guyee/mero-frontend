@@ -3,7 +3,7 @@ import { AlertCircle, Check } from '@tamagui/lucide-icons';
 import { useEffect, useState } from 'react';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 import { Spinner, Text, XStack, styled } from 'tamagui';
-import { useSyncContext } from '../../contexts/SyncContext';
+import { useSyncingContext } from '../../contexts/SyncingContext';
 
 const AnimatedXStack = Animated.createAnimatedComponent(
   styled(XStack, {
@@ -39,26 +39,31 @@ interface SyncingResultBadgeProps {
 }
 
 export function SyncingResultBadge({ id }: SyncingResultBadgeProps) {
-  const { isSyncing, isSyncSucceeded, clearSyncSucceeded, isSyncFailed, clearSyncFailed } =
-    useSyncContext();
+  const {
+    isSyncing,
+    isSyncingSucceeded,
+    clearSyncingSucceeded,
+    isSyncingFailed,
+    clearSyncingFailed,
+  } = useSyncingContext();
   const syncing = isSyncing(id);
 
-  const syncSucceeded = isSyncSucceeded(id);
-  const syncFailed = isSyncFailed(id);
+  const syncSucceeded = isSyncingSucceeded(id);
+  const syncFailed = isSyncingFailed(id);
   const displayState = getDisplayState(syncing, syncSucceeded, syncFailed);
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     if (!syncSucceeded) return;
-    const timer = setTimeout(() => clearSyncSucceeded(id), 1500);
+    const timer = setTimeout(() => clearSyncingSucceeded(id), 1500);
     return () => clearTimeout(timer);
-  }, [syncSucceeded, id, clearSyncSucceeded]);
+  }, [syncSucceeded, id, clearSyncingSucceeded]);
 
   useEffect(() => {
     if (!syncFailed) return;
-    const timer = setTimeout(() => clearSyncFailed(id), 1500);
+    const timer = setTimeout(() => clearSyncingFailed(id), 1500);
     return () => clearTimeout(timer);
-  }, [syncFailed, id, clearSyncFailed]);
+  }, [syncFailed, id, clearSyncingFailed]);
 
   useEffect(() => {
     if (!displayState) {
