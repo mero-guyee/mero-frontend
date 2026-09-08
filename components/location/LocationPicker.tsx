@@ -153,7 +153,10 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
   if (!visible) return null;
 
   return (
-    <Modal style={[styles.fullscreen, { backgroundColor: theme.background.val }]}>
+    <Modal
+      onRequestClose={onClose}
+      style={[styles.fullscreen, { backgroundColor: theme.background.val }]}
+    >
       <FadeWrapper>
         <View style={[styles.modalContainer, { backgroundColor: theme.background.val }]}>
           <View style={[styles.container, { backgroundColor: mapBackground }]}>
@@ -196,7 +199,7 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
                   >
                     <View style={{ height: 44, justifyContent: 'center' }}>
                       <Pressable onPress={() => onClose()} hitSlop={16}>
-                        <ArrowLeft color="$card" />
+                        <ArrowLeft color="$foreground" />
                       </Pressable>
                     </View>
                     <LocationSearch mapRef={mapRef} setSelected={setSelected} />
@@ -205,7 +208,10 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
 
                 {selected && (
                   <TouchableOpacity
-                    style={[styles.button, { backgroundColor: theme.accent.val }]}
+                    style={[
+                      styles.button,
+                      { backgroundColor: theme.accent.val, bottom: insets.bottom + 32 },
+                    ]}
                     onPress={() => {
                       onConfirm(selected);
                       onClose();
