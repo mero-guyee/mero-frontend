@@ -61,7 +61,7 @@ export function useCreateMemo() {
             });
             await memoRepo.setServerId(fresh.id, String(serverMemo.id));
             markSyncingSucceeded(localMemo.id);
-            qc.invalidateQueries({ queryKey: memoKeys.all });
+            await qc.invalidateQueries({ queryKey: memoKeys.all });
           }
         } catch {
           markSyncingFailed(localMemo.id);
@@ -103,7 +103,7 @@ export function useUpdateMemo() {
               });
               await memoRepo.markSynced(memo.id);
               markSyncingSucceeded(memo.id);
-              qc.invalidateQueries({ queryKey: memoKeys.all });
+              await qc.invalidateQueries({ queryKey: memoKeys.all });
             }
           }
         } catch {

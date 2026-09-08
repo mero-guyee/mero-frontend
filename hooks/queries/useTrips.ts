@@ -94,7 +94,7 @@ export function useCreateTrip() {
           });
           await repo.setServerId(fresh.id, String(serverTrip.id));
           markSyncingSucceeded(localTrip.id);
-          qc.invalidateQueries({ queryKey: tripKeys.all });
+          await qc.invalidateQueries({ queryKey: tripKeys.all });
         } catch (e) {
           if (e instanceof ApiError) {
             console.error('Failed to create trip on server:', e.status, e.message);
@@ -142,8 +142,10 @@ export function useUpdateTrip() {
 
             await repo.markSynced(trip.id);
             markSyncingSucceeded(trip.id);
-            qc.invalidateQueries({ queryKey: tripKeys.all });
-            qc.invalidateQueries({ queryKey: tripKeys.detail(trip.id) });
+            await Promise.all([
+              qc.invalidateQueries({ queryKey: tripKeys.all }),
+              qc.invalidateQueries({ queryKey: tripKeys.detail(trip.id) }),
+            ]);
           }
         } catch {
           markSyncingFailed(trip.id);

@@ -80,7 +80,7 @@ export function useCreateDocument() {
             });
             await docRepo.setServerId(fresh.id, String(serverDoc.id));
             markSyncingSucceeded(doc.id);
-            qc.invalidateQueries({ queryKey: documentKeys.byTrip(fresh.tripId) });
+            await qc.invalidateQueries({ queryKey: documentKeys.byTrip(fresh.tripId) });
           }
         } catch (e) {
           if (e instanceof ApiError) {

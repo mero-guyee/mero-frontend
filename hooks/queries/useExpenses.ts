@@ -90,7 +90,7 @@ export function useCreateExpense() {
             });
             await repo.setServerId(fresh.id, String(serverExpense.id));
             markSyncingSucceeded(localExpense.id);
-            qc.invalidateQueries({ queryKey: expenseKeys.byTrip(fresh.tripId) });
+            await qc.invalidateQueries({ queryKey: expenseKeys.byTrip(fresh.tripId) });
           }
         } catch {
           markSyncingFailed(localExpense.id);
@@ -148,7 +148,7 @@ export function useUpdateExpense() {
               });
               await repo.markSynced(expense.id);
               markSyncingSucceeded(expense.id);
-              qc.invalidateQueries({ queryKey: expenseKeys.byTrip(fresh.tripId) });
+              await qc.invalidateQueries({ queryKey: expenseKeys.byTrip(fresh.tripId) });
             }
           }
         } catch {

@@ -132,8 +132,10 @@ export function useCreateFootprint() {
             }
 
             markSyncingSucceeded(localFootprint.id);
-            qc.invalidateQueries({ queryKey: footprintKeys.byTrip(fresh.tripId) });
-            qc.invalidateQueries({ queryKey: footprintKeys.photos(localFootprint.id) });
+            await Promise.all([
+              qc.invalidateQueries({ queryKey: footprintKeys.byTrip(fresh.tripId) }),
+              qc.invalidateQueries({ queryKey: footprintKeys.photos(localFootprint.id) }),
+            ]);
           }
         } catch {
           markSyncingFailed(localFootprint.id);
@@ -201,9 +203,11 @@ export function useUpdateFootprint() {
                 );
               }
 
-              qc.invalidateQueries({ queryKey: footprintKeys.byTrip(fresh.tripId) });
-              qc.invalidateQueries({ queryKey: footprintKeys.detail(footprint.id) });
-              qc.invalidateQueries({ queryKey: footprintKeys.photos(footprint.id) });
+              await Promise.all([
+                qc.invalidateQueries({ queryKey: footprintKeys.byTrip(fresh.tripId) }),
+                qc.invalidateQueries({ queryKey: footprintKeys.detail(footprint.id) }),
+                qc.invalidateQueries({ queryKey: footprintKeys.photos(footprint.id) }),
+              ]);
             }
           }
         } catch {

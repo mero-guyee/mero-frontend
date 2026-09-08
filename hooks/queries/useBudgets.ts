@@ -69,8 +69,10 @@ export function useCreateBudget() {
             });
             await repo.setServerId(fresh.id, String(serverBudget.id));
             markSyncingSucceeded(localBudget.id);
-            qc.invalidateQueries({ queryKey: budgetKeys.all });
-            qc.invalidateQueries({ queryKey: budgetKeys.byTrip(fresh.tripId) });
+            await Promise.all([
+              qc.invalidateQueries({ queryKey: budgetKeys.all }),
+              qc.invalidateQueries({ queryKey: budgetKeys.byTrip(fresh.tripId) }),
+            ]);
           }
         } catch {
           markSyncingFailed(localBudget.id);
@@ -114,8 +116,10 @@ export function useUpdateBudget() {
               });
               await repo.markSynced(budget.id);
               markSyncingSucceeded(budget.id);
-              qc.invalidateQueries({ queryKey: budgetKeys.all });
-              qc.invalidateQueries({ queryKey: budgetKeys.byTrip(fresh.tripId) });
+              await Promise.all([
+                qc.invalidateQueries({ queryKey: budgetKeys.all }),
+                qc.invalidateQueries({ queryKey: budgetKeys.byTrip(fresh.tripId) }),
+              ]);
             }
           }
         } catch {
