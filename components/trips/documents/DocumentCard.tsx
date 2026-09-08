@@ -1,5 +1,6 @@
 import { XCard } from '@/components/ui/Card';
-import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator';
+import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
+import { UnsyncedBadge } from '@/components/ui/UnsyncedBadge';
 import { Archive, File, FileCode, FileSpreadsheet, FileText, Image } from '@tamagui/lucide-icons';
 import { Pressable } from 'react-native';
 import { Text, XStack, YStack } from 'tamagui';
@@ -54,6 +55,7 @@ export function DocumentCard({ id, name, syncStatus, onPress }: DocumentCardProp
         justifyContent="space-between"
         position="relative"
       >
+        <SyncingResultBadge id={id} />
         <XStack alignItems="center" gap="$3" flex={1}>
           <YStack
             width={40}
@@ -72,7 +74,7 @@ export function DocumentCard({ id, name, syncStatus, onPress }: DocumentCardProp
             </Text>
           </YStack>
         </XStack>
-        <SyncStatusIndicator id={id} status={syncStatus ?? 'pending'} showSyncBadge />
+        <UnsyncedBadge id={id} status={syncStatus ?? 'pending'} />
       </XCard>
     </Pressable>
   );

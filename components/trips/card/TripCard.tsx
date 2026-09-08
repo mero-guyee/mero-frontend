@@ -1,7 +1,8 @@
 import AppBottomSheet from '@/components/ui/AppBottomSheet';
 import { YCard } from '@/components/ui/Card';
 import { pressFeedbackStyle } from '@/components/ui/pressFeedback';
-import { SyncStatusIndicator } from '@/components/ui/SyncStatusIndicator';
+import { SyncingResultBadge } from '@/components/ui/SyncingResultBadge';
+import { UnsyncedBadge } from '@/components/ui/UnsyncedBadge';
 import { MoreVertical, Pencil, Trash2 } from '@tamagui/lucide-icons';
 import { useState } from 'react';
 import { Text, XStack, YStack } from 'tamagui';
@@ -30,12 +31,11 @@ export function TripCard({
     <YCard marginBottom="$4" onPress={onPress} {...pressFeedbackStyle}>
       <YStack height={180} overflow="hidden" position="relative">
         <TripCoverImage uri={trip.imageUrl} trip={trip} />
-        <SyncStatusIndicator
-          id={trip.id}
-          status={trip.syncStatus ?? 'pending'}
-          showSyncBadge={showSyncBadge}
-          onImage
-        />
+        {showSyncBadge && <SyncingResultBadge id={trip.id} />}
+
+        <XStack position="absolute" top="$3" left="$3" zIndex={2}>
+          <UnsyncedBadge id={trip.id} status={trip.syncStatus ?? 'pending'} onImage />
+        </XStack>
 
         <XStack
           position="absolute"

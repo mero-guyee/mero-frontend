@@ -4,7 +4,8 @@ import { Text, XStack, YStack } from 'tamagui';
 import { getCurrencyCode } from '../../data/constants';
 import { Budget, Expense, Trip } from '../../types';
 import { YCard } from '../ui/Card';
-import { SyncStatusIndicator } from '../ui/SyncStatusIndicator';
+import { SyncingResultBadge } from '../ui/SyncingResultBadge';
+import { UnsyncedBadge } from '../ui/UnsyncedBadge';
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 const startOfDay = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -81,6 +82,8 @@ export function BudgetCard({
 
   return (
     <YCard padding="$5" position="relative">
+      {isNew && <SyncingResultBadge id={budget.id} />}
+
       <YStack gap="$2" marginBottom="$4">
         <XStack alignItems="center" justifyContent="space-between">
           <Text color="$foreground" fontSize={20} fontWeight="700" flex={1} paddingRight="$2">
@@ -113,7 +116,7 @@ export function BudgetCard({
             </Pressable>
           </XStack>
         </XStack>
-        <SyncStatusIndicator id={budget.id} status={budget.syncStatus} showSyncBadge={isNew} />
+        <UnsyncedBadge id={budget.id} status={budget.syncStatus} />
       </YStack>
 
       <YStack
