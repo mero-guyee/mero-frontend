@@ -57,7 +57,13 @@ export default function ImagePickerSheet({
   };
 
   return (
-    <AppBottomSheet open={open} onOpenChange={onOpenChange}>
+    <AppBottomSheet
+      open={open}
+      onOpenChange={onOpenChange}
+      zIndex={100001}
+      sheetKey="image-picker"
+      snapPoints={[24]}
+    >
       <XStack onPress={launchCamera} padding="$4" alignItems="center" gap="$3">
         <Camera size={20} color="$foreground" />
         <Text color="$foreground" fontSize={16}>

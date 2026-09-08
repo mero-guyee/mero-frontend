@@ -57,7 +57,7 @@ export function TripCard({
         <TripCoverMeta trip={trip} showProgress />
       </YStack>
 
-      <AppBottomSheet open={showActions} onOpenChange={setShowActions}>
+      <AppBottomSheet open={showActions} onOpenChange={setShowActions} snapPoints={[24]}>
         <XStack
           onPress={() => {
             setShowActions(false);

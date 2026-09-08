@@ -17,6 +17,7 @@ interface DatePickerInputProps {
   minimumDate?: Date;
   maximumDate?: Date;
   zIndex?: number;
+  sheetKey?: string;
 }
 
 export default function DatePickerInput({
@@ -27,6 +28,7 @@ export default function DatePickerInput({
   minimumDate,
   maximumDate,
   zIndex,
+  sheetKey,
 }: DatePickerInputProps) {
   const [show, setShow] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(value ? new Date(value) : new Date());
@@ -71,6 +73,7 @@ export default function DatePickerInput({
           onOpenChange={setShow}
           frameProps={{ paddingHorizontal: paddingHorizontalGeneral * 2 }}
           zIndex={zIndex}
+          sheetKey={sheetKey}
         >
           <DateTimePicker
             value={tempDate}

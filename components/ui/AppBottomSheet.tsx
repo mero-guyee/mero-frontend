@@ -1,6 +1,6 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
-import { ComponentProps, ReactNode } from 'react';
-import { Keyboard } from 'react-native';
+import { ComponentProps, ReactNode, useEffect } from 'react';
+import { BackHandler, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Sheet } from 'tamagui';
 
@@ -14,6 +14,8 @@ interface AppBottomSheetProps {
   dismissOnSnapToBottom?: boolean;
   dismissOnOverlayPress?: boolean;
   frameProps?: FrameProps;
+  zIndex?: number;
+  sheetKey?: string;
 }
 
 export default function AppBottomSheet({
@@ -24,11 +26,23 @@ export default function AppBottomSheet({
   dismissOnSnapToBottom = true,
   dismissOnOverlayPress,
   frameProps,
+  zIndex,
+  sheetKey,
 }: AppBottomSheetProps) {
   const insets = useSafeAreaInsets();
 
+  useEffect(() => {
+    if (!open) return;
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => {
+      onOpenChange(false);
+      return true;
+    });
+    return () => subscription.remove();
+  }, [open, onOpenChange]);
+
   return (
     <Sheet
+      key={sheetKey}
       modal
       open={open}
       onOpenChange={onOpenChange}
@@ -36,6 +50,7 @@ export default function AppBottomSheet({
       snapPoints={snapPoints}
       dismissOnSnapToBottom={dismissOnSnapToBottom}
       dismissOnOverlayPress={dismissOnOverlayPress}
+      zIndex={zIndex}
     >
       <Sheet.Overlay
         animation="lazy"

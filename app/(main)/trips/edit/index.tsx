@@ -89,7 +89,6 @@ export default function EditTripScreen() {
           imageUrl={imageUrl}
           onChange={setImageUrl}
           onRemove={() => setImageUrl('')}
-          zIndex={100001}
         />
 
         <YStack padding={24}>
@@ -113,7 +112,12 @@ export default function EditTripScreen() {
               <Text color="$foreground" marginBottom="$2" fontWeight="500">
                 출발일
               </Text>
-              <DatePickerInput value={startDate} onChange={setStartDate} zIndex={100002} />
+              <DatePickerInput
+                value={startDate}
+                onChange={setStartDate}
+                zIndex={100002}
+                sheetKey="start-date"
+              />
             </YStack>
             <YStack flex={1}>
               <Text color="$foreground" marginBottom="$2" fontWeight="500">
@@ -124,6 +128,7 @@ export default function EditTripScreen() {
                 onChange={setEndDate}
                 minimumDate={startDate ? new Date(startDate) : undefined}
                 zIndex={100003}
+                sheetKey="end-date"
               />
             </YStack>
           </XStack>
@@ -166,6 +171,7 @@ export default function EditTripScreen() {
         snapPoints={[85]}
         frameProps={{ padding: '$4' }}
         zIndex={100004}
+        sheetKey="country"
       >
         <XStack justifyContent="space-between" alignItems="center" marginBottom="$3">
           <Text color="$foreground" fontWeight="600" fontSize={16}>
