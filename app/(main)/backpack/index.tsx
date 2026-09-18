@@ -1,7 +1,6 @@
 import BackpackSkeleton from '@/components/backpack/BackpackSkeleton';
 import { DocumentsTab } from '@/components/trips/documents/DocumentsTab';
 import MemoTab from '@/components/trips/memos/MemoTab';
-import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { SubTabs } from '@/components/ui/tabbar/subTabs/SubTabs';
 import { useTripQuery } from '@/hooks/queries/useTrips';
@@ -46,33 +45,31 @@ export default function TripHomeScreen() {
   return (
     <YStack flex={1} backgroundColor="$background">
       <TabScreenHeader label="배낭" />
-      <FadeWrapper>
-        <YStack flex={1}>
-          <TabView
-            navigationState={{ index, routes }}
-            renderScene={({ route }) => {
-              switch (route.key) {
-                case 'memos':
-                  return <MemoTab memos={memos} tripId={activeTrip!} />;
-                case 'files':
-                  return <DocumentsTab tripId={trip.id} />;
-                default:
-                  return null;
-              }
-            }}
-            renderTabBar={(props) => (
-              <SubTabs
-                tabs={props.navigationState.routes.map((r) => ({ value: r.key, label: r.title! }))}
-                activeTab={props.navigationState.routes[props.navigationState.index].key}
-                onTabChange={props.jumpTo}
-                swipePosition={props.position}
-              />
-            )}
-            onIndexChange={setIndex}
-            initialLayout={{ width: layout.width }}
-          />
-        </YStack>
-      </FadeWrapper>
+      <YStack flex={1}>
+        <TabView
+          navigationState={{ index, routes }}
+          renderScene={({ route }) => {
+            switch (route.key) {
+              case 'memos':
+                return <MemoTab memos={memos} tripId={activeTrip!} />;
+              case 'files':
+                return <DocumentsTab tripId={trip.id} />;
+              default:
+                return null;
+            }
+          }}
+          renderTabBar={(props) => (
+            <SubTabs
+              tabs={props.navigationState.routes.map((r) => ({ value: r.key, label: r.title! }))}
+              activeTab={props.navigationState.routes[props.navigationState.index].key}
+              onTabChange={props.jumpTo}
+              swipePosition={props.position}
+            />
+          )}
+          onIndexChange={setIndex}
+          initialLayout={{ width: layout.width }}
+        />
+      </YStack>
     </YStack>
   );
 }

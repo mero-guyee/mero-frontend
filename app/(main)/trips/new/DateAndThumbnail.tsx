@@ -1,7 +1,6 @@
 import TripCoverImagePicker from '@/components/trips/TripCoverImagePicker';
 import { FormInput } from '@/components/ui';
 import DatePickerInput from '@/components/ui/DatePickerInput';
-import FadeWrapper from '@/components/ui/FadeWrapper';
 import ErrorText from '@/components/ui/form/ErrorText';
 import FormLabel from '@/components/ui/form/FormLabel';
 import PrevNextButtons from '@/components/ui/form/multiStepForm/PrevNextButtons';
@@ -65,73 +64,71 @@ export default function NewTripFormDate() {
   };
 
   return (
-    <FadeWrapper>
-      <YStack flex={1} backgroundColor="$background">
-        <YStack height={insets.top} />
-        <TripCoverImagePicker
-          imageUrl={newTrip.imageUrl}
-          onChange={(uri) => setNewTrip({ ...newTrip, imageUrl: uri })}
-          onRemove={() => setNewTrip({ ...newTrip, imageUrl: '' })}
-        />
+    <YStack flex={1} backgroundColor="$background">
+      <YStack height={insets.top} />
+      <TripCoverImagePicker
+        imageUrl={newTrip.imageUrl}
+        onChange={(uri) => setNewTrip({ ...newTrip, imageUrl: uri })}
+        onRemove={() => setNewTrip({ ...newTrip, imageUrl: '' })}
+      />
 
-        <YStack
-          flex={1}
-          paddingHorizontal={paddingHorizontalGeneral}
-          paddingVertical={24}
-          justifyContent="space-between"
-        >
-          <YStack>
-            <YStack marginBottom="$4">
-              <FormLabel marginBottom="$2">모험의 이름</FormLabel>
-              <FormInput
-                autoFocus
-                placeholder="예: 2026 남미 여행"
-                placeholderTextColor="$placeholderForeground"
-                value={newTrip.title}
-                onChangeText={(text) => {
-                  setNewTrip({ ...newTrip, title: text });
-                  if (titleError) setTitleError(null);
-                }}
-                color="$foreground"
-              />
-              <ErrorText error={titleError} />
-            </YStack>
-
-            <XStack gap="$3">
-              <YStack flex={1}>
-                <FormLabel marginBottom="$2">출발일</FormLabel>
-                <DatePickerInput
-                  value={newTrip.startDate}
-                  onChange={(date) => setNewTrip({ ...newTrip, startDate: date })}
-                />
-                <ErrorText error={startDateError} />
-              </YStack>
-              <YStack flex={1}>
-                <FormLabel marginBottom="$2">귀환일</FormLabel>
-                <DatePickerInput
-                  value={newTrip.endDate}
-                  onChange={(date) => setNewTrip({ ...newTrip, endDate: date })}
-                  minimumDate={newTrip.startDate ? new Date(newTrip.startDate) : undefined}
-                />
-                <ErrorText error={endDateError} />
-              </YStack>
-            </XStack>
+      <YStack
+        flex={1}
+        paddingHorizontal={paddingHorizontalGeneral}
+        paddingVertical={24}
+        justifyContent="space-between"
+      >
+        <YStack>
+          <YStack marginBottom="$4">
+            <FormLabel marginBottom="$2">모험의 이름</FormLabel>
+            <FormInput
+              autoFocus
+              placeholder="예: 2026 남미 여행"
+              placeholderTextColor="$placeholderForeground"
+              value={newTrip.title}
+              onChangeText={(text) => {
+                setNewTrip({ ...newTrip, title: text });
+                if (titleError) setTitleError(null);
+              }}
+              color="$foreground"
+            />
+            <ErrorText error={titleError} />
           </YStack>
 
-          <View paddingBottom={insets.bottom}>
-            <PrevNextButtons
-              isLast
-              onNext={handleSubmit}
-              isNextLoading={isSubmitting}
-              nextDisabled={
-                !newTrip.title.trim() ||
-                !!validateStartDate(newTrip.startDate) ||
-                !!validateEndDate(newTrip.endDate, newTrip.startDate)
-              }
-            />
-          </View>
+          <XStack gap="$3">
+            <YStack flex={1}>
+              <FormLabel marginBottom="$2">출발일</FormLabel>
+              <DatePickerInput
+                value={newTrip.startDate}
+                onChange={(date) => setNewTrip({ ...newTrip, startDate: date })}
+              />
+              <ErrorText error={startDateError} />
+            </YStack>
+            <YStack flex={1}>
+              <FormLabel marginBottom="$2">귀환일</FormLabel>
+              <DatePickerInput
+                value={newTrip.endDate}
+                onChange={(date) => setNewTrip({ ...newTrip, endDate: date })}
+                minimumDate={newTrip.startDate ? new Date(newTrip.startDate) : undefined}
+              />
+              <ErrorText error={endDateError} />
+            </YStack>
+          </XStack>
         </YStack>
+
+        <View paddingBottom={insets.bottom}>
+          <PrevNextButtons
+            isLast
+            onNext={handleSubmit}
+            isNextLoading={isSubmitting}
+            nextDisabled={
+              !newTrip.title.trim() ||
+              !!validateStartDate(newTrip.startDate) ||
+              !!validateEndDate(newTrip.endDate, newTrip.startDate)
+            }
+          />
+        </View>
       </YStack>
-    </FadeWrapper>
+    </YStack>
   );
 }

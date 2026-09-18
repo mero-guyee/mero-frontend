@@ -20,7 +20,6 @@ import { Stack, useTheme, XStack, YStack } from 'tamagui';
 import { useTheme as useAppTheme } from '../../contexts';
 import MapOfflineFallback from '../map/MapOfflineFallback';
 import { toastConfig } from '../ui/CustomToast';
-import FadeWrapper from '../ui/FadeWrapper';
 import LocationSearch from './LocationSearch';
 import LocationView from './LocationView';
 
@@ -157,79 +156,77 @@ export default function LocationPicker({ visible, onClose, onConfirm }: Props) {
       onRequestClose={onClose}
       style={[styles.fullscreen, { backgroundColor: theme.background.val }]}
     >
-      <FadeWrapper>
-        <View style={[styles.modalContainer, { backgroundColor: theme.background.val }]}>
-          <View style={[styles.container, { backgroundColor: mapBackground }]}>
-            {loading ? (
-              <YStack flex={1} justifyContent="center" alignItems="center">
-                <Plane width={24} height={24} color="$placeholderForeground" />
-              </YStack>
-            ) : isOffline ? (
-              <>
-                <View
-                  style={{
-                    height: 44,
-                    justifyContent: 'center',
-                    paddingHorizontal: 16,
-                    paddingTop: insets.top + 8,
+      <View style={[styles.modalContainer, { backgroundColor: theme.background.val }]}>
+        <View style={[styles.container, { backgroundColor: mapBackground }]}>
+          {loading ? (
+            <YStack flex={1} justifyContent="center" alignItems="center">
+              <Plane width={24} height={24} color="$placeholderForeground" />
+            </YStack>
+          ) : isOffline ? (
+            <>
+              <View
+                style={{
+                  height: 44,
+                  justifyContent: 'center',
+                  paddingHorizontal: 16,
+                  paddingTop: insets.top + 8,
+                }}
+              >
+                <Pressable onPress={() => onClose()} hitSlop={16}>
+                  <ArrowLeft color="$foreground" />
+                </Pressable>
+              </View>
+              <MapOfflineFallback message="오프라인 상태에서는 위치를 선택할 수 없어요" />
+            </>
+          ) : (
+            <>
+              <LocationView
+                mapRef={mapRef}
+                initialLocation={initialLocation}
+                onMapPress={handleMapPress}
+                selected={selected}
+              />
+              <Stack position="absolute" width="100%">
+                <XStack
+                  flex={1}
+                  alignItems="flex-start"
+                  justifyContent="space-between"
+                  gap="$3.5"
+                  paddingHorizontal={16}
+                  paddingTop={insets.top + 8}
+                >
+                  <View style={{ height: 44, justifyContent: 'center' }}>
+                    <Pressable onPress={() => onClose()} hitSlop={16}>
+                      <ArrowLeft color="$foreground" />
+                    </Pressable>
+                  </View>
+                  <LocationSearch mapRef={mapRef} setSelected={setSelected} />
+                </XStack>
+              </Stack>
+
+              {selected && (
+                <TouchableOpacity
+                  style={[
+                    styles.button,
+                    { backgroundColor: theme.accent.val, bottom: insets.bottom + 32 },
+                  ]}
+                  onPress={() => {
+                    onConfirm(selected);
+                    onClose();
                   }}
                 >
-                  <Pressable onPress={() => onClose()} hitSlop={16}>
-                    <ArrowLeft color="$foreground" />
-                  </Pressable>
-                </View>
-                <MapOfflineFallback message="오프라인 상태에서는 위치를 선택할 수 없어요" />
-              </>
-            ) : (
-              <>
-                <LocationView
-                  mapRef={mapRef}
-                  initialLocation={initialLocation}
-                  onMapPress={handleMapPress}
-                  selected={selected}
-                />
-                <Stack position="absolute" width="100%">
-                  <XStack
-                    flex={1}
-                    alignItems="flex-start"
-                    justifyContent="space-between"
-                    gap="$3.5"
-                    paddingHorizontal={16}
-                    paddingTop={insets.top + 8}
+                  <Text
+                    style={[styles.buttonText, { color: theme.foreground.val }]}
+                    pointerEvents="none"
                   >
-                    <View style={{ height: 44, justifyContent: 'center' }}>
-                      <Pressable onPress={() => onClose()} hitSlop={16}>
-                        <ArrowLeft color="$foreground" />
-                      </Pressable>
-                    </View>
-                    <LocationSearch mapRef={mapRef} setSelected={setSelected} />
-                  </XStack>
-                </Stack>
-
-                {selected && (
-                  <TouchableOpacity
-                    style={[
-                      styles.button,
-                      { backgroundColor: theme.accent.val, bottom: insets.bottom + 32 },
-                    ]}
-                    onPress={() => {
-                      onConfirm(selected);
-                      onClose();
-                    }}
-                  >
-                    <Text
-                      style={[styles.buttonText, { color: theme.foreground.val }]}
-                      pointerEvents="none"
-                    >
-                      이 위치로 선택
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </>
-            )}
-          </View>
+                    이 위치로 선택
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </>
+          )}
         </View>
-      </FadeWrapper>
+      </View>
       <Toast config={toastConfig} />
     </Modal>
   );

@@ -1,7 +1,6 @@
 import FootprintList from '@/components/footprint/FootprintList';
 import FootprintSkeleton from '@/components/footprint/FootprintSkeleton';
 import FootprintMapView from '@/components/footprint/map/FootprintMapView';
-import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { footprintDraftKeys } from '@/hooks/queries/useFootprints';
 import { formatDateLabel, getTripDayNumber } from '@/utils/date';
@@ -84,28 +83,26 @@ export default function FootprintListScreen() {
         )}
       </TabScreenHeader>
 
-      <FadeWrapper>
-        {viewMode === 'map' ? (
-          <FootprintMapView footprints={filteredFootprints} isLoading={isFootPrintLoading} />
-        ) : (
-          <Stack flex={1} mt="$4">
-            <FootprintList
-              sections={footprintsByDate}
-              drafts={drafts}
-              showSearch={showSearch}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onCreateFootprint={() => router.push('/(main)/footprint/new')}
-              onSelectFootprint={(id) => router.push(`/(main)/footprint/${id}`)}
-              onSelectDraft={(id) =>
-                router.push({ pathname: '/(main)/footprint/new', params: { draftId: id } })
-              }
-              isEmpty={filteredFootprints.length === 0}
-              createdId={created}
-            />
-          </Stack>
-        )}
-      </FadeWrapper>
+      {viewMode === 'map' ? (
+        <FootprintMapView footprints={filteredFootprints} isLoading={isFootPrintLoading} />
+      ) : (
+        <Stack flex={1} mt="$4">
+          <FootprintList
+            sections={footprintsByDate}
+            drafts={drafts}
+            showSearch={showSearch}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onCreateFootprint={() => router.push('/(main)/footprint/new')}
+            onSelectFootprint={(id) => router.push(`/(main)/footprint/${id}`)}
+            onSelectDraft={(id) =>
+              router.push({ pathname: '/(main)/footprint/new', params: { draftId: id } })
+            }
+            isEmpty={filteredFootprints.length === 0}
+            createdId={created}
+          />
+        </Stack>
+      )}
     </YStack>
   );
 }

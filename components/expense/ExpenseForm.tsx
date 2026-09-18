@@ -3,7 +3,6 @@ import CurrencyPicker from '@/components/expense/CurrencyPicker';
 import LocationPicker from '@/components/location/LocationPicker';
 import SubmitButton from '@/components/ui/button/SubmitButton';
 import DatePickerInput from '@/components/ui/DatePickerInput';
-import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { inputStyle } from '@/components/ui/Input';
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
@@ -136,84 +135,82 @@ export default function ExpenseForm({
         />
       </BackActionHeader>
 
-      <FadeWrapper>
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
-          {/* Amount and Currency */}
-          <YStack marginBottom="$6">
-            <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              금액
-            </Text>
-            <FormInputBox paddingHorizontal="$0">
-              {(focusProps) => (
-                <>
-                  <FormInput
-                    autoFocus
-                    flex={1}
-                    placeholder="0"
-                    placeholderTextColor="$placeholderForeground"
-                    value={amount}
-                    onChangeText={setAmount}
-                    keyboardType="number-pad"
-                    color="$foreground"
-                    borderWidth={0}
-                    height={44}
-                    focusStyle={{ borderWidth: 0 }}
-                    {...focusProps}
-                  />
-                  <CurrencyPicker value={currency} onChange={setCurrency} />
-                </>
-              )}
-            </FormInputBox>
-          </YStack>
-          {/* Category */}
-          <YStack marginBottom="$6">
-            <Text color="$foreground" marginBottom="$3" fontWeight="500">
-              카테고리
-            </Text>
-            <CategoryPicker categories={categories} value={categoryId} onChange={setCategoryId} />
-          </YStack>
-          {/* Date */}
-          <YStack marginBottom="$6">
-            <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              날짜
-            </Text>
-            <DatePickerInput value={date} onChange={setDate} />
-          </YStack>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24 }}>
+        {/* Amount and Currency */}
+        <YStack marginBottom="$6">
+          <Text color="$foreground" marginBottom="$2" fontWeight="500">
+            금액
+          </Text>
+          <FormInputBox paddingHorizontal="$0">
+            {(focusProps) => (
+              <>
+                <FormInput
+                  autoFocus
+                  flex={1}
+                  placeholder="0"
+                  placeholderTextColor="$placeholderForeground"
+                  value={amount}
+                  onChangeText={setAmount}
+                  keyboardType="number-pad"
+                  color="$foreground"
+                  borderWidth={0}
+                  height={44}
+                  focusStyle={{ borderWidth: 0 }}
+                  {...focusProps}
+                />
+                <CurrencyPicker value={currency} onChange={setCurrency} />
+              </>
+            )}
+          </FormInputBox>
+        </YStack>
+        {/* Category */}
+        <YStack marginBottom="$6">
+          <Text color="$foreground" marginBottom="$3" fontWeight="500">
+            카테고리
+          </Text>
+          <CategoryPicker categories={categories} value={categoryId} onChange={setCategoryId} />
+        </YStack>
+        {/* Date */}
+        <YStack marginBottom="$6">
+          <Text color="$foreground" marginBottom="$2" fontWeight="500">
+            날짜
+          </Text>
+          <DatePickerInput value={date} onChange={setDate} />
+        </YStack>
 
-          {/* Description */}
-          <YStack marginBottom="$6">
-            <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              설명
-            </Text>
-            <Input
-              placeholder="맛있게 먹었으니 0원"
-              placeholderTextColor="$placeholderForeground"
-              value={description}
-              onChangeText={setDescription}
-            />
-          </YStack>
+        {/* Description */}
+        <YStack marginBottom="$6">
+          <Text color="$foreground" marginBottom="$2" fontWeight="500">
+            설명
+          </Text>
+          <Input
+            placeholder="맛있게 먹었으니 0원"
+            placeholderTextColor="$placeholderForeground"
+            value={description}
+            onChangeText={setDescription}
+          />
+        </YStack>
 
-          {/* Location */}
-          <YStack marginBottom="$6">
-            <Text color="$foreground" marginBottom="$2" fontWeight="500">
-              장소
-            </Text>
-            <Pressable onPress={() => setLocationPickerOpen(true)}>
-              <XStack {...inputStyle} alignItems="center" justifyContent="space-between">
-                <Text color={location ? '$foreground' : '$placeholderForeground'}>
-                  {location || '예: 마추픽추'}
-                </Text>
-                <MapPin size={18} color="$mutedForeground" />
-              </XStack>
-            </Pressable>
-            <LocationPicker
-              visible={locationPickerOpen}
-              onClose={() => setLocationPickerOpen(false)}
-              onConfirm={handleLocationConfirm}
-            />
-          </YStack>
-        </ScrollView>
-      </FadeWrapper>
+        {/* Location */}
+        <YStack marginBottom="$6">
+          <Text color="$foreground" marginBottom="$2" fontWeight="500">
+            장소
+          </Text>
+          <Pressable onPress={() => setLocationPickerOpen(true)}>
+            <XStack {...inputStyle} alignItems="center" justifyContent="space-between">
+              <Text color={location ? '$foreground' : '$placeholderForeground'}>
+                {location || '예: 마추픽추'}
+              </Text>
+              <MapPin size={18} color="$mutedForeground" />
+            </XStack>
+          </Pressable>
+          <LocationPicker
+            visible={locationPickerOpen}
+            onClose={() => setLocationPickerOpen(false)}
+            onConfirm={handleLocationConfirm}
+          />
+        </YStack>
+      </ScrollView>
     </YStack>
   );
 }

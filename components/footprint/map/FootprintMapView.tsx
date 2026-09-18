@@ -12,7 +12,6 @@ import ClusterMarker from '../../map/ClusterMarker';
 import { darkMapStyle } from '../../map/darkMapStyle';
 import MapOfflineFallback from '../../map/MapOfflineFallback';
 import PinMarker from '../../map/PinMarker';
-import FadeWrapper from '../../ui/FadeWrapper';
 import FootprintMapModal from './FootprintMapModal';
 
 const PIN_COLOR = '#9BC4D1';
@@ -123,51 +122,49 @@ export default function FootprintMapView({ isLoading, footprints }: FootprintMap
   }
 
   return (
-    <FadeWrapper>
-      <View style={styles.container}>
-        <ClusteredMapView
-          mapRef={(ref: React.Ref<MapView>) => {
-            mapRef.current = ref as MapView | null;
-          }}
-          initialRegion={initialRegion}
-          radius={60}
-          maxZoom={16}
-          renderCluster={({
-            geometry,
-            properties,
-            onPress,
-          }: {
-            geometry: { coordinates: [number, number] };
-            properties: { cluster_id: number; point_count: number };
-            onPress: () => void;
-          }) => (
-            <ClusterMarker
-              key={`cluster-${properties.cluster_id}`}
-              coordinate={{
-                latitude: geometry.coordinates[1],
-                longitude: geometry.coordinates[0],
-              }}
-              count={properties.point_count}
-              onPress={onPress}
-            />
-          )}
-          showsPointsOfInterest={false}
-          style={StyleSheet.absoluteFillObject}
-          onMapReady={() => setIsMapReady(true)}
-          onPress={handleDeselect}
-          userInterfaceStyle={theme}
-          customMapStyle={theme === 'dark' ? darkMapStyle : []}
-        >
-          {pinMarkers}
-        </ClusteredMapView>
+    <View style={styles.container}>
+      <ClusteredMapView
+        mapRef={(ref: React.Ref<MapView>) => {
+          mapRef.current = ref as MapView | null;
+        }}
+        initialRegion={initialRegion}
+        radius={60}
+        maxZoom={16}
+        renderCluster={({
+          geometry,
+          properties,
+          onPress,
+        }: {
+          geometry: { coordinates: [number, number] };
+          properties: { cluster_id: number; point_count: number };
+          onPress: () => void;
+        }) => (
+          <ClusterMarker
+            key={`cluster-${properties.cluster_id}`}
+            coordinate={{
+              latitude: geometry.coordinates[1],
+              longitude: geometry.coordinates[0],
+            }}
+            count={properties.point_count}
+            onPress={onPress}
+          />
+        )}
+        showsPointsOfInterest={false}
+        style={StyleSheet.absoluteFillObject}
+        onMapReady={() => setIsMapReady(true)}
+        onPress={handleDeselect}
+        userInterfaceStyle={theme}
+        customMapStyle={theme === 'dark' ? darkMapStyle : []}
+      >
+        {pinMarkers}
+      </ClusteredMapView>
 
-        <FootprintMapModal
-          visible={showModal}
-          onClose={handleCloseModal}
-          footprint={selectedFootprint}
-        />
-      </View>
-    </FadeWrapper>
+      <FootprintMapModal
+        visible={showModal}
+        onClose={handleCloseModal}
+        footprint={selectedFootprint}
+      />
+    </View>
   );
 }
 
