@@ -117,7 +117,13 @@ export default function TripCountrySearch({ selectedCountries, onAdd, onRemove, 
           <ErrorText error={error} />
         </YStack>
 
-        <ScrollView backgroundColor="$card" borderRadius="$6" flex={1} overflow="scroll">
+        <ScrollView
+          backgroundColor="$card"
+          borderRadius="$6"
+          flex={1}
+          overflow="scroll"
+          keyboardShouldPersistTaps="handled"
+        >
           {searchResults.map((name, index) => {
             const isSelected = selectedCountries.includes(name);
             return (
