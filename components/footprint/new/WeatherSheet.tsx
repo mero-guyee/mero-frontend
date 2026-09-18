@@ -66,11 +66,8 @@ export default function WeatherSheet({
   }, [open]);
 
   const handleConfirm = () => {
-    if (!keyDraft) {
-      onConfirm('');
-    } else {
-      onConfirm(tempDraft.trim() ? `${keyDraft} ${tempDraft.trim()}°C` : keyDraft);
-    }
+    if (!keyDraft) return;
+    onConfirm(tempDraft.trim() ? `${keyDraft} ${tempDraft.trim()}°C` : keyDraft);
     onOpenChange(false);
   };
 
@@ -114,7 +111,13 @@ export default function WeatherSheet({
           °C
         </Text>
       </XStack>
-      <FilledButton onPress={handleConfirm}>확인</FilledButton>
+      <FilledButton
+        onPress={handleConfirm}
+        disabled={!keyDraft}
+        opacity={!keyDraft ? 0.5 : 1}
+      >
+        확인
+      </FilledButton>
     </AppBottomSheet>
   );
 }
