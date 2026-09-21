@@ -13,6 +13,10 @@ export interface TripDocumentCreateRequest {
   file: { fileName: string; fileUri: string };
 }
 
+export interface TripDocumentUpdateRequest {
+  fileName: string;
+}
+
 export const documentsApi = {
   upload: (params: TripDocumentCreateRequest): Promise<ServerTripDocument> => {
     const { tripId, clientId, file } = params;
@@ -27,6 +31,16 @@ export const documentsApi = {
     form.append('file', { uri: fileUri, name: fileName, type: mimeType } as any);
     return apiFormRequest(`/api/trips/${tripId}/documents`, form);
   },
+
+  update: (
+    tripId: number,
+    documentId: number,
+    data: TripDocumentUpdateRequest
+  ): Promise<ServerTripDocument> =>
+    apiRequest(`/api/trips/${tripId}/documents/${documentId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
 
   delete: (tripId: number, documentId: number): Promise<void> =>
     apiRequest(`/api/trips/${tripId}/documents/${documentId}`, { method: 'DELETE' }),

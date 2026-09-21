@@ -3,6 +3,7 @@ import {
   useCreateDocument,
   useDeleteDocument,
   useDocumentsQuery,
+  useUpdateDocument,
 } from '../hooks/queries/useDocuments';
 import {
   useCreateTrip,
@@ -24,6 +25,7 @@ interface TripContextType {
   getTripById: (tripId: string) => Trip | undefined;
   documents: TripDocument[];
   createDocument: (tripId: string, document: TripDocumentFile) => void;
+  updateDocument: (documentId: string, fileName: string) => void;
   deleteDocument: (documentId: string) => void;
   tripsByProgress: TripByProgressObj;
   isTripsLoading: boolean;
@@ -60,6 +62,7 @@ export function useTrips(): TripContextType {
   const updateTripMut = useUpdateTrip();
   const deleteTripMut = useDeleteTrip();
   const createDocumentMut = useCreateDocument();
+  const updateDocumentMut = useUpdateDocument();
   const deleteDocumentMut = useDeleteDocument();
 
   return {
@@ -93,6 +96,10 @@ export function useTrips(): TripContextType {
     documents,
     createDocument: (tripId, document) => {
       createDocumentMut.mutate({ tripId, data: document });
+    },
+    updateDocument: (documentId, fileName) => {
+      if (!ui.activeTrip) return;
+      updateDocumentMut.mutate({ id: documentId, tripId: ui.activeTrip, fileName });
     },
     deleteDocument: (documentId) => {
       if (!ui.activeTrip) return;

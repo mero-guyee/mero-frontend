@@ -69,6 +69,11 @@ export class DocumentRepository extends BaseRepository<DocumentRow> {
     return rowToDocument(row);
   }
 
+  async updateFileName(id: string, fileName: string): Promise<TripDocument | null> {
+    const row = await this.update(id, { fileName });
+    return row ? rowToDocument(row) : null;
+  }
+
   async deleteByTripId(tripId: string): Promise<void> {
     const rows = await this.db.getAllAsync<DocumentRow>(
       `SELECT * FROM documents WHERE tripId = ? AND deletedAt IS NULL`,

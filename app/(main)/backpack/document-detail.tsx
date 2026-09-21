@@ -1,9 +1,11 @@
 import { getFileType } from '@/components/trips/documents/DocumentCard';
+import DocumentNameSheet from '@/components/trips/documents/DocumentNameSheet';
 import { IconButton } from '@/components/ui/button/BaseButton';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
-import { File as FileIcon, Share2, Trash2 } from '@tamagui/lucide-icons';
+import { File as FileIcon, Pencil, Share2, Trash2 } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Sharing from 'expo-sharing';
+import { useState } from 'react';
 import { WebView } from 'react-native-webview';
 import { Image, Text, XStack, YStack } from 'tamagui';
 import { useAppModal, useTrips } from '../../../contexts';
@@ -11,11 +13,12 @@ import { useAppModal, useTrips } from '../../../contexts';
 export default function DocumentDetailScreen() {
   const { documentId } = useLocalSearchParams<{ documentId: string }>();
   const router = useRouter();
-  const { documents, deleteDocument } = useTrips();
+  const { documents, updateDocument, deleteDocument } = useTrips();
   const { showConfirm } = useAppModal();
+  const [isRenameSheetOpen, setIsRenameSheetOpen] = useState(false);
 
   const document = documents.find((doc) => doc.id === documentId);
-  const { mime, ctg } = (document && getFileType(document.fileName)) ?? {};
+  const { mime, ctg } = (document && getFileType(document.fileUri)) ?? {};
 
   const handleDelete = async () => {
     if (!document) return;
@@ -43,6 +46,9 @@ export default function DocumentDetailScreen() {
     <YStack flex={1} backgroundColor="$background">
       <BackActionHeader onBack={() => router.back()} label={document.fileName}>
         <XStack alignItems="center" gap="$3">
+          <IconButton onPress={() => setIsRenameSheetOpen(true)} hitSlop={10}>
+            <Pencil size="$6.5" color="$foreground" />
+          </IconButton>
           <IconButton onPress={handleShare} hitSlop={10}>
             <Share2 size="$6.5" color="$foreground" />
           </IconButton>
@@ -51,6 +57,14 @@ export default function DocumentDetailScreen() {
           </IconButton>
         </XStack>
       </BackActionHeader>
+      <DocumentNameSheet
+        open={isRenameSheetOpen}
+        onOpenChange={setIsRenameSheetOpen}
+        title="파일 이름 수정"
+        defaultValue={document.fileName}
+        confirmText="수정"
+        onConfirm={(fileName) => updateDocument(document.id, fileName)}
+      />
       <YStack flex={1}>
         {ctg === 'image' && (
           <YStack flex={1} backgroundColor="black">

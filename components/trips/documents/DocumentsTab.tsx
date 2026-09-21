@@ -5,13 +5,16 @@ import { Plus } from '@tamagui/lucide-icons';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, Text, XStack, YStack } from 'tamagui';
+import { TripDocumentFile } from '../../../types';
 import DocumentAddSheet from './DocumentAddSheet';
 import { DocumentCard } from './DocumentCard';
+import DocumentNameSheet from './DocumentNameSheet';
 import EmptyDocuments from './EmptyDocuments';
 
 export function DocumentsTab({ tripId }: { tripId: string }) {
   const { createDocument, documents } = useTrips();
   const [isSourceSheetOpen, setIsSourceSheetOpen] = useState(false);
+  const [pendingFile, setPendingFile] = useState<TripDocumentFile | null>(null);
 
   const handleOpenDocument = (documentId: string) => {
     router.push({
@@ -52,7 +55,18 @@ export function DocumentsTab({ tripId }: { tripId: string }) {
       <DocumentAddSheet
         open={isSourceSheetOpen}
         onOpenChange={setIsSourceSheetOpen}
-        onSelect={(file) => createDocument(tripId, file)}
+        onSelect={(file) => setPendingFile(file)}
+      />
+      <DocumentNameSheet
+        open={!!pendingFile}
+        onOpenChange={(open) => !open && setPendingFile(null)}
+        title="파일 이름 설정"
+        defaultValue={pendingFile?.fileName ?? ''}
+        confirmText="추가"
+        onConfirm={(fileName) => {
+          if (!pendingFile) return;
+          createDocument(tripId, { ...pendingFile, fileName });
+        }}
       />
     </>
   );
