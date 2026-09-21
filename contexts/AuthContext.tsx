@@ -10,8 +10,7 @@ import {
   tokenStorage,
   userApi,
 } from '../api';
-import { useDb } from '../providers/DatabaseProvider';
-import { UserRepository } from '../repositories';
+import { resetDatabase } from '../db';
 
 GoogleSignin.configure({
   webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
@@ -24,7 +23,7 @@ interface AuthContextType {
   setIsAuthenticated: (value: boolean) => void;
   loginWithGoogle: () => Promise<void>;
   loginWithApple: () => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -33,7 +32,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const db = useDb();
 
   useEffect(() => {
     (async () => {
@@ -112,7 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     setIsAuthenticated(false);
     await authApi.logout();
-    await new UserRepository(db).clear();
+    await resetDatabase();
   };
 
   const value: AuthContextType = {

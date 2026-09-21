@@ -55,3 +55,11 @@ export async function closeDatabase(): Promise<void> {
     db = null;
   }
 }
+
+export async function resetDatabase(): Promise<void> {
+  const database = await getDatabase();
+  await database.execAsync('PRAGMA foreign_keys = OFF;');
+  await database.execAsync(DROP_TABLES);
+  await database.execAsync(CREATE_TABLES);
+  await database.execAsync('PRAGMA foreign_keys = ON;');
+}

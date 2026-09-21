@@ -7,6 +7,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, XStack, YStack } from 'tamagui';
 import { FilledButton } from '../../../components/ui';
 import { ThemeMode, useAppModal, useAuth, useTheme } from '../../../contexts';
+import { useDb } from '../../../providers/DatabaseProvider';
+import { OutboxRepository } from '../../../repositories';
 
 const THEME_MODE_OPTIONS: { mode: ThemeMode; label: string; Icon: typeof Monitor }[] = [
   { mode: 'system', label: '시스템 설정', Icon: Monitor },
@@ -20,6 +22,7 @@ export default function SettingsScreen() {
   const { mode, setMode } = useTheme();
   const insets = useSafeAreaInsets();
   const { showConfirm } = useAppModal();
+  const db = useDb();
 
   const handleManageCategories = () => {
     router.push('/settings/categories');
@@ -30,12 +33,22 @@ export default function SettingsScreen() {
   };
 
   const handleLogout = async () => {
-    const confirmed = await showConfirm('로그아웃', '정말 로그아웃하시겠습니까?', {
-      confirmText: '로그아웃',
-      destructive: true,
-    });
+    const pendingCount = await new OutboxRepository(db).count();
+
+    const confirmed =
+      pendingCount > 0
+        ? await showConfirm(
+            '동기화되지 않은 변경사항이 있습니다',
+            '아직 서버에 저장되지 않은 변경사항이 있습니다. 로그아웃하면 이 데이터가 사라집니다. 계속하시겠습니까?',
+            { confirmText: '로그아웃', destructive: true }
+          )
+        : await showConfirm('로그아웃', '정말 로그아웃하시겠습니까?', {
+            confirmText: '로그아웃',
+            destructive: true,
+          });
+
     if (!confirmed) return;
-    logout();
+    await logout();
     router.replace('/');
   };
 
