@@ -2,6 +2,11 @@ import { tokenStorage } from './tokenStorage';
 
 export const BASE_URL = process.env.EXPO_PUBLIC_TEST_BASE_URL;
 
+const REQUEST_TIMEOUT_MS = 2000;
+const RETRY_BASE_DELAY_MS = 500;
+const RETRY_MAX_DELAY_MS = 3000;
+const RETRY_BUDGET_MS = 7000;
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -70,6 +75,29 @@ async function retryOriginRequestWithToken<T>(
   return retryRes.status === 204 ? (undefined as T) : await retryRes.json();
 }
 
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchWithRetry(url: string, options: RequestInit): Promise<Response> {
+  const startAll = Date.now();
+  for (let attempt = 0; ; attempt++) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const res = await fetch(url, { ...options, signal: controller.signal });
+      return res;
+    } catch (e) {
+      const elapsed = Date.now() - startAll;
+      if (elapsed >= RETRY_BUDGET_MS) throw e;
+      const retryDelay = Math.min(RETRY_BASE_DELAY_MS * 2 ** attempt, RETRY_MAX_DELAY_MS);
+      await delay(retryDelay);
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  }
+}
+
 export async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   const accessToken = await tokenStorage.getAccessToken();
 
@@ -81,7 +109,7 @@ export async function apiRequest<T>(path: string, options: RequestInit = {}): Pr
     headers['Authorization'] = `Bearer ${accessToken}`;
   }
 
-  const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  const res = await fetchWithRetry(`${BASE_URL}${path}`, { ...options, headers });
 
   if (res.status === 401 || res.status === 403) {
     if (isRefreshing) {
@@ -119,18 +147,14 @@ export async function apiFormRequest<T>(path: string, body: FormData): Promise<T
   const headers: Record<string, string> = {};
   if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
 
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method: 'POST',
-    headers,
-    body,
-  });
+  const res = await fetchWithRetry(`${BASE_URL}${path}`, { method: 'POST', headers, body });
 
   if (res.status === 401 || res.status === 403) {
     if (isRefreshing) {
       return new Promise<T>((resolve, reject) => {
         registerRefreshSubscriberAction((token) => {
           const retryHeaders = { ...headers, Authorization: `Bearer ${token}` };
-          fetch(`${BASE_URL}${path}`, { method: 'POST', headers: retryHeaders, body })
+          fetchWithRetry(`${BASE_URL}${path}`, { method: 'POST', headers: retryHeaders, body })
             .then((r) => (r.status === 204 ? (undefined as T) : r.json()))
             .then(resolve)
             .catch(reject);
@@ -146,7 +170,7 @@ export async function apiFormRequest<T>(path: string, body: FormData): Promise<T
 
     onRefreshed(newToken);
     const retryHeaders = { ...headers, Authorization: `Bearer ${newToken}` };
-    const retryRes = await fetch(`${BASE_URL}${path}`, {
+    const retryRes = await fetchWithRetry(`${BASE_URL}${path}`, {
       method: 'POST',
       headers: retryHeaders,
       body,
