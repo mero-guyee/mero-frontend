@@ -5,8 +5,8 @@ import FadeWrapper from '@/components/ui/FadeWrapper';
 import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { SubTabs } from '@/components/ui/tabbar/subTabs/SubTabs';
 import { useTripQuery } from '@/hooks/queries/useTrips';
-import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useCallback, useEffect, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { TabView } from 'react-native-tab-view';
 import { Text, YStack } from 'tamagui';
@@ -30,6 +30,12 @@ export default function TripHomeScreen() {
     if (tab === 'files') setIndex(1);
     else if (tab === 'memos') setIndex(0);
   }, [tab]);
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => setIndex(tab === 'files' ? 1 : 0);
+    }, [tab])
+  );
 
   if (isLoading) {
     return <BackpackSkeleton />;
