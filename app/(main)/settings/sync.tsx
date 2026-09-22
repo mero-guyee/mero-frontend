@@ -49,13 +49,11 @@ export default function SyncStatusScreen() {
   const db = useDb();
   const qc = useQueryClient();
   const [retrying, setRetrying] = useState<string | null>(null);
-  const [isSyncing, setIsSyncing] = useState(true);
   const syncAndInvalidate = useDomainSync(db);
 
   useFocusEffect(
     useCallback(() => {
-      setIsSyncing(true);
-      syncAndInvalidate().finally(() => setIsSyncing(false));
+      syncAndInvalidate();
     }, [syncAndInvalidate])
   );
 
@@ -89,6 +87,7 @@ export default function SyncStatusScreen() {
         text1: '동기화 시도',
         text2: `${DOMAIN_LABELS[entry.domain] ?? entry.domain} 항목을 다시 동기화하는 중입니다...`,
       });
+      await new OutboxRepository(db).resetBackoff(entry.domain, entry.dataId);
       if (syncFn) await syncFn(db);
       await qc.invalidateQueries({ queryKey: outboxKey });
       await qc.invalidateQueries({ queryKey: [entry.domain] });
@@ -127,7 +126,7 @@ export default function SyncStatusScreen() {
       </BackActionHeader>
 
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>
-        {isSyncing || isLoading ? (
+        {isLoading ? (
           <YStack alignItems="center" paddingTop="$12" gap="$3">
             <Plane size={40} color="$mutedForeground" />
             <Text color="$mutedForeground" textAlign="center">
