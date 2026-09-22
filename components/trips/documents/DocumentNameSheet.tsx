@@ -55,7 +55,7 @@ export default function DocumentNameSheet({
             placeholderTextColor="$placeholderForeground"
             value={fileName}
             onChangeText={setFileName}
-            autoFocus
+            autoFocus={open}
             color="$foreground"
             borderWidth={0}
             height={44}
