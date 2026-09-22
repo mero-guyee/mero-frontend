@@ -8,7 +8,6 @@ export default function SettingsLayout() {
       <Stack.Screen name="categories" />
       <Stack.Screen name="sync" />
       <Stack.Screen name="about" />
-      <Stack.Screen name="debug-logs" />
     </Stack>
   );
 }

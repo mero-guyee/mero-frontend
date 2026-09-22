@@ -1,5 +1,6 @@
 import { IconButton } from '@/components/ui/button/BaseButton';
 import SubmitButton from '@/components/ui/button/SubmitButton';
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import { FormInput } from '@/components/ui/FormInput';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { Trash2 } from '@tamagui/lucide-icons';
@@ -94,35 +95,37 @@ export default function MemoFormScreen() {
           />
         </XStack>
       </BackActionHeader>
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
-        <YStack flex={1} justifyContent="flex-start" gap="$3">
-          <FormInput
-            multiline
-            autoFocus={!existingMemo}
-            placeholder="제목을 입력해주세요"
-            placeholderTextColor="$placeholderForeground"
-            value={title}
-            onChangeText={setTitle}
-            fontSize={20}
-            fontWeight="600"
-            color="$foreground"
-            borderWidth={0}
-            padding={0}
-          />
-          <YStack borderBottomWidth={1} borderColor="$mutedStrong" />
-          <TextArea
-            placeholder="여행에 도움이 될 만한 간단한 메모를 남겨보세요"
-            placeholderTextColor="$placeholderForeground"
-            value={content}
-            onChangeText={setContent}
-            color="$foreground"
-            minHeight={200}
-            padding={0}
-            verticalAlign={'top'}
-            borderWidth={0}
-          />
-        </YStack>
-      </ScrollView>
+      <FadeWrapper>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 20 }}>
+          <YStack flex={1} justifyContent="flex-start" gap="$3">
+            <FormInput
+              multiline
+              autoFocus={!existingMemo}
+              placeholder="제목을 입력해주세요"
+              placeholderTextColor="$placeholderForeground"
+              value={title}
+              onChangeText={setTitle}
+              fontSize={20}
+              fontWeight="600"
+              color="$foreground"
+              borderWidth={0}
+              padding={0}
+            />
+            <YStack borderBottomWidth={1} borderColor="$mutedStrong" />
+            <TextArea
+              placeholder="여행에 도움이 될 만한 간단한 메모를 남겨보세요"
+              placeholderTextColor="$placeholderForeground"
+              value={content}
+              onChangeText={setContent}
+              color="$foreground"
+              minHeight={200}
+              padding={0}
+              verticalAlign={'top'}
+              borderWidth={0}
+            />
+          </YStack>
+        </ScrollView>
+      </FadeWrapper>
     </YStack>
   );
 }

@@ -1,4 +1,5 @@
 import TripCountrySearch from '@/components/trips/TripCountrySearch';
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import FormLabel from '@/components/ui/form/FormLabel';
 import PrevNextButtons from '@/components/ui/form/multiStepForm/PrevNextButtons';
 import { paddingHorizontalGeneral } from '@/constants/theme';
@@ -25,38 +26,40 @@ export default function NewInputCountryStep() {
   };
 
   return (
-    <YStack
-      flex={1}
-      backgroundColor="$background"
-      paddingTop={24 + insets.top}
-      paddingBottom={24}
-      paddingHorizontal={paddingHorizontalGeneral}
-      justifyContent="flex-end"
-    >
-      <YStack flex={1}>
-        <FormLabel marginBottom="$2">거쳐갈 땅</FormLabel>
-        <TripCountrySearch
-          selectedCountries={newTrip.countries}
-          onAdd={(country) => {
-            if (!newTrip.countries.includes(country)) {
-              setNewTrip({ ...newTrip, countries: [...newTrip.countries, country] });
-              setError(null);
+    <FadeWrapper>
+      <YStack
+        flex={1}
+        backgroundColor="$background"
+        paddingTop={24 + insets.top}
+        paddingBottom={24}
+        paddingHorizontal={paddingHorizontalGeneral}
+        justifyContent="flex-end"
+      >
+        <YStack flex={1}>
+          <FormLabel marginBottom="$2">거쳐갈 땅</FormLabel>
+          <TripCountrySearch
+            selectedCountries={newTrip.countries}
+            onAdd={(country) => {
+              if (!newTrip.countries.includes(country)) {
+                setNewTrip({ ...newTrip, countries: [...newTrip.countries, country] });
+                setError(null);
+              }
+            }}
+            onRemove={(country) =>
+              setNewTrip({ ...newTrip, countries: newTrip.countries.filter((c) => c !== country) })
             }
-          }}
-          onRemove={(country) =>
-            setNewTrip({ ...newTrip, countries: newTrip.countries.filter((c) => c !== country) })
-          }
-          error={error}
-        />
-      </YStack>
+            error={error}
+          />
+        </YStack>
 
-      <View paddingBottom={insets.bottom}>
-        <PrevNextButtons
-          isFirst
-          onNext={handleNext}
-          nextDisabled={newTrip.countries.length === 0}
-        />
-      </View>
-    </YStack>
+        <View paddingBottom={insets.bottom}>
+          <PrevNextButtons
+            isFirst
+            onNext={handleNext}
+            nextDisabled={newTrip.countries.length === 0}
+          />
+        </View>
+      </YStack>
+    </FadeWrapper>
   );
 }

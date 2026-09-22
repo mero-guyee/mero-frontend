@@ -1,6 +1,7 @@
 import { getFileType } from '@/components/trips/documents/DocumentCard';
 import DocumentNameSheet from '@/components/trips/documents/DocumentNameSheet';
 import { IconButton } from '@/components/ui/button/BaseButton';
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { File as FileIcon, Pencil, Share2, Trash2 } from '@tamagui/lucide-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -65,31 +66,33 @@ export default function DocumentDetailScreen() {
         confirmText="수정"
         onConfirm={(fileName) => updateDocument(document.id, fileName)}
       />
-      <YStack flex={1}>
-        {ctg === 'image' && (
-          <YStack flex={1} backgroundColor="black">
-            <Image
+      <FadeWrapper>
+        <YStack flex={1}>
+          {ctg === 'image' && (
+            <YStack flex={1} backgroundColor="black">
+              <Image
+                source={{ uri: document.fileUri }}
+                style={{ width: '100%', height: '100%' }}
+                resizeMode="contain"
+              />
+            </YStack>
+          )}
+          {ctg === 'pdf' && (
+            <WebView
               source={{ uri: document.fileUri }}
-              style={{ width: '100%', height: '100%' }}
-              resizeMode="contain"
+              style={{ flex: 1 }}
+              originWhitelist={['*']}
+              allowingReadAccessToURL={document.fileUri}
             />
-          </YStack>
-        )}
-        {ctg === 'pdf' && (
-          <WebView
-            source={{ uri: document.fileUri }}
-            style={{ flex: 1 }}
-            originWhitelist={['*']}
-            allowingReadAccessToURL={document.fileUri}
-          />
-        )}
-        {!ctg && (
-          <YStack flex={1} justifyContent="center" alignItems="center" gap="$3">
-            <FileIcon size={48} color="$mutedForeground" />
-            <Text color="$foreground">{document.fileName}</Text>
-          </YStack>
-        )}
-      </YStack>
+          )}
+          {!ctg && (
+            <YStack flex={1} justifyContent="center" alignItems="center" gap="$3">
+              <FileIcon size={48} color="$mutedForeground" />
+              <Text color="$foreground">{document.fileName}</Text>
+            </YStack>
+          )}
+        </YStack>
+      </FadeWrapper>
     </YStack>
   );
 }

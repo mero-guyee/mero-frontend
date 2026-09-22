@@ -6,6 +6,7 @@ import Animated, { LinearTransition } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 
 import FloatingActionButton from '@/components/ui/button/FloatingActionButton';
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import { useIsFocused } from '@react-navigation/native';
 import { Plane } from '@tamagui/lucide-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -81,7 +82,7 @@ export default function TripListScreen() {
           <Plane size={44} color="$mutedForeground" />
         </View>
       ) : (
-        <>
+        <FadeWrapper>
           {trips.length === 0 ? (
             <YStack flex={1} alignItems="center" justifyContent="flex-start" mt="-200">
               <TripEmptyState onCreateTrip={handleCreateTrip} />
@@ -102,13 +103,15 @@ export default function TripListScreen() {
               )}
               renderItem={({ item }) => (
                 <Animated.View layout={LinearTransition.springify().damping(70).stiffness(350)}>
-                  <TripCard
-                    trip={item}
-                    onPress={() => handleSelectTrip(item.id)}
-                    onEdit={() => handleEditTrip(item.id)}
-                    onDelete={() => handleDeleteTrip(item)}
-                    showSyncBadge={created === item.id}
-                  />
+                  <FadeWrapper>
+                    <TripCard
+                      trip={item}
+                      onPress={() => handleSelectTrip(item.id)}
+                      onEdit={() => handleEditTrip(item.id)}
+                      onDelete={() => handleDeleteTrip(item)}
+                      showSyncBadge={created === item.id}
+                    />
+                  </FadeWrapper>
                 </Animated.View>
               )}
               showsVerticalScrollIndicator={false}
@@ -119,7 +122,7 @@ export default function TripListScreen() {
               <Plane size={44} strokeWidth={1} />
             </FloatingActionButton>
           )}
-        </>
+        </FadeWrapper>
       )}
     </YStack>
   );

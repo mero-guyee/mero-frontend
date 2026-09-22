@@ -1,5 +1,4 @@
 import { useAppModal } from '@/contexts';
-import { debugLog } from '@/utils/debugLog';
 import { usePreventRemove } from '@react-navigation/native';
 import { useFocusEffect, useNavigation, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef } from 'react';
@@ -19,9 +18,6 @@ export function useUnsavedChangesGuard(isDirty: boolean) {
 
   const confirmLeave = useCallback(
     async (leave: () => void) => {
-      debugLog(
-        `[unsavedguard] confirmLeave called isDirty=${isDirty} bypass=${bypassRef.current}`
-      );
       if (!isDirty || bypassRef.current) {
         leave();
         return;
@@ -31,7 +27,6 @@ export function useUnsavedChangesGuard(isDirty: boolean) {
         '작성한 내용이 사라집니다.',
         { confirmText: '나가기', cancelText: '계속 작성', destructive: true }
       );
-      debugLog(`[unsavedguard] showConfirm resolved confirmed=${confirmed}`);
       if (!confirmed) return;
       bypassRef.current = true;
       leave();
@@ -40,7 +35,6 @@ export function useUnsavedChangesGuard(isDirty: boolean) {
   );
 
   usePreventRemove(isDirty, ({ data }) => {
-    debugLog(`[unsavedguard] beforeRemove intercepted isDirty=${isDirty}`);
     if (bypassRef.current) {
       navigation.dispatch(data.action);
       return;

@@ -1,4 +1,5 @@
 import { YCard } from '@/components/ui/Card';
+import FadeWrapper from '@/components/ui/FadeWrapper';
 import BackActionHeader from '@/components/ui/header/BackActionHeader';
 import { ChevronRight, Cloud, Info, Monitor, Moon, Sun, User } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
@@ -85,126 +86,120 @@ export default function SettingsScreen() {
     <YStack flex={1} backgroundColor="$background" pb={insets.bottom}>
       <BackActionHeader onBack={() => router.back()} label="설정" />
 
-      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>
-        {/* Account Section */}
-        <YStack marginBottom="$6">
-          <Text color="$mutedForeground" marginBottom="$3">
-            계정
-          </Text>
-          <YCard>
-            <SettingItem
-              icon={<User size={20} color="$foreground" />}
-              label="프로필 설정"
-              onPress={handleProfileSettings}
-            />
-          </YCard>
-        </YStack>
+      <FadeWrapper>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 24, paddingBottom: 100 }}>
+          {/* Account Section */}
+          <YStack marginBottom="$6">
+            <Text color="$mutedForeground" marginBottom="$3">
+              계정
+            </Text>
+            <YCard>
+              <SettingItem
+                icon={<User size={20} color="$foreground" />}
+                label="프로필 설정"
+                onPress={handleProfileSettings}
+              />
+            </YCard>
+          </YStack>
 
-        {/* Data Section */}
-        <YStack marginBottom="$6">
-          <Text color="$mutedForeground" marginBottom="$3">
-            데이터
-          </Text>
-          <YCard>
-            <SettingItem
-              icon={<Cloud size={20} color="$foreground" />}
-              label="동기화"
-              onPress={() => router.push('/settings/sync')}
-            />
-          </YCard>
-        </YStack>
+          {/* Data Section */}
+          <YStack marginBottom="$6">
+            <Text color="$mutedForeground" marginBottom="$3">
+              데이터
+            </Text>
+            <YCard>
+              <SettingItem
+                icon={<Cloud size={20} color="$foreground" />}
+                label="동기화"
+                onPress={() => router.push('/settings/sync')}
+              />
+            </YCard>
+          </YStack>
 
-        {/* Expense Section */}
-        {/* <YStack marginBottom="$6">
-          <Text color="$mutedForeground" marginBottom="$3">
-            경비
-          </Text>
-          <YCard>
-            <SettingItem
-              icon={<Tag size={20} color="$foreground" />}
-              label="카테고리 관리"
-              onPress={handleManageCategories}
-            />
-          </YCard>
-        </YStack> */}
+          {/* Expense Section */}
+          {/* <YStack marginBottom="$6">
+            <Text color="$mutedForeground" marginBottom="$3">
+              경비
+            </Text>
+            <YCard>
+              <SettingItem
+                icon={<Tag size={20} color="$foreground" />}
+                label="카테고리 관리"
+                onPress={handleManageCategories}
+              />
+            </YCard>
+          </YStack> */}
 
-        {/* Display Section */}
-        <YStack marginBottom="$6">
-          <Text color="$mutedForeground" marginBottom="$3">
-            화면 모드
-          </Text>
-          <YCard>
-            <XStack padding="$3" gap="$2">
-              {THEME_MODE_OPTIONS.map(({ mode: optionMode, label, Icon }) => {
-                const isSelected = mode === optionMode;
-                return (
-                  <Pressable
-                    key={optionMode}
-                    style={{ flex: 1 }}
-                    onPress={() => setMode(optionMode)}
-                  >
-                    <YStack
-                      alignItems="center"
-                      gap="$1.5"
-                      paddingVertical="$3"
-                      borderRadius="$3"
-                      backgroundColor={isSelected ? '$accent' : 'transparent'}
+          {/* Display Section */}
+          <YStack marginBottom="$6">
+            <Text color="$mutedForeground" marginBottom="$3">
+              화면 모드
+            </Text>
+            <YCard>
+              <XStack padding="$3" gap="$2">
+                {THEME_MODE_OPTIONS.map(({ mode: optionMode, label, Icon }) => {
+                  const isSelected = mode === optionMode;
+                  return (
+                    <Pressable
+                      key={optionMode}
+                      style={{ flex: 1 }}
+                      onPress={() => setMode(optionMode)}
                     >
-                      <Icon size={18} color="$foreground" />
-                      <Text
-                        color="$foreground"
-                        fontSize={13}
-                        fontWeight={isSelected ? '600' : '400'}
+                      <YStack
+                        alignItems="center"
+                        gap="$1.5"
+                        paddingVertical="$3"
+                        borderRadius="$3"
+                        backgroundColor={isSelected ? '$accent' : 'transparent'}
                       >
-                        {label}
-                      </Text>
-                    </YStack>
-                  </Pressable>
-                );
-              })}
-            </XStack>
-          </YCard>
-        </YStack>
+                        <Icon size={18} color="$foreground" />
+                        <Text
+                          color="$foreground"
+                          fontSize={13}
+                          fontWeight={isSelected ? '600' : '400'}
+                        >
+                          {label}
+                        </Text>
+                      </YStack>
+                    </Pressable>
+                  );
+                })}
+              </XStack>
+            </YCard>
+          </YStack>
 
-        {/* Support Section */}
-        <YStack marginBottom="$6">
-          <Text color="$mutedForeground" marginBottom="$3">
-            지원
-          </Text>
-          <YCard>
-            <SettingItem
-              icon={<Info size={20} color="$foreground" />}
-              label="앱 정보"
-              onPress={() => router.push('/settings/about')}
-              showDivider={__DEV__}
-            />
-            {__DEV__ && (
+          {/* Support Section */}
+          <YStack marginBottom="$6">
+            <Text color="$mutedForeground" marginBottom="$3">
+              지원
+            </Text>
+            <YCard>
               <SettingItem
                 icon={<Info size={20} color="$foreground" />}
-                label="디버그 로그"
-                onPress={() => router.push('/settings/debug-logs')}
+                label="앱 정보"
+                onPress={() => router.push('/settings/about')}
               />
-            )}
-          </YCard>
-        </YStack>
+            </YCard>
+          </YStack>
 
-        {/* Logout Button */}
-        <FilledButton
-          backgroundColor="$destructive"
-          pressStyle={{ opacity: 0.8 }}
-          marginTop="$4"
-          onPress={handleLogout}
-        >
-          <Text color="white" fontWeight="500">
-            로그아웃
+          {/* Logout Button */}
+          <FilledButton
+            backgroundColor="$destructive"
+            pressStyle={{ opacity: 0.8 }}
+            marginTop="$4"
+            onPress={handleLogout}
+          >
+            <Text color="white" fontWeight="500">
+              로그아웃
+            </Text>
+          </FilledButton>
+
+          {/* Version */}
+          <Text textAlign="center" color="$mutedForeground" marginTop="$6">
+            Version 1.0.0
           </Text>
-        </FilledButton>
-
-        {/* Version */}
-        <Text textAlign="center" color="$mutedForeground" marginTop="$6">
-          Version 1.0.0
-        </Text>
-      </ScrollView>
+        </ScrollView>
+      </FadeWrapper>
     </YStack>
   );
 }

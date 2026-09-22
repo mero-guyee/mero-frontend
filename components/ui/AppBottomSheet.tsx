@@ -51,6 +51,7 @@ export default function AppBottomSheet({
       dismissOnSnapToBottom={dismissOnSnapToBottom}
       dismissOnOverlayPress={dismissOnOverlayPress}
       zIndex={zIndex}
+      moveOnKeyboardChange
     >
       <Sheet.Overlay
         animation="lazy"
