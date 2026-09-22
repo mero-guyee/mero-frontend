@@ -75,16 +75,18 @@ export default function DatePickerInput({
           zIndex={zIndex}
           sheetKey={sheetKey}
         >
-          <DateTimePicker
-            value={tempDate}
-            mode="date"
-            display="spinner"
-            onChange={handleSpinnerChange}
-            style={{ height: 200 }}
-            themeVariant={theme}
-            minimumDate={minimumDate}
-            maximumDate={maximumDate}
-          />
+          {show && (
+            <DateTimePicker
+              value={tempDate}
+              mode="date"
+              display="spinner"
+              onChange={handleSpinnerChange}
+              style={{ height: 200 }}
+              themeVariant={theme}
+              minimumDate={minimumDate}
+              maximumDate={maximumDate}
+            />
+          )}
 
           <FilledButton fontWeight="600" fontSize={16} onPress={handleConfirm}>
             <Text color="$foreground">완료</Text>
