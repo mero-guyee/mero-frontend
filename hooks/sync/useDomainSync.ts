@@ -1,3 +1,4 @@
+import { SyncingCallbacks, useSyncingContext } from '@/contexts/SyncingContext';
 import { outboxKey } from '@/repositories/outbox';
 import { useQueryClient } from '@tanstack/react-query';
 import * as SQLite from 'expo-sqlite';
@@ -28,18 +29,22 @@ function getTouchedDomains(results: SyncResults): Set<string> {
   return touched;
 }
 
-async function runSync(db: SQLite.SQLiteDatabase, maxAgeMinutes?: number): Promise<SyncResults> {
-  const trips = await syncTrips(db, maxAgeMinutes);
+async function runSync(
+  db: SQLite.SQLiteDatabase,
+  maxAgeMinutes: number | undefined,
+  syncing: SyncingCallbacks
+): Promise<SyncResults> {
+  const trips = await syncTrips(db, maxAgeMinutes, syncing);
 
   const [memos, footprints, budgets, documents] = await Promise.all([
-    syncMemos(db, maxAgeMinutes),
-    syncFootprints(db, maxAgeMinutes),
-    syncBudgets(db, maxAgeMinutes),
-    syncDocuments(db, maxAgeMinutes),
+    syncMemos(db, maxAgeMinutes, syncing),
+    syncFootprints(db, maxAgeMinutes, syncing),
+    syncBudgets(db, maxAgeMinutes, syncing),
+    syncDocuments(db, maxAgeMinutes, syncing),
   ]);
 
-  const photos = await syncPhotos(db, maxAgeMinutes);
-  const expenses = await syncExpenses(db, maxAgeMinutes);
+  const photos = await syncPhotos(db, maxAgeMinutes, syncing);
+  const expenses = await syncExpenses(db, maxAgeMinutes, syncing);
 
   return { trips, memos, footprints, budgets, documents, photos, expenses };
 }
@@ -51,35 +56,46 @@ interface InFlightSync {
 
 export function useDomainSync(db: SQLite.SQLiteDatabase) {
   const qc = useQueryClient();
-  const prevSyncResult = useRef<InFlightSync | null>(null);
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
+  const inFlightSync = useRef<InFlightSync | null>(null);
 
   return useCallback(
     async (maxAgeMinutes?: number) => {
-      let touched = new Set<string>();
       try {
-        const isIdle = !prevSyncResult.current;
+        const isIdle = !inFlightSync.current;
         const isCurrentSyncImmediately = maxAgeMinutes === undefined;
-        const isPrevSyncPolling = prevSyncResult.current?.maxAgeMinutes !== undefined;
+        const isInFlightPolling = inFlightSync.current?.maxAgeMinutes !== undefined;
 
-        if (isIdle || (isPrevSyncPolling && isCurrentSyncImmediately)) {
-          const promise = runSync(db, maxAgeMinutes).finally(() => {
-            if (prevSyncResult.current?.promise === promise) {
-              prevSyncResult.current = null;
-            }
-          });
-          prevSyncResult.current = { maxAgeMinutes, promise };
+        if (isIdle || (isInFlightPolling && isCurrentSyncImmediately)) {
+          const promise = runSync(db, maxAgeMinutes, {
+            markSyncing,
+            unmarkSyncing,
+            markSyncingSucceeded,
+            markSyncingFailed,
+          })
+            .then((results) => {
+              const touched = getTouchedDomains(results);
+              if (touched.size > 0) {
+                for (const domain of touched) {
+                  qc.invalidateQueries({ queryKey: [domain] });
+                }
+                qc.invalidateQueries({ queryKey: outboxKey });
+              }
+              return results;
+            })
+            .finally(() => {
+              if (inFlightSync.current?.promise === promise) {
+                inFlightSync.current = null;
+              }
+            });
+          inFlightSync.current = { maxAgeMinutes, promise };
         }
-        touched = getTouchedDomains(await prevSyncResult.current!.promise);
+        await inFlightSync.current!.promise;
       } catch {
-      } finally {
-        if (touched.size > 0) {
-          for (const domain of touched) {
-            qc.invalidateQueries({ queryKey: [domain] });
-          }
-          qc.invalidateQueries({ queryKey: outboxKey });
-        }
+        // sync errors are surfaced per-item via outbox status; nothing to do here
       }
     },
-    [db, qc]
+    [db, qc, markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed]
   );
 }

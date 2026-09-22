@@ -1,4 +1,6 @@
+import { ApiError } from '@/api/client';
 import { expensesApi } from '@/api/expenses';
+import { SyncingCallbacks } from '@/contexts/SyncingContext';
 import { enqueueMutation } from '@/hooks/queries/mutationQueue';
 import {
   ExpenseCategoryRepository,
@@ -11,7 +13,8 @@ import * as SQLite from 'expo-sqlite';
 
 export async function syncExpenses(
   db: SQLite.SQLiteDatabase,
-  maxAgeMinutes?: number
+  maxAgeMinutes?: number,
+  syncing?: SyncingCallbacks
 ): Promise<boolean> {
   const repo = new ExpenseRepository(db);
   const tripRepo = new TripRepository(db);
@@ -22,6 +25,7 @@ export async function syncExpenses(
 
   for (const { dataId, operation } of ready) {
     await enqueueMutation(dataId, async () => {
+      syncing?.markSyncing(dataId);
       try {
         if (operation === 'create') {
           const expense = await repo.findById(dataId);
@@ -30,15 +34,21 @@ export async function syncExpenses(
             return;
           }
           const trip = await tripRepo.findById(expense.tripId);
-          if (!trip?.serverId) return;
+          if (!trip?.serverId) {
+            return;
+          }
 
           const categoryServerId = (await categoryRepo.findById(expense.categoryId))?.serverId;
-          if (!categoryServerId) return;
+          if (!categoryServerId) {
+            return;
+          }
 
           let footprintServerId: number | undefined;
           if (expense.footprintId) {
             const footprint = await footprintRepo.findById(expense.footprintId);
-            if (!footprint?.serverId) return;
+            if (!footprint?.serverId) {
+              return;
+            }
             footprintServerId = parseInt(footprint.serverId);
           }
 
@@ -54,6 +64,7 @@ export async function syncExpenses(
             location: expense.location ?? undefined,
           });
           await repo.setServerId(expense.id, String(serverExpense.id));
+          syncing?.markSyncingSucceeded(dataId);
         } else if (operation === 'update') {
           const expense = await repo.findById(dataId);
           if (!expense?.serverId) {
@@ -61,10 +72,14 @@ export async function syncExpenses(
             return;
           }
           const trip = await tripRepo.findById(expense.tripId);
-          if (!trip?.serverId) return;
+          if (!trip?.serverId) {
+            return;
+          }
 
           const categoryServerId = (await categoryRepo.findById(expense.categoryId))?.serverId;
-          if (!categoryServerId) return;
+          if (!categoryServerId) {
+            return;
+          }
 
           await expensesApi.update(parseInt(trip.serverId), parseInt(expense.serverId), {
             amount: expense.amount,
@@ -75,6 +90,7 @@ export async function syncExpenses(
             location: expense.location ?? undefined,
           });
           await repo.markSynced(dataId);
+          syncing?.markSyncingSucceeded(dataId);
         } else if (operation === 'delete') {
           const expense = await repo.findByIdIncludeDeleted(dataId);
           if (!expense?.serverId) {
@@ -82,12 +98,22 @@ export async function syncExpenses(
             return;
           }
           const trip = await tripRepo.findById(expense.tripId);
-          if (!trip?.serverId) return;
+          if (!trip?.serverId) {
+            return;
+          }
           await expensesApi.delete(parseInt(trip.serverId), parseInt(expense.serverId));
           await outbox.remove('expenses', dataId);
         }
-      } catch {
-        await outbox.markFailed('expenses', dataId);
+      } catch (e) {
+        if (operation === 'delete' && e instanceof ApiError && e.status === 404) {
+          await outbox.remove('expenses', dataId);
+          syncing?.markSyncingSucceeded(dataId);
+        } else {
+          await outbox.markFailed('expenses', dataId);
+          syncing?.markSyncingFailed(dataId);
+        }
+      } finally {
+        syncing?.unmarkSyncing(dataId);
       }
     });
   }

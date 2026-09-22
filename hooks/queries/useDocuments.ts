@@ -101,6 +101,58 @@ export function useCreateDocument() {
   });
 }
 
+export function useUpdateDocument() {
+  const db = useDb();
+  const qc = useQueryClient();
+  const { markSyncing, unmarkSyncing, markSyncingSucceeded, markSyncingFailed } =
+    useSyncingContext();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      tripId,
+      fileName,
+    }: {
+      id: string;
+      tripId: string;
+      fileName: string;
+    }) => {
+      const docRepo = new DocumentRepository(db);
+      const tripRepo = new TripRepository(db);
+      const updated = await docRepo.updateFileName(id, fileName);
+
+      enqueueMutation(id, async () => {
+        markSyncing(id);
+        try {
+          const fresh = await docRepo.findById(id);
+          if (fresh?.serverId) {
+            const trip = await tripRepo.getTripById(tripId);
+            if (trip?.serverId) {
+              await documentsApi.update(parseInt(trip.serverId), parseInt(fresh.serverId), {
+                fileName: fresh.fileName,
+              });
+              await docRepo.markSynced(id);
+              markSyncingSucceeded(id);
+              await qc.invalidateQueries({ queryKey: documentKeys.byTrip(tripId) });
+            }
+          }
+        } catch (e) {
+          if (e instanceof ApiError) {
+            console.error('Failed to update document on server:', e);
+          }
+          markSyncingFailed(id);
+        } finally {
+          unmarkSyncing(id);
+        }
+      });
+
+      return updated;
+    },
+    onSuccess: (_, { tripId }) => {
+      qc.invalidateQueries({ queryKey: documentKeys.byTrip(tripId) });
+    },
+  });
+}
+
 export function useDeleteDocument() {
   const db = useDb();
   const qc = useQueryClient();

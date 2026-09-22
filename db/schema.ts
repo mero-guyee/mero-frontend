@@ -1,4 +1,4 @@
-export const SCHEMA_VERSION = 22;
+export const SCHEMA_VERSION = 23;
 
 export const DROP_TABLES = `
   DROP TABLE IF EXISTS outbox;
@@ -200,13 +200,15 @@ export const CREATE_TABLES = `
   );
 
   CREATE TABLE IF NOT EXISTS outbox (
-    id        TEXT PRIMARY KEY NOT NULL,
-    domain    TEXT NOT NULL,
-    dataId    TEXT NOT NULL,
-    dataName  TEXT NOT NULL DEFAULT '',
-    operation TEXT NOT NULL DEFAULT 'create',
-    status    TEXT NOT NULL DEFAULT 'pending',
-    createdAt TEXT NOT NULL DEFAULT (datetime('now')),
+    id          TEXT PRIMARY KEY NOT NULL,
+    domain      TEXT NOT NULL,
+    dataId      TEXT NOT NULL,
+    dataName    TEXT NOT NULL DEFAULT '',
+    operation   TEXT NOT NULL DEFAULT 'create',
+    status      TEXT NOT NULL DEFAULT 'pending',
+    createdAt   TEXT NOT NULL DEFAULT (datetime('now')),
+    failCount   INTEGER NOT NULL DEFAULT 0,
+    nextRetryAt TEXT NOT NULL DEFAULT (datetime('now')),
     UNIQUE(domain, dataId)
   );
 

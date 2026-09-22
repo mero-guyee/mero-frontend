@@ -14,6 +14,11 @@ interface SyncingContextType {
   clearSyncingFailed: (id: string) => void;
 }
 
+export type SyncingCallbacks = Pick<
+  SyncingContextType,
+  'markSyncing' | 'unmarkSyncing' | 'markSyncingSucceeded' | 'markSyncingFailed'
+>;
+
 const SyncingContext = createContext<SyncingContextType | null>(null);
 
 export function SyncingProvider({ children }: { children: ReactNode }) {
