@@ -28,6 +28,10 @@ export function useFootprintForm() {
   const [locations, setLocations] = useState<FootprintLocation[]>([]);
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
 
+  const currentTrip = trips.find((t) => t.id === tripId);
+  const dateMin = currentTrip ? new Date(currentTrip.startDate) : undefined;
+  const dateMax = currentTrip ? new Date(currentTrip.endDate) : undefined;
+
   useEffect(() => {
     if (!existingFootprint) return;
     setTitle(existingFootprint.title);
@@ -72,6 +76,15 @@ export function useFootprintForm() {
   };
 
   const handleSubmit = async () => {
+    if (currentTrip && (date < currentTrip.startDate || date > currentTrip.endDate)) {
+      Toast.show({
+        type: 'error',
+        text1: '날짜 오류',
+        text2: '일지 날짜는 여행 기간 내로 설정해주세요.',
+      });
+      return;
+    }
+
     const footprintData = {
       tripId,
       title: title.trim(),
@@ -108,6 +121,8 @@ export function useFootprintForm() {
     setTitle,
     date,
     setDate,
+    dateMin,
+    dateMax,
     content,
     setContent,
     tripId,

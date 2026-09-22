@@ -46,9 +46,13 @@ export default function ExpenseForm({
 }: ExpenseFormProps) {
   const isEdit = mode === 'edit';
   const router = useRouter();
-  const { activeTrip } = useTrips();
+  const { activeTrip, getTripById } = useTrips();
   const { categories, addExpense, updateExpense } = useExpenses();
   const effectiveTripId = tripId || activeTrip || '';
+
+  const currentTrip = getTripById(isEdit ? expense.tripId : effectiveTripId);
+  const dateMin = currentTrip ? new Date(currentTrip.startDate) : undefined;
+  const dateMax = currentTrip ? new Date(currentTrip.endDate) : undefined;
 
   const [amount, setAmount] = useState(expense?.amount?.toString() ?? '');
   const [currency, setCurrency] = useState(expense?.currency ?? 'KRW');
@@ -85,6 +89,15 @@ export default function ExpenseForm({
   };
 
   const handleSubmit = async () => {
+    if (currentTrip && (date < currentTrip.startDate || date > currentTrip.endDate)) {
+      Toast.show({
+        type: 'error',
+        text1: '날짜 오류',
+        text2: '경비 날짜는 여행 기간 내로 설정해주세요.',
+      });
+      return;
+    }
+
     markSaved();
 
     if (isEdit) {
@@ -177,7 +190,12 @@ export default function ExpenseForm({
             <Text color="$foreground" marginBottom="$2" fontWeight="500">
               날짜
             </Text>
-            <DatePickerInput value={date} onChange={setDate} />
+            <DatePickerInput
+              value={date}
+              onChange={setDate}
+              minimumDate={dateMin}
+              maximumDate={dateMax}
+            />
           </YStack>
 
           {/* Description */}

@@ -21,6 +21,8 @@ export default function FootprintFormScreen() {
     setTitle,
     date,
     setDate,
+    dateMin,
+    dateMax,
     content,
     setContent,
     weatherInfo,
@@ -56,6 +58,8 @@ export default function FootprintFormScreen() {
           <FootprintToolbar
             date={date}
             onDateChange={setDate}
+            dateMin={dateMin}
+            dateMax={dateMax}
             weatherInfo={weatherInfo}
             onWeatherChange={setWeatherInfo}
             onLocationAdd={(loc) => setLocations((prev) => [...prev, loc])}

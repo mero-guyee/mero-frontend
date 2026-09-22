@@ -15,7 +15,7 @@ import { ComponentRef, useRef, useState } from 'react';
 import { Pressable } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { ScrollView, Stack, Text, XStack, YStack } from 'tamagui';
-import { useAppModal, useExpenses, useFootprints } from '../../contexts';
+import { useAppModal, useExpenses, useFootprints, useTrips } from '../../contexts';
 
 const plainInputStyle = {
   borderWidth: 0,
@@ -58,10 +58,14 @@ export default function ExpenseDetail({ expenseId }: { expenseId: string }) {
   const router = useRouter();
   const { expenses, categories, updateExpense, deleteExpense } = useExpenses();
   const { footprints } = useFootprints();
+  const { getTripById } = useTrips();
   const { showConfirm } = useAppModal();
 
   const expense = expenses.find((e) => e.id === expenseId);
   const linkedFootprint = footprints.find((f) => f.id === expense?.footprintId);
+  const currentTrip = expense ? getTripById(expense.tripId) : undefined;
+  const dateMin = currentTrip ? new Date(currentTrip.startDate) : undefined;
+  const dateMax = currentTrip ? new Date(currentTrip.endDate) : undefined;
 
   const [tempAmount, setTempAmount] = useState(expense?.amount?.toString() ?? '');
   const [tempDescription, setTempDescription] = useState(expense?.description ?? '');
@@ -210,6 +214,8 @@ export default function ExpenseDetail({ expenseId }: { expenseId: string }) {
             <DatePickerInput
               value={expense.date}
               onChange={(date) => updateExpense({ ...expense, date })}
+              minimumDate={dateMin}
+              maximumDate={dateMax}
               renderTrigger={(onPress) => (
                 <FieldRow label="날짜" value={expense.date} onPress={onPress} />
               )}

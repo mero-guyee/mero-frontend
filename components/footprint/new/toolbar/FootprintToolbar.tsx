@@ -8,6 +8,8 @@ import WeatherButton from './WeatherButton';
 interface FootprintToolbarProps {
   date: string;
   onDateChange: (date: string) => void;
+  dateMin?: Date;
+  dateMax?: Date;
   weatherInfo: string;
   onWeatherChange: (weatherInfo: string) => void;
   onLocationAdd: (location: FootprintLocation) => void;
@@ -17,6 +19,8 @@ interface FootprintToolbarProps {
 export default function FootprintToolbar({
   date,
   onDateChange,
+  dateMin,
+  dateMax,
   weatherInfo,
   onWeatherChange,
   onLocationAdd,
@@ -24,7 +28,7 @@ export default function FootprintToolbar({
 }: FootprintToolbarProps) {
   return (
     <XStack flexWrap="wrap" paddingHorizontal="$3">
-      <DateButton value={date} onChange={onDateChange} />
+      <DateButton value={date} onChange={onDateChange} minimumDate={dateMin} maximumDate={dateMax} />
       <LocationButton onAdd={onLocationAdd} />
       <WeatherButton value={weatherInfo} onChange={onWeatherChange} />
       <PhotoButton onAdd={onPhotoAdd} />
