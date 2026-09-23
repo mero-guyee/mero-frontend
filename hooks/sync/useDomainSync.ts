@@ -1,6 +1,6 @@
 import { SyncingCallbacks, useSyncingContext } from '@/contexts/SyncingContext';
 import { outboxKey } from '@/repositories/outbox';
-import { useQueryClient } from '@tanstack/react-query';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import * as SQLite from 'expo-sqlite';
 import { useCallback, useRef } from 'react';
 import { syncBudgets } from './syncBudgets';
@@ -21,30 +21,37 @@ interface SyncResults {
   expenses: boolean;
 }
 
-function getTouchedDomains(results: SyncResults): Set<string> {
-  const touched = new Set<string>();
-  for (const [key, changed] of Object.entries(results) as [keyof SyncResults, boolean][]) {
-    if (changed) touched.add(key === 'photos' ? 'footprints' : key);
+async function syncDomain(
+  domain: keyof SyncResults,
+  sync: () => Promise<boolean>,
+  qc: QueryClient
+): Promise<boolean> {
+  const changed = await sync();
+  if (changed) {
+    const queryKey = domain === 'photos' ? 'footprints' : domain;
+    qc.invalidateQueries({ queryKey: [queryKey] });
+    qc.invalidateQueries({ queryKey: outboxKey });
   }
-  return touched;
+  return changed;
 }
 
 async function runSync(
   db: SQLite.SQLiteDatabase,
   maxAgeMinutes: number | undefined,
-  syncing: SyncingCallbacks
+  syncing: SyncingCallbacks,
+  qc: QueryClient
 ): Promise<SyncResults> {
-  const trips = await syncTrips(db, maxAgeMinutes, syncing);
+  const trips = await syncDomain('trips', () => syncTrips(db, maxAgeMinutes, syncing), qc);
 
   const [memos, footprints, budgets, documents] = await Promise.all([
-    syncMemos(db, maxAgeMinutes, syncing),
-    syncFootprints(db, maxAgeMinutes, syncing),
-    syncBudgets(db, maxAgeMinutes, syncing),
-    syncDocuments(db, maxAgeMinutes, syncing),
+    syncDomain('memos', () => syncMemos(db, maxAgeMinutes, syncing), qc),
+    syncDomain('footprints', () => syncFootprints(db, maxAgeMinutes, syncing), qc),
+    syncDomain('budgets', () => syncBudgets(db, maxAgeMinutes, syncing), qc),
+    syncDomain('documents', () => syncDocuments(db, maxAgeMinutes, syncing), qc),
   ]);
 
-  const photos = await syncPhotos(db, maxAgeMinutes, syncing);
-  const expenses = await syncExpenses(db, maxAgeMinutes, syncing);
+  const photos = await syncDomain('photos', () => syncPhotos(db, maxAgeMinutes, syncing), qc);
+  const expenses = await syncDomain('expenses', () => syncExpenses(db, maxAgeMinutes, syncing), qc);
 
   return { trips, memos, footprints, budgets, documents, photos, expenses };
 }
@@ -68,27 +75,21 @@ export function useDomainSync(db: SQLite.SQLiteDatabase) {
         const isInFlightPolling = inFlightSync.current?.maxAgeMinutes !== undefined;
 
         if (isIdle || (isInFlightPolling && isCurrentSyncImmediately)) {
-          const promise = runSync(db, maxAgeMinutes, {
-            markSyncing,
-            unmarkSyncing,
-            markSyncingSucceeded,
-            markSyncingFailed,
-          })
-            .then((results) => {
-              const touched = getTouchedDomains(results);
-              if (touched.size > 0) {
-                for (const domain of touched) {
-                  qc.invalidateQueries({ queryKey: [domain] });
-                }
-                qc.invalidateQueries({ queryKey: outboxKey });
-              }
-              return results;
-            })
-            .finally(() => {
-              if (inFlightSync.current?.promise === promise) {
-                inFlightSync.current = null;
-              }
-            });
+          const promise = runSync(
+            db,
+            maxAgeMinutes,
+            {
+              markSyncing,
+              unmarkSyncing,
+              markSyncingSucceeded,
+              markSyncingFailed,
+            },
+            qc
+          ).finally(() => {
+            if (inFlightSync.current?.promise === promise) {
+              inFlightSync.current = null;
+            }
+          });
           inFlightSync.current = { maxAgeMinutes, promise };
         }
         await inFlightSync.current!.promise;
