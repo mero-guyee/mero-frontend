@@ -2,6 +2,7 @@ import { ApiError } from '@/api/client';
 import { expensesApi } from '@/api/expenses';
 import { SyncingCallbacks } from '@/contexts/SyncingContext';
 import { enqueueMutation } from '@/hooks/queries/mutationQueue';
+import { runWithConcurrency, SYNC_CONCURRENCY } from '@/hooks/sync/concurrency';
 import {
   ExpenseCategoryRepository,
   ExpenseRepository,
@@ -23,7 +24,7 @@ export async function syncExpenses(
   const outbox = new OutboxRepository(db);
   const ready = await outbox.getReady('expenses', maxAgeMinutes);
 
-  for (const { dataId, operation } of ready) {
+  await runWithConcurrency(ready, SYNC_CONCURRENCY, async ({ dataId, operation }) => {
     await enqueueMutation(dataId, async () => {
       syncing?.markSyncing(dataId);
       try {
@@ -116,7 +117,7 @@ export async function syncExpenses(
         syncing?.unmarkSyncing(dataId);
       }
     });
-  }
+  });
 
   return ready.length > 0;
 }

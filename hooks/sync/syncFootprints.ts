@@ -2,6 +2,7 @@ import { ApiError } from '@/api/client';
 import { footprintsApi } from '@/api/footprints';
 import { SyncingCallbacks } from '@/contexts/SyncingContext';
 import { enqueueMutation } from '@/hooks/queries/mutationQueue';
+import { runWithConcurrency, SYNC_CONCURRENCY } from '@/hooks/sync/concurrency';
 import { FootprintRepository, OutboxRepository, TripRepository } from '@/repositories';
 import * as SQLite from 'expo-sqlite';
 
@@ -15,7 +16,7 @@ export async function syncFootprints(
   const outbox = new OutboxRepository(db);
   const ready = await outbox.getReady('footprints', maxAgeMinutes);
 
-  for (const { dataId, operation } of ready) {
+  await runWithConcurrency(ready, SYNC_CONCURRENCY, async ({ dataId, operation }) => {
     await enqueueMutation(dataId, async () => {
       syncing?.markSyncing(dataId);
       try {
@@ -87,7 +88,7 @@ export async function syncFootprints(
         syncing?.unmarkSyncing(dataId);
       }
     });
-  }
+  });
 
   return ready.length > 0;
 }

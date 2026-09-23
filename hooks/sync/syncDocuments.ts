@@ -2,6 +2,7 @@ import { ApiError } from '@/api/client';
 import { documentsApi } from '@/api/documents';
 import { SyncingCallbacks } from '@/contexts/SyncingContext';
 import { enqueueMutation } from '@/hooks/queries/mutationQueue';
+import { runWithConcurrency, SYNC_CONCURRENCY } from '@/hooks/sync/concurrency';
 import { DocumentRepository, OutboxRepository, TripRepository } from '@/repositories';
 import { resolveAbsoluteFileUri } from '@/repositories/documents';
 import * as SQLite from 'expo-sqlite';
@@ -16,7 +17,7 @@ export async function syncDocuments(
   const outbox = new OutboxRepository(db);
   const ready = await outbox.getReady('documents', maxAgeMinutes);
 
-  for (const { dataId, operation } of ready) {
+  await runWithConcurrency(ready, SYNC_CONCURRENCY, async ({ dataId, operation }) => {
     await enqueueMutation(dataId, async () => {
       syncing?.markSyncing(dataId);
       try {
@@ -77,7 +78,7 @@ export async function syncDocuments(
         syncing?.unmarkSyncing(dataId);
       }
     });
-  }
+  });
 
   return ready.length > 0;
 }

@@ -2,6 +2,7 @@ import { ApiError } from '@/api/client';
 import { budgetsApi } from '@/api/budgets';
 import { SyncingCallbacks } from '@/contexts/SyncingContext';
 import { enqueueMutation } from '@/hooks/queries/mutationQueue';
+import { runWithConcurrency, SYNC_CONCURRENCY } from '@/hooks/sync/concurrency';
 import { BudgetRepository, OutboxRepository, TripRepository } from '@/repositories';
 import * as SQLite from 'expo-sqlite';
 
@@ -15,7 +16,7 @@ export async function syncBudgets(
   const outbox = new OutboxRepository(db);
   const ready = await outbox.getReady('budgets', maxAgeMinutes);
 
-  for (const { dataId, operation } of ready) {
+  await runWithConcurrency(ready, SYNC_CONCURRENCY, async ({ dataId, operation }) => {
     await enqueueMutation(dataId, async () => {
       syncing?.markSyncing(dataId);
       try {
@@ -79,7 +80,7 @@ export async function syncBudgets(
         syncing?.unmarkSyncing(dataId);
       }
     });
-  }
+  });
 
   return ready.length > 0;
 }

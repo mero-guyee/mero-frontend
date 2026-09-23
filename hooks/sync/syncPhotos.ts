@@ -2,6 +2,7 @@ import { ApiError } from '@/api/client';
 import { photosApi } from '@/api/photos';
 import { SyncingCallbacks } from '@/contexts/SyncingContext';
 import { enqueueMutation } from '@/hooks/queries/mutationQueue';
+import { runWithConcurrency, SYNC_CONCURRENCY } from '@/hooks/sync/concurrency';
 import { FootprintRepository, OutboxRepository, PhotoRepository, TripRepository } from '@/repositories';
 import { uploadPhotosAndSync } from '@/utils/photoSync';
 import * as SQLite from 'expo-sqlite';
@@ -26,37 +27,41 @@ export async function syncPhotos(
     byFootprint.set(photo.footprintId, group);
   }
 
-  for (const [footprintId, photos] of byFootprint) {
-    await enqueueMutation(footprintId, async () => {
-      syncing?.markSyncing(footprintId);
-      try {
-        const footprint = await footprintRepo.findById(footprintId);
-        if (!footprint?.serverId) {
-          return;
+  await runWithConcurrency(
+    Array.from(byFootprint.entries()),
+    SYNC_CONCURRENCY,
+    async ([footprintId, photos]) => {
+      await enqueueMutation(footprintId, async () => {
+        syncing?.markSyncing(footprintId);
+        try {
+          const footprint = await footprintRepo.findById(footprintId);
+          if (!footprint?.serverId) {
+            return;
+          }
+          const trip = await tripRepo.getTripById(footprint.tripId);
+          if (!trip?.serverId) {
+            return;
+          }
+          await uploadPhotosAndSync(
+            photoRepo,
+            photos,
+            parseInt(trip.serverId),
+            parseInt(footprint.serverId)
+          );
+          syncing?.markSyncingSucceeded(footprintId);
+        } catch (e) {
+          // leave as pending for next sync
+          syncing?.markSyncingFailed(footprintId);
+        } finally {
+          syncing?.unmarkSyncing(footprintId);
         }
-        const trip = await tripRepo.getTripById(footprint.tripId);
-        if (!trip?.serverId) {
-          return;
-        }
-        await uploadPhotosAndSync(
-          photoRepo,
-          photos,
-          parseInt(trip.serverId),
-          parseInt(footprint.serverId)
-        );
-        syncing?.markSyncingSucceeded(footprintId);
-      } catch (e) {
-        // leave as pending for next sync
-        syncing?.markSyncingFailed(footprintId);
-      } finally {
-        syncing?.unmarkSyncing(footprintId);
-      }
-    });
-  }
+      });
+    }
+  );
 
   // 2. Delete photos from outbox
   const readyDeletes = await outbox.getReady('photos', maxAgeMinutes);
-  for (const { dataId } of readyDeletes) {
+  await runWithConcurrency(readyDeletes, SYNC_CONCURRENCY, async ({ dataId }) => {
     await enqueueMutation(dataId, async () => {
       try {
         const photo = await photoRepo.findByIdIncludeDeleted(dataId);
@@ -87,7 +92,7 @@ export async function syncPhotos(
         }
       }
     });
-  }
+  });
 
   return pendingUploads.length > 0 || readyDeletes.length > 0;
 }
