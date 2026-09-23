@@ -4,8 +4,8 @@ import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { SubTabs } from '@/components/ui/tabbar/subTabs/SubTabs';
 import { useTrips } from '@/contexts';
 import { getDaysUntilTripStart } from '@/data/utils';
-import { useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { TabView } from 'react-native-tab-view';
 import Toast from 'react-native-toast-message';
@@ -25,12 +25,6 @@ export default function ExpenseScreen() {
 
   const [index, setIndex] = useState(tripNotStarted ? 1 : 0);
   const layout = useWindowDimensions();
-
-  useFocusEffect(
-    useCallback(() => {
-      return () => setIndex(tripNotStarted ? 1 : 0);
-    }, [tripNotStarted])
-  );
 
   const handleDisabledPress = () => {
     Toast.show({
