@@ -5,6 +5,10 @@ export const outboxKey = ['outbox'] as const;
 const BASE_BACKOFF_SECONDS = 10;
 const MAX_BACKOFF_SECONDS = 30 * 60;
 
+function computeBackoffDelaySeconds(failCount: number): number {
+  return Math.min(BASE_BACKOFF_SECONDS * 2 ** (failCount - 1), MAX_BACKOFF_SECONDS);
+}
+
 export interface OutboxEntry {
   id: string;
   domain: string;
@@ -47,7 +51,7 @@ export class OutboxRepository {
       [domain, dataId]
     );
     const failCount = (row?.failCount ?? 0) + 1;
-    const delaySeconds = Math.min(BASE_BACKOFF_SECONDS * 2 ** (failCount - 1), MAX_BACKOFF_SECONDS);
+    const delaySeconds = computeBackoffDelaySeconds(failCount);
     await this.db.runAsync(
       `UPDATE outbox
        SET status = 'failed', failCount = ?, nextRetryAt = datetime('now', '+' || ? || ' seconds')
@@ -60,6 +64,13 @@ export class OutboxRepository {
     await this.db.runAsync(
       `UPDATE outbox SET failCount = 0, nextRetryAt = datetime('now') WHERE domain = ? AND dataId = ?`,
       [domain, dataId]
+    );
+  }
+
+  async resetBackoffForDomain(domain: string): Promise<void> {
+    await this.db.runAsync(
+      `UPDATE outbox SET failCount = 0, nextRetryAt = datetime('now') WHERE domain = ?`,
+      [domain]
     );
   }
 
