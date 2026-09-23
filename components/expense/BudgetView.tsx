@@ -34,7 +34,6 @@ export function BudgetView() {
   const [showBudgetModal, setShowBudgetModal] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | null>(null);
   const [budgetForm, setBudgetForm] = useState({ currency: getDefaultCurrency(), amount: '' });
-  const [createdId, setCreatedId] = useState<string | null>(null);
   const [expandedBudgetIds, setExpandedBudgetIds] = useState<Set<string>>(new Set());
 
   const toggleBudgetExpanded = (budgetId: string) => {
@@ -79,12 +78,11 @@ export function BudgetView() {
     }
 
     try {
-      const created = await addBudget({
+      await addBudget({
         tripId: activeTrip!,
         currency: budgetForm.currency,
         amount,
       });
-      setCreatedId(created.id);
       handleCloseBudgetModal();
     } catch {
       Toast.show({
@@ -148,7 +146,6 @@ export function BudgetView() {
                   onToggleExpand={() => toggleBudgetExpanded(budget.id)}
                   onEdit={() => handleOpenBudgetModal(budget)}
                   onDelete={() => handleDeleteBudget(budget.id)}
-                  isNew={budget.id === createdId}
                 />
               ))}
             </YStack>

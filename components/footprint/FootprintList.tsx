@@ -26,7 +26,6 @@ interface Props {
   onSelectFootprint: (id: string) => void;
   onSelectDraft: (id: string) => void;
   isEmpty: boolean;
-  createdId?: string;
 }
 
 function EmptyList() {
@@ -109,7 +108,6 @@ export default function FootprintList({
   onSelectFootprint,
   onSelectDraft,
   isEmpty,
-  createdId,
 }: Props) {
   const [currentSection, setCurrentSection] = useState<FootprintSection | undefined>(sections[0]);
   const { onElementLayout, onScroll, hasScrolledPast } = useScrolledPastElement();
@@ -172,14 +170,7 @@ export default function FootprintList({
             ) : null
           }
           renderItem={({ item }) => (
-            <FootprintItem
-              footprint={item}
-              onPress={() => onSelectFootprint(item.id)}
-              showSyncBadge={
-                item.id === createdId &&
-                (item.syncStatus === 'pending' || item.syncStatus === 'synced')
-              }
-            />
+            <FootprintItem footprint={item} onPress={() => onSelectFootprint(item.id)} />
           )}
           renderSectionFooter={() => <YStack height="$6" />}
           ListEmptyComponent={EmptyList}

@@ -18,7 +18,6 @@ interface BudgetCardProps {
   onToggleExpand: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  isNew?: boolean;
 }
 
 export function BudgetCard({
@@ -29,7 +28,6 @@ export function BudgetCard({
   onToggleExpand,
   onEdit,
   onDelete,
-  isNew = false,
 }: BudgetCardProps) {
   const currencyExpenses = expenses.filter((e) => e.currency === budget.currency);
   const spent = currencyExpenses.reduce((sum, e) => sum + e.amount, 0);
@@ -82,7 +80,7 @@ export function BudgetCard({
 
   return (
     <YCard padding="$5" position="relative">
-      {isNew && <SyncingResultBadge id={budget.id} />}
+      <SyncingResultBadge id={budget.id} />
 
       <YStack gap="$2" marginBottom="$4">
         <XStack alignItems="center" justifyContent="space-between">

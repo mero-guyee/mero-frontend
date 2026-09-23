@@ -7,7 +7,7 @@ import { footprintDraftKeys } from '@/hooks/queries/useFootprints';
 import { formatDateLabel, getTripDayNumber } from '@/utils/date';
 import { List, Map } from '@tamagui/lucide-icons';
 import { useQueryClient } from '@tanstack/react-query';
-import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { Pressable } from 'react-native';
 import { Stack, YStack } from 'tamagui';
@@ -16,7 +16,6 @@ import { useFootprints, useTrips } from '../../../contexts';
 export default function FootprintListScreen() {
   const router = useRouter();
   const qc = useQueryClient();
-  const { created } = useLocalSearchParams<{ created?: string }>();
 
   const { activeTrip, getTripById } = useTrips();
   const { footprints, drafts, isFootPrintLoading } = useFootprints();
@@ -101,7 +100,6 @@ export default function FootprintListScreen() {
                 router.push({ pathname: '/(main)/footprint/new', params: { draftId: id } })
               }
               isEmpty={filteredFootprints.length === 0}
-              createdId={created}
             />
           </Stack>
         )}

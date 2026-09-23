@@ -1,6 +1,6 @@
 import { paddingHorizontalGeneral } from '@/constants/theme';
 import { Trip } from '@/types';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { SectionList } from 'react-native';
 import Animated, { LinearTransition } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
@@ -23,7 +23,6 @@ export default function TripListScreen() {
   const isFocused = useIsFocused();
   const { showConfirm } = useAppModal();
 
-  const { created } = useLocalSearchParams<{ created?: string }>();
   const { tripsByProgress, trips, setActiveTrip, deleteTrip, isTripsLoading } = useTrips();
 
   const sections: { title: string; data: Trip[] }[] = [
@@ -109,7 +108,6 @@ export default function TripListScreen() {
                       onPress={() => handleSelectTrip(item.id)}
                       onEdit={() => handleEditTrip(item.id)}
                       onDelete={() => handleDeleteTrip(item)}
-                      showSyncBadge={created === item.id}
                     />
                   </FadeWrapper>
                 </Animated.View>

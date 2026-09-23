@@ -66,7 +66,7 @@ export function SyncingResultBadge({ id }: SyncingResultBadgeProps) {
   }, [syncFailed, id, clearSyncingFailed]);
 
   useEffect(() => {
-    if (!displayState) {
+    if (displayState !== 'syncSucceeded' && displayState !== 'syncFailed') {
       setHidden(false);
       return;
     }

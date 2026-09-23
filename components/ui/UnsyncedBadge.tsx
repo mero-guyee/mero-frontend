@@ -1,5 +1,5 @@
 import { CloudUpload } from '@tamagui/lucide-icons';
-import { Text, XStack } from 'tamagui';
+import { AnimatePresence, Text, XStack } from 'tamagui';
 import { useSyncingContext } from '../../contexts/SyncingContext';
 import type { SyncStatus } from '../../repositories/base';
 
@@ -17,20 +17,30 @@ const textShadow = {
 
 export function UnsyncedBadge({ status, id, onImage = false }: UnsyncedBadgeProps) {
   const { isSyncing } = useSyncingContext();
-  if (status !== 'pending') return null;
-  if (id && isSyncing(id)) return null;
+  const visible = status === 'pending' && !(id && isSyncing(id));
 
   return (
-    <XStack alignItems="center" gap="$1">
-      <CloudUpload size={12} color="$destructiveText" />
-      <Text
-        fontSize={11}
-        fontWeight="700"
-        color="$destructiveText"
-        {...(onImage ? textShadow : undefined)}
-      >
-        미동기화
-      </Text>
-    </XStack>
+    <AnimatePresence>
+      {visible && (
+        <XStack
+          key="unsynced"
+          alignItems="center"
+          gap="$1"
+          animation="fast"
+          enterStyle={{ opacity: 0 }}
+          exitStyle={{ opacity: 0 }}
+        >
+          <CloudUpload size={12} color="$destructiveText" />
+          <Text
+            fontSize={11}
+            fontWeight="700"
+            color="$destructiveText"
+            {...(onImage ? textShadow : undefined)}
+          >
+            미동기화
+          </Text>
+        </XStack>
+      )}
+    </AnimatePresence>
   );
 }

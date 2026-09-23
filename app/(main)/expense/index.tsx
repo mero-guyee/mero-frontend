@@ -4,7 +4,6 @@ import TabScreenHeader from '@/components/ui/header/TabScreenHeader';
 import { SubTabs } from '@/components/ui/tabbar/subTabs/SubTabs';
 import { useTrips } from '@/contexts';
 import { getDaysUntilTripStart } from '@/data/utils';
-import { useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { TabView } from 'react-native-tab-view';
@@ -17,7 +16,6 @@ const routes = [
 ];
 
 export default function ExpenseScreen() {
-  const { created } = useLocalSearchParams<{ created?: string }>();
   const { activeTrip, getTripById } = useTrips();
   const trip = activeTrip ? getTripById(activeTrip) : undefined;
   const daysUntilStart = trip ? getDaysUntilTripStart(trip.startDate) : 0;
@@ -44,7 +42,7 @@ export default function ExpenseScreen() {
         renderScene={({ route }) => {
           switch (route.key) {
             case 'expenses':
-              return <ExpensesView createdId={created} />;
+              return <ExpensesView />;
             case 'budget':
               return <BudgetView />;
             default:

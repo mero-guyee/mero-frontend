@@ -15,23 +15,16 @@ interface TripCardProps {
   onPress: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  showSyncBadge?: boolean;
 }
 
-export function TripCard({
-  trip,
-  onPress,
-  onEdit,
-  onDelete,
-  showSyncBadge = false,
-}: TripCardProps) {
+export function TripCard({ trip, onPress, onEdit, onDelete }: TripCardProps) {
   const [showActions, setShowActions] = useState(false);
 
   return (
     <YCard marginBottom="$4" onPress={onPress} {...pressFeedbackStyle}>
       <YStack height={180} overflow="hidden" position="relative">
         <TripCoverImage uri={trip.imageUrl} trip={trip} />
-        {showSyncBadge && <SyncingResultBadge id={trip.id} />}
+        <SyncingResultBadge id={trip.id} />
 
         <XStack position="absolute" top="$3" left="$3" zIndex={2}>
           <UnsyncedBadge id={trip.id} status={trip.syncStatus ?? 'pending'} onImage />

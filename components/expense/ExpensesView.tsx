@@ -13,7 +13,7 @@ import FloatingActionButton from '../ui/button/FloatingActionButton';
 import { ExpenseCard } from './ExpenseCard';
 import ExpenseDayTotal from './ExpenseDayTotal';
 
-export function ExpensesView({ createdId }: { createdId?: string }) {
+export function ExpensesView() {
   const router = useRouter();
   const { activeTrip } = useTrips();
   const { expenses } = useExpenses();
@@ -74,14 +74,7 @@ export function ExpensesView({ createdId }: { createdId?: string }) {
                   <ExpenseDayTotal date={date} dayExpenses={dayExpenses} />
                   <YStack gap="$2">
                     {dayExpenses.map((expense) => (
-                      <ExpenseCard
-                        key={expense.id}
-                        expense={expense}
-                        showSyncBadge={
-                          expense.id === createdId &&
-                          (expense.syncStatus === 'pending' || expense.syncStatus === 'synced')
-                        }
-                      />
+                      <ExpenseCard key={expense.id} expense={expense} />
                     ))}
                   </YStack>
                 </YStack>

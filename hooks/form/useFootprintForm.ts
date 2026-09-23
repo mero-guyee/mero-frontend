@@ -101,9 +101,9 @@ export function useFootprintForm() {
     }
 
     try {
-      const created = await addFootprint({ ...footprintData, photoUris: photoUrls });
+      await addFootprint({ ...footprintData, photoUris: photoUrls });
       await draft.deleteDraft();
-      router.push(`/(main)/footprint?created=${created.id}`);
+      router.push('/(main)/footprint');
     } catch {
       Toast.show({
         type: 'error',

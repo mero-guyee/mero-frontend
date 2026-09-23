@@ -9,10 +9,9 @@ import { Expense } from '../../types';
 
 interface ExpenseCardProps {
   expense: Expense;
-  showSyncBadge?: boolean;
 }
 
-export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps) {
+export function ExpenseCard({ expense }: ExpenseCardProps) {
   const router = useRouter();
 
   return (
@@ -27,7 +26,7 @@ export function ExpenseCard({ expense, showSyncBadge = false }: ExpenseCardProps
       justifyContent="space-between"
       position="relative"
     >
-      {showSyncBadge && <SyncingResultBadge id={expense.id} />}
+      <SyncingResultBadge id={expense.id} />
       <XStack alignItems="flex-start" gap="$3">
         <YStack
           width={44}

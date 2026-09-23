@@ -12,10 +12,9 @@ import { Footprint } from '../../types';
 interface Props {
   footprint: Footprint;
   onPress: () => void;
-  showSyncBadge?: boolean;
 }
 
-export default function FootprintItem({ footprint, onPress, showSyncBadge = false }: Props) {
+export default function FootprintItem({ footprint, onPress }: Props) {
   const { data: photos = [] } = useFootprintPhotosQuery(footprint.id);
   const thumbnailUri = photos[0] ? photos[0].s3Url || photos[0].localUri : undefined;
   const thumbnailHash = photos[0]?.thumbhash ?? DEFAULT_THUMBHASH_PLACEHOLDER;
@@ -32,7 +31,7 @@ export default function FootprintItem({ footprint, onPress, showSyncBadge = fals
 
   return (
     <PressableYCard onPress={onPress} padding={0} marginBottom="$2" position="relative">
-      {showSyncBadge && <SyncingResultBadge id={footprint.id} />}
+      <SyncingResultBadge id={footprint.id} />
 
       {thumbnailUri ? (
         <YStack height={180} overflow="hidden" position="relative">
