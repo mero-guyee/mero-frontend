@@ -2,9 +2,9 @@ import { tokenStorage } from './tokenStorage';
 
 export const BASE_URL = process.env.EXPO_PUBLIC_TEST_BASE_URL;
 
-const REQUEST_TIMEOUT_MS = 2000;
-const RETRY_BASE_DELAY_MS = 500;
-const RETRY_MAX_DELAY_MS = 3000;
+const REQUEST_TIMEOUT_MS = 5000;
+const RETRY_BASE_DELAY_MS = 400;
+const RETRY_MAX_DELAY_MS = 2000;
 const RETRY_BUDGET_MS = 7000;
 
 export class ApiError extends Error {
@@ -14,6 +14,16 @@ export class ApiError extends Error {
   ) {
     super(message);
     this.name = 'ApiError';
+  }
+}
+
+export class NetworkTimeoutError extends Error {
+  constructor(
+    public timeoutMs: number,
+    public originalError: unknown
+  ) {
+    super(`요청이 ${timeoutMs}ms 내에 응답하지 않았습니다`);
+    this.name = 'NetworkTimeoutError';
   }
 }
 
@@ -83,13 +93,18 @@ async function fetchWithRetry(url: string, options: RequestInit): Promise<Respon
   const startAll = Date.now();
   for (let attempt = 0; ; attempt++) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    let timedOut = false;
+    const timeoutId = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, REQUEST_TIMEOUT_MS);
     try {
       const res = await fetch(url, { ...options, signal: controller.signal });
       return res;
     } catch (e) {
+      const error = timedOut ? new NetworkTimeoutError(REQUEST_TIMEOUT_MS, e) : e;
       const elapsed = Date.now() - startAll;
-      if (elapsed >= RETRY_BUDGET_MS) throw e;
+      if (elapsed >= RETRY_BUDGET_MS) throw error;
       const retryDelay = Math.min(RETRY_BASE_DELAY_MS * 2 ** attempt, RETRY_MAX_DELAY_MS);
       await delay(retryDelay);
     } finally {
