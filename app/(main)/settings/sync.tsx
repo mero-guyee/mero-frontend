@@ -87,7 +87,12 @@ export default function SyncStatusScreen() {
         text1: '동기화 시도',
         text2: `${DOMAIN_LABELS[entry.domain] ?? entry.domain} 항목을 다시 동기화하는 중입니다...`,
       });
-      await new OutboxRepository(db).resetBackoff(entry.domain, entry.dataId);
+      const outbox = new OutboxRepository(db);
+      await outbox.resetBackoff(entry.domain, entry.dataId);
+      if (entry.domain !== 'trips') {
+        await outbox.resetBackoffForDomain('trips');
+        await syncTrips(db);
+      }
       if (syncFn) await syncFn(db);
       await qc.invalidateQueries({ queryKey: outboxKey });
       await qc.invalidateQueries({ queryKey: [entry.domain] });
